@@ -13,6 +13,8 @@ jobs:
           node-version: '22'
       - name: Z-depth collector portable safety tests (not AE host tests)
         run: node scripts/test_acx_depth_probe.js
+      - name: Edge and frame-export portable safety tests (not AE host tests)
+        run: node scripts/test_acx_edge_render_probe.js
       - run: python -m pip install -r requirements-docs.txt
       - run: python -m unittest discover -s 18-SDK-HEADER-TOOLS/tests -v
       - run: >-
