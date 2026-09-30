@@ -1,5 +1,13 @@
 # Verification — v1.1
 
+## Supplied SDK and chapter review (2026-09-30)
+
+The user supplied `ae25.6_61.64bit.AfterEffectsSDK`. The uploaded Zstandard stream was decompressed and compared byte-for-byte with the separately uploaded TAR; they match. Source hashes and exact file/line references are recorded in [the supplied-SDK review](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md).
+
+This iteration expands the Effect anatomy and SmartFX chapters and adds an auxiliary-channel chapter. It verifies the described declarations, ownership rules and relevant Skeleton/SmartyPants source behavior. In particular, auxiliary-channel checkin and SmartFX world checkin have different documented contracts.
+
+**Scope: SDK source review and documentation.** No new native reader, compiled plug-in, AE render, importer qualification or concurrency run is claimed. The historical compiler baseline below was not repeated in this iteration and is not automatically attributed to the new upload. GitHub documentation validation is separate from native compilation and host execution.
+
 ## Recorded baseline (2026-09-30)
 
 - Adobe After Effects SDK **25.6 build 61**, locally supplied; proprietary headers are not redistributed.
