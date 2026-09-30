@@ -97,3 +97,12 @@ This is positive runtime evidence that the Anti-alias switch changes Z-Depth out
 The first Render Queue item reached DONE, but AE emitted two TIFF sequence files (`frame_00007.tif` and `frame_00008.tif`) for the requested interval. The v01 collector expected exactly one file and correctly stopped rather than silently accepting ambiguous output. Both files were non-empty (8,313,088 bytes). Their SHA-256 values are `dab1c4123afab941051ed69a4ac749b5ea70bfded5e578113f96939e8d7bf4d9` and `2669082a4b639d9d9480dcb636094a4e22ea3188d3e2908218797885c2c0d4d1`.
 
 Root cause: the requested duration equaled one composition frame while the recorded frame-aligned start/duration values straddled AE's Render Queue frame-boundary interpretation, so two sequence files were produced. Build `ACX-EDGE-20260930-02` uses a half-frame render duration after setting the aligned start; this preserves a single target frame while avoiding the boundary ambiguity. Host validation of v02 remains pending.
+
+
+## Sequence-output correction — build v04
+
+The subsequent v03 host run reproduced the same boundary behavior: Render Queue reached DONE and emitted more than one non-empty TIFF sequence member. This establishes that the previous exactly-one-file assertion was a collector assumption, not evidence of an Adobe effect/render failure.
+
+Build `ACX-EDGE-20260930-04` therefore keeps the full-frame Render Queue interval required by AE, requires at least one matching non-empty output, validates the signature of every matching sequence member, and records every member plus `framesProduced`. It does not silently choose one frame or weaken path/format validation.
+
+Host execution of v04 remains pending.
