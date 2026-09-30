@@ -574,3 +574,62 @@ PLUG_RoutineDescPriv::GetEntryPoint
 ```
 
 to prove how PiPL `EntryPointName = FilterMain` becomes the concrete function pointer.
+
+
+## Entry-point name → callable pointer bridge proven
+
+`PLUGp_LoadPlatRoutine(...)` calls:
+
+```text
+PLUG_RoutineDescPriv::GetEntryPoint(entryPointName)
+```
+
+and immediately stores the returned pointer into the public routine descriptor's callable slot:
+
+```asm
+bl   PLUG_RoutineDescPriv::GetEntryPoint(...)
+ldr  x8, [x19]
+str  x0, [x8, #0x8]
+```
+
+Therefore:
+
+```text
+PLUG_RoutineDesc + 0x08 = resolved entry-point function pointer
+```
+
+Inside `PLUG_RoutineDescPriv::GetEntryPoint(...)`, the plugin-backed path uses the plugin object held by the descriptor and invokes its virtual method at vtable offset `+0x68`. The entry-point-name argument remains in `x1` across that call, the returned function pointer arrives in `x0`, and that result is cached in `PLUG_RoutineDescPriv + 0x08`.
+
+Recovered core:
+
+```asm
+ldr  x0, [x19, #0x48]    ; plugin object/interface
+ldr  x8, [x0]
+ldr  x8, [x8, #0x68]
+blr  x8                  ; x1 = requested entry-point name
+str  x0, [x19, #0x08]   ; cache resolved function pointer
+```
+
+### End-to-end host-side chain now proven
+
+```text
+PiPL EntryPointName
+  → PLUG_RoutineDescPriv::GetEntryPoint(name)
+  → plugin/module entry-point lookup
+  → resolved function pointer
+  → PLUG_RoutineDesc + 0x08
+  → FLT_FCSpec::ReadyFilter
+  → FLT_FCSpec + 0xD0
+  → GetEffectProc()
+  → PluginDispatch[0]
+  → BLR
+```
+
+For the target PiPL:
+
+```text
+ADBE AUX CHANNEL EXTRACT
+EntryPointName = FilterMain
+```
+
+the remaining target-specific problem is no longer host dispatch. It is to identify which module/plugin object handles this hardcoded PiPL and what concrete address its entry-point lookup returns for `FilterMain`.
