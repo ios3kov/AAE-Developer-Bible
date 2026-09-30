@@ -9436,13 +9436,74 @@ The principal differences are output-domain conversion and pixel stride:
 
 This is strong static evidence of one conceptual auxiliary-channel algorithm implemented for three output depths, rather than three unrelated algorithms.
 
+
+
+## Additional exact formulas: byte RGB, UV, scalar-ID and datatype contracts
+
+A second cross-bit-depth pass resolves several previously open conversion details.
+
+### BKCR / byte RGB path
+
+The 8-bpc renderer's byte-RGB branch copies three adjacent source bytes directly into output RGB and writes output alpha = 255.
+
+The 16-bpc counterpart reads the same three byte components and maps them into AE's 16-bit domain using the float conversion visible in the function. The 32-bpc path divides by 255.0.
+
+This confirms that the byte-RGB family is a direct component visualization, not a luminance conversion.
+
+### TEXR / two-float path
+
+The 16-bpc TEXR block requires datatype FourCC `FLT4`, reads two consecutive 32-bit floats, converts each through the host float conversion callback, writes the two converted values to two output color components, explicitly writes the third component as zero, and writes opaque alpha.
+
+The 32-bpc block has the same two-component shape. The remaining uncertainty is only the human R/G naming of the two destination offsets; the arithmetic and zero third component are established.
+
+### OBID datatype and visualization
+
+The OBID block checks datatype FourCC `SU2T` and reads one unsigned 16-bit source value. In the 16-bpc renderer the scalar is transformed and then replicated to all three output color components. The 32-bpc path converts the unsigned-16 scalar to float and likewise replicates it.
+
+This establishes **scalar → grayscale RGB**. The exact user-visible wrap/bias rule for the 16-bit integer display still deserves a fixture because the machine code contains a conditional integer adjustment around the half-range boundary.
+
+### MATR datatype and visualization
+
+The MATR block checks datatype FourCC `UB1T`, reads one source byte, and replicates that value to R, G and B. The 8-bpc renderer does this directly; the 16-bpc renderer stores the scalar into each 16-bit color component; alpha is opaque.
+
+Thus Material ID is also rendered as grayscale, but it has a different source datatype from Object ID.
+
+### NRML datatype
+
+The normal branch checks datatype FourCC `FLT4`. This is consistent across the render implementations and supports the already reconstructed three-float normal visualization.
+
+### Depth datatype
+
+Both `DPTH` and `DPAA` converge on a branch that checks `FLT4` before the depth loop. The Black/White range and invert logic therefore operate on float auxiliary samples.
+
+### Missing datatype path
+
+When the acquired channel datatype does not match the expected FourCC, the render functions enter a shared error path that requests localized diagnostic ID 7 (`Datatype mismatch`), sets the host error-message flag, and returns an error status rather than silently reinterpreting the bytes.
+
+This behavior is now static-code evidence.
+
+## Revised compact channel contract
+
+| Machine channel | Expected source datatype observed in code | Output structure |
+|---|---|---|
+| `DPTH` / `DPAA` | `FLT4` | normalized grayscale RGB + opaque A |
+| `OBID` | `SU2T` | scalar grayscale RGB + opaque A |
+| `TEXR` | `FLT4` | two float components, third color component zero + opaque A |
+| `NRML` | `FLT4` | `(xyz + 1) * 0.5` visualization + opaque A |
+| `COVR` | still being isolated | dedicated scalar path |
+| `BKCR` | byte RGB family | direct RGB visualization + opaque A |
+| `UNCP` | byte RGB family in captured paths | direct RGB visualization + opaque A |
+| `MATR` | `UB1T` | byte scalar grayscale RGB + opaque A |
+
+FourCC datatype labels above are written exactly as reconstructed from the machine immediates. Their SDK typedef/enumeration spelling should be cross-checked before translating them into higher-level SDK names.
+
 ## Remaining algorithm gaps after cross-bit-depth pass
 
 Before claiming a bit-exact independent implementation, the following remain open:
 
 - exact COVR scalar formula;
-- exact OBID and MATR integer display conversion;
-- exact UV component-to-R/G ordering;
+- exact OBID half-range adjustment/wrap semantics at the user-visible boundary;
+- exact UV component-to-R/G naming (the two-component arithmetic itself is resolved);
 - exact DPTH vs DPAA selection condition and anti-alias semantics;
 - exact infinity/degenerate-range behavior;
 - effect of Clamp Output outside the depth path, if any;
@@ -10476,7 +10537,7 @@ Remaining:
 - [x] Decode ACX_Power2 (`2^n` over its signed-char input).
 - [ ] Map parameters/defaults/ranges. **Slots 1–6 and labels decoded; defaults/ranges still open.**
 - [x] Map channel cases with evidence. **Stored selector values 1–8 → OBID/TEXR/NRML/COVR/BKCR/UNCP/MATR/depth(DPTH|DPAA) decoded; UI/value translation caveat documented.**
-- [ ] Reconstruct 8/16/32-bpc pseudocode. **Cross-bit-depth decision tree plus NRML/BKCR/TEXR/UNCP/depth core reconstructed; COVR/ID and edge behavior remain.**
+- [ ] Reconstruct 8/16/32-bpc pseudocode. **Cross-bit-depth decision tree plus NRML/BKCR/TEXR/UNCP/depth core reconstructed; OBID/MATR datatypes and grayscale structure resolved; COVR and edge behavior remain.**
 - [ ] Missing-channel, range reversal/equal-limit, clamp and alpha behavior.
 - [ ] Controlled AE fixtures + output hashes.
 - [ ] CPU/GPU/MFR status.
