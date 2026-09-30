@@ -218,3 +218,82 @@ AUX CHANNEL identifier
 ```
 
 Only after that mapping is proven should algorithm reconstruction begin.
+
+
+## Dispatch path evidence — FLTHost / GenericPluginDispatch
+
+Further disassembly establishes an additional host-side dispatch layer.
+
+### Confirmed symbols
+
+```text
+FLTp_DispatchFilter(...)                    @ 0x98494
+FLTHost::DispatchFilter(...)                @ 0x38d60
+FLT_FCSpec::GetEffectProc() const           @ 0x5e2f0
+FLT_FCSpec::SetEffectProc(int (*)())        @ 0x5d0f8
+```
+
+### Confirmed call chain
+
+Inside `FLTp_DispatchFilter`, execution reaches:
+
+```text
+FLTHost::DispatchFilter(...)
+```
+
+Inside `FLTHost::DispatchFilter`, the host:
+
+1. obtains data from the `IFilterSpec` through virtual methods;
+2. constructs `U_GenericPluginDispatch<FLTHost::PluginDispatch>`;
+3. obtains effect metadata used for dispatch/reporting, including match name, display name and effect version;
+4. marks execution through `FLT_FilterCrashHandler::NotifyExecutingPluginCode`;
+5. invokes `DispatchWithOptionalMachineExceptionSupport(...)`;
+6. reports completion through `NotifyDoneExecutingPluginCode`.
+
+Relevant diagnostic literals in this path include:
+
+```text
+effectMatchName
+effectDisplayName
+effectVersion
+selector
+```
+
+This proves that the native FLT route is wrapped in the same generic plugin-dispatch/error-containment infrastructure before the concrete effect code is executed.
+
+### Important correction to earlier working hypothesis
+
+No direct call to `FLT_FCSpec::GetEffectProc()` was observed inside the recovered body of `FLTHost::DispatchFilter`.
+
+Therefore the currently supported path is:
+
+```text
+hardcoded PiPL / effect registration
+    ↓
+FLT registry / FLT_FCSpec
+    ↓
+FLTp_DispatchFilter
+    ↓
+FLTHost::DispatchFilter
+    ↓
+U_GenericPluginDispatch<FLTHost::PluginDispatch>
+    ↓
+DispatchWithOptionalMachineExceptionSupport
+    ↓
+[concrete PluginDispatch/native callback resolution — NEXT TARGET]
+```
+
+Do **not** yet claim that `FLTHost::DispatchFilter` itself directly calls the stored `EffectProc`.
+
+### Next reverse-engineering target
+
+Recover `FLTHost::PluginDispatch` and the generic dispatcher call operator to determine exactly where the concrete native callback is selected/invoked.
+
+Goal remains:
+
+```text
+ADBE AUX CHANNEL / ADBE AUX CHANNEL EXTRACT
+→ FLT effect record
+→ concrete native callback
+→ implementation
+```
