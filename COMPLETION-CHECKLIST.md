@@ -183,8 +183,8 @@ Where applicable:
 Already captured: physical module, FilterMain, selector table, named function boundaries, RenderX 8/16, FillInAllParams and evidence of inline 32-bpc processing.
 
 Remaining:
-- [ ] Complete static capture + binary hash.
-- [ ] Decode ACX_Power2.
+- [x] Complete static capture + binary hash (`412a6deefc1d7a710a9019b6a068180556417b0548d0703d34852bcd395dcab8`).
+- [x] Decode ACX_Power2 (`2^n` over its signed-char input).
 - [ ] Map parameters/defaults/ranges.
 - [ ] Map channel cases with evidence.
 - [ ] Reconstruct 8/16/32-bpc pseudocode.
