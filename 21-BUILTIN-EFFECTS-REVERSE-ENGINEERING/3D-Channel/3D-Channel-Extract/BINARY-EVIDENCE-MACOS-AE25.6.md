@@ -297,3 +297,60 @@ ADBE AUX CHANNEL / ADBE AUX CHANNEL EXTRACT
 → concrete native callback
 → implementation
 ```
+
+
+## Concrete generic-dispatch invocation recovered
+
+Further ARM64 disassembly identifies the actual indirect invocation performed by `U_GenericPluginDispatch<FLTHost::PluginDispatch>`.
+
+### Machine-exception path
+
+Inside `DispatchWithMachineExceptionSupport_Impl`:
+
+```asm
+0x3b51c  ldr x8, [x21]
+0x3b520  ldr w0, [x21, #0x8]
+0x3b524  ldp x1, x2, [x21, #0x10]
+0x3b528  ldp x3, x4, [x21, #0x20]
+0x3b52c  ldr x5, [x21, #0x30]
+0x3b530  blr x8
+```
+
+### Crash-info path
+
+Inside `DispatchWithCrashInfo_Impl`:
+
+```asm
+0x3b8cc  ldr x8, [x19]
+0x3b8d0  ldr w0, [x19, #0x8]
+0x3b8d4  ldp x1, x2, [x19, #0x10]
+0x3b8d8  ldp x3, x4, [x19, #0x20]
+0x3b8dc  ldr x5, [x19, #0x30]
+0x3b8e0  blr x8
+```
+
+This proves that the generic dispatch wrapper stores a callable target in the first machine word of its `PluginDispatch` payload and invokes it indirectly with six arguments reconstructed from the payload.
+
+### Correction
+
+The previously inspected lambda at `0x3d4b0` is **not** the effect callback. It builds crash diagnostic context (`U_GenericPluginDispatch.h`, `crash`, `Crashed with context`).
+
+### Updated proven chain
+
+```text
+hardcoded PiPL / FLT registration
+→ FLTp_DispatchFilter
+→ FLTHost::DispatchFilter
+→ U_GenericPluginDispatch<FLTHost::PluginDispatch>
+→ optional machine-exception / crash-context wrapper
+→ indirect callable invocation via BLR
+```
+
+### Remaining unknown
+
+The `BLR` target above is the callable stored in the `PluginDispatch` payload. We still need to trace **where that first word is initialized** and determine whether it is:
+
+1. `FLTHost::PluginDispatch::operator()` / an equivalent static thunk, which then resolves `FLT_FCSpec::GetEffectProc()`; or
+2. the concrete effect procedure itself.
+
+Next target: trace construction/copy of `FLTHost::PluginDispatch` into `U_GenericPluginDispatch` and identify the value placed at payload offset `+0x0`.
