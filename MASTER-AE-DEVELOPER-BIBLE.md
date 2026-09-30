@@ -8250,6 +8250,62 @@ ADBE AUX CHANNEL EXTRACT
 ```
 
 
+## RoutineDesc → EffectProc mapping proven
+
+`FLT_FCSpec::ReadyFilter()` establishes exactly how the concrete effect procedure is populated.
+
+Relevant recovered flow:
+
+```asm
+0x5cf1c  ldp  x21, x20, [x19, #0xc0]   ; shared_ptr<PLUG_RoutineDesc>
+...
+0x5cf9c  add  x0, sp, #0x8
+0x5cfa0  bl   PLUG_PrepRoutine(...)
+...
+0x5d020  ldp  x8, x20, [x19, #0xc0]    ; x8 = PLUG_RoutineDesc*
+...
+0x5d034  ldr  x8, [x8, #0x8]           ; routine entry pointer
+0x5d038  add  x10, x19, #0xd0
+0x5d03c  swpal x8, x8, [x10]            ; store EffectProc atomically
+```
+
+The same direct load/store path is used when there is no shared_ptr control block.
+
+### Proven structure relationship
+
+```text
+FLT_FCSpec + 0xC0
+  → PLUG_RoutineDesc*
+PLUG_RoutineDesc + 0x08
+  → concrete routine entry pointer
+FLT_FCSpec::ReadyFilter()
+  → PLUG_PrepRoutine(RoutineDesc)
+  → loads [RoutineDesc + 0x08]
+  → stores it atomically at [FLT_FCSpec + 0xD0]
+FLT_FCSpec::GetEffectProc()
+  → returns [FLT_FCSpec + 0xD0]
+FLTHost dispatch
+  → invokes that pointer through BLR
+```
+
+This closes the full host-side path from a prepared `PLUG_RoutineDesc` to the actual effect callback.
+
+### Remaining target-specific gap
+
+For **3D Channel Extract**, we still need to map:
+
+```text
+hardcoded PiPL:
+  MatchName = ADBE AUX CHANNEL EXTRACT
+  EntryPointName = FilterMain
+→ PLUG_RoutineDesc instance
+→ [RoutineDesc + 0x08]
+→ concrete EffectProc address
+```
+
+Next step: trace where `FLT_FCSpec + 0xC0` / `SetRoutineDescH()` is populated during registration/loading.
+
+
 ---
 
 <!-- SOURCE: 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/EXECUTION-PLAN.md -->
