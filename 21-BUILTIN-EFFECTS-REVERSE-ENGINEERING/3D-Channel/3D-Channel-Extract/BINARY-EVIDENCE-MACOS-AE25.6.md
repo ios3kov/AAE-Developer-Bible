@@ -687,3 +687,76 @@ PiPL
 The remaining question is no longer how `FilterMain` is obtained or propagated. It is to identify the **specific module/plugin object backing ADBE AUX CHANNEL EXTRACT** and the exact function address returned for `FilterMain`.
 
 Next: trace the plugin/module object stored in `PLUG_RoutineDescPriv +0x48/+0x50` for the hardcoded 3D Channel Extract PiPL.
+
+
+## Backing plugin object for RoutineDesc proven
+
+The constructors of `PLUG_RoutineDescPriv` show exactly how fields `+0x48/+0x50` are populated.
+
+### IPiPL + plugin path constructor
+
+For:
+
+```text
+PLUG_RoutineDescPriv(IPiPL, pluginFilePath)
+```
+
+the constructor:
+
+1. Stores the PiPL interface in the descriptor.
+2. Calls `ML::Plugin::CreateClassRef()`.
+3. Queries/casts that object to `ML::PluginImpl`.
+4. Stores the resulting plugin object/interface at `PLUG_RoutineDescPriv + 0x48/+0x50`.
+5. Calls `ML::PluginImpl::SetFullPath(pluginFilePath)`.
+
+Recovered core includes:
+
+```asm
+bl   ML::Plugin::CreateClassRef
+...
+blr  <query/cast to ML::PluginImpl>
+...
+str  x0, [x19, #0x48]
+str  q0, [x19, #0x50]
+...
+bl   ML::PluginImpl::SetFullPath(...)
+```
+
+### IPiPL + IPlugin constructor
+
+For:
+
+```text
+PLUG_RoutineDescPriv(IPiPL, IPlugin)
+```
+
+the constructor receives an existing plugin object, queries/casts it to `ML::PluginImpl`, and again stores the backing object/interface at `+0x48/+0x50`.
+
+### Consequence for entry-point resolution
+
+The previously recovered `GetEntryPoint(name)` path calls the virtual method at `ML::PluginImpl` vtable offset `+0x68`, so the final symbol resolution is performed by the backing MediaCore/ML plugin object.
+
+Updated chain:
+
+```text
+PiPL EntryPointName = "FilterMain"
+  → PLUG_RoutineDescPriv
+  → backing ML::PluginImpl (+0x48/+0x50)
+  → plugin entry-point lookup
+  → concrete function pointer
+  → PLUG_RoutineDesc +0x08
+  → FLT_FCSpec +0xD0
+  → host dispatch
+```
+
+### Remaining target-specific question
+
+For `ADBE AUX CHANNEL EXTRACT`, determine which `FLTp_FiltSetup` branch is used:
+
+```text
+IPiPL + pluginFilePath
+or
+IPiPL + existing IPlugin
+```
+
+and identify the backing module/path that resolves `FilterMain`.
