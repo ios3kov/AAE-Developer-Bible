@@ -12347,34 +12347,38 @@ The v0.4 tooling deliberately does **not** bundle Adobe SDK headers. Exact inven
 
 **v1.1 — verified SDK syntax baseline and reproducible documentation**
 
-Updated: **2026-09-30**. Previously recorded native compilation baseline: **Adobe SDK 25.6, macOS arm64, C++17**. That historical compiler result is separate from the new source-review milestone below.
+Updated: **2026-09-30**. Previously recorded native compilation baseline: **Adobe SDK 25.6, macOS arm64, C++17**. Historical compiler results are separate from the editorial/source-review milestones below.
 
 ## Current work — writing the Bible from the supplied SDK
 
-The user supplied `ae25.6_61.64bit.AfterEffectsSDK`. Its compressed/decompressed archives were checked for byte identity; the reviewed source files have recorded SHA-256 and line ranges. See [supplied SDK 25.6 review](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md).
+The user supplied `ae25.6_61.64bit.AfterEffectsSDK`. Its identity and reviewed source files are recorded in the [first supplied-SDK review](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md) and [parameter/pixel source review](18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md).
 
 Completed editorial changes:
 
-- [Effect anatomy](02-EFFECT-PLUGINS/01-ANATOMY.md): expanded from the actual handler declaration, lifecycle contracts and Skeleton sample.
-- [SmartFX](02-EFFECT-PLUGINS/03-SMARTFX.md): expanded dependency/rectangle/checkout-ID explanations, pre-render state, cleanup differences and documented SmartyPants limitations.
-- [Auxiliary channels](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md): new chapter covering semantic types, descriptors, requested/returned datatype, raw layout, missing-data distinctions and mandatory checkin.
-- Section navigation, verification boundaries and the atlas work-priority note now reference these chapters.
+- [Effect anatomy](02-EFFECT-PLUGINS/01-ANATOMY.md): handler declaration, registration, lifecycle and Skeleton source.
+- [Parameters and UI](02-EFFECT-PLUGINS/02-PARAMETERS-UI.md): expanded chapter on indexes/IDs, setup macros, animation versus interpolation, USER_CHANGED_PARAM versus UPDATE_PARAMS_UI, UI-only/button/disabled/hidden controls, default/range/Point units and sample discrepancies.
+- [SmartFX](02-EFFECT-PLUGINS/03-SMARTFX.md): dependency/rectangle/checkout-ID explanations, pre-render state, different cleanup contracts and documented SmartyPants limitations.
+- [Pixels, color and alpha](02-EFFECT-PLUGINS/06-COLOR-PIXELS.md): expanded chapter on actual ARGB formats, 16-bpc range 0..32768, typed access, rowbytes/origin, float/HDR, alpha mathematics, working-space color parameters and separation of world data from exported images.
+- [Auxiliary channels](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md): semantic types, descriptors, requested/returned datatype, raw layout, missing-data distinctions and mandatory checkin.
+- Section reading path and VERIFICATION now distinguish both source-review iterations from the earlier native compiler baseline.
 
-This advances documentation work and the source-review part of [plan stages 3–4](COMPLETION-PLAN.md), not the complete acceptance of those stages. **Native readout-adapter development is paused; the focus is the Bible, not a separate testing product.** No new AE run is requested.
+The second review identifies 15 SDK source files by SHA-256. Discrepancies in comments and samples are explicitly retained: the integer-range explanation has two numeric typos; Paramarama enums and setup order differ; Supervisor modifies popup fields outside the stated PF_UpdateParamUI whitelist. No new host bug reproduction is claimed. The declarations also explicitly allow iterate callbacks on multiple threads, so a single-frame workflow cannot be presumed single-threaded.
 
-Next editorial work: expand parameter/UI and color/pixel chapters against the supplied headers, then reconcile memory/MFR sections. Existing safety, reuse-audit, compiler and host gates remain as listed in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
+This advances documentation and source-review work in [plan stages 3–4](COMPLETION-PLAN.md), not the complete acceptance of those stages. **Native readout-adapter development remains paused; the deliverable is the Bible, not a separate testing product.** No new user AE run is requested.
+
+**Next editorial block: memory ownership, resource lifetime and MFR**, reconciling those contracts with the existing examples. Existing safety, reuse-audit, exact-compiler and host gates remain as listed in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
 
 ## Earlier baseline evidence
 
 - Native translation units and foundation headers passed strict syntax/type checks against a locally installed Adobe SDK 25.6 in the previously recorded baseline.
 - Python tests cover incomplete parsing, missing inputs, ignored comments, conflicting tables and function-field reordering.
-- Foundation tests exercise resource release, moves, acquisition failure, undo balance and callback exceptions.
-- MASTER, checksum manifest and MkDocs staging are generated by `scripts/build_docs.py`; CI checks freshness and builds the site.
+- Foundation tests cover resource release, moves, acquisition failure, undo balance and callback exceptions.
+- MASTER, checksum manifest and MkDocs staging are generated by `scripts/build_docs.py`; CI validates generated documentation and builds the site.
 - The header indexer fails closed on unsupported declarations. Full real SDK indexing remains **incomplete**, not a successful SDK validation.
 
 ## Verification boundaries
 
-Source review is not compilation. Syntax compilation does not establish linking, PiPL correctness, host loading, rendered pixels or MFR safety. No native reference binary in this edition is labelled host-verified. Windows compilation and reference-example AE host tests remain pending. An installed AE application is not evidence of a successful test.
+Source review is not compilation. The authored Markdown snippets in the new chapters illustrate isolated operations; their target-platform compilation, linking and host execution are NOT RUN. Syntax compilation does not establish PiPL correctness, host loading, pixels or MFR safety. No native reference binary in this edition is labelled host-verified. Windows compilation and reference-example AE host tests remain pending.
 
 Previously collected native-effect research remains separately scoped in the [evidence audit](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/EVIDENCE-AUDIT-2026-09-30.md); it is not full-effect acceptance.
 
