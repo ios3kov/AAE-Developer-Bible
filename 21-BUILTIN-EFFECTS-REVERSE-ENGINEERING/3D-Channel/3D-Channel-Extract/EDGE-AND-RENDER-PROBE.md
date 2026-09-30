@@ -78,3 +78,22 @@ The tests use a synthetic host/queue/filesystem and synthetic sample values. The
 ## API sources consulted
 
 [OutputModule API](https://ae-scripting.docsforadobe.dev/renderqueue/outputmodule/) documents template enumeration/application, read-only Format access and object invalidation after settings changes. [RenderQueueItem API](https://ae-scripting.docsforadobe.dev/renderqueue/renderqueueitem/) documents render flags, statuses, time-span settings and settings readback. These sources inform the new automation code; they are not substituted for measurements of the user's fixture.
+
+
+## Partial host run — 2026-09-30
+
+Run `ACX-EDGE-20260930-01-1790789109165-767655` reached edge sampling successfully and then stopped during the first frame-export validation.
+
+Preserved evidence identity:
+- supplied ZIP: `AE_Edge_Render_ACX-EDGE-20260930-01-1790789109165-767655.zip`;
+- report SHA-256: `0bd7ca686f6e4617ce07ea106bbd43951a2da6b261200a7a9cfc78ccf2c2d2a1`;
+- report status: `ERROR`; cleanup errors: 0;
+- six AA edge records are present, 1342 samples each;
+- at each of 8/16/32 bpc, AA ON differs from AA OFF at 84/1342 sampled locations;
+- maximum observed RGBA delta: 8 bpc `0.1254901886`, 16 bpc `0.1244201660`, 32 bpc `0.1243966520`.
+
+This is positive runtime evidence that the Anti-alias switch changes Z-Depth output at deliberately sampled boundaries in this fixture. It does not by itself identify DPTH versus DPAA callbacks.
+
+The first Render Queue item reached DONE, but AE emitted two TIFF sequence files (`frame_00007.tif` and `frame_00008.tif`) for the requested interval. The v01 collector expected exactly one file and correctly stopped rather than silently accepting ambiguous output. Both files were non-empty (8,313,088 bytes). Their SHA-256 values are `dab1c4123afab941051ed69a4ac749b5ea70bfded5e578113f96939e8d7bf4d9` and `2669082a4b639d9d9480dcb636094a4e22ea3188d3e2908218797885c2c0d4d1`.
+
+Root cause: the requested duration equaled one composition frame while the recorded frame-aligned start/duration values straddled AE's Render Queue frame-boundary interpretation, so two sequence files were produced. Build `ACX-EDGE-20260930-02` uses a half-frame render duration after setting the aligned start; this preserves a single target frame while avoiding the boundary ambiguity. Host validation of v02 remains pending.
