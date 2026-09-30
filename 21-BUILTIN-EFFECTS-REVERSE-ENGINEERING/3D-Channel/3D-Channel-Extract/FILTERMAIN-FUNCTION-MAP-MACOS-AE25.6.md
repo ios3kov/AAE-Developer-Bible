@@ -260,12 +260,89 @@ The following are plausible from the structure but remain intentionally unpromot
 - interaction of Invert Depth Map with Black/White Point and Clamp Output;
 - performance and concurrency characteristics.
 
+
+
+## Parameter checkout map from FillInAllParams
+
+The complete `FillInAllParams` body is now decoded far enough to establish its checkout contract.
+
+It performs six host parameter checkouts, using indices **1 through 6**, and checks each one back in after copying the returned `PF_ParamDef` data into a contiguous local aggregate used by the render/event code.
+
+The parameter-setup branch independently requests localized strings in this order:
+
+| Effect parameter slot | Localization ID | Observed label |
+|---:|---:|---|
+| 1 | 1 | `3D Channel` |
+| 2 | 8 | `Black Point` |
+| 3 | 9 | `White Point` |
+| 4 | 20 | `Anti-alias` |
+| 5 | 21 | `Clamp Output` |
+| 6 | 22 | `Invert Depth Map` |
+
+This gives a direct parameter-slot mapping, not merely a list of strings found in the binary.
+
+`FillInAllParams` itself does not establish the human meaning of every copied field. Exact defaults, numeric limits and UI enable/disable dependencies still require decoding the setup structures and/or host observation.
+
+## Channel selector dispatch decoded
+
+The render functions load the channel selector, subtract one, and dispatch through an eight-entry byte jump table at image-relative `0xB4FA`. The table bytes are:
+
+```text
+26 15 18 1B 1E 21 24 00
+```
+
+with branch base `0x6644` in the 16-bpc specialization. This establishes the following **stored-selector-value → machine channel identifier** map:
+
+| Stored selector value | Branch | Identifier integer | ASCII FourCC |
+|---:|---:|---:|---|
+| 1 | fall-through to `0x66DC` | `0x4F424944` | `OBID` |
+| 2 | `0x6698` | `0x54455852` | `TEXR` |
+| 3 | `0x66A4` | `0x4E524D4C` | `NRML` |
+| 4 | `0x66B0` | `0x434F5652` | `COVR` |
+| 5 | `0x66BC` | `0x424B4352` | `BKCR` |
+| 6 | `0x66C8` | `0x554E4350` | `UNCP` |
+| 7 | `0x66D4` | `0x4D415452` | `MATR` |
+| 8 | `0x6644` | conditional | `DPTH` or `DPAA` |
+
+The depth branch selects between `DPTH` and `DPAA` using additional parameter/state tests before joining the common channel-acquisition path.
+
+This table is **PROVEN for the stored selector values used by the machine code**. It must not yet be rewritten as a final UI-order table: the localized eight-name string is stored as `Z-Depth|Object ID|Texture UV|Surface Normals|Coverage|Background RGB|Unclamped RGB|Material ID`, while the machine selector values above place the depth path at stored value 8. The UI/value translation needs one more setup/host check before those two representations are reconciled.
+
+### Identifier interpretation status
+
+The following semantic readings are strongly supported by both their FourCC spelling and the localized mode inventory:
+
+- `OBID` — Object ID
+- `TEXR` — texture-related channel
+- `NRML` — Surface Normals
+- `COVR` — Coverage
+- `BKCR` — Background RGB/color
+- `UNCP` — Unclamped RGB/color
+- `MATR` — Material ID
+- `DPTH` / `DPAA` — depth variants
+
+The Bible keeps the machine identifiers and UI labels separate until the exact host/API mapping is independently tied down.
+
+## Render case tree: first exact branches
+
+The 16-bpc renderer compares the acquired channel identifier and channel datatype before entering specialized loops. The static capture already proves several structural facts:
+
+- channel acquisition happens before pixel iteration;
+- a channel-availability flag is tested and a missing/unavailable channel exits the processing path;
+- channel datatype is checked before a specialized conversion loop;
+- the output loop writes 16-bit AE pixels with an 8-byte stride;
+- some branches explicitly fill output alpha while channel data populate RGB;
+- depth/range values are converted to float and ordered with `min/max`-style floating comparisons before channel processing;
+- `UNCP`, `COVR`, `OBID`, `TEXR` and the remaining identifiers enter distinct conversion blocks rather than one generic RGB-copy routine.
+
+The exact arithmetic of each block is being reconstructed next. Until that is complete, these structural observations should not be summarized as a single universal normalization formula.
+
 ## Updated reconstruction workflow
 
 The static-capture milestone is complete. The next reconstruction pass should work from the captured file rather than collecting more overlapping LLDB excerpts:
 
-1. decode `FillInAllParams` and parameter setup into a parameter-index table;
-2. decode the eight channel-case targets and four-character identifiers;
+1. ~~decode `FillInAllParams` and parameter setup into a parameter-index table;~~ **Complete for slots 1–6; defaults/ranges remain.**
+2. ~~decode the eight channel-case targets and four-character identifiers;~~ **Complete for stored selector values; UI/value translation remains.**
 3. annotate the 8-bit and 16-bit functions side-by-side;
 4. annotate the inline 32-bpc path;
 5. derive pseudocode only after each arithmetic block has a channel identity;
