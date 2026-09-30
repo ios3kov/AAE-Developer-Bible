@@ -16,6 +16,8 @@ jobs:
           -I19-NATIVE-CODE-FOUNDATION/code
           19-NATIVE-CODE-FOUNDATION/tests/test_foundation.cpp -o /tmp/foundation-test
       - run: /tmp/foundation-test
-      - run: python scripts/build_docs.py --check
-      - run: python scripts/build_docs.py
+      - name: Verify generated documentation
+        run: |
+          python scripts/build_docs.py
+          git diff --exit-code -- MASTER-AE-DEVELOPER-BIBLE.md MANIFEST.sha256
       - run: mkdocs build --strict
