@@ -1,0 +1,43 @@
+name: ACX input qualification
+on:
+  push:
+    paths:
+      - 'scripts/acx_fixture_candidate.py'
+      - 'scripts/test_acx_fixture_candidate.py'
+      - '.github/workflows/acx-fixture.yml'
+  pull_request:
+    paths:
+      - 'scripts/acx_fixture_candidate.py'
+      - 'scripts/test_acx_fixture_candidate.py'
+      - '.github/workflows/acx-fixture.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  qualify-file-inputs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Portable fixture safety and structure tests (not AE)
+        run: python -m unittest discover -s scripts -p test_acx_fixture_candidate.py -v
+      - name: Install pinned independent OpenEXR reader
+        run: python -m pip install --only-binary=:all: OpenEXR==3.3.3 numpy==1.26.4
+      - name: Generate deterministic source data
+        run: python scripts/acx_fixture_candidate.py build ACX_Input_Candidate --source-commit "$GITHUB_SHA"
+      - name: Decode and compare every input plane with the reference library
+        run: python scripts/acx_fixture_candidate.py verify ACX_Input_Candidate --reference > ACX_Input_Candidate/reference-validation.json
+      - name: Include provenance and instructions
+        run: |
+          cp scripts/acx_fixture_candidate.py scripts/test_acx_fixture_candidate.py ACX_Input_Candidate/
+          cp 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/AUXILIARY-FIXTURE-CANDIDATE.md ACX_Input_Candidate/README.md
+      - name: Preserve candidate only after reference validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: ACX-input-candidate-${{ github.sha }}
+          path: ACX_Input_Candidate/
+          if-no-files-found: error
+          retention-days: 90
