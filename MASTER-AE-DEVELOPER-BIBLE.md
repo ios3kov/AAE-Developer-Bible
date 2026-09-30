@@ -9635,235 +9635,107 @@ This milestone records the function map and dispatch evidence only. Algorithm eq
 # 3D Channel Extract — Runtime Acceptance Protocol
 
 Target: **After Effects 25.6.0.101 / macOS arm64**  
-Binary identity from static capture: SHA-256 `412a6deefc1d7a710a9019b6a068180556417b0548d0703d34852bcd395dcab8`
-
-Purpose: close only facts that static disassembly cannot prove. Record observed values; do not infer missing behavior.
-
-## Required runtime gates
-
-- [ ] UI menu item ↔ stored selector integer mapping
-- [ ] Parameter defaults and ranges
-- [ ] Anti-alias OFF → DPTH/DPAA identity
-- [ ] Anti-alias ON → DPTH/DPAA identity
-- [ ] Clamp Output behavior
-- [ ] Invert Depth Map behavior
-- [ ] Black Point == White Point
-- [ ] reversed Black/White points
-- [ ] Plus Infinity
-- [ ] Minus Infinity
-- [ ] missing channel behavior/error
-- [ ] datatype mismatch behavior/error where a controlled fixture permits it
-- [ ] 8-bpc pixel fixture
-- [ ] 16-bpc pixel fixture
-- [ ] 32-bpc pixel fixture
-- [ ] Object ID boundary behavior
-- [ ] alpha behavior
-- [ ] CPU/GPU/MFR runtime status
-
-## Evidence rule
-
-For each observation record:
+Previously captured binary SHA-256: `412a6deefc1d7a710a9019b6a068180556417b0548d0703d34852bcd395dcab8`  
+Current status: **qualitative user-run observations exist; numerical batch collection is prepared, not yet host-verified. Gate 8 remains open.**
 
-```text
-Repository commit:
-AE exact build:
-OS:
-Composition/project:
-Renderer/source:
-Project bit depth:
-Effect parameter values:
-Expected question:
-Observed UI/output:
-Pixel values or output hash:
-Screenshot/log reference:
-PASS / FAIL / UNAVAILABLE:
-Notes:
-```
+## Current source constraints — corrections, not new runtime results
 
-## Phase A — parameter/UI inspection
+Adobe documents that the **3D Channel popup is disabled on a nested composition**. A disabled popup on DEPTH_SOURCE inside DEPTH_TEST is expected behavior, not evidence of a damaged plug-in. Resetting, reinstalling, duplicating the layer or restarting AE is not a remedy for this documented restriction.
 
-On a layer where the effect is available, record the exact visible defaults and allowed values for:
+Adobe describes **Clamp Output as a 32-bpc-only control** and separately states that nested-composition depth is clamped to 0–1 at 32 bpc. Do not infer from a grey checkbox at another bit depth that Classic 3D never supports the control. A stored checkbox value, a script accepting a write, UI availability and an observable pixel change are four different observations.
 
-1. 3D Channel
-2. Black Point
-3. White Point
-4. Anti-alias
-5. Clamp Output
-6. Invert Depth Map
+Source: [Adobe — 3D Channel effects, Anti-alias and Extract a depth pass](https://helpx.adobe.com/after-effects/desktop/apply-effects-and-animation-presets/list-of-effects/3d-channel-effects.html), reviewed 2026-09-30. These statements are **vendor documentation**, not additional measurements of the supplied fixture.
 
-Cycle the 3D Channel popup through all eight entries and record any parameter enable/disable changes.
+The user confirmed that **Anti-alias can be clicked** in the nested-depth fixture. Earlier conclusions based only on its grey appearance must not override that interaction evidence. A screenshot cannot establish that a particular private FourCC, such as DPAA, was requested.
 
-## Phase B — selector and DPTH/DPAA
+## Existing observations and their limits
 
-Use LLDB only to observe, not patch, the target binary.
+The chronological record before this correction remains available at [the pinned pre-correction revision](https://github.com/ios3kov/AAE-Developer-Bible/blob/c240edf6e59f8fb6305a3547f2b79301e1795353/21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/RUNTIME-ACCEPTANCE-MACOS-AE25.6.md). The table below preserves the observations while correcting overly broad interpretations.
 
-Break on the common channel-acquisition area after the channel FourCC has been selected. For each UI popup item record the selected machine FourCC. Repeat Z-Depth with Anti-alias OFF and ON.
+| Observation on 2026-09-30 | Evidence scope | Current interpretation |
+|---|---|---|
+| Popup on a plain Black Solid listed Z-Depth, Object ID, Texture UV, Surface Normals, Coverage, Background RGB, Unclamped RGB, Material ID | User screenshots | UI order observed. No proof of the underlying selector/FourCC mapping or availability of those channels. |
+| Initial visible values: Black 5000, White 0, AA OFF, Clamp stored ON, Invert OFF | User screenshots | Values observed. Not a complete allowed-range or enablement test. |
+| Several subordinate controls appeared grey while cycling non-depth items on the solid | Appearance only | Do not promote visual styling into a universal source-dependent enablement rule. |
+| Nested source with a camera and three 3D solids produced distinct grayscale areas | User-built fixture and screenshot | Qualitative depth response observed; geometry and exact sample values were not independently captured. |
+| Invert ON with Black 5000 / White 0 changed depth-ramp orientation | Screenshot at 17:47 | Qualitative inversion observed. Exact numerical complement remains open. |
+| Black = White = 1000 produced a uniform mid-grey field, without a visible error dialog | Screenshot at 17:48 | Degenerate-range response observed. Screenshot does not establish an exact scalar or general absence of errors. |
+| Black 0 / White 5000 with Invert OFF reversed the previous ramp orientation | Screenshot at 17:48 | Qualitative endpoint reversal observed. |
+| User subsequently reported Collapse Transformations had been ON during earlier runs | User report | Earlier inversion/equal/reversal observations must be labelled Collapse ON, user-reported; not reused as OFF-baseline acceptance. |
+| Collapse was then switched OFF and a new depth image supplied at 17:51 | User action and screenshot | Separate OFF fixture state. Do not pool ON/OFF images as identical test inputs. |
+| Black 1000 / White 2000 was displayed with Clamp stored ON | User screenshot | A single setting cannot establish an ON/OFF clamp difference. The earlier claim that this completed the clamp test was too strong. |
+| Anti-alias was reported clickable and an enabled-state image supplied at 17:57 | User interaction and screenshot | Checkbox interaction observed. DPTH/DPAA identity and numerical edge differences remain open. |
+| Popup stayed disabled after resets and restarts on the precomp | User report plus Adobe documentation | Expected nested-composition restriction, not a reproduced state/UI bug. |
 
-Acceptance result should produce a table:
+Screen captures are qualitative evidence. Their display-managed RGB is not raw effect output. No new runtime test is marked PASS merely because this document or a script has been created.
 
-| UI item | stored selector | FourCC | datatype |
-|---|---:|---|---|
-| Z-Depth | | | |
-| Object ID | | | |
-| Texture UV | | | |
-| Surface Normals | | | |
-| Coverage | | | |
-| Background RGB | | | |
-| Unclamped RGB | | | |
-| Material ID | | | |
+## Next: one numerical observation batch
 
-## Phase C — depth edge fixtures
+Use [ACX_Depth_Probe.jsx](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/../../../scripts/ACX_Depth_Probe.jsx) with the existing open project. `DEPTH_TEST` must contain one **2D precomp layer**, with only `3D Channel Extract` on that layer. The script validates this instead of guessing which layer to modify.
 
-With a source that exposes depth data, capture the same pixels under:
+Run **File > Scripts > Run Script File** and select the JSX. It creates a unique `AE_Depth_...` folder on Desktop containing `report.json`. If file writing is denied, it stops before duplicating the composition and explains the scripting permission needed. It never changes that preference itself.
 
-1. normal Black < White;
-2. Invert ON;
-3. Clamp OFF/ON with samples outside range;
-4. Black == White;
-5. Black > White;
-6. +Infinity sample if source can produce it;
-7. -Infinity sample if source can produce it;
-8. Anti-alias OFF/ON.
+### Batch matrix
 
-Record raw source depth where observable and output RGBA at 8/16/32 bpc.
+Each of the following is requested at **8, 16 and 32 project bpc**, at one recorded time and 45 layer-space sample locations:
 
-## Phase D — channel fixtures
+| Case | Black / White | Invert | AA | Collapse | Effect |
+|---|---|---|---|---|---|
+| baseline | 5000 / 0 | OFF | OFF | OFF | ON |
+| invert | 5000 / 0 | ON | OFF | OFF | ON |
+| equal | 1000 / 1000 | OFF | OFF | OFF | ON |
+| reversed | 0 / 5000 | OFF | OFF | OFF | ON |
+| narrow | 1000 / 2000 | OFF | OFF | OFF | ON |
+| narrow_aa | 1000 / 2000 | OFF | ON | OFF | ON |
+| collapse_on | 5000 / 0 | OFF | OFF | ON | ON |
+| source_color_control | 5000 / 0 | OFF | OFF | OFF | OFF |
+| baseline_repeat | 5000 / 0 | OFF | OFF | OFF | ON |
 
-For every available channel select at least one known non-zero pixel and record output RGBA at 8/16/32 bpc.
+One additional **32-bpc-only** case requests Clamp OFF with Black 1000 / White 2000. Total: **28 planned records**. Accepted writes and parameter readbacks are logged separately from image samples. The popup is not forced to another channel. The script does not manufacture infinity, ID or datatype-mismatch fixtures.
 
-Special cases:
+### Measurement contract
 
-- Object ID: test 0, 1, values around 32767/32768 if controllable, and max available.
-- Texture UV: choose a pixel with non-equal U/V to establish component ordering.
-- Normals: choose a non-symmetric normal to establish XYZ→RGB ordering.
-- Coverage: choose fractional coverage if controllable.
-- Background RGB: choose distinct R/G/B bytes.
-- Unclamped RGB: include a component outside 0..1 if source permits.
-- Material ID: test at least 0, 1 and a larger ID.
+The sampler uses a temporary Source Text expression and `sampleImage(point, [0.5,0.5], true, time)`, read through `valueAtTime(time, false)`. It records RGBA, parameter names/match names/values/available numeric bounds, project bit depth, renderer, color-management settings and run identity.
 
-## Phase E — unavailable/error behavior
+This is **alpha-weighted expression sampling after the layer's effects**, not a raw output-file render, frame hash or final-composition screenshot. The 45-point grid can miss anti-aliased edges or small objects. Lack of a difference in this grid does not prove lack of an effect. A warm repeated sample does not prove cold-cache behavior or MFR safety.
 
-Apply the effect to a source without auxiliary 3D data and record:
+Sources: [Adobe expression-language reference](https://helpx.adobe.com/after-effects/desktop/work-with-expressions/expression-language-reference/expression-language-reference.html) and the maintained [After Effects Scripting Guide — Property.valueAtTime](https://ae-scripting.docsforadobe.dev/property/property/#propertyvalueattime).
 
-- visible output;
-- error text;
-- return/error behavior;
-- whether alpha/RGB are cleared or preserved.
+### Safety and failure behavior
 
-If a controlled datatype mismatch can be produced without binary modification, record it. Otherwise mark it UNAVAILABLE rather than manufacturing evidence.
+Only a disposable duplicate of the outer composition is edited. The nested source is referenced read-only; its layers are not rebuilt. The script does not save or overwrite the input AEP, alter preferences, purge caches, touch the Render Queue or patch a binary. It restores project bpc and removes its temporary composition in `finally`. A cleanup failure is an error. The project can remain marked dirty due to temporary edits; the original disk file remains unchanged by the script.
 
-## Phase F — runtime architecture
+A checkpoint is written before each host sampling call. A crash/hang can leave `RUNNING`, never an invented PASS. The 180-second budget is checked **between** host calls and cannot interrupt a hung AE. The collector stops on a failed core setting or malformed sample rather than repeating a broken operation. Retain any partial report.
 
-Record:
+`COLLECTED`/`RECORDED` are acquisition states, **not test acceptance statuses**. Review the returned report and define supported numerical comparisons before closing gates. The report does not export the live AEP or prove the identity of the loaded native binary.
 
-- whether AE reports the effect as CPU/GPU accelerated;
-- behavior under Multi-Frame Rendering;
-- whether concurrent renders remain deterministic;
-- whether 8/16/32 bpc produce equivalent normalized results within expected quantization.
+## Remaining full-effect acceptance gates
 
-## Completion condition
+- [ ] UI menu item / stored integer / private FourCC mapping, using appropriate source and evidence.
+- [ ] Parameter defaults, allowed ranges and source/bit-depth-dependent UI availability.
+- [ ] AA OFF/ON channel identity and edge-specific numerical samples.
+- [ ] Clamp behavior, separating general 32-bpc control from nested-source policy.
+- [ ] Invert, equal endpoints and reversed endpoints: numerical comparison with known Collapse state.
+- [ ] Controlled positive/negative infinity input, or an explicit fixture limitation.
+- [ ] Missing-channel behavior, visible output and return/error reporting.
+- [ ] Controlled datatype mismatch, or an explicit fixture limitation.
+- [ ] Raw 8/16/32-bpc renders, input/output identities and applicable tolerance checks.
+- [ ] Object ID boundary values and Material ID samples from a suitable auxiliary source.
+- [ ] UV, normals, coverage, background and unclamped color from suitable auxiliary sources.
+- [ ] Alpha and out-of-bounds behavior, including edge coverage.
+- [ ] Effect-level CPU/GPU evidence, not merely the project's renderer setting.
+- [ ] Real MFR/concurrent-render determinism and repeat/cold-cache checks.
+- [ ] Independent implementation compared against controlled native-effect outputs.
 
-This protocol is complete only when every gate above is PASS or explicitly UNAVAILABLE with a reason. Static evidence may explain a runtime observation but may not replace it.
+A fixture limitation is BLOCKED or N/A with a reason, not PASS for the whole plug-in. Scope exclusion requires an explicit decision. Numerical collection does not by itself close bit-exact reconstruction or the complete atlas pilot.
 
+## Collector validation record
 
-## Runtime observation 2026-09-30 — plain Black Solid
+Build: `ACX-PROBE-20260930-01`. Source: script introduced at `76dfdbbc18f7a1586aadea2a90dcb3e92d15eebd`; portable tests at `f23163ec54bd614d0ae34c1de7004192d9697eb8`.
 
-Host UI observation on a plain Black Solid confirms the popup order:
+Local Node 22.16: **13 portable control-flow/safety tests PASS** via `node scripts/test_acx_depth_probe.js`. ECMAScript 3 syntax parsed successfully with Node's bundled Acorn 8.14.1 after removing the Adobe `#target` directive. These checks cover run count, source isolation, restoration, filesystem failure, malformed observations, ignored clamp requests and interrupted runs. They do not emulate Adobe's effect algorithm.
 
-1. Z-Depth
-2. Object ID
-3. Texture UV
-4. Surface Normals
-5. Coverage
-6. Background RGB
-7. Unclamped RGB
-8. Material ID
-
-Observed initial values with Z-Depth selected:
-
-- Black Point = 5000.0
-- White Point = 0.0
-- Anti-alias = OFF
-- Clamp Output = ON
-- Invert Depth Map = OFF
-
-On this source, Anti-alias and Clamp Output are visually disabled for Z-Depth. This must not be generalized to a source that actually exposes auxiliary depth data.
-
-For every non-depth selection observed (Object ID, Texture UV, Surface Normals, Coverage, Background RGB, Unclamped RGB, Material ID), all five subordinate controls are visually disabled while retaining their stored values:
-
-- Black Point = 5000.0
-- White Point = 0.0
-- Anti-alias = OFF
-- Clamp Output = ON
-- Invert Depth Map = OFF
-
-This proves a UI dependency on channel/source state and confirms that the stored parameter values survive while controls are disabled. It does **not** yet prove the enabled-state rules on a real auxiliary-channel source.
-
-### Status updates
-
-- [x] UI popup order observed directly.
-- [x] Initial visible stored values observed on plain Black Solid.
-- [x] Non-depth disabled-control behavior observed on plain Black Solid.
-- [ ] Exact popup stored integer ↔ FourCC still requires LLDB observation.
-- [ ] Enabled-state/default/range behavior on an actual 3D auxiliary source remains open.
-
-
-## Runtime observation 2026-09-30 — nested Classic 3D source
-
-A controlled nested composition was created with a camera and three 3D solids at different Z positions, then used as a single precomp layer in DEPTH_TEST with 3D Channel Extract set to Z-Depth.
-
-Observed result: the effect produces distinct grayscale regions instead of the uniform output seen on a plain solid. This confirms that the nested Classic 3D composition exposes usable depth auxiliary data to 3D Channel Extract and that the recovered depth render path is active in the tested host.
-
-Visible stored values remain Black Point 5000.0, White Point 0.0, Anti-alias OFF, Clamp Output ON, Invert Depth Map OFF.
-
-This screenshot is qualitative evidence only. Display-managed screenshot RGB values are not accepted as bit-exact pixel evidence; exact 8/16/32 values still require controlled render/output sampling.
-
-
-## Runtime observation 2026-09-30 — Invert Depth Map
-
-Using the validated nested Classic 3D fixture, Z-Depth was observed with Black Point 5000.0, White Point 0.0, Clamp Output ON, Anti-alias OFF.
-
-With Invert Depth Map enabled, the visible depth ordering reverses relative to the prior non-inverted observation: the outside/background region becomes white, the larger depth region becomes light gray, and the nearer central region becomes darker gray.
-
-This runtime result is consistent with the statically reconstructed endpoint/range inversion path. It proves observable inversion of the depth visualization for this fixture. Screenshot colors are qualitative evidence only; bit-exact complement values remain for output sampling.
-
-- [x] Invert Depth Map behavior: qualitative runtime PASS.
-
-
-## Runtime observation 2026-09-30 — degenerate depth range
-
-Fixture: validated nested Classic 3D depth source.
-
-Parameters:
-- Black Point = 1000.0
-- White Point = 1000.0
-- Invert Depth Map = OFF
-- Anti-alias = OFF
-- Clamp Output stored ON
-
-Observed result: the composition becomes a uniform mid-gray field; the previously visible depth regions disappear. AE does not visibly crash or present an error dialog in this observation.
-
-This confirms that the Black == White path has an explicit finite fallback rather than exposing an obvious divide-by-zero failure. The screenshot alone does not establish the exact numeric fallback value, so the static constant and runtime pixel value must remain separate until sampled from rendered output.
-
-- [x] Black Point == White Point: qualitative runtime PASS.
-
-
-## Runtime observation 2026-09-30 — reversed Black/White endpoints
-
-Fixture: validated nested Classic 3D depth source.
-
-Parameters:
-- Black Point = 0.0
-- White Point = 5000.0
-- Invert Depth Map = OFF
-- Anti-alias = OFF
-- Clamp Output stored ON
-
-Observed result: the depth ordering is visually the same orientation as the prior Invert-ON test with endpoints 5000→0: background/outside is white, the larger region is light gray, and the nearer central region is darker gray.
-
-This confirms that swapping the Black/White endpoints reverses the displayed depth ramp independently of the Invert checkbox. It is consistent with the reconstructed code that orders the clipping interval separately from the mapped output endpoints.
-
-- [x] Reversed Black/White points: qualitative runtime PASS.
+**Collector execution inside After Effects: NOT RUN by the assistant.** The user's first returned `report.json` is the next evidence to review; it is not pre-labelled as a successful host run.
 
 
 ---
