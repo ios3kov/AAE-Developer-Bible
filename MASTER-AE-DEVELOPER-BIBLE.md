@@ -9380,9 +9380,7 @@ This proves a two-component UV-style visualization structure. Exact R/G componen
 
 ### UNCP — unclamped color
 
-The UNCP branch accepts an 8-bit channel representation and processes three byte components. The float path divides each byte by 255.0; the 16-bit path performs the corresponding scale to the 16-bit AE pixel domain. Alpha is opaque.
-
-This is structurally similar to BKCR, but they remain distinct auxiliary channels.
+**Superseded by the full branch pass below:** UNCP is a three-component `FLT4` path, not byte RGB. See **Coverage and Unclamped RGB resolved**.
 
 ### MATR — Material ID
 
@@ -9482,6 +9480,102 @@ When the acquired channel datatype does not match the expected FourCC, the rende
 
 This behavior is now static-code evidence.
 
+
+
+## Coverage and Unclamped RGB resolved
+
+The remaining major channel branches can now be separated correctly.
+
+### COVR — Coverage
+
+The COVR branch requires `FLT4`. It reads a single 32-bit float auxiliary sample, passes it through the host float conversion callback used elsewhere by this effect, and **replicates the resulting scalar to R, G and B**. Alpha is opaque.
+
+Cross-depth structure:
+
+```cpp
+coverage = host_float_convert(src_float);
+out.a = opaque;
+out.r = coverage;
+out.g = coverage;
+out.b = coverage;
+```
+
+The 8- and 16-bpc implementations perform the corresponding conversion into their integer output domains.
+
+The localization string `Coverage %.2f` independently confirms that Coverage is treated as a scalar value by the effect UI/event path. This closes the previously open Coverage formula at the structural level.
+
+### UNCP — Unclamped RGB correction
+
+Earlier notes classified UNCP with the byte-RGB family. The full branch analysis corrects that.
+
+UNCP requires `FLT4` and reads **three float components**. Each component is converted independently through the host float conversion callback and written to RGB; alpha is opaque.
+
+Conceptually for 32-bpc output:
+
+```cpp
+out.a = 1.0f;
+out.r = host_float_convert(src[0]);
+out.g = host_float_convert(src[1]);
+out.b = host_float_convert(src[2]);
+```
+
+The 8/16-bpc paths then quantize/scale those converted float values into their output domains. This matches the localization format `Unclamped Color %.1f %.1f %.1f`.
+
+Therefore **BKCR and UNCP are not the same source datatype**:
+
+- BKCR is byte RGB/color data;
+- UNCP is three-component float color data.
+
+## Event/UI evidence
+
+The binary's localized event strings expose the values the custom interaction path can inspect/display:
+
+- `Layer Coordinates: %d, %d`
+- `Depth %.2f`
+- `Depth not available`
+- `Normal %.2f, %.2f, %.2f`
+- `Texture uv %.2f, %.2f`
+- `Coverage %.2f`
+- `Object ID %d`
+- `Background Color %d %d %d`
+- `Unclamped Color %.1f %.1f %.1f`
+- `Material ID %d`
+
+This is useful corroboration of channel dimensionality, but string presence alone is not a substitute for the render-loop evidence above.
+
+## Near-complete static reconstruction status
+
+At this point all eight channel families have a statically identified source shape and output visualization structure:
+
+| UI concept | Machine channel | Source shape observed | Visualization |
+|---|---|---|---|
+| Z-Depth | `DPTH` / `DPAA` | float scalar | Black/White normalized grayscale, optional inversion/clamp |
+| Object ID | `OBID` | unsigned 16-bit scalar | grayscale ID visualization |
+| Texture UV | `TEXR` | 2 × float | two color components + zero third component |
+| Surface Normals | `NRML` | 3 × float | `(component + 1) * 0.5` |
+| Coverage | `COVR` | float scalar | replicated grayscale |
+| Background RGB | `BKCR` | 3 × byte | direct RGB |
+| Unclamped RGB | `UNCP` | 3 × float | direct float RGB / quantized for integer output |
+| Material ID | `MATR` | byte scalar | replicated grayscale |
+
+The mapping between UI ordering and the stored selector integer still needs an actual parameter-value observation before it is called bit-exact host behavior.
+
+## What static analysis cannot honestly close by itself
+
+The binary dump is now sufficient for the core render architecture, but the following acceptance items require runtime fixtures rather than more disassembly:
+
+- exact UI selector integer ↔ menu item mapping;
+- exact default/range values as exposed by AE;
+- DPTH vs DPAA selection under the Anti-alias checkbox;
+- Black Point == White Point observable output;
+- Plus/Minus Infinity observable output;
+- missing-channel output and returned host error;
+- exact Object ID half-range behavior;
+- pixel-level equivalence fixtures for 8/16/32 bpc;
+- CPU/GPU/MFR runtime status.
+
+These are deliberately left open instead of being guessed from static code.
+
 ## Revised compact channel contract
 
 | Machine channel | Expected source datatype observed in code | Output structure |
@@ -9490,9 +9584,9 @@ This behavior is now static-code evidence.
 | `OBID` | `SU2T` | scalar grayscale RGB + opaque A |
 | `TEXR` | `FLT4` | two float components, third color component zero + opaque A |
 | `NRML` | `FLT4` | `(xyz + 1) * 0.5` visualization + opaque A |
-| `COVR` | still being isolated | dedicated scalar path |
+| `COVR` | `FLT4` | float scalar → grayscale RGB + opaque A |
 | `BKCR` | byte RGB family | direct RGB visualization + opaque A |
-| `UNCP` | byte RGB family in captured paths | direct RGB visualization + opaque A |
+| `UNCP` | `FLT4` | three float components → RGB + opaque A |
 | `MATR` | `UB1T` | byte scalar grayscale RGB + opaque A |
 
 FourCC datatype labels above are written exactly as reconstructed from the machine immediates. Their SDK typedef/enumeration spelling should be cross-checked before translating them into higher-level SDK names.
@@ -9501,7 +9595,6 @@ FourCC datatype labels above are written exactly as reconstructed from the machi
 
 Before claiming a bit-exact independent implementation, the following remain open:
 
-- exact COVR scalar formula;
 - exact OBID half-range adjustment/wrap semantics at the user-visible boundary;
 - exact UV component-to-R/G naming (the two-component arithmetic itself is resolved);
 - exact DPTH vs DPAA selection condition and anti-alias semantics;
@@ -10537,7 +10630,7 @@ Remaining:
 - [x] Decode ACX_Power2 (`2^n` over its signed-char input).
 - [ ] Map parameters/defaults/ranges. **Slots 1–6 and labels decoded; defaults/ranges still open.**
 - [x] Map channel cases with evidence. **Stored selector values 1–8 → OBID/TEXR/NRML/COVR/BKCR/UNCP/MATR/depth(DPTH|DPAA) decoded; UI/value translation caveat documented.**
-- [ ] Reconstruct 8/16/32-bpc pseudocode. **Cross-bit-depth decision tree plus NRML/BKCR/TEXR/UNCP/depth core reconstructed; OBID/MATR datatypes and grayscale structure resolved; COVR and edge behavior remain.**
+- [ ] Reconstruct 8/16/32-bpc pseudocode. **Core static reconstruction complete for all 8 channel families across 8/16/32-bpc structure. Remaining items require runtime fixtures for edge/host behavior.**
 - [ ] Missing-channel, range reversal/equal-limit, clamp and alpha behavior.
 - [ ] Controlled AE fixtures + output hashes.
 - [ ] CPU/GPU/MFR status.
