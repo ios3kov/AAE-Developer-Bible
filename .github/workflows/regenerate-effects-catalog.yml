@@ -2,12 +2,9 @@ name: Regenerate docs
 
 on:
   push:
-    paths:
-      - "**/*.md"
-      - "*.md"
-      - "!MASTER-AE-DEVELOPER-BIBLE.md"
-      - "scripts/build_docs.py"
-      - ".github/workflows/regenerate-effects-catalog.yml"
+    paths-ignore:
+      - "MASTER-AE-DEVELOPER-BIBLE.md"
+      - "MANIFEST.sha256"
 
 permissions:
   contents: write
