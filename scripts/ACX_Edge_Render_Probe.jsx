@@ -1,5 +1,5 @@
 #target aftereffects
-/* AE Developer Bible -- ACX-EDGE-20260930-03.
+/* AE Developer Bible -- ACX-EDGE-20260930-04.
  * Adaptive edge sampling + six one-frame Render Queue exports, not the old 28-case batch.
  * Run in an idle, open DEPTH_TEST fixture. Only a disposable outer comp is edited.
  * No save, preference changes, cache purge, source edits, binary patches or MFR claims.
@@ -7,7 +7,7 @@
  * Runtime validation is pending. See EDGE-AND-RENDER-PROBE.md for evidence boundaries.
  */
 (function () {
-    var BUILD = "ACX-EDGE-20260930-03", MATCH = "ADBE AUX CHANNEL EXTRACT";
+    var BUILD = "ACX-EDGE-20260930-04", MATCH = "ADBE AUX CHANNEL EXTRACT";
     var start = new Date().getTime(), runId = BUILD + "-" + start + "-" + Math.floor(Math.random()*1000000);
     var project = app.project, scratch = null, ownRQ = null, out = null, initialBpc = null, undo = false;
     var suspended = [], fatal = null, probeText = null, layer = null, time = 0, sampleSerial = 0;
@@ -228,10 +228,15 @@
         for(i=0;i<entries.length;i++){
             f=entries[i];if(f instanceof File&&new RegExp('\\.'+choice.ext+'$','i').test(f.name)){images.push(f);}
         }
-        if(images.length!==1||images[0].length<=8){throw Error('DONE without exactly one nonempty expected image (found '+images.length+').');}
-        signature(images[0],choice.kind);
-        r.file={relativePath:folder.name+'/'+images[0].name,bytes:images[0].length,format:choice.kind,
-            integrity:'signature screened; full decode, component precision and hashes pending offline analysis'};
+        if(images.length<1){throw Error('DONE without a nonempty expected image.');}
+        r.files=[];
+        for(i=0;i<images.length;i++){
+            if(images[i].length<=8){throw Error('DONE produced an empty expected image: '+images[i].name);}
+            signature(images[i],choice.kind);
+            r.files.push({relativePath:folder.name+'/'+images[i].name,bytes:images[i].length,format:choice.kind,
+                integrity:'signature screened; full decode, component precision and hashes pending offline analysis'});
+        }
+        r.framesProduced=images.length;
         r.parametersAfter=params(effect(layer));
         if(json(r.parametersAfter)!==json(r.parametersBefore)){throw Error('Effect settings changed during render.');}
         r.status='EXPORTED';ownRQ.remove();ownRQ=null;checkpoint();
