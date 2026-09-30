@@ -12387,22 +12387,36 @@ See [verification commands and results](VERIFICATION.md) and [coverage matrix](F
 
 # Verification — v1.1
 
-## Supplied SDK and chapter review (2026-09-30)
+## Parameter/UI and color/pixel chapter review (2026-09-30)
 
-The user supplied `ae25.6_61.64bit.AfterEffectsSDK`. The uploaded Zstandard stream was decompressed and compared byte-for-byte with the separately uploaded TAR; they match. Source hashes and exact file/line references are recorded in [the supplied-SDK review](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md).
+Expanded [parameters and UI](02-EFFECT-PLUGINS/02-PARAMETERS-UI.md) and [pixels, color and alpha](02-EFFECT-PLUGINS/06-COLOR-PIXELS.md) from the supplied SDK 25.6 build 61. The [second source-review record](18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md) records hashes for 15 source files, exact declaration/sample line ranges and unresolved source discrepancies.
 
-This iteration expands the Effect anatomy and SmartFX chapters and adds an auxiliary-channel chapter. It verifies the described declarations, ownership rules and relevant Skeleton/SmartyPants source behavior. In particular, auxiliary-channel checkin and SmartFX world checkin have different documented contracts.
+Reviewed contracts include non-animatable versus non-interpolated parameters; setup macro clearing; USER_CHANGED_PARAM versus UPDATE_PARAMS_UI; UI-only/disabled/hidden states; Point/default units; ARGB32/64/128; the 0..32768 integer 16-bpc range; typed pixel access; rowbytes/origin; alpha-conversion signatures; floating color parameters in the effect working space; and possible multithreading of iterate callbacks.
 
-**Scope: SDK source review and documentation.** No new native reader, compiled plug-in, AE render, importer qualification or concurrency run is claimed. The historical compiler baseline below was not repeated in this iteration and is not automatically attributed to the new upload. GitHub documentation validation is separate from native compilation and host execution.
+Source discrepancies are retained explicitly: two numeric typos beside 16-bit constants, Paramarama enum/setup ordering, Supervisor popup changes beyond the documented PF_UpdateParamUI field list, and differing macro initialization behavior. No SDK source was edited to hide them. They are source observations, not newly reproduced host defects.
+
+**Verification level: documentation and SDK source review, not new native compilation.** Authored C++ fragments illustrate setup, UI flags and floating color lookup; they are not linked or host-tested plug-ins. Numeric normalization/alpha examples are mathematical explanations, not native-effect measurements. The TAR identity was rechecked against the previous recorded SHA-256; the prior compressed/decompressed byte comparison is not claimed as a new successful run.
+
+GitHub Validate remains responsible for the documentation build and existing portable regressions on the committed revision. It does not compile these Markdown fragments against the licensed SDK. Native readout development remains paused; no new user AE run, map installation, output conversion experiment or GPU/MFR comparison was performed. Plan gates 2, 3A and 4–9 are not silently closed by editorial work.
+
+## First supplied-SDK chapter review (2026-09-30)
+
+The user supplied `ae25.6_61.64bit.AfterEffectsSDK`. In the first review, the uploaded Zstandard stream was decompressed and compared byte-for-byte with the separately uploaded TAR; they matched. Source hashes and exact file/line references are recorded in [the supplied-SDK review](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md).
+
+That iteration expanded Effect anatomy and SmartFX and added an auxiliary-channel chapter. It checked declarations, ownership rules and relevant Skeleton/SmartyPants source behavior. In particular, auxiliary-channel checkin and SmartFX world checkin have different documented contracts.
+
+**Scope: SDK source review and documentation.** No new native reader, compiled plug-in, AE render, importer qualification or concurrency run was claimed. The historical compiler baseline below was not repeated and is not automatically attributed to the new upload. GitHub documentation validation is separate from native compilation and host execution.
 
 ## Recorded baseline (2026-09-30)
 
 - Adobe After Effects SDK **25.6 build 61**, locally supplied; proprietary headers are not redistributed.
-- macOS arm64, Apple Clang, C++17: **13 translation-unit checks passed** (including two forwarding entry files and a foundation-header probe).
+- macOS arm64, Apple Clang, C++17: **13 translation-unit checks passed**.
 - Python: **7 tests passed**.
 - Foundation: strict C++17 build and behavioral assertions passed against synthetic stubs.
 - Full SDK index: 70 headers, 230 recognized tables, 3537 parsed functions. **Incomplete**: unsupported declarations produce diagnostics and a nonzero exit code. These counts are exploratory, not coverage claims.
 - Native linking, PiPL packaging, AE loading/rendering, MFR stress and Windows compilation: **not verified**.
+
+The 13 recorded translation-unit checks include two forwarding entry files and a foundation-header probe. These historical results are not repeated by the two editorial reviews above.
 
 `scripts/materialize_sdk_examples.py` provides exact local sample shells for all six gaps. `scripts/host_cycle.py` installs a built bundle and optionally invokes `aerender`, but intentionally reports UI load/unload and MFR stress as pending.
 
