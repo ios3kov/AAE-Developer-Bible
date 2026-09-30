@@ -9830,6 +9830,24 @@ This runtime result is consistent with the statically reconstructed endpoint/ran
 - [x] Invert Depth Map behavior: qualitative runtime PASS.
 
 
+## Runtime observation 2026-09-30 — degenerate depth range
+
+Fixture: validated nested Classic 3D depth source.
+
+Parameters:
+- Black Point = 1000.0
+- White Point = 1000.0
+- Invert Depth Map = OFF
+- Anti-alias = OFF
+- Clamp Output stored ON
+
+Observed result: the composition becomes a uniform mid-gray field; the previously visible depth regions disappear. AE does not visibly crash or present an error dialog in this observation.
+
+This confirms that the Black == White path has an explicit finite fallback rather than exposing an obvious divide-by-zero failure. The screenshot alone does not establish the exact numeric fallback value, so the static constant and runtime pixel value must remain separate until sampled from rendered output.
+
+- [x] Black Point == White Point: qualitative runtime PASS.
+
+
 ---
 
 <!-- SOURCE: 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/EXECUTION-PLAN.md -->
