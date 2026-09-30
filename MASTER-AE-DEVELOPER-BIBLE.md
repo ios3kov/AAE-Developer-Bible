@@ -8306,6 +8306,69 @@ hardcoded PiPL:
 Next step: trace where `FLT_FCSpec + 0xC0` / `SetRoutineDescH()` is populated during registration/loading.
 
 
+## PiPL → PLUG_RoutineDesc registration bridge proven
+
+The target registration flow is implemented in:
+
+```text
+FLTp_FiltSetup(
+  dvacore::classref::InterfaceRef<ML::IPiPL>,
+  std::u16string const& pluginFilePath,
+  dvacore::classref::InterfaceRef<ML::IPlugin>,
+  AELibPluginCachedInfos*,
+  boost::shared_ptr<FLT_FCSpec>
+)
+```
+
+Recovered behavior shows that `FLTp_FiltSetup` reads effect metadata from the `IPiPL`, including display name/category/match-name information, populates the `FLT_FCSpec`, and then registers the callable routine.
+
+Two registration paths are present:
+
+```text
+PLUG_RegisterRoutine(IPiPL, pluginFilePath)
+PLUG_RegisterRoutine(IPiPL, IPlugin)
+```
+
+The first path is visible around `0x8e288`, and the second around `0x8e4e0`.
+
+In both cases the returned `boost::shared_ptr<PLUG_RoutineDesc>` is copied into local storage and passed to:
+
+```text
+FLT_FCSpec::SetRoutineDescH(...)
+```
+
+After that, the already-proven `ReadyFilter()` path prepares the routine and loads `[PLUG_RoutineDesc + 0x08]` into `FLT_FCSpec + 0xD0`, which is later returned by `GetEffectProc()` and invoked by the generic host dispatch.
+
+### Proven host-side registration chain
+
+```text
+PiPL metadata
+  → FLTp_FiltSetup
+  → PLUG_RegisterRoutine(...)
+  → PLUG_RoutineDesc
+  → FLT_FCSpec::SetRoutineDescH
+  → FLT_FCSpec::ReadyFilter
+  → [PLUG_RoutineDesc + 0x08]
+  → FLT_FCSpec + 0xD0
+  → GetEffectProc()
+  → PluginDispatch
+  → BLR EffectProc
+```
+
+### Remaining target-specific step
+
+For **3D Channel Extract / ADBE AUX CHANNEL EXTRACT**, the remaining task is now inside the `PLUG_RegisterRoutine` implementation:
+
+```text
+PiPL EntryPointName = FilterMain
+→ routine lookup / symbol resolution
+→ PLUG_RoutineDesc + 0x08
+→ concrete EffectProc address
+```
+
+Next: reverse engineer `PLUG_RegisterRoutine` in `PLUG.dylib` and identify how `FilterMain` resolves for hardcoded/bundled effects.
+
+
 ---
 
 <!-- SOURCE: 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/EXECUTION-PLAN.md -->
