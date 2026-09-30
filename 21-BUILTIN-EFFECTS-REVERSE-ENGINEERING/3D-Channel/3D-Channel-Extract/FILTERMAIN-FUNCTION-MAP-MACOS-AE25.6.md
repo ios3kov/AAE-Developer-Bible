@@ -120,10 +120,163 @@ The earlier `image dump symtab Aux_Channel_Extract | grep ...` command did not p
 
 For the next static capture, use an ordinary shell, not the `(lldb)` prompt. The confirmed physical module path allows disassembly without starting another After Effects process. Capture the full code, constants, and identity together rather than repeatedly copying overlapping console excerpts.
 
+
+
+## Static binary capture milestone — 2026-09-30
+
+A complete shell capture of the target arm64 binary is now available as `Aux_Channel_Extract-analysis.txt`. The capture contains SHA-256 identity, full `__TEXT,__text` disassembly, `__TEXT,__const`, and `__TEXT,__cstring`.
+
+Captured binary SHA-256:
+
+```text
+412a6deefc1d7a710a9019b6a068180556417b0548d0703d34852bcd395dcab8
+```
+
+### OBSERVED — binary identity and registration
+
+The binary contains:
+
+```text
+Plug-Ins/Effects/Aux_Channel_Extract
+ADBE AUX CHANNEL EXTRACT
+ADBE_AUX_CHANNEL_EXTRACT
+3D Channel
+```
+
+`GetAEEffect_AUX_CHANNEL_EXT` constructs the effect registration metadata. This is direct static evidence that the physical module participates in registration of the native effect. It does not by itself document the complete host loader contract.
+
+### OBSERVED — user-visible channel modes
+
+The localization strings enumerate exactly eight menu entries, in this order:
+
+1. Z-Depth
+2. Object ID
+3. Texture UV
+4. Surface Normals
+5. Coverage
+6. Background RGB
+7. Unclamped RGB
+8. Material ID
+
+The constant block also contains eight four-byte channel identifiers:
+
+```text
+DIBO RXET LMRN RVOC RCKB PCNU RTAM
+```
+
+The byte order visible in an `otool` word dump must be decoded before publishing a final SDK four-character-code mapping. The eight-entry UI list and the eight-way machine-code dispatch are observed; the exact identifier-to-SDK-name mapping is still reconstruction work.
+
+### OBSERVED — parameters and diagnostics
+
+The binary contains user-visible labels:
+
+```text
+Black Point
+White Point
+Anti-alias
+Clamp Output
+Invert Depth Map
+```
+
+and diagnostics including:
+
+```text
+Cannot acquire multi-channel suite.
+Channel not available.
+Datatype mismatch
+Plus Infinity
+Minus Infinity
+```
+
+These establish feature/diagnostic presence. Defaults, numeric ranges, enable/disable rules and precise per-channel semantics still require parameter-setup decoding or controlled host observation.
+
+### OBSERVED — channel access
+
+The render code acquires:
+
+```text
+PF AE Channel Suite
+```
+
+and uses its callbacks before channel-dependent processing. This directly supports the architectural statement that auxiliary data is requested through AE's channel-suite interface rather than being inferred solely from ordinary RGBA input pixels.
+
+Other suite-name strings in the binary include AEGP PF Interface, Layer, Item, Project, PF Param Utils and PF AE Adv App suites. String presence alone is not proof that every suite participates in every render path.
+
+### PROVEN — ACX_Power2
+
+The complete body of `AE_AUX_CHANNEL_EXT::ACX_Power2(char)` is captured. It starts at image-relative `0x455C` and ends at `0x45B0`.
+
+The positive branch starts at 1.0 and repeatedly doubles. The negative branch starts at 1.0 and repeatedly halves. Zero returns 1.0. Therefore, for the representable signed-char input domain:
+
+```text
+ACX_Power2(n) = 2^n
+```
+
+This helper is no longer an inference from its symbol name.
+
+### OBSERVED — render architecture
+
+The static capture confirms the previously observed function boundaries:
+
+- `RenderX<PF_Pixel16>` at `0x6544..0x7B10`
+- `RenderX<PF_Pixel8>` at `0x7B10..0x90E0`
+- `FillInAllParams` at `0x90E0..0x9414`
+
+The command-24 path in `FilterMain` contains a separate inline 32-bpc float-processing path. Therefore the absence of a named `RenderX<PF_PixelFloat>` symbol must not be interpreted as absence of float rendering.
+
+The code also shows an eight-way channel selection and constructs channel identifiers before acquiring/using the channel suite.
+
+### OBSERVED — visible conversion primitives
+
+The captured machine code contains, in channel-dependent paths:
+
+- byte-component conversion to float using division by 255;
+- unsigned-16 conversion to float;
+- a three-component `(component + 1) * 0.5` transformation;
+- float comparisons between the two range values before processing.
+
+These are implementation observations, not yet a complete per-channel specification. They must be attached to exact channel cases before the Bible claims semantic equivalence.
+
+### INFERRED / not yet promoted to fact
+
+The following are plausible from the structure but remain intentionally unpromoted:
+
+- which four-character identifier corresponds to each of the eight UI modes;
+- which visible conversion primitive belongs to every named mode;
+- exact anti-alias behavior;
+- exact Black/White Point normalization formula for every channel;
+- behavior when Black Point equals White Point;
+- complete meaning of range reversal;
+- exact alpha policy;
+- exact clamp ordering;
+- CPU/GPU/MFR behavior.
+
+### UNKNOWN / requires host fixtures or deeper decoding
+
+- exact parameter defaults and legal ranges;
+- parameter enable/disable dependencies;
+- exact output for missing channels and datatype mismatch in every render path;
+- byte-for-byte/pixel-for-pixel equivalence across 8/16/32 bpc;
+- interaction of Invert Depth Map with Black/White Point and Clamp Output;
+- performance and concurrency characteristics.
+
+## Updated reconstruction workflow
+
+The static-capture milestone is complete. The next reconstruction pass should work from the captured file rather than collecting more overlapping LLDB excerpts:
+
+1. decode `FillInAllParams` and parameter setup into a parameter-index table;
+2. decode the eight channel-case targets and four-character identifiers;
+3. annotate the 8-bit and 16-bit functions side-by-side;
+4. annotate the inline 32-bpc path;
+5. derive pseudocode only after each arithmetic block has a channel identity;
+6. validate edge cases with controlled AE fixtures;
+7. promote only host-confirmed/reproducible behavior to algorithm-equivalence claims.
+
+
 ## Next acceptance criteria
 
-1. Capture both complete `RenderX` bodies and `FillInAllParams`, preserving function boundaries.
-2. Decode the small `ACX_Power2` helper rather than inferring its exponent convention from its name.
+1. ~~Capture both complete `RenderX` bodies and `FillInAllParams`, preserving function boundaries.~~ **Complete in the static binary capture.**
+2. ~~Decode `ACX_Power2`.~~ **Complete: `2^n` for signed-char `n`.**
 3. Associate parameter indices and channel-table cases with evidence before naming their UI semantics.
 4. Write separate pseudocode for the 8-bit, 16-bit, and inline 32-bit paths, including missing-channel handling, range reversal, equal limits, clamping, and alpha writes.
 5. Validate reconstructed pixel behavior against controlled host fixtures before claiming algorithm equivalence.
