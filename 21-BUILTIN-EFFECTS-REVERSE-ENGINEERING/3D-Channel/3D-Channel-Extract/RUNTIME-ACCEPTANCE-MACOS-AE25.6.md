@@ -183,3 +183,14 @@ Observed result: the effect produces distinct grayscale regions instead of the u
 Visible stored values remain Black Point 5000.0, White Point 0.0, Anti-alias OFF, Clamp Output ON, Invert Depth Map OFF.
 
 This screenshot is qualitative evidence only. Display-managed screenshot RGB values are not accepted as bit-exact pixel evidence; exact 8/16/32 values still require controlled render/output sampling.
+
+
+## Runtime observation 2026-09-30 — Invert Depth Map
+
+Using the validated nested Classic 3D fixture, Z-Depth was observed with Black Point 5000.0, White Point 0.0, Clamp Output ON, Anti-alias OFF.
+
+With Invert Depth Map enabled, the visible depth ordering reverses relative to the prior non-inverted observation: the outside/background region becomes white, the larger depth region becomes light gray, and the nearer central region becomes darker gray.
+
+This runtime result is consistent with the statically reconstructed endpoint/range inversion path. It proves observable inversion of the depth visualization for this fixture. Screenshot colors are qualitative evidence only; bit-exact complement values remain for output sampling.
+
+- [x] Invert Depth Map behavior: qualitative runtime PASS.
