@@ -9912,7 +9912,7 @@ print('Report comparisons reproduced; full-effect acceptance remains open.')
 Full-effect acceptance remains **OPEN**. Existing measurements and new test tooling must not be conflated.
 
 - [Numerical observations, 2026-09-30](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/NUMERICAL-OBSERVATIONS-2026-09-30.md): reviewed user-run 28-case report, scope and limitations.
-- [Next run: Anti-alias edges and frame export](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/EDGE-AND-RENDER-PROBE.md): a separate six-pair/three-bpc collection workflow. Portable tests pass; this new workflow has not yet run in AE.
+- [Next run: Anti-alias edges and frame export](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/EDGE-AND-RENDER-PROBE.md): AA OFF/ON at each of three bpc levels, six cases total. Portable tests pass; this new workflow has not yet run in AE.
 - [Runtime acceptance protocol](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/RUNTIME-ACCEPTANCE-MACOS-AE25.6.md): remaining full-effect gates and corrections to earlier screenshot interpretations.
 - [Static function map and reconstruction notes](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/FILTERMAIN-FUNCTION-MAP-MACOS-AE25.6.md): binary investigation; not a substitute for host measurements.
 - [Chronological binary evidence](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/BINARY-EVIDENCE-MACOS-AE25.6.md): historical investigation record; later corrections must be respected.
