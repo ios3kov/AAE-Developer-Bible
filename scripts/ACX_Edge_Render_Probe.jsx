@@ -1,5 +1,5 @@
 #target aftereffects
-/* AE Developer Bible -- ACX-EDGE-20260930-01.
+/* AE Developer Bible -- ACX-EDGE-20260930-02.
  * Adaptive edge sampling + six one-frame Render Queue exports, not the old 28-case batch.
  * Run in an idle, open DEPTH_TEST fixture. Only a disposable outer comp is edited.
  * No save, preference changes, cache purge, source edits, binary patches or MFR claims.
@@ -7,7 +7,7 @@
  * Runtime validation is pending. See EDGE-AND-RENDER-PROBE.md for evidence boundaries.
  */
 (function () {
-    var BUILD = "ACX-EDGE-20260930-01", MATCH = "ADBE AUX CHANNEL EXTRACT";
+    var BUILD = "ACX-EDGE-20260930-02", MATCH = "ADBE AUX CHANNEL EXTRACT";
     var start = new Date().getTime(), runId = BUILD + "-" + start + "-" + Math.floor(Math.random()*1000000);
     var project = app.project, scratch = null, ownRQ = null, out = null, initialBpc = null, undo = false;
     var suspended = [], fatal = null, probeText = null, layer = null, time = 0, sampleSerial = 0;
@@ -201,7 +201,7 @@
         if(folder.exists||!folder.create()){throw Error('Cannot create unique frame directory.');}
         r.parametersBefore=state(aa);ownRQ=project.renderQueue.items.add(scratch);ownRQ.render=false;
         ownRQ.setSettings({'Quality':'Best','Effects':'All On','Resolution':'Full','Color Depth':bpc+' bits per channel'});
-        ownRQ.timeSpanDuration=scratch.frameDuration;ownRQ.timeSpanStart=time;ownRQ.skipFrames=0;
+        ownRQ.timeSpanStart=time;ownRQ.timeSpanDuration=scratch.frameDuration*0.5;ownRQ.skipFrames=0;
         if(ownRQ.numOutputModules!==1){throw Error('Expected exactly one owned output module.');}
         r.renderSettings=ownRQ.getSettings(GetSettingsFormat.STRING);
         if(String(r.renderSettings['Color Depth']).indexOf(String(bpc))<0||r.renderSettings.Quality!=='Best'||
@@ -228,7 +228,7 @@
         for(i=0;i<entries.length;i++){
             f=entries[i];if(f instanceof File&&new RegExp('\\.'+choice.ext+'$','i').test(f.name)){images.push(f);}
         }
-        if(images.length!==1||images[0].length<=8){throw Error('DONE without exactly one nonempty expected image.');}
+        if(images.length!==1||images[0].length<=8){throw Error('DONE without exactly one nonempty expected image (found '+images.length+').');}
         signature(images[0],choice.kind);
         r.file={relativePath:folder.name+'/'+images[0].name,bytes:images[0].length,format:choice.kind,
             integrity:'signature screened; full decode, component precision and hashes pending offline analysis'};
