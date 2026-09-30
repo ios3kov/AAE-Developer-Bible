@@ -8479,6 +8479,60 @@ EntryPointName = FilterMain
 the remaining target-specific problem is no longer host dispatch. It is to identify which module/plugin object handles this hardcoded PiPL and what concrete address its entry-point lookup returns for `FilterMain`.
 
 
+## PiPL EntryPointName retrieval proven
+
+The `PLUG_RoutineDescPriv` vtable is located at `0x14920`. Its first virtual method entries resolve as:
+
+```text
+vptr + 0x00 → PLUG_RoutineDescPriv::GetKind() const
+vptr + 0x08 → PLUG_RoutineDescPriv::GetName() const
+vptr + 0x10 → PLUG_RoutineDescPriv::GetMatchName() const
+vptr + 0x18 → PLUG_RoutineDescPriv::GetCategory() const
+vptr + 0x20 → PLUG_RoutineDescPriv::GetEntryPointName() const
+```
+
+The `+0x20` slot points to `0xDEA0`, which is exactly:
+
+```text
+PLUG_RoutineDescPriv::GetEntryPointName() const
+```
+
+Recovered implementation shows that `GetEntryPointName()` dereferences the stored PiPL interface at `RoutineDescPriv + 0x30/+0x38` and tail-calls the PiPL virtual method at vtable offset `+0x50`.
+
+Therefore the entry-point name used later by `PLUGp_LoadPlatRoutine()` is sourced directly from the PiPL metadata, not synthesized elsewhere.
+
+### Proven target path
+
+For the hardcoded target PiPL:
+
+```text
+MatchName      = ADBE AUX CHANNEL EXTRACT
+EntryPointName = FilterMain
+```
+
+the proven host-side chain is now:
+
+```text
+PiPL
+  → PLUG_RoutineDescPriv::GetEntryPointName()
+  → "FilterMain"
+  → PLUG_RoutineDescPriv::GetEntryPoint("FilterMain")
+  → resolved function pointer
+  → PLUG_RoutineDesc + 0x08
+  → FLT_FCSpec::ReadyFilter
+  → FLT_FCSpec + 0xD0
+  → GetEffectProc()
+  → PluginDispatch
+  → BLR
+```
+
+### Remaining target-specific task
+
+The remaining question is no longer how `FilterMain` is obtained or propagated. It is to identify the **specific module/plugin object backing ADBE AUX CHANNEL EXTRACT** and the exact function address returned for `FilterMain`.
+
+Next: trace the plugin/module object stored in `PLUG_RoutineDescPriv +0x48/+0x50` for the hardcoded 3D Channel Extract PiPL.
+
+
 ---
 
 <!-- SOURCE: 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/EXECUTION-PLAN.md -->
