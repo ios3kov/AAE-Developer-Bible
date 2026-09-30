@@ -337,14 +337,135 @@ The 16-bpc renderer compares the acquired channel identifier and channel datatyp
 
 The exact arithmetic of each block is being reconstructed next. Until that is complete, these structural observations should not be summarized as a single universal normalization formula.
 
+
+
+## Cross-bit-depth render reconstruction
+
+The three render implementations now line up strongly enough to document several channel formulas. The claims below are restricted to arithmetic directly visible in the captured binary; where a channel datatype name has not been independently resolved from the SDK, the machine FourCC is used.
+
+### NRML — normal visualization
+
+**PROVEN arithmetic:** the float path reads three float components and writes each RGB component as:
+
+```text
+out = (component + 1.0) * 0.5
+```
+
+The 16-bpc path performs the equivalent mapping into the AE 16-bit pixel domain. The output alpha is filled opaque for valid output pixels.
+
+This is consistent with visualization of signed normal components in [-1,+1], but the range statement is semantic interpretation; the transform itself is machine-code evidence.
+
+### BKCR — background RGB
+
+**PROVEN conversion shape:** the channel is accepted in an 8-bit three-component form. Each source byte is converted to float and divided by **255.0** in the float-output path. The 16-bpc path scales the same byte components into the AE 16-bit output domain. RGB components are copied independently; alpha is filled opaque.
+
+Conceptual float pseudocode:
+
+```cpp
+out.a = 1.0f;
+out.r = src.r / 255.0f;
+out.g = src.g / 255.0f;
+out.b = src.b / 255.0f;
+```
+
+### COVR — coverage
+
+The renderer has a dedicated COVR branch and requires a float channel datatype before processing. It is not routed through the byte-RGB or normal-vector conversion blocks.
+
+The exact scalar-to-output formula still needs a clean isolated extraction before promotion to pseudocode.
+
+### OBID — Object ID
+
+The dedicated OBID branch requires a two-byte unsigned channel representation. The value is replicated to R, G and B, producing a grayscale visualization, with opaque output alpha.
+
+The exact display scaling/wrapping behavior at all integer values should still be verified with fixtures before claiming a user-level formula.
+
+### TEXR — texture coordinates
+
+The TEXR branch requires a float channel representation. In the float-output path it reads two float components, applies the host float conversion callback to each, writes them into two color components and explicitly writes the remaining color component as zero; alpha is opaque.
+
+This proves a two-component UV-style visualization structure. Exact R/G component ordering is intentionally left for fixture verification rather than inferred from register offsets alone.
+
+### UNCP — unclamped color
+
+The UNCP branch accepts an 8-bit channel representation and processes three byte components. The float path divides each byte by 255.0; the 16-bit path performs the corresponding scale to the 16-bit AE pixel domain. Alpha is opaque.
+
+This is structurally similar to BKCR, but they remain distinct auxiliary channels.
+
+### MATR — Material ID
+
+MATR has its own branch and datatype check rather than sharing the OBID dispatch. It produces a visualization from a scalar identifier. Exact integer conversion/scaling is still being isolated before publishing a formula.
+
+### DPTH / DPAA — depth
+
+Depth is the most elaborate path and is shared by two machine identifiers, `DPTH` and `DPAA`. Both require a float channel datatype.
+
+The code:
+
+1. converts Black Point and White Point to float;
+2. orders them into low/high values for clipping;
+3. uses the Invert Depth Map state to select which endpoint is treated as the output start/end;
+4. computes a range difference;
+5. reads a float depth sample;
+6. optionally clamps the sample to the ordered range when Clamp Output is active;
+7. for ordinary finite values, computes a normalized scalar from the sample and the selected endpoint/range;
+8. replicates that scalar to R, G and B;
+9. writes opaque alpha.
+
+The finite-value core visible in the float path is equivalent in structure to:
+
+```cpp
+range = mapped_white - mapped_black;
+value = depth;
+if (clamp_output)
+    value = clamp(value, min(black, white), max(black, white));
+
+if (range != 0)
+    gray = (value - mapped_black) / range;
+else
+    gray = fallback;
+```
+
+The binary also contains explicit handling for very large positive/negative float values and a separate fallback for a zero/degenerate range. Therefore the simplified pseudocode above is **not yet a complete bit-exact specification**.
+
+### 8 / 16 / 32 consistency
+
+The captured implementations show the same channel decision tree repeated across:
+
+- inline 32-bpc float output in `FilterMain`;
+- `RenderX<PF_Pixel16>`;
+- `RenderX<PF_Pixel8>`.
+
+The principal differences are output-domain conversion and pixel stride:
+
+- 32-bpc: float RGBA;
+- 16-bpc: AE 16-bit integer RGBA;
+- 8-bpc: byte RGBA.
+
+This is strong static evidence of one conceptual auxiliary-channel algorithm implemented for three output depths, rather than three unrelated algorithms.
+
+## Remaining algorithm gaps after cross-bit-depth pass
+
+Before claiming a bit-exact independent implementation, the following remain open:
+
+- exact COVR scalar formula;
+- exact OBID and MATR integer display conversion;
+- exact UV component-to-R/G ordering;
+- exact DPTH vs DPAA selection condition and anti-alias semantics;
+- exact infinity/degenerate-range behavior;
+- effect of Clamp Output outside the depth path, if any;
+- pixel behavior for unavailable/mismatched channel data;
+- fixture confirmation of alpha and edge behavior.
+
+
 ## Updated reconstruction workflow
 
 The static-capture milestone is complete. The next reconstruction pass should work from the captured file rather than collecting more overlapping LLDB excerpts:
 
 1. ~~decode `FillInAllParams` and parameter setup into a parameter-index table;~~ **Complete for slots 1–6; defaults/ranges remain.**
 2. ~~decode the eight channel-case targets and four-character identifiers;~~ **Complete for stored selector values; UI/value translation remains.**
-3. annotate the 8-bit and 16-bit functions side-by-side;
-4. annotate the inline 32-bpc path;
+3. **Cross-bit-depth pass substantially complete:** NRML, BKCR, TEXR, UNCP and depth structure reconstructed; COVR/ID edge formulas remain.
+4. **Inline 32-bpc path correlated with the named 8/16-bit implementations.**
 5. derive pseudocode only after each arithmetic block has a channel identity;
 6. validate edge cases with controlled AE fixtures;
 7. promote only host-confirmed/reproducible behavior to algorithm-equivalence claims.
