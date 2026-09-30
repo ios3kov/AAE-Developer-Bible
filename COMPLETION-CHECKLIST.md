@@ -19,9 +19,9 @@ A checked item requires recorded evidence. Documentation presence alone is not c
 
 | Dimension | Required baseline | Current state |
 |---|---|---|
-| After Effects | 25.6.0.101 | available for current macOS investigation; practical examples not host-verified |
+| After Effects | 25.6.0.101 | native-effect user-run numerical observations exist; practical reference examples not host-verified |
 | Adobe SDK | 25.6 | macOS syntax/type baseline exists |
-| macOS | arm64 | host verification pending |
+| macOS | arm64 | native-effect research observations exist; reference-example host acceptance pending |
 | Windows | x64 baseline | SDK/host verification pending |
 | C++ | C++17 | current native baseline |
 | Classic Effect | Minimal Gain 8/16-bpc | host pending |
@@ -182,16 +182,24 @@ Where applicable:
 ### 3D Channel Extract pilot
 Already captured: physical module, FilterMain, selector table, named function boundaries, RenderX 8/16, FillInAllParams and evidence of inline 32-bpc processing.
 
-Remaining:
+Latest milestone: [reviewed numerical observations](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/NUMERICAL-OBSERVATIONS-2026-09-30.md), user-run collector `ACX-PROBE-20260930-01-1790786999423-396382`. All **28 planned records / 1260 sampleImage RGBA tuples** returned, without logged acquisition or cleanup errors. This is acquisition and scoped numerical evidence, not full-effect PASS.
+
+- [x] Review first numerical batch: baseline/invert/equal/reversed/narrow/AA/Collapse/source control/repeat at 8/16/32 bpc and one Clamp OFF request at 32 bpc.
+- [x] Record exact comparisons, original report hash and limitations. Baseline repeats and invert/reversed pairs match at the sampled points; equal-1000 gives approximately 128/255 at 8 bpc and 0.5 at 16/32; Clamp OFF permits values above 1 in this run.
+- [ ] Edge-specific AA and DPTH/DPAA evidence. **The coarse AA pair is unchanged; this is not an AA acceptance result.**
+
+Remaining full pilot gates:
 - [x] Complete static capture + binary hash (`412a6deefc1d7a710a9019b6a068180556417b0548d0703d34852bcd395dcab8`).
 - [x] Decode ACX_Power2 (`2^n` over its signed-char input).
-- [ ] Map parameters/defaults/ranges. **Slots 1–6 and labels decoded; defaults/ranges still open.**
-- [x] Map channel cases with evidence. **Stored selector values 1–8 → OBID/TEXR/NRML/COVR/BKCR/UNCP/MATR/depth(DPTH|DPAA) decoded; UI/value translation caveat documented.**
-- [ ] Reconstruct 8/16/32-bpc pseudocode. **Core static reconstruction complete for all 8 channel families across 8/16/32-bpc structure. Remaining items require runtime fixtures for edge/host behavior.**
-- [ ] Missing-channel, range reversal/equal-limit, clamp and alpha behavior.
-- [ ] Controlled AE fixtures + output hashes.
-- [ ] CPU/GPU/MFR status.
-- [ ] Independent reimplementation recipe.
+- [ ] Map parameters/defaults/ranges. **Slots and initial values captured; Black/White API bounds ±10000000 observed. Fresh defaults, endpoint writes and UI dependencies remain open.**
+- [x] Record static channel branch targets. **Prior static selector interpretation is not a runtime mapping: the returned Z-Depth scripting value is 1. Full UI/stored-value/private-FourCC correspondence still requires reconciliation.**
+- [ ] Reconstruct 8/16/32-bpc pseudocode. **Prior all-channel static write-up exists; this Z-Depth-only batch does not validate other channels or establish bit-exact equivalence.**
+- [ ] Missing-channel, range reversal/equal-limit, clamp and alpha behavior. **Numerical inversion/reversal/equal-1000 and sampled 32-bpc upper clamping recorded; missing data, lower bound, non-finite inputs and transparent edges remain.**
+- [ ] Controlled AE fixtures + raw output hashes. **Report hash recorded; the project was dirty at run start, and neither live geometry nor raw rendered frames were exported.**
+- [ ] CPU/GPU/MFR status. **Project identifiers and same-session sample repeatability do not close this gate.**
+- [ ] Independent reimplementation recipe and native-output comparison.
+
+The collector reports `sourceRenderer=ADBE Advanced 3d` and `projectGpuSetting=1816`; retain the identifiers literally rather than asserting an effect execution path. Keep Collapse ON and OFF results separate: their samples differ at every grid point in this run.
 
 ### Full catalog
 For every agreed entry in MASTER-EFFECT-LIST.md:
@@ -233,5 +241,5 @@ For cross-project lessons also record the source repository, pinned document/cod
 4. Gate 4: strengthen exact-SDK verification.
 5. Gate 5: host-verify Minimal Gain, SmartFX Copy and MenuTool using audited reusable components where appropriate.
 6. Gates 6–7: complete families and correctness/stress coverage.
-7. Gate 8: finish 3D Channel Extract pilot, then catalog.
+7. Gate 8: finish 3D Channel Extract pilot, then catalog. **Current user-directed work is the numerical native-effect research milestone above; other gates are not implicitly complete.**
 8. Gate 9: release audits.
