@@ -9,10 +9,10 @@ namespace bible {
 class UndoGroup final {
 public:
     UndoGroup(AEGP_SuiteHandler& suites, const char* name)
-        : suites_(suites)
+        : utility_(suites.UtilitySuite6())
     {
         active_ =
-            (suites_.UtilitySuite6()->AEGP_StartUndoGroup(name) == A_Err_NONE);
+            (utility_->AEGP_StartUndoGroup(name) == A_Err_NONE);
     }
 
     ~UndoGroup()
@@ -20,7 +20,7 @@ public:
         if (active_) {
             // Destructors must not throw. Production caller may prefer
             // an explicit Close() if EndUndoGroup errors must be surfaced.
-            suites_.UtilitySuite6()->AEGP_EndUndoGroup();
+            utility_->AEGP_EndUndoGroup();
         }
     }
 
@@ -28,7 +28,7 @@ public:
     UndoGroup& operator=(const UndoGroup&) = delete;
 
 private:
-    AEGP_SuiteHandler& suites_;
+    const AEGP_UtilitySuite6* utility_;
     bool active_ = false;
 };
 

@@ -1,4 +1,4 @@
-# v0.3 drop-in C++ code
+# Native recipe source — v1.1
 
 Эти файлы предназначены для **graft в официальный AEGP sample project**, где уже есть:
 - Adobe headers;
@@ -20,6 +20,6 @@
 
 ## Verification label
 
-**Compile-shaped / SDK-contract verified; host-test-required.**
+**SDK 25.6 macOS syntax/type-checked; linking and host tests pending.**
 
-В песочнице нет Adobe SDK distribution и AE host, поэтому финальная гарантия — build + run в вашей реальной matrix macOS/Windows.
+Команда и результаты: [VERIFICATION.md](../../VERIFICATION.md). Сохраните relative includes к `19-NATIVE-CODE-FOUNDATION` или перенесите helpers вместе с recipes. Host callbacks, вызывающие recipes, должны иметь exception boundary.

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+.build/
+site/
+docs/
+18-SDK-HEADER-TOOLS/generated/local-sdk/

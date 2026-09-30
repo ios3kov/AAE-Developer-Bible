@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.1 — 2026-09-30
+
+- Fixed Minimal Gain registration macro, About callback context, selector spelling and suite includes.
+- Implemented SmartFX host-copy pass-through; corrected checkout context/time fields; disabled unverified MFR capability.
+- Added exception guards and error propagation to MenuTool; retained callback state safely after partial registration.
+- Corrected cookbook suite generations and keyframe value ABI for SDK 25.6; added missing macro includes and cleanup error handling.
+- Added real-SDK syntax/type driver; 13 checks pass on macOS arm64.
+- Made symbol checks reject absent/empty inputs; added partial-parse diagnostics, bounded declaration parsing and field-order diffs.
+- Added regression/ownership tests, docs CI, generated MASTER/manifest and explicit verification matrix.
+- Replaced duplicated implementation files with canonical-source forwarding files.
+
 ## v0.4 — 2026-09-30
 
 - Added `18-SDK-HEADER-TOOLS/`: exact native contract inventory generated from local SDK headers.

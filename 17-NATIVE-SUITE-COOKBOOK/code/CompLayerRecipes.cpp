@@ -1,6 +1,7 @@
 #include "AEConfig.h"
 #include "AE_GeneralPlug.h"
 #include "AEGP_SuiteHandler.h"
+#include "AE_Macros.h"
 
 A_Err Bible_CreateComp(
     SPBasicSuite* pica,
@@ -19,7 +20,7 @@ A_Err Bible_CreateComp(
     A_Time duration{10, 1};
     A_Ratio fps{25, 1};
 
-    ERR(suites.CompSuite13()->AEGP_CreateComp(
+    ERR(suites.CompSuite12()->AEGP_CreateComp(
         parent_folderH,
         nameZ,
         1920,

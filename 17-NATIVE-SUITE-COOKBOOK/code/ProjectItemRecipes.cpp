@@ -1,6 +1,7 @@
 #include "AEConfig.h"
 #include "AE_GeneralPlug.h"
 #include "AEGP_SuiteHandler.h"
+#include "AE_Macros.h"
 
 A_Err Bible_GetProjectAndRoot(
     SPBasicSuite* pica,

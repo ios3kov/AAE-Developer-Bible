@@ -1,6 +1,6 @@
 # Minimal Artisan registrar
 
-Status: **host-test-required**.
+Status: **guide-only — no registrar source supplied**. The historical directory name is retained for existing links.
 
 Artisan replaces parts of AE's 3D rendering path and has a much larger host contract than a normal Effect. Start from the SDK Artisan sample, preserve its registration/function-table plumbing, then replace scene/render code incrementally.
 

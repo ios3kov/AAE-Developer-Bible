@@ -8,7 +8,7 @@
 class AegpStreamRefOwner final {
 public:
     AegpStreamRefOwner() = default;
-    AegpStreamRefOwner(const AEGP_StreamSuite7* suite, AEGP_StreamRefH h) : suite_(suite), h_(h) {}
+    AegpStreamRefOwner(const AEGP_StreamSuite6* suite, AEGP_StreamRefH h) : suite_(suite), h_(h) {}
     ~AegpStreamRefOwner() { reset(); }
     AegpStreamRefOwner(const AegpStreamRefOwner&) = delete;
     AegpStreamRefOwner& operator=(const AegpStreamRefOwner&) = delete;
@@ -24,7 +24,7 @@ public:
         h_ = h;
     }
 private:
-    const AEGP_StreamSuite7* suite_ = nullptr;
+    const AEGP_StreamSuite6* suite_ = nullptr;
     AEGP_StreamRefH h_ = nullptr;
 };
 

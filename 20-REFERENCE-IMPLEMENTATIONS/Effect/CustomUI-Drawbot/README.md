@@ -1,6 +1,6 @@
 # Custom UI / Drawbot starter
 
-Status: **sample-derived / host-test-required**.
+Status: **acquisition skeleton / SDK 25.6 macOS syntax-checked / host-test-required**. This code obtains a drawing reference; it does not create paths or draw UI.
 
 Use this with Adobe's Custom ECW UI / Drawbot-capable sample shell. The stable pattern is:
 

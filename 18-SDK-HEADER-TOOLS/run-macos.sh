@@ -14,4 +14,4 @@ python3 "$HERE/tools/ae_sdk_inventory.py" "$SDK_HEADERS" \
 python3 "$HERE/tools/verify_recipe_symbols.py" \
   "$OUT/ae-sdk-inventory.json" \
   "$HERE/../17-NATIVE-SUITE-COOKBOOK/code"
-echo "native SDK validation: PASS"
+echo "symbol-name check: PASS (not a signature, ABI, build or host test)"

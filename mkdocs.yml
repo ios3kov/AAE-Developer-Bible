@@ -1,4 +1,9 @@
 site_name: AE Developer Bible
+docs_dir: docs
+site_dir: site
+validation:
+  nav:
+    omitted_files: info
 theme:
   name: material
 nav:
@@ -6,6 +11,9 @@ nav:
   - Status: STATUS.md
   - Changelog: CHANGELOG.md
   - Sources: SOURCES.md
+  - Verification: VERIFICATION.md
+  - Coverage: FINAL-COVERAGE-AUDIT.md
+  - Reference implementations: 20-REFERENCE-IMPLEMENTATIONS/README.md
   - 00-START-HERE:
       - "Decision tree — что именно вы разрабатываете?": 00-START-HERE/00-DECISION-TREE.md
       - "Extension types": 00-START-HERE/01-EXTENSION-TYPES.md

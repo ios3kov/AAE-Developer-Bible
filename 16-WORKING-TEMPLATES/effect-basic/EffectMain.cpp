@@ -5,7 +5,7 @@
 #include "AE_EffectSuites.h"
 #include "AE_Macros.h"
 #include "Param_Utils.h"
-#include "AEFX_SuiteHelper.h"
+#include "AEGP_SuiteHandler.h"
 
 #include <algorithm>
 
@@ -40,7 +40,7 @@ static PF_Err GainPixel(void* refcon, A_long, A_long, T* inP, T* outP) {
     return PF_Err_NONE;
 }
 
-static PF_Err About(PF_OutData* out_data) {
+static PF_Err About(PF_InData* in_data, PF_OutData* out_data) {
     PF_SPRINTF(out_data->return_msg,
                "Bible Minimal Gain v%d.%d\rMinimal AE SDK effect template.",
                kMajor, kMinor);
@@ -113,9 +113,9 @@ PF_Err EffectMain(
 {
     try {
         switch (cmd) {
-            case PF_Cmd_ABOUT:        return About(out_data);
+            case PF_Cmd_ABOUT:        return About(in_data, out_data);
             case PF_Cmd_GLOBAL_SETUP: return GlobalSetup(out_data);
-            case PF_Cmd_PARAM_SETUP:  return ParamsSetup(in_data, out_data);
+            case PF_Cmd_PARAMS_SETUP: return ParamsSetup(in_data, out_data);
             case PF_Cmd_RENDER:       return Render(in_data, params, output);
             default:                  return PF_Err_NONE;
         }
@@ -134,11 +134,13 @@ PF_Err PluginDataEntryFunction(
     const char* /*inHostName*/,
     const char* /*inHostVersion*/)
 {
-    return PF_REGISTER_EFFECT(
+    PF_Err result = PF_Err_NONE;
+    PF_REGISTER_EFFECT(
         inPtr,
         inPluginDataCallBackPtr,
         "Bible Minimal Gain",
         "com.aedevbible.MinimalGain",
         "AE Developer Bible",
         AE_RESERVED_INFO);
+    return result;
 }

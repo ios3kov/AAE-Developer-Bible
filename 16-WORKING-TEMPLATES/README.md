@@ -1,4 +1,6 @@
-# Working templates
+# Source templates and integration guides
+
+v1.1: implementation and verification levels are listed in [the coverage matrix](../FINAL-COVERAGE-AUDIT.md). Historical directory names are retained for link compatibility.
 
 Цель этого раздела — не псевдокод, а **минимальные production-shaped куски**, которые можно graft/вставлять в официальный SDK sample соответствующего типа.
 
@@ -28,8 +30,8 @@ Adobe сама рекомендует стартовать от ближайше
 
 ## Validation status labels
 
-- **SDK-contract exact** — signatures/patterns follow public current SDK guide; still compile against headers you ship with.
+- **SDK syntax-checked** — compiler-checked against SDK 25.6 on macOS; not linked or host-tested.
 - **drop-in** — intended to replace logic inside named Adobe sample, retaining its PiPL/project files.
 - **standalone** — no Adobe SDK compile needed (JSX/HTML).
 
-Нельзя честно назвать C++ binary «compiled/tested in AE» внутри этой sandbox без установленного proprietary SDK + AE host. Поэтому эта библия отличает **working contract template** от **host-verified binary**.
+Результаты проверок фиксируются в [VERIFICATION.md](../VERIFICATION.md). `drop-in` обозначает способ интеграции, а не доказанную готовность бинарного плагина.

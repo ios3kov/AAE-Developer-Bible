@@ -1,6 +1,6 @@
 # Minimal AEIO registrar
 
-Status: **host-test-required**.
+Status: **guide-only — no registrar source supplied**. The historical directory name is retained for existing links.
 
 AEIO is not just a single entry function: After Effects asks the module to register an `AEIO_FunctionBlock` whose callbacks implement file sniffing, spec creation/disposal, metadata, frame/audio retrieval and (for output modules) writing.
 

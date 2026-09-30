@@ -1,6 +1,11 @@
 $._aeBible = $._aeBible || {};
 
 $._aeBible.dispatch = function (json) {
+    // ExtendScript does not guarantee a native JSON global. Load a vetted
+    // ES3-compatible JSON implementation at bootstrap if the host lacks it.
+    if (typeof JSON === "undefined" || !JSON.parse || !JSON.stringify) {
+        return '{"ok":false,"requestId":null,"error":{"message":"JSON_UNAVAILABLE: load an ES3 JSON polyfill"}}';
+    }
     var req = null;
     var out = { ok: false, requestId: null };
     try {

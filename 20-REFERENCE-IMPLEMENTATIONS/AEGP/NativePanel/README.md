@@ -1,6 +1,6 @@
 # Native AEGP panel path
 
-Status: **host-test-required**.
+Status: **guide-only — no panel source supplied**.
 
 Native panel integration is version-sensitive and sample-dependent. Use `14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md` as the contract and graft registration into the closest AEGP UI sample shipped with the exact SDK version.
 

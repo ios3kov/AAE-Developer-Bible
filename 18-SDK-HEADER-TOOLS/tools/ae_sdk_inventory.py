@@ -25,7 +25,7 @@ TABLE_NAME_RE = re.compile(
     r"(?:Suite\d*|FunctionBlock\d*|EntryPoints\d*|EntryPoints|Callbacks\d*|Callbacks)$"
 )
 FUNC_PTR_RE = re.compile(
-    r"(?P<ret>(?:[A-Za-z_][\w]*|const|unsigned|signed|long|short|\s|\*)+?)"
+    r"(?P<ret>[A-Za-z_][\w\s*]*?)"
     r"\(\s*\*\s*(?P<name>[A-Za-z_][\w]*)\s*\)\s*"
     r"\((?P<args>.*?)\)\s*;",
     re.S,
@@ -108,7 +108,12 @@ def parse_functions(body: str) -> list[FunctionDecl]:
     funcs: list[FunctionDecl] = []
     # Adobe tables frequently prefix fields with SPAPI. Remove only the calling-convention token.
     body = re.sub(r"\bSPAPI\b", "", body)
-    for m in FUNC_PTR_RE.finditer(body):
+    # Full-match individual declarations: bounded work on macro-heavy headers,
+    # and no accidental match starting halfway through an unsupported field.
+    for declaration in body.split(";"):
+        m = FUNC_PTR_RE.fullmatch(declaration.strip() + ";")
+        if not m:
+            continue
         ret = normalize_ws(m.group("ret"))
         name = m.group("name")
         args = normalize_ws(m.group("args"))
@@ -134,7 +139,7 @@ def nearby_defines(raw_text: str, start: int, table_name: str) -> dict[str, str]
     return dict(sorted(selected.items()))
 
 
-def parse_header(path: Path, base: Path | None = None) -> tuple[list[ContractTable], list[str]]:
+def parse_header(path: Path, base: Path | None = None, partial: dict | None = None) -> tuple[list[ContractTable], list[str]]:
     raw = path.read_text("utf-8", errors="replace")
     clean = strip_comments(raw)
     sha = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -153,6 +158,13 @@ def parse_header(path: Path, base: Path | None = None) -> tuple[list[ContractTab
             if not TABLE_NAME_RE.search(alias):
                 continue
             funcs = parse_functions(m.group("body"))
+            # Any nonempty declaration we cannot fully consume is a diagnostic.
+            # A recognized table must not hide unsupported fields/macros.
+            body = re.sub(r"\bSPAPI\b", "", m.group("body"))
+            remainder = "; ".join(decl.strip() for decl in body.split(";")
+                                  if decl.strip() and not FUNC_PTR_RE.fullmatch(decl.strip() + ";"))
+            if remainder and partial is not None:
+                partial[f"{rel}:{alias}"] = normalize_ws(remainder)
             if not funcs:
                 continue
             found.append(
@@ -168,7 +180,7 @@ def parse_header(path: Path, base: Path | None = None) -> tuple[list[ContractTab
             )
 
     # Candidate tables whose names look right but yielded no fields are useful diagnostics.
-    candidate_names = set(re.findall(r"}\s*([A-Za-z_][\w]*(?:Suite\d*|FunctionBlock\d*|EntryPoints\d*))\s*;", clean))
+    candidate_names = set(re.findall(r"}\s*([A-Za-z_][\w]*(?:Suite\d*|FunctionBlock\d*|EntryPoints\d*|Callbacks\d*))\s*;", clean))
     parsed_names = {t.name for t in found}
     unparsed = sorted(candidate_names - parsed_names)
     return found, unparsed
@@ -187,8 +199,9 @@ def inventory(inputs: Sequence[str]) -> dict:
 
     tables: list[ContractTable] = []
     unparsed: dict[str, list[str]] = {}
+    partial: dict[str, str] = {}
     for h in headers:
-        ts, bad = parse_header(h, common_base)
+        ts, bad = parse_header(h, common_base, partial)
         tables.extend(ts)
         if bad:
             unparsed[str(h)] = bad
@@ -209,6 +222,7 @@ def inventory(inputs: Sequence[str]) -> dict:
         "families": sorted({t.family for t in tables}),
         "tables": [asdict(t) for t in tables],
         "unparsed_candidate_tables": unparsed,
+        "partial_candidate_tables": partial,
     }
 
 
@@ -245,6 +259,10 @@ def markdown(data: dict) -> str:
         for src, names in sorted(data["unparsed_candidate_tables"].items()):
             lines.append(f"- `{src}`: " + ", ".join(f"`{n}`" for n in names))
         lines.append("")
+    if data.get("partial_candidate_tables"):
+        lines += ["## Partially parsed tables", "", "Unsupported declarations remain; this inventory is incomplete.", ""]
+        for name, remainder in sorted(data["partial_candidate_tables"].items()):
+            lines.append(f"- `{name}`: `{remainder}`")
     return "\n".join(lines)
 
 
@@ -253,17 +271,24 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument("inputs", nargs="+", help="SDK header file(s) or directories")
     ap.add_argument("--json", dest="json_path", default="ae-sdk-inventory.json")
     ap.add_argument("--markdown", dest="md_path", default="ae-sdk-inventory.md")
+    ap.add_argument("--allow-incomplete", action="store_true", help="Write an exploratory index despite diagnostics (never a verification pass)")
     args = ap.parse_args(argv)
     try:
         data = inventory(args.inputs)
     except Exception as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
+    for destination in (args.json_path, args.md_path):
+        Path(destination).parent.mkdir(parents=True, exist_ok=True)
     Path(args.json_path).write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", "utf-8")
     Path(args.md_path).write_text(markdown(data), "utf-8")
     print(f"headers={data['header_count']} tables={data['table_count']} functions={data['function_count']}")
     print(f"json={args.json_path}")
     print(f"markdown={args.md_path}")
+    incomplete = not data["table_count"] or data["unparsed_candidate_tables"] or data["partial_candidate_tables"]
+    if incomplete:
+        print("Incomplete index: inspect parser diagnostics; no ABI or signature validation performed", file=sys.stderr)
+        return 0 if args.allow_incomplete else 1
     return 0
 
 

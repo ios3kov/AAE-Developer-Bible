@@ -1,6 +1,6 @@
 # Minimal Gain effect — drop-in for SDK Skeleton
 
-Status: **drop-in / SDK-contract exact pattern**.
+Status: **source implementation / SDK 25.6 macOS syntax-checked / host-test pending**. Requires C++17, SDK utility sources and the sample's PiPL/build configuration.
 
 ## Base
 

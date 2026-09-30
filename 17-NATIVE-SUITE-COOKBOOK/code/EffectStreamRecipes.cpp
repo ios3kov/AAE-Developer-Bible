@@ -3,6 +3,7 @@
 #include "AEConfig.h"
 #include "AE_GeneralPlug.h"
 #include "AEGP_SuiteHandler.h"
+#include "AE_Macros.h"
 
 A_Err Bible_FindInstalledEffect(
     SPBasicSuite* pica,
@@ -47,6 +48,7 @@ A_Err Bible_ApplyEffect(
     AEGP_LayerH layerH,
     const char* match_nameZ)
 {
+    if (!pica || !layerH || !match_nameZ) return A_Err_PARAMETER;
     A_Err err = A_Err_NONE;
     AEGP_SuiteHandler suites(pica);
 
@@ -60,7 +62,8 @@ A_Err Bible_ApplyEffect(
     }
 
     if (effectH) {
-        ERR2(suites.EffectSuite4()->AEGP_DisposeEffect(effectH));
+        const A_Err cleanup = suites.EffectSuite4()->AEGP_DisposeEffect(effectH);
+        if (!err) err = cleanup;
     }
     return err;
 }
@@ -71,11 +74,17 @@ A_Err Bible_SetStaticOneD(
     AEGP_StreamRefH streamH,
     A_FpLong x)
 {
+    if (!pica || !streamH) return A_Err_PARAMETER;
     A_Err err = A_Err_NONE;
     AEGP_SuiteHandler suites(pica);
 
+    AEGP_StreamType type = AEGP_StreamType_NO_DATA;
+    ERR(suites.StreamSuite6()->AEGP_GetStreamType(streamH, &type));
+    if (err) return err;
+    if (type != AEGP_StreamType_OneD) return A_Err_PARAMETER;
+
     A_Boolean varyingB = FALSE;
-    ERR(suites.StreamSuite7()->AEGP_IsStreamTimevarying(
+    ERR(suites.StreamSuite6()->AEGP_IsStreamTimevarying(
         streamH, &varyingB));
 
     if (!err && varyingB) {
@@ -86,7 +95,7 @@ A_Err Bible_SetStaticOneD(
     AEGP_StreamValue2 v{};
     A_Boolean have_valueB = FALSE;
 
-    ERR(suites.StreamSuite7()->AEGP_GetNewStreamValue(
+    ERR(suites.StreamSuite6()->AEGP_GetNewStreamValue(
         plugin_id,
         streamH,
         AEGP_LTimeMode_CompTime,
@@ -97,12 +106,13 @@ A_Err Bible_SetStaticOneD(
     if (!err) {
         have_valueB = TRUE;
         v.val.one_d = x;
-        ERR(suites.StreamSuite7()->AEGP_SetStreamValue(
+        ERR(suites.StreamSuite6()->AEGP_SetStreamValue(
             plugin_id, streamH, &v));
     }
 
     if (have_valueB) {
-        ERR2(suites.StreamSuite7()->AEGP_DisposeStreamValue(&v));
+        const A_Err cleanup = suites.StreamSuite6()->AEGP_DisposeStreamValue(&v);
+        if (!err) err = cleanup;
     }
     return err;
 }

@@ -1,8 +1,8 @@
-# SDK Header Tools — полный native API без ручного копирования
+# SDK Header Tools — declaration index and symbol-name checks
 
-Это слой, который делает библию **самопроверяемой относительно конкретного Adobe After Effects SDK**.
+Это вспомогательный индексатор локальных SDK headers. Он не является C/C++ compiler, signature checker или полным ABI diff. Проверка типов выполняется отдельно через `scripts/check_native.py`.
 
-Главное правило: HTML guide удобен для объяснений, но **точный контракт сборки задают headers той версии SDK, с которой собирается plug-in**. Поэтому здесь нет вручную переписанного «вечного» списка сотен функций. Вместо этого есть генератор, который читает локальные headers и строит точный inventory.
+Главное правило: точный контракт сборки задают headers целевого SDK. Regex parser поддерживает ограниченные формы объявлений. Неполный разбор таблицы теперь сохраняет диагностику и возвращает ошибку; `--allow-incomplete` разрешает только исследовательский индекс. Реальный SDK 25.6 содержит неподдерживаемые объявления, поэтому полного inventory пока нет.
 
 ## Что генерируется
 
@@ -54,7 +54,7 @@ python3 tools/verify_recipe_symbols.py \
   ../17-NATIVE-SUITE-COOKBOOK/code
 ```
 
-Скрипт проверяет реальные suite call-sites вида `suite->AEGP_Foo(...)` / `suite->PF_Foo(...)` и выдаёт `UNKNOWN`, если такого function pointer нет в локальных headers.
+Скрипт проверяет имена в call-sites вида `suite->AEGP_Foo(...)` / `suite->PF_Foo(...)`; suite generation, аргументы и типы не проверяются. Пустые/несуществующие входы, отсутствие вызовов и неполный inventory завершаются ошибкой. Комментарии и строки не считаются вызовами.
 
 ## Сравнение двух SDK
 
@@ -64,7 +64,7 @@ python3 tools/verify_recipe_symbols.py \
 python3 tools/diff_sdk_inventory.py old.json new.json --markdown sdk-diff.md
 ```
 
-Получим added/removed tables, added/removed functions и changed signatures.
+Получим added/removed tables/functions, textual signature changes и изменения порядка function fields. Typedef expansion, packing и platform ABI не проверяются. Конфликтующие или неполные inventory отклоняются.
 
 ## Что уже протестировано здесь
 
@@ -76,7 +76,7 @@ python3 tests/test_inventory.py
 
 ## Что нельзя честно заявить в песочнице
 
-Здесь нет лицензированного актуального Adobe SDK и самого After Effects, поэтому я не называю generated inventory «проверенным на AE host». На машине разработчика критерий готовности такой:
+В v1.1 выполнены syntax/type checks с локальным SDK 25.6; host validation не выполнялась. Критерий готовности на машине разработчика:
 
 1. inventory успешно строится из фактических headers;
 2. `verify_recipe_symbols.py` не показывает неизвестных calls;

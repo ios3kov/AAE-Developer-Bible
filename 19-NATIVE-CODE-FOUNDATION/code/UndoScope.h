@@ -22,6 +22,6 @@ public:
     bool active() const noexcept { return active_; }
 private:
     const AEGP_UtilitySuite6* suite_ = nullptr;
-    A_Err start_err_ = A_Err_NONE;
+    A_Err start_err_ = A_Err_PARAMETER;
     bool active_ = false;
 };

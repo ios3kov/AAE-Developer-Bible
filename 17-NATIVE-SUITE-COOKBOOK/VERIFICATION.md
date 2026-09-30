@@ -1,5 +1,11 @@
 # Verification matrix
 
+## v1.1 compiled baseline
+
+All six `code/*.cpp` recipes pass strict syntax/type checks with **SDK 25.6 on macOS arm64**. Sources use CompSuite12, StreamSuite6, KeyframeSuite5 and RQItemSuite3 where applicable. Narrative sections may describe newer generations; acquire only suites supplied by the SDK/host you target. See [reproducible checks](../VERIFICATION.md).
+
+The table below records historical public-documentation review, not compiler or host evidence. No host execution is claimed.
+
 | Area | Public SDK signature checked | Adobe sample pattern | Host executed here |
 |---|---:|---:|---:|
 | Project / Item | yes | Projector | no |
@@ -27,4 +33,4 @@ official 26.5 SDK headers
 → record result in compatibility matrix
 ```
 
-Until then, code is **compile-shaped and SDK-contract verified**, not falsely labelled as host-tested.
+Current source is **SDK 25.6 syntax/type-checked**; linking, host execution and other SDK/platform versions remain pending.

@@ -9,6 +9,8 @@ template <typename Fn>
 A_Err GuardAeHostCallback(Fn&& fn, A_Err fallback_err) noexcept {
     try {
         return std::forward<Fn>(fn)();
+    } catch (A_Err err) {
+        return err ? err : fallback_err;
     } catch (...) {
         return fallback_err;
     }

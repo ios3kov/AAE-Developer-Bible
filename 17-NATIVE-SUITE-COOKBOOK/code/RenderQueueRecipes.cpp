@@ -1,6 +1,7 @@
 #include "AEConfig.h"
 #include "AE_GeneralPlug.h"
 #include "AEGP_SuiteHandler.h"
+#include "AE_Macros.h"
 
 A_Err Bible_AddCompAndSetFirstOutputPath(
     SPBasicSuite* pica,
@@ -20,17 +21,17 @@ A_Err Bible_AddCompAndSetFirstOutputPath(
         compH, initial_pathZ));
 
     A_long item_count = 0;
-    ERR(suites.RQItemSuite4()->AEGP_GetNumRQItems(&item_count));
+    ERR(suites.RQItemSuite3()->AEGP_GetNumRQItems(&item_count));
     if (!err && item_count < 1) {
         return A_Err_GENERIC;
     }
 
     AEGP_RQItemRefH rq_itemH = nullptr;
-    ERR(suites.RQItemSuite4()->AEGP_GetRQItemByIndex(
+    ERR(suites.RQItemSuite3()->AEGP_GetRQItemByIndex(
         item_count - 1, &rq_itemH));
 
     A_long outmod_count = 0;
-    ERR(suites.RQItemSuite4()->AEGP_GetNumOutputModulesForRQItem(
+    ERR(suites.RQItemSuite3()->AEGP_GetNumOutputModulesForRQItem(
         rq_itemH, &outmod_count));
     if (!err && outmod_count < 1) {
         return A_Err_GENERIC;
@@ -43,7 +44,7 @@ A_Err Bible_AddCompAndSetFirstOutputPath(
     ERR(suites.OutputModuleSuite4()->AEGP_SetOutputFilePath(
         rq_itemH, outmodH, final_pathZ));
 
-    ERR(suites.RQItemSuite4()->AEGP_SetRenderState(
+    ERR(suites.RQItemSuite3()->AEGP_SetRenderState(
         rq_itemH, TRUE));
 
     return err;

@@ -1,10 +1,13 @@
 #include "AEConfig.h"
 #include "AE_Effect.h"
 #include "AE_EffectSuites.h"
-#include "AEFX_SuiteHelper.h"
-#include "Drawbot.h"
+#include "AEGP_SuiteHandler.h"
+#include "AE_EffectUI.h"
+#include "adobesdk/DrawbotSuite.h"
+#include "../../../19-NATIVE-CODE-FOUNDATION/code/HostCallbackGuard.h"
 
 PF_Err HandleCustomUIEvent(PF_InData* in_data, PF_EventExtra* event_extra) {
+    return static_cast<PF_Err>(GuardAeHostCallback([&]() -> A_Err {
     if (!in_data || !event_extra) return PF_Err_BAD_CALLBACK_PARAM;
     if (event_extra->e_type != PF_Event_DRAW) return PF_Err_NONE;
 
@@ -19,4 +22,5 @@ PF_Err HandleCustomUIEvent(PF_InData* in_data, PF_EventExtra* event_extra) {
     // From here acquire the Drawbot supplier/surface/path suites matching your SDK
     // and perform drawing. Keep Drawbot object lifetimes inside this callback.
     return PF_Err_NONE;
+    }, PF_Err_INTERNAL_STRUCT_DAMAGED));
 }

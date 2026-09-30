@@ -173,3 +173,8 @@
 - [Undo transaction](19-NATIVE-CODE-FOUNDATION/03-UNDO-TRANSACTIONS.md)
 - [Host callback ABI boundary](19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md)
 - [Native C++ foundation — повторно используемые безопасные куски](19-NATIVE-CODE-FOUNDATION/README.md)
+# v1.1 verification and maintenance
+
+- [Verification results and commands](VERIFICATION.md)
+- [Coverage matrix](FINAL-COVERAGE-AUDIT.md)
+- [Reference implementations and guides](20-REFERENCE-IMPLEMENTATIONS/README.md)

@@ -1,36 +1,32 @@
-# Final coverage audit
+# Coverage and verification matrix
 
-Research snapshot: 2026-09-30.
+Edition: **v1.1**, 2026-09-30. A chapter being present does not mean its API family is fully implemented.
 
-## User requirements
+| Area | Documentation | Implementation | Verification |
+|---|---|---|---|
+| Extension selection, architecture, communication | Architectural guidance | Protocol headers and recipes | Manual review |
+| Classic Effect | Lifecycle and rendering guidance | Minimal Gain, 8/16-bpc | SDK 25.6 macOS syntax/type check; host pending |
+| SmartFX | ROI/checkout guidance | Host-copy pass-through, 8/16/32-bpc intent | SDK syntax/type check; pixel/ROI host tests pending; MFR disabled |
+| Custom UI / Drawbot | Event and lifetime guidance | Drawing-reference acquisition skeleton | SDK syntax/type check; no drawing implementation |
+| AEGP MenuTool | Hooks and suites | Command registration and info callback | SDK syntax/type check; host lifecycle tests pending |
+| AEGP recipes | Project, layers, streams, keyframes, render queue | Selected C++ recipes | SDK syntax/type check; host operations pending |
+| Native panels | Architecture and sample selection | Guide only | No implementation/host test |
+| AEIO | Architecture and callback overview | Guide only | No importer/exporter implementation |
+| Artisan | Architecture and sample selection | Guide only | No renderer implementation |
+| PICA / Effect↔AEGP | Communication protocol | Contract headers | No end-to-end provider/consumer host test |
+| JSX / ScriptUI | Usage guidance | Scripts supplied | AE execution pending |
+| CEP | Dispatcher architecture | Logic files; packaging dependencies external | Host execution pending |
+| GPU | Backend design and testing guidance | No GPU implementation | CPU/GPU comparison pending |
+| SDK tooling | Reproducible commands and limits | Declaration index, symbol-name check, textual/order diff | Synthetic regression tests; full SDK index incomplete |
+| C++ foundation | Ownership/undo/callback guidance | Helpers | Behavioral stub tests and SDK syntax/type check |
+| macOS / Windows | Build/distribution guidance | SDK syntax-check driver for Clang | macOS baseline checked; Windows pending |
 
-| Requirement | Coverage | Where |
-|---|---|---|
-| Correct categories | complete | `00-START-HERE`, `14-NATIVE-INTEGRATIONS`, `NAVIGATION.md` |
-| Native AE mechanisms first | complete | `14-NATIVE-INTEGRATIONS`, `17-NATIVE-SUITE-COOKBOOK`, `19-NATIVE-CODE-FOUNDATION` |
-| How Effect plug-ins work | complete | `02-EFFECT-PLUGINS`, native integrations, working templates |
-| How AEGP tools work | complete | `03-AEGP`, native integrations, cookbook |
-| How AEIO works | complete at architecture/API level | `04-AEIO`, native integrations |
-| How Artisan works | complete at architecture/API level | `05-ARTISAN`, native integrations |
-| Keyframer / native panel / BlitHook | covered | `14-NATIVE-INTEGRATIONS` |
-| Scripts / ScriptUI | covered + runnable example | `06-SCRIPTING`, `20-REFERENCE-IMPLEMENTATIONS/Scripts` |
-| CEP / future UXP | covered | `07-PANELS`, CEP bridge |
-| Communication with AE | complete | `01-ARCHITECTURE/07-*`, `15-COMMUNICATION` |
-| Native plug-in ↔ native plug-in | covered | PICA suite + Effect↔AEGP bridge |
-| macOS separately | complete workflow | `08-MACOS` |
-| Windows separately | complete workflow | `09-WINDOWS` |
-| Copyable code | broad coverage | `16-WORKING-TEMPLATES`, `17-.../code`, `19-.../code`, `20-REFERENCE-IMPLEMENTATIONS` |
-| Exact SDK signatures | self-verifying | `18-SDK-HEADER-TOOLS` |
+## Vocabulary
 
-## What "working" means here
+- **Guide only**: explanatory material, no source implementation.
+- **Skeleton**: partial code with explicitly missing behavior.
+- **Source implementation**: behavior is implemented, but host correctness is not implied.
+- **SDK syntax-checked**: the compiler accepted types and declarations for a named SDK/platform.
+- **Host-verified**: a recorded load/operation/render test passed on a named AE build. None is claimed here yet.
 
-This repository can syntax/unit-test its own generic tooling and C++ foundation, but it does not redistribute Adobe's proprietary SDK package and does not have a licensed AE host in CI. Therefore native host-load validation must be run locally against the exact Adobe SDK + After Effects version.
-
-The Bible deliberately distinguishes:
-
-- runnable script/CEP examples;
-- native **drop-ins** designed for official Adobe sample shells;
-- sample-derived native reference code;
-- host-test-required areas such as AEIO/Artisan/native panels.
-
-That distinction is a feature, not a gap: claiming an AEIO or Artisan binary is "really working" without loading it in the target host would be misleading.
+Historical directory names are retained for existing links. `MinimalRegistrar` directories contain guides, not registrar implementations. `drop-in` describes how source is integrated into an Adobe sample, not a verification level.

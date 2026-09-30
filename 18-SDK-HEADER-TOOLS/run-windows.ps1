@@ -11,4 +11,4 @@ py (Join-Path $Here "tools\ae_sdk_inventory.py") $SdkHeaders --json $Inventory -
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 py (Join-Path $Here "tools\verify_recipe_symbols.py") $Inventory (Join-Path $Here "..\17-NATIVE-SUITE-COOKBOOK\code")
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-Write-Host "native SDK validation: PASS"
+Write-Host "symbol-name check: PASS (not a signature, ABI, build or host test)"

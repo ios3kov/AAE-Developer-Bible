@@ -3,7 +3,15 @@
 **Практическая библия разработчика инструментов, скриптов, панелей и нативных plug-in'ов для Adobe After Effects.**
 
 Research snapshot: **2026-09-30**  
-Status: **v1.0 — native-first final reference edition**
+Status: **v1.1 — SDK syntax-checked baseline and reproducible documentation**
+
+## Проверенность v1.1
+
+Исправлены реальные ошибки компиляции шаблонов; 13 translation-unit checks проходят с Adobe SDK 25.6 на macOS arm64. SmartFX реализует pass-through; MFR выключен до host stress tests. SDK tooling проверяет индексируемые объявления и имена символов, а не полную ABI-совместимость. Неполный разбор headers теперь завершает проверку ошибкой.
+
+См. [результаты и команды проверок](VERIFICATION.md) и [фактическое покрытие](FINAL-COVERAGE-AUDIT.md). AEIO, Artisan и native panel пока представлены руководствами. Нативные примеры не имеют статуса host-verified.
+
+Сборка сайта: `python3 -m pip install -r requirements-docs.txt`, затем `python3 scripts/build_docs.py` и `mkdocs build --strict`.
 
 Эта база отвечает не на вопрос «что есть в API», а на вопрос **«как правильно спроектировать, собрать, отладить, протестировать и выпустить инструмент для After Effects»**.
 
