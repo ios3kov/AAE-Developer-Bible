@@ -1,11 +1,13 @@
 # 3D Channel Extract — investigation index
 
-Full-effect acceptance remains **OPEN**. Existing measurements and new test tooling must not be conflated.
+**Full-effect acceptance remains OPEN. No new user AE run is requested.** Existing measurements are preserved, but acquisition statuses must not be read as a completed plug-in acceptance.
 
-- [Numerical observations, 2026-09-30](NUMERICAL-OBSERVATIONS-2026-09-30.md): reviewed user-run 28-case report, scope and limitations.
-- [Next run: Anti-alias edges and frame export](EDGE-AND-RENDER-PROBE.md): AA OFF/ON at each of three bpc levels, six cases total. Portable tests pass; this new workflow has not yet run in AE.
-- [Runtime acceptance protocol](RUNTIME-ACCEPTANCE-MACOS-AE25.6.md): remaining full-effect gates and corrections to earlier screenshot interpretations.
-- [Static function map and reconstruction notes](FILTERMAIN-FUNCTION-MAP-MACOS-AE25.6.md): binary investigation; not a substitute for host measurements.
-- [Chronological binary evidence](BINARY-EVIDENCE-MACOS-AE25.6.md): historical investigation record; later corrections must be respected.
+- [Evidence audit and corrections, 2026-09-30](EVIDENCE-AUDIT-2026-09-30.md): current authoritative interpretation; all six supplied ZIPs and 30 images reviewed, original evidence preserved, full-effect claims withdrawn.
+- [Numerical observations](NUMERICAL-OBSERVATIONS-2026-09-30.md): scoped nested-composition Z-Depth results from the original 28-case report.
+- [Edge sampling and frame exports](EDGE-AND-RENDER-PROBE.md): collector history, actual file precision, decoded AA comparisons and output-pipeline limitations. Not a new run request.
+- [Runtime acceptance protocol](RUNTIME-ACCEPTANCE-MACOS-AE25.6.md): retained observations and remaining test gates.
+- [Corrected static function map](FILTERMAIN-FUNCTION-MAP-MACOS-AE25.6.md): corrected selector byte offset, datatype literals and UNCP interpretation; partial reconstruction, not finished independent code.
+- [Mega v01 withdrawal](MEGA-PROBE.md): why forced selector writes and capability placeholders do not validate all channels.
+- [Chronological binary evidence](BINARY-EVIDENCE-MACOS-AE25.6.md): historical record; superseded interpretations must not override the current audit.
 
-No new rendering or AA acceptance is claimed merely because a script or documentation was committed.
+Next internal work is fixture qualification and source-backed reconstruction, not repeating already collected depth measurements. Historical versions remain in Git; original artifacts remain unchanged.
