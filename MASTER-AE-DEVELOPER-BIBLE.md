@@ -8785,6 +8785,88 @@ MEE_HardcodedPluginsCache::GetAEPlugin
 ```
 
 
+## MEE hardcoded PiPL factory bridge proven
+
+Reverse engineering of `MEE.dylib` now connects the hardcoded cache directly to the AE Library video-filter factory.
+
+### AELib plugin setter storage
+
+`MEE_SetAELibPluginSetter(...)` copies/swaps the supplied `boost::function<int(IPlugin, IPiPL, AELibPluginCachedInfos&)>` into a process-global function object around:
+
+```text
+MEE.dylib + 0x10FE60
+```
+
+`MEE_GetAELibPluginSetter()` returns a copy of that same stored callback.
+
+Since aelib was previously proven to register:
+
+```text
+aelib::SetupAEPlugin @ 0x63AA0
+```
+
+through `MEE_SetAELibPluginSetter`, the callback is now proven to persist inside MEE for later plugin setup.
+
+### AELibraryVideoFilterFactory uses the hardcoded cache
+
+`ML::AELibraryVideoFilterFactory::GetPiPLFromHardcodedCache(IPlugin, bool&)` is a thin wrapper that obtains:
+
+```text
+MEE_HardcodedPluginsCache::GetInstance()
+```
+
+and tail-calls:
+
+```text
+MEE_HardcodedPluginsCache::GetPiPLFromHardcodedCache(IPlugin const&, bool&)
+```
+
+The generic `ML::IPluginModuleFactory::GetPiPLFromHardcodedCache` implementation simply returns an empty PiPL, confirming that hardcoded PiPL support is a specialization of the AE Library video-filter factory path.
+
+### GetPiPLFromHardcodedCache lookup path
+
+Inside `MEE_HardcodedPluginsCache::GetPiPLFromHardcodedCache`:
+
+1. The incoming `IPlugin` is queried for its plugin path.
+2. That path is passed to:
+   `MEE_HardcodedPluginsCache::GetAEPlugin(path)`.
+3. If a hardcoded entry exists, the cache iterates the stored effect records and constructs an `IPiPL` representation from that metadata.
+
+This establishes:
+
+```text
+IPlugin
+  → AELibraryVideoFilterFactory::GetPiPLFromHardcodedCache
+  → MEE_HardcodedPluginsCache
+  → GetAEPlugin(plugin path)
+  → hardcoded effect record
+  → IPiPL
+```
+
+Combined with the earlier callback registration:
+
+```text
+hardcodedpipls.txt
+  → MEE_HardcodedPluginsCache
+  → AELibraryVideoFilterFactory
+  → IPlugin + IPiPL
+  → MEE stored AELib plugin setter
+  → aelib::SetupAEPlugin
+  → FLT_SetupAEPlugin
+```
+
+### Remaining gap
+
+The remaining static proof is the actual invocation site of the stored AELib plugin setter after the factory has produced the hardcoded PiPL. Once that call is located, the generic hardcoded-effect loading chain is complete.
+
+After that, the final target-specific task is to identify the concrete function pointer returned for:
+
+```text
+ADBE AUX CHANNEL EXTRACT
+EntryPointName = FilterMain
+```
+
+
 ---
 
 <!-- SOURCE: 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/EXECUTION-PLAN.md -->
