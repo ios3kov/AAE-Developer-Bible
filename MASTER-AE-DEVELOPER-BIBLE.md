@@ -8946,6 +8946,46 @@ EntryPointName = FilterMain
 and map that address to its containing image/function implementation.
 
 
+## Target-specific EffectProc resolved: ADBE AUX CHANNEL EXTRACT
+
+Dynamic LLDB tracing finally resolved the exact callable used by the built-in effect `ADBE AUX CHANNEL EXTRACT`.
+
+The target `FLT_FCSpec` was identified by its in-object match-name at offset `+0x40`:
+
+```text
+ADBE AUX CHANNEL EXTRACT
+```
+
+For the matched `FLT_FCSpec`:
+
+```text
+FLT_FCSpec                 = 0x00000008Aefd0f00
+FLT_FCSpec + 0xD0          = 0x00000001666c85b0
+```
+
+LLDB resolved that pointer as:
+
+```text
+Address: Aux_Channel_Extract[0x00000000000045b0]
+Summary: Aux_Channel_Extract`FilterMain
+```
+
+Therefore the target-specific chain is now proven end-to-end:
+
+```text
+hardcodedpipls.txt
+  → ADBE AUX CHANNEL EXTRACT
+  → EntryPointName = FilterMain
+  → PLUG routine resolution
+  → FLT_FCSpec
+  → EffectProc stored at FCSpec + 0xD0
+  → Aux_Channel_Extract + 0x45B0
+  → FilterMain
+```
+
+This closes the remaining target-specific gap for 3D Channel Extract on macOS After Effects 25.6.0.101 arm64.
+
+
 ---
 
 <!-- SOURCE: 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/EXECUTION-PLAN.md -->
