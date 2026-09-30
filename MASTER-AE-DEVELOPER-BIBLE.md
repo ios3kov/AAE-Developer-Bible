@@ -8665,6 +8665,126 @@ is instantiated through this exact callback.
 Next: trace references/callback registration for `aelib::SetupAEPlugin` and connect them to hardcoded PiPL enumeration/loading.
 
 
+## Hardcoded PiPL cache and aelib plugin callback registration proven
+
+Two previously separate parts of the loading path are now directly visible in `aelib.framework`.
+
+### 1. SetupAEPlugin is explicitly registered with MEE
+
+During aelib initialization, the address of the local function:
+
+```text
+(anonymous namespace)::SetupAEPlugin(...) = 0x63AA0
+```
+
+is placed into a `boost::function` object and passed to:
+
+```text
+MEE_SetAELibPluginSetter(...)
+```
+
+Recovered core:
+
+```asm
+0x61558  adrp x8, 0x63000
+0x6155c  add  x8, x8, #0xaa0      ; 0x63AA0 = SetupAEPlugin
+...
+0x61568  stp  x9, x8, [sp, #0xa8]
+0x6156c  add  x0, sp, #0xa8
+0x61570  bl   MEE_SetAELibPluginSetter(...)
+```
+
+Immediately after registering that callback, aelib calls:
+
+```text
+ML::PluginSupport::LoadAEPlugins(...)
+MEE_GetVideoFilterModules(...)
+FLT_NotifyFilterLoadingDone(...)
+MEE_NotifyFilterLoadingDone(...)
+```
+
+This proves that MEE/PluginSupport is configured to call back into aelib's `SetupAEPlugin`, which in turn calls `FLT_SetupAEPlugin`.
+
+### 2. hardcodedpipls resource is loaded into MEE_HardcodedPluginsCache
+
+`initializeHardcodedPluginsCache()` explicitly requests the bundle resource:
+
+```text
+hardcodedpipls
+type: txt
+```
+
+through `GetBinaryFromModule(...)`, converts the returned bytes into a string, and calls:
+
+```text
+MEE_HardcodedPluginsCache::Initialize(hardcodedPiPLText, false)
+```
+
+Recovered core includes:
+
+```asm
+... literal "hardcodedpipls"
+... literal "txt"
+bl GetBinaryFromModule(...)
+...
+bl MEE_HardcodedPluginsCache::Initialize(...)
+```
+
+The nearby `SkipHardcoded_PLUGScanFunc(path)` also queries:
+
+```text
+MEE_HardcodedPluginsCache::GetInstance()
+MEE_HardcodedPluginsCache::GetAEPlugin(path)
+```
+
+showing that the hardcoded cache participates directly in plugin discovery/scan decisions.
+
+### Proven architecture after this milestone
+
+```text
+aelib resource: hardcodedpipls
+  → initializeHardcodedPluginsCache
+  → MEE_HardcodedPluginsCache::Initialize
+
+aelib initialization
+  → boost::function(SetupAEPlugin @ 0x63AA0)
+  → MEE_SetAELibPluginSetter
+  → ML::PluginSupport::LoadAEPlugins
+
+MEE invokes registered aelib plugin setter
+  → aelib::SetupAEPlugin
+  → FLT_SetupAEPlugin
+  → FLTp_FiltSetup
+  → PLUG_RegisterRoutine
+  → PiPL EntryPointName
+  → GetEntryPoint("FilterMain")
+  → PLUG_RoutineDesc + 0x08
+  → FLT_FCSpec + 0xD0
+  → EffectProc dispatch
+```
+
+### Remaining target-specific gap
+
+The generic callback/cache architecture is now proven. The last target-specific gap is to show that the hardcoded cache entry for:
+
+```text
+ADBE AUX CHANNEL EXTRACT
+Plug-Ins/Effects/Aux_Channel_Extract
+EntryPointName = FilterMain
+```
+
+produces the specific `IPlugin/IPiPL` pair passed through the registered setter, and then identify the concrete function address returned for `FilterMain`.
+
+Next: reverse engineer the relevant `MEE.dylib` functions, especially:
+
+```text
+MEE_SetAELibPluginSetter
+MEE_HardcodedPluginsCache::Initialize
+MEE_HardcodedPluginsCache::GetPiPLFromHardcodedCache
+MEE_HardcodedPluginsCache::GetAEPlugin
+```
+
+
 ---
 
 <!-- SOURCE: 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/EXECUTION-PLAN.md -->
