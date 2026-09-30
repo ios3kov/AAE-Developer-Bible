@@ -8200,6 +8200,56 @@ The `BLR` target above is the callable stored in the `PluginDispatch` payload. W
 Next target: trace construction/copy of `FLTHost::PluginDispatch` into `U_GenericPluginDispatch` and identify the value placed at payload offset `+0x0`.
 
 
+## EffectProc dispatch chain proven end-to-end
+
+The `FLT_FCSpec` vtable is located at `0xD5C70`. After the Itanium C++ ABI vtable header and destructor entries, the virtual slot used by `FLTHost::DispatchFilter` resolves to:
+
+```text
+0x5E2F0  FLT_FCSpec::GetEffectProc() const
+```
+
+Recovered implementation:
+
+```asm
+0x5e2f0  add  x8, x0, #0xd0
+0x5e2f4  ldar x0, [x8]
+0x5e2f8  ret
+```
+
+Therefore `GetEffectProc()` atomically loads the stored effect procedure pointer from `FLT_FCSpec + 0xD0`.
+
+Earlier disassembly of `FLTHost::DispatchFilter` showed the virtual call result being placed into the first word of the `PluginDispatch` payload. `U_GenericPluginDispatch` copies that payload unchanged, and its protected dispatch paths later execute the first word through `BLR`.
+
+### Proven chain
+
+```text
+FLT_FCSpec
+  → virtual GetEffectProc()
+  → atomic load [FLT_FCSpec + 0xD0]
+  → PluginDispatch[0]
+  → U_GenericPluginDispatch copies PluginDispatch unchanged
+  → machine-exception / crash-context wrapper
+  → BLR PluginDispatch[0]
+  → concrete EffectProc
+```
+
+This closes the previously unknown host-dispatch bridge.
+
+### What remains unknown
+
+This proves **how After Effects invokes the concrete effect procedure**, but does not yet identify the procedure stored at `+0xD0` specifically for **3D Channel Extract / ADBE AUX CHANNEL EXTRACT**.
+
+Next target:
+
+```text
+ADBE AUX CHANNEL EXTRACT
+→ its FLT_FCSpec instance
+→ value stored at FCSpec + 0xD0
+→ concrete EffectProc address
+→ disassembly / algorithm reconstruction
+```
+
+
 ---
 
 <!-- SOURCE: 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/EXECUTION-PLAN.md -->
