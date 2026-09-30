@@ -9766,6 +9766,48 @@ Record:
 This protocol is complete only when every gate above is PASS or explicitly UNAVAILABLE with a reason. Static evidence may explain a runtime observation but may not replace it.
 
 
+## Runtime observation 2026-09-30 — plain Black Solid
+
+Host UI observation on a plain Black Solid confirms the popup order:
+
+1. Z-Depth
+2. Object ID
+3. Texture UV
+4. Surface Normals
+5. Coverage
+6. Background RGB
+7. Unclamped RGB
+8. Material ID
+
+Observed initial values with Z-Depth selected:
+
+- Black Point = 5000.0
+- White Point = 0.0
+- Anti-alias = OFF
+- Clamp Output = ON
+- Invert Depth Map = OFF
+
+On this source, Anti-alias and Clamp Output are visually disabled for Z-Depth. This must not be generalized to a source that actually exposes auxiliary depth data.
+
+For every non-depth selection observed (Object ID, Texture UV, Surface Normals, Coverage, Background RGB, Unclamped RGB, Material ID), all five subordinate controls are visually disabled while retaining their stored values:
+
+- Black Point = 5000.0
+- White Point = 0.0
+- Anti-alias = OFF
+- Clamp Output = ON
+- Invert Depth Map = OFF
+
+This proves a UI dependency on channel/source state and confirms that the stored parameter values survive while controls are disabled. It does **not** yet prove the enabled-state rules on a real auxiliary-channel source.
+
+### Status updates
+
+- [x] UI popup order observed directly.
+- [x] Initial visible stored values observed on plain Black Solid.
+- [x] Non-depth disabled-control behavior observed on plain Black Solid.
+- [ ] Exact popup stored integer ↔ FourCC still requires LLDB observation.
+- [ ] Enabled-state/default/range behavior on an actual 3D auxiliary source remains open.
+
+
 ---
 
 <!-- SOURCE: 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/EXECUTION-PLAN.md -->
