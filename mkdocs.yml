@@ -13,6 +13,8 @@ nav:
   - Sources: SOURCES.md
   - Verification: VERIFICATION.md
   - Coverage: FINAL-COVERAGE-AUDIT.md
+  - Completion plan: COMPLETION-PLAN.md
+  - Completion checklist: COMPLETION-CHECKLIST.md
   - Reference implementations: 20-REFERENCE-IMPLEMENTATIONS/README.md
   - 00-START-HERE:
       - "Decision tree — что именно вы разрабатываете?": 00-START-HERE/00-DECISION-TREE.md
@@ -95,7 +97,7 @@ nav:
       - "Bug report template": 13-TEMPLATES/BUG-REPORT.md
       - "Compatibility matrix template": 13-TEMPLATES/COMPATIBILITY-MATRIX.md
       - "Performance report template": 13-TEMPLATES/PERFORMANCE-REPORT.md
-      - "Plug-in specification template": 13-TEMPLATES/PLUGIN-SPEC.md
+      - "Plugin specification template": 13-TEMPLATES/PLUGIN-SPEC.md
       - "Release notes template": 13-TEMPLATES/RELEASE-NOTES.md
   - 14-NATIVE-INTEGRATIONS:
       - "Native SDK taxonomy": 14-NATIVE-INTEGRATIONS/01-TAXONOMY.md
@@ -168,3 +170,5 @@ nav:
       - "Undo transaction": 19-NATIVE-CODE-FOUNDATION/03-UNDO-TRANSACTIONS.md
       - "Host callback ABI boundary": 19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md
       - "Native C++ foundation — повторно используемые безопасные куски": 19-NATIVE-CODE-FOUNDATION/README.md
+  - 22-PROJECT-CASE-STUDIES:
+      - "Практические кейсы — FSTR Line и AE Hot Loader": 22-PROJECT-CASE-STUDIES/README.md
