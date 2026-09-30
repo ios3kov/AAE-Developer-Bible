@@ -1,3 +1,4 @@
+21fcdaba1d14dbef920f6924c255a2d67a545717f1295559df302758652b1e6f  .github/workflows/acx-fixture.yml
 eda8d655fa2c5702535bdffee2965bc95d45c34fd6e538da46c4ea892320a558  .github/workflows/regenerate-effects-catalog.yml
 6a49cec3995697f15d0d30dfd63ad51f87f84b46e47d681d3ec0d0a087c879be  .github/workflows/validate.yml
 857aed2c1949d010ede7b8011c71e2907b0fc1377fbb7762f0a61d5d85bb57d6  .gitignore
