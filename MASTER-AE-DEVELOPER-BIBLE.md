@@ -8606,6 +8606,65 @@ IPiPL + existing IPlugin
 and identify the backing module/path that resolves `FilterMain`.
 
 
+## aelib → FLT plugin setup bridge proven
+
+The internal `aelib.framework` imports both:
+
+```text
+FLT_SetupAEPlugin(IPlugin, IPiPL, AELibPluginCachedInfos&)
+FLT_NotifyFilterLoadingDone(...)
+```
+
+Within `aelib`, the local wrapper:
+
+```text
+(anonymous namespace)::SetupAEPlugin(IPlugin, IPiPL, AELibPluginCachedInfos&)
+```
+
+copies/refcounts the incoming `IPlugin` and `IPiPL` interfaces and directly calls the imported `FLT_SetupAEPlugin(...)`.
+
+Recovered core:
+
+```asm
+add  x0, sp, #0x18    ; IPlugin
+mov  x1, sp           ; IPiPL
+bl   FLT_SetupAEPlugin(...)
+```
+
+If the FLT path reports the relevant fallback/AEGP condition, the same wrapper subsequently calls:
+
+```text
+MEE_SetupAEGPPlugin(IPlugin const&, IPiPL const&)
+```
+
+### Consequence
+
+This proves a direct Adobe-internal bridge:
+
+```text
+aelib plugin/PiPL loading
+  → aelib::SetupAEPlugin
+  → FLT_SetupAEPlugin
+  → FLTp_FiltSetup
+  → PLUG_RegisterRoutine
+  → EntryPointName resolution
+  → EffectProc
+```
+
+### Remaining proof gap
+
+This establishes the generic aelib-to-FLT path, but does not yet prove that the specific hardcoded PiPL entry:
+
+```text
+ADBE AUX CHANNEL EXTRACT
+EntryPointName = FilterMain
+```
+
+is instantiated through this exact callback.
+
+Next: trace references/callback registration for `aelib::SetupAEPlugin` and connect them to hardcoded PiPL enumeration/loading.
+
+
 ---
 
 <!-- SOURCE: 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/EXECUTION-PLAN.md -->
