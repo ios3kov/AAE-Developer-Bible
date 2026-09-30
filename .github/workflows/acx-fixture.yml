@@ -25,7 +25,8 @@ jobs:
       - name: Portable fixture safety and structure tests (not AE)
         run: python -m unittest discover -s scripts -p test_acx_fixture_candidate.py -v
       - name: Install pinned independent OpenEXR reader
-        run: python -m pip install --only-binary=:all: OpenEXR==3.3.3 numpy==1.26.4
+        run: >-
+          python -m pip install --only-binary=:all: OpenEXR==3.3.3 numpy==1.26.4
       - name: Generate deterministic source data
         run: python scripts/acx_fixture_candidate.py build ACX_Input_Candidate --source-commit "$GITHUB_SHA"
       - name: Decode and compare every input plane with the reference library
