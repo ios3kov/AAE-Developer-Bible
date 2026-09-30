@@ -1,6 +1,6 @@
 # Minimal AEIO registrar
 
-Status: **guide-only — no registrar source supplied**. The historical directory name is retained for existing links.
+Status: **SDK sample workspace: `IO`/`FBIO`; host-test pending**. Materialize with `scripts/materialize_sdk_examples.py`.
 
 AEIO is not just a single entry function: After Effects asks the module to register an `AEIO_FunctionBlock` whose callbacks implement file sniffing, spec creation/disposal, metadata, frame/audio retrieval and (for output modules) writing.
 

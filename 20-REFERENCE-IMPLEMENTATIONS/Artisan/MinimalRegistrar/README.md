@@ -1,6 +1,6 @@
 # Minimal Artisan registrar
 
-Status: **guide-only — no registrar source supplied**. The historical directory name is retained for existing links.
+Status: **SDK sample workspace: `Artie`; host-test pending**. Materialize with `scripts/materialize_sdk_examples.py`.
 
 Artisan replaces parts of AE's 3D rendering path and has a much larger host contract than a normal Effect. Start from the SDK Artisan sample, preserve its registration/function-table plumbing, then replace scene/render code incrementally.
 

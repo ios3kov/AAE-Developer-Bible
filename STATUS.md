@@ -16,4 +16,4 @@ Updated: **2026-09-30**. Native compilation baseline: **Adobe SDK 25.6, macOS ar
 
 Syntax compilation does not establish linking, PiPL correctness, host loading, rendered pixels or MFR safety. No native binary in this edition is labelled host-verified. Windows compilation and AE host tests remain pending. An installed AE application is not evidence of a successful test.
 
-See [verification commands and results](VERIFICATION.md) and [coverage matrix](FINAL-COVERAGE-AUDIT.md).
+See [verification commands and results](VERIFICATION.md) and [coverage matrix](FINAL-COVERAGE-AUDIT.md). Six families now have reproducible exact-SDK sample workspaces; none is called host-verified until the full cycle is recorded.

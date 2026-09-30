@@ -7657,7 +7657,7 @@ The example intentionally performs a harmless operation: reports info to the use
 
 # Native AEGP panel path
 
-Status: **guide-only — no panel source supplied**.
+Status: **SDK sample workspace: `Panelator`; host-test pending**. Materialize with `scripts/materialize_sdk_examples.py`.
 
 Native panel integration is version-sensitive and sample-dependent. Use `14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md` as the contract and graft registration into the closest AEGP UI sample shipped with the exact SDK version.
 
@@ -7670,7 +7670,7 @@ The Bible intentionally does not publish invented project glue here. The host re
 
 # Minimal AEIO registrar
 
-Status: **guide-only — no registrar source supplied**. The historical directory name is retained for existing links.
+Status: **SDK sample workspace: `IO`/`FBIO`; host-test pending**. Materialize with `scripts/materialize_sdk_examples.py`.
 
 AEIO is not just a single entry function: After Effects asks the module to register an `AEIO_FunctionBlock` whose callbacks implement file sniffing, spec creation/disposal, metadata, frame/audio retrieval and (for output modules) writing.
 
@@ -7685,7 +7685,7 @@ A "registration-only" source file is intentionally not labelled working because 
 
 # Minimal Artisan registrar
 
-Status: **guide-only — no registrar source supplied**. The historical directory name is retained for existing links.
+Status: **SDK sample workspace: `Artie`; host-test pending**. Materialize with `scripts/materialize_sdk_examples.py`.
 
 Artisan replaces parts of AE's 3D rendering path and has a much larger host contract than a normal Effect. Start from the SDK Artisan sample, preserve its registration/function-table plumbing, then replace scene/render code incrementally.
 
@@ -7756,11 +7756,38 @@ Run `scripts/check_native.py` against your SDK for syntax/type checks, build in 
 
 ---
 
+<!-- SOURCE: 20-REFERENCE-IMPLEMENTATIONS/GPU/README.md -->
+
+# GPU effect implementation path
+
+Status: **SDK sample workspace: `Effect/SDK_Invert_ProcAmp`; host GPU-test pending**.
+
+The implementation is deliberately based on Adobe's version-matched GPU sample because kernel build dependencies, PiPL flags, GPU device callbacks and generated assets vary by SDK. Materialize it with:
+
+```bash
+python3 scripts/materialize_sdk_examples.py "/path/to/SDK/Examples" --only gpu-effect
+```
+
+Keep the sample project and replace the CPU/GPU math only after CPU reference and tolerance tests exist. Do not enable GPU flags in a custom binary without checking both `GLOBAL_SETUP` and `PF_RenderOutputFlag_GPU_RENDER_POSSIBLE`.
+
+
+---
+
 <!-- SOURCE: 20-REFERENCE-IMPLEMENTATIONS/README.md -->
 
 # Reference implementations
 
 v1.1 verification: [coverage matrix](20-REFERENCE-IMPLEMENTATIONS/../FINAL-COVERAGE-AUDIT.md), [commands and results](20-REFERENCE-IMPLEMENTATIONS/../VERIFICATION.md). AEIO/Artisan/native-panel entries are **guide only**; Drawbot is an acquisition skeleton. Script/CEP host execution is pending. The historical matrix below describes intended integration, not test evidence.
+
+## v1.2 implementation workspaces
+
+Materialize the exact licensed SDK samples locally:
+
+```bash
+python3 scripts/materialize_sdk_examples.py "/path/to/SDK/Examples"
+```
+
+This creates untracked graft workspaces for AEIO (`IO`), Artisan (`Artie`), native panel (`Panelator`), GPU (`SDK_Invert_ProcAmp`), PICA (`Sweetie`) and Effect↔AEGP (`Commando`). SDK project/PiPL/utility files remain owned by Adobe and are not redistributed here.
 
 MenuTool, Keyframer and bridge files forward to canonical sources in sections 16/17. Compile either location, not both, and retain the relative directory layout or copy the canonical implementation.
 
@@ -7876,16 +7903,16 @@ Edition: **v1.1**, 2026-09-30. A chapter being present does not mean its API fam
 | Custom UI / Drawbot | Event and lifetime guidance | Drawing-reference acquisition skeleton | SDK syntax/type check; no drawing implementation |
 | AEGP MenuTool | Hooks and suites | Command registration and info callback | SDK syntax/type check; host lifecycle tests pending |
 | AEGP recipes | Project, layers, streams, keyframes, render queue | Selected C++ recipes | SDK syntax/type check; host operations pending |
-| Native panels | Architecture and sample selection | Guide only | No implementation/host test |
-| AEIO | Architecture and callback overview | Guide only | No importer/exporter implementation |
-| Artisan | Architecture and sample selection | Guide only | No renderer implementation |
-| PICA / Effect↔AEGP | Communication protocol | Contract headers | No end-to-end provider/consumer host test |
+| Native panels | Architecture and Panelator sample path | Local SDK sample workspace | Host test pending |
+| AEIO | Architecture and IO/FBIO sample path | Local SDK sample workspace | Host test pending |
+| Artisan | Architecture and Artie sample path | Local SDK sample workspace | Host test pending |
+| PICA / Effect↔AEGP | Communication protocol and Sweetie/Commando paths | Local SDK sample workspaces | End-to-end host test pending |
 | JSX / ScriptUI | Usage guidance | Scripts supplied | AE execution pending |
 | CEP | Dispatcher architecture | Logic files; packaging dependencies external | Host execution pending |
-| GPU | Backend design and testing guidance | No GPU implementation | CPU/GPU comparison pending |
+| GPU | Backend design and testing guidance | SDK_Invert_ProcAmp sample path | GPU comparison pending |
 | SDK tooling | Reproducible commands and limits | Declaration index, symbol-name check, textual/order diff | Synthetic regression tests; full SDK index incomplete |
 | C++ foundation | Ownership/undo/callback guidance | Helpers | Behavioral stub tests and SDK syntax/type check |
-| macOS / Windows | Build/distribution guidance | SDK syntax-check driver for Clang | macOS baseline checked; Windows pending |
+| macOS / Windows | Build/distribution guidance | Sample materializer + syntax drivers | macOS checked; Windows runner requires SDK |
 
 ## Vocabulary
 
@@ -8362,7 +8389,7 @@ Updated: **2026-09-30**. Native compilation baseline: **Adobe SDK 25.6, macOS ar
 
 Syntax compilation does not establish linking, PiPL correctness, host loading, rendered pixels or MFR safety. No native binary in this edition is labelled host-verified. Windows compilation and AE host tests remain pending. An installed AE application is not evidence of a successful test.
 
-See [verification commands and results](VERIFICATION.md) and [coverage matrix](FINAL-COVERAGE-AUDIT.md).
+See [verification commands and results](VERIFICATION.md) and [coverage matrix](FINAL-COVERAGE-AUDIT.md). Six families now have reproducible exact-SDK sample workspaces; none is called host-verified until the full cycle is recorded.
 
 
 ---
@@ -8379,6 +8406,8 @@ See [verification commands and results](VERIFICATION.md) and [coverage matrix](F
 - Foundation: strict C++17 build and behavioral assertions passed against synthetic stubs.
 - Full SDK index: 70 headers, 230 recognized tables, 3537 parsed functions. **Incomplete**: unsupported declarations produce diagnostics and a nonzero exit code. These counts are exploratory, not coverage claims.
 - Native linking, PiPL packaging, AE loading/rendering, MFR stress and Windows compilation: **not verified**.
+
+`scripts/materialize_sdk_examples.py` provides exact local sample shells for all six gaps. `scripts/host_cycle.py` installs a built bundle and optionally invokes `aerender`, but intentionally reports UI load/unload and MFR stress as pending.
 
 ## Reproduce portable checks
 

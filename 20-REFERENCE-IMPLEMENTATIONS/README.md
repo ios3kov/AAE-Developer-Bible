@@ -2,6 +2,16 @@
 
 v1.1 verification: [coverage matrix](../FINAL-COVERAGE-AUDIT.md), [commands and results](../VERIFICATION.md). AEIO/Artisan/native-panel entries are **guide only**; Drawbot is an acquisition skeleton. Script/CEP host execution is pending. The historical matrix below describes intended integration, not test evidence.
 
+## v1.2 implementation workspaces
+
+Materialize the exact licensed SDK samples locally:
+
+```bash
+python3 scripts/materialize_sdk_examples.py "/path/to/SDK/Examples"
+```
+
+This creates untracked graft workspaces for AEIO (`IO`), Artisan (`Artie`), native panel (`Panelator`), GPU (`SDK_Invert_ProcAmp`), PICA (`Sweetie`) and Effect↔AEGP (`Commando`). SDK project/PiPL/utility files remain owned by Adobe and are not redistributed here.
+
 MenuTool, Keyframer and bridge files forward to canonical sources in sections 16/17. Compile either location, not both, and retain the relative directory layout or copy the canonical implementation.
 
 This directory turns the architecture chapters into copyable starting points.

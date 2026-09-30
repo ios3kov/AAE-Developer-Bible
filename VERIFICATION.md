@@ -9,6 +9,8 @@
 - Full SDK index: 70 headers, 230 recognized tables, 3537 parsed functions. **Incomplete**: unsupported declarations produce diagnostics and a nonzero exit code. These counts are exploratory, not coverage claims.
 - Native linking, PiPL packaging, AE loading/rendering, MFR stress and Windows compilation: **not verified**.
 
+`scripts/materialize_sdk_examples.py` provides exact local sample shells for all six gaps. `scripts/host_cycle.py` installs a built bundle and optionally invokes `aerender`, but intentionally reports UI load/unload and MFR stress as pending.
+
 ## Reproduce portable checks
 
 ```bash
