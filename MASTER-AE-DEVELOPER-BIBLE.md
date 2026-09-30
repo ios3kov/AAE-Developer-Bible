@@ -1,0 +1,8053 @@
+# AE Developer Bible — MASTER v0.4
+
+Generated from the structured Markdown tree. Links are rewritten to be valid from this root-level MASTER file.
+
+
+---
+
+<!-- SOURCE: README.md -->
+
+# AE Developer Bible
+
+**Практическая библия разработчика инструментов, скриптов, панелей и нативных plug-in'ов для Adobe After Effects.**
+
+Research snapshot: **2026-09-30**  
+Status: **v0.4 — self-verifying native SDK edition**
+
+Эта база отвечает не на вопрос «что есть в API», а на вопрос **«как правильно спроектировать, собрать, отладить, протестировать и выпустить инструмент для After Effects»**.
+
+## Главный принцип
+
+Сначала выбирается **правильный тип расширения**, и только потом технология:
+
+| Задача | Основной путь |
+|---|---|
+| Обработать пиксели / создать эффект | C++ Effect plug-in |
+| Глубоко управлять проектом/AE, меню, hooks | AEGP |
+| Импорт/экспорт собственного медиаформата | AEIO |
+| Заменить 3D-renderer AE | Artisan — только при реальной необходимости |
+| Автоматизировать проект, слои, render queue | ExtendScript |
+| Сделать dockable UI-панель | CEP сейчас; UXP — план миграции |
+| Высокая скорость + UI | Hybrid: native C++ + panel/script bridge |
+
+## Что читать сначала
+
+1. [`00-START-HERE/00-DECISION-TREE.md`](00-START-HERE/00-DECISION-TREE.md)
+2. [`00-START-HERE/01-EXTENSION-TYPES.md`](00-START-HERE/01-EXTENSION-TYPES.md)
+3. Затем ветку своей платформы:
+   - [`08-MACOS/README.md`](08-MACOS/README.md)
+   - [`09-WINDOWS/README.md`](09-WINDOWS/README.md)
+4. Для C++ effect plug-in — [`02-EFFECT-PLUGINS/README.md`](02-EFFECT-PLUGINS/README.md)
+5. Перед релизом — [`11-DISTRIBUTION/03-RELEASE-CHECKLIST.md`](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
+
+## Структура
+
+```text
+00-START-HERE/       выбор архитектуры и технологии
+01-ARCHITECTURE/     общая архитектура SDK, lifecycle, PiPL, ABI
+02-EFFECT-PLUGINS/   эффекты, SmartFX, MFR, GPU, UI, color
+03-AEGP/             глубокая интеграция с AE
+04-AEIO/             import/export
+05-ARTISAN/          custom 3D renderer
+06-SCRIPTING/        ExtendScript / ScriptUI / expressions
+07-PANELS/           CEP и переход на UXP
+08-MACOS/            Xcode, Universal, debug, signing, notarization
+09-WINDOWS/          Visual Studio, x64/ARM64, debug, signing
+10-TESTING/          correctness, MFR, GPU/CPU, perf, crashes
+11-DISTRIBUTION/     versioning, packaging, release
+12-RECIPES/          практические пошаговые сценарии
+13-TEMPLATES/        шаблоны ТЗ, bug report, compatibility matrix
+14-NATIVE-INTEGRATIONS/ полный taxonomy нативных C++ integration types
+15-COMMUNICATION/      как AE, plug-ins, scripts и panels общаются
+16-WORKING-TEMPLATES/  рабочие drop-in C++/JSX/CEP шаблоны
+17-NATIVE-SUITE-COOKBOOK/ suite-by-suite native recipes + C++ drop-ins
+18-SDK-HEADER-TOOLS/     generate/verify/diff exact native SDK contracts
+19-NATIVE-CODE-FOUNDATION/ reusable suite/ownership/undo ABI helpers
+```
+
+
+## Новое в v0.4
+
+- Добавлен header-derived API inventory: локальный Adobe SDK автоматически превращается в точный Suite/FunctionBlock → function → signature index.
+- Генератор охватывает AEGP, PF/Effect, AEIO function blocks, Artisan/PR entry points, Drawbot и другие native function tables.
+- Добавлены `verify_recipe_symbols.py` и `diff_sdk_inventory.py`: проверка cookbook calls против конкретного SDK и diff двух SDK versions.
+- Добавлены отдельные launchers для macOS (`run-macos.sh`) и Windows (`run-windows.ps1`).
+- Добавлен native C++ foundation: PICA suite acquire/release, move-only owners для stream/effect/frame/memory handles, undo scope и exception boundary.
+- Python tooling проходит unit test; C++ foundation проходит strict C++17 compile (`-Wall -Wextra -Werror`) против синтетического ABI-stub.
+- Это не заменяет compile/load test с реальным Adobe SDK + After Effects host.
+
+## Новое в v0.3
+
+- Suite-by-suite native cookbook: project/items/comps/layers/effects/streams/keyframes/masks/text/render/render queue/guides.
+- Добавлен function map по основным AEGP suites: какой вызов за что отвечает.
+- Добавлены новые compile-shaped C++ drop-ins для project traversal, comp/layer, effect/stream, keyframes, frame checkout и render queue.
+- Добавлен `14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md`: зафиксированы ошибки/опечатки публичного HTML guide и правило «headers are source of truth».
+- Введены уровни доверия `SDK-verified`, `sample-derived`, `host-test-required`.
+- Исправлены найденные при перепроверке сигнатур ошибки до релиза v0.3 (`CreateComp` framerate, mask API, render-queue state, LayerID type).
+
+## Новое в v0.2
+
+- Полная taxonomy нативных integration types: Effect, AEGP, Keyframer, native panel, AEIO, Artisan, Interactive Artisan, BlitHook, shared PICA suites и legacy paths.
+- Отдельная карта внутренней коммуникации: selectors, hooks, PICA, generic Effect calls, scripting и CEP bridge.
+- Working templates: Minimal Gain Effect, AEGP menu tool, Effect↔AEGP message protocol, PICA shared-suite ABI, standalone JSX и CEP JSON bridge.
+- Зафиксировано правило: C++ templates graft-ятся в официальный SDK sample, чтобы не ломать PiPL/platform build plumbing.
+
+## Состояние UXP / CEP на дату снимка
+
+Adobe 24 сентября 2026 объявила расширение UXP на After Effects. **Public beta UXP для After Effects заявлена к ноябрю 2026**, поэтому на дату этой базы UXP нельзя считать стабильным production-путём для AE. CEP остаётся рабочим legacy-путём, но Adobe объявила его постепенный вывод; полный retirement заявлен к концу 2029.
+
+Практическое правило на сегодня:
+
+- новый тяжёлый render/effect код → **C++ SDK**;
+- новая панель, которую надо выпустить прямо сейчас → **CEP**, но архитектуру отделять от UI, чтобы облегчить UXP migration;
+- не зашивать бизнес-логику в CEP DOM/Node-код без слоя абстракции.
+
+## Что эта база не делает
+
+- Не перепечатывает Adobe SDK Guide.
+- Не подменяет headers и sample projects из официального SDK.
+- Не обещает бинарную совместимость без тестирования.
+- Не считает внутренние/недокументированные API допустимым production-контрактом.
+
+## Golden rules
+
+1. Для native-разработки **стартуй от ближайшего Adobe sample**, а не с пустого Xcode/Visual Studio проекта.
+2. Один `.r`/PiPL источник — для macOS и Windows.
+3. Никогда не выпускай MFR-флаг, пока render path не доказанно thread-safe.
+4. Не держи mutex, вызывая обратно host API.
+5. Не позволяй C++ exception пересечь `extern "C"` entry point.
+6. Результат CPU и GPU должен быть визуально/численно эквивалентен в пределах заранее заданной tolerance.
+7. Каждый заявленный AE version и architecture — отдельная строка test matrix.
+8. Signing/notarization — часть build pipeline, а не ручной финальный ритуал.
+9. Любая оптимизация принимается только после profiling и regression test.
+10. «Работает у разработчика» ≠ «готово к релизу».
+
+## Источники
+
+См. [`SOURCES.md`](SOURCES.md). Источники разделены на canonical/official, community-maintained Adobe SDK guides и secondary references.
+
+
+---
+
+<!-- SOURCE: 00-START-HERE/00-DECISION-TREE.md -->
+
+# Decision tree — что именно вы разрабатываете?
+
+## 1. Нужна обработка кадра?
+
+Да → **C++ Effect plug-in**.
+
+Типичные задачи:
+- blur, distort, keying, color, generation;
+- анализ изображения;
+- GPU-heavy processing;
+- custom parameters в Effect Controls;
+- SmartFX/MFR.
+
+Дальше: `02-EFFECT-PLUGINS/`.
+
+## 2. Нужно управлять самим After Effects глубже, чем позволяет scripting?
+
+Да → **AEGP**.
+
+Типичные задачи:
+- меню и commands;
+- project/layer/item access через suites;
+- hooks;
+- render queue integration;
+- коммуникация с другими native plug-ins;
+- background/idle integration в пределах поддержанного SDK.
+
+Дальше: `03-AEGP/`.
+
+## 3. Нужен собственный формат видео/изображений/аудио?
+
+Да → **AEIO**.
+
+Типичные задачи:
+- import decoder;
+- export encoder;
+- interpretation/options;
+- передача frames/audio между AE и codec/container implementation.
+
+Дальше: `04-AEIO/`.
+
+## 4. Нужно заменить способ, которым AE рендерит 3D layers?
+
+Да → возможно **Artisan**.
+
+Но если вы просто рисуете 3D внутри собственного эффекта, Artisan обычно не нужен. Это очень тяжёлый API.
+
+Дальше: `05-ARTISAN/`.
+
+## 5. Нужна автоматизация без тяжёлого realtime render?
+
+Да → **ExtendScript**.
+
+Подходит для:
+- создание comps/layers;
+- применение эффектов;
+- keyframes;
+- import/export orchestration;
+- render queue;
+- batch tools;
+- pipeline automation.
+
+Дальше: `06-SCRIPTING/`.
+
+## 6. Нужна dockable UI-панель?
+
+На дату 2026-09-30:
+- production сейчас: **CEP**;
+- стратегическое направление Adobe: **UXP**;
+- UXP public beta для AE заявлена на ноябрь 2026.
+
+Дальше: `07-PANELS/`.
+
+## 7. Нужны и высокая скорость, и богатый UI?
+
+Часто правильная архитектура — **hybrid**:
+
+```text
+Panel / Script UI
+      ↓ commands / serialized data
+Native C++ core
+      ↓
+AE SDK / GPU / MFR
+```
+
+UI не должен владеть render state. Native core не должен знать о DOM/UI деталях.
+
+## Red flags выбора
+
+- «Сделаем всё AEGP, потому что он мощнее» → лишняя сложность.
+- «Сделаем всё ExtendScript» → плохо для heavy pixel compute.
+- «Сделаем UI прямо внутри effect custom UI» → подходит только для effect-local controls, не для полноценного приложения.
+- «Начнём новый большой CEP framework» → допустимо для релиза сейчас, но только с migration boundary под UXP.
+
+
+---
+
+<!-- SOURCE: 00-START-HERE/01-EXTENSION-TYPES.md -->
+
+# Extension types
+
+## Effect plug-in
+
+**Сильные стороны:** realtime/render path, pixels, GPU, SmartFX, MFR, параметры Effect Controls, возможность совместимости с Premiere при использовании поддерживаемого подмножества.
+
+**Слабые стороны:** C++, ABI/lifecycle, сложное тестирование, host-managed memory, versioned suites.
+
+## AEGP
+
+**Сильные стороны:** широкий доступ к host functionality через PICA suites, hooks, menu commands, проектные данные.
+
+**Слабые стороны:** сложнее lifecycle и invalidation; не заменяет effect API там, где нужен обычный per-frame effect render.
+
+## AEIO
+
+**Сильные стороны:** настоящий import/export pipeline для собственного media format.
+
+**Слабые стороны:** вы отвечаете за codec/container side и корректную работу frames/audio/options.
+
+## Artisan
+
+**Сильные стороны:** контроль 3D rendering path.
+
+**Слабые стороны:** огромный scope. Adobe SDK Guide прямо предупреждает, что это путь только при сильной необходимости.
+
+## ExtendScript
+
+**Сильные стороны:** быстро, просто распространять, огромная часть project automation.
+
+**Слабые стороны:** legacy JS runtime, ограниченная производительность, не pixel plugin API.
+
+## CEP
+
+**Сильные стороны:** HTML/CSS/JS dockable UI, существующая ecosystem, shipping path в AE сегодня.
+
+**Слабые стороны:** legacy; Adobe объявила retirement к концу 2029. Архитектурно завязан на CEF/CEP model.
+
+## UXP
+
+**Сильные стороны:** современное направление Adobe, более новый security/extensibility model.
+
+**Состояние на 2026-09-30:** Adobe объявила UXP для AE, public beta запланирована к ноябрю 2026. Не проектировать текущий production AE продукт на ещё не выпущенный публичный API.
+
+## Hybrid
+
+Обычно лучший путь для коммерческого сложного продукта:
+
+- C++ делает heavy compute и host-native работу;
+- panel/script делает orchestration/UI;
+- protocol между слоями маленький, versioned и testable.
+
+
+---
+
+<!-- SOURCE: 00-START-HERE/02-ENVIRONMENT-MATRIX.md -->
+
+# Environment matrix
+
+Перед началом разработки зафиксировать матрицу. Не использовать «последний Mac/Windows» как спецификацию.
+
+| Dimension | macOS | Windows |
+|---|---|---|
+| IDE | Xcode | Visual Studio |
+| Primary CPU | arm64 + x86_64 Universal | x64; ARM64 where supported |
+| Native effect suffix/package | bundle/plugin from SDK project | `.aex` |
+| Shared plug-in location | `/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/` | registry-driven installer path; common dev path under `Adobe\Common\Plug-ins\7.0\MediaCore` |
+| User dev location | `~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/` | usually admin/common path or custom dev copy step |
+| Debugger | Xcode / lldb | Visual Studio debugger |
+| Signing | codesign + Developer ID | Authenticode / SignTool |
+| Release trust | notarization + Gatekeeper | certificate reputation / Windows trust |
+
+## Record for each project
+
+```yaml
+product: MyPlugin
+min_ae: 25.x
+max_tested_ae: 26.x
+macos:
+  min_os: TBD by product policy
+  arch: [arm64, x86_64]
+windows:
+  arch: [x64]
+  arm64: planned-or-supported
+gpu:
+  mac: enabled-or-none
+  windows_cuda: enabled-or-none
+  windows_directx: enabled-or-none
+mfr: true-or-false
+smartfx: true-or-false
+premiere_compatible: true-or-false
+```
+
+Это становится входом для CI, test matrix и release notes.
+
+
+---
+
+<!-- SOURCE: 01-ARCHITECTURE/01-LIFECYCLE.md -->
+
+# Native plug-in lifecycle
+
+## Effect plug-in mental model
+
+After Effects владеет циклом вызовов. Plug-in предоставляет entry point. Host вызывает его с command selector, входными структурами, параметрами, output и дополнительными данными.
+
+Основные фазы, которые надо мыслить раздельно:
+
+1. **Global setup** — capabilities/flags, global allocation.
+2. **Params setup** — объявление параметров.
+3. **Sequence lifecycle** — state конкретного instance эффекта.
+4. **Frame/render lifecycle** — setup/render/setdown конкретного кадра.
+5. **UI/event commands** — отдельный event path.
+6. **Global setdown** — освобождение global resources.
+
+## Rule: state ownership
+
+Для каждого объекта/буфера должно быть понятно:
+
+- кто создаёт;
+- кто уничтожает;
+- можно ли хранить между callbacks;
+- кто может обращаться concurrently;
+- что происходит при duplicate/project reload;
+- нужна ли serialization/flattening.
+
+Если этого нет в design doc, баг уже заложен.
+
+## Host boundary
+
+Entry points и callbacks — ABI boundary. На нём:
+
+- не пропускать C++ exceptions;
+- не возвращать dangling pointers;
+- переводить внутренние ошибки в корректный SDK error;
+- минимизировать работу, не относящуюся к текущему command;
+- логировать command + instance/frame identity в debug builds.
+
+## AEGP mental model
+
+AEGP после входной регистрации работает через hooks и PICA suites. Здесь важнее lifetime opaque handles и invalidation после операций host-а.
+
+## Versioned suites
+
+Suite acquisition — это capability check. Не считать, что функция есть только потому, что header компилируется.
+
+Design pattern:
+
+```text
+acquire required suite version
+  ├─ success → use
+  └─ unavailable → fallback or explicit unsupported error
+release suite
+```
+
+## What not to cache
+
+Нельзя бездумно кэшировать:
+- host opaque handles, если docs говорят об invalidation;
+- frame-local worlds;
+- pointers inside temporary suite-returned structures;
+- render-context-specific data вне render context.
+
+
+---
+
+<!-- SOURCE: 01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md -->
+
+# Memory, threading, errors
+
+## Memory
+
+After Effects SDK часто предоставляет host allocators/handles и буферы со своим lifetime. Главные правила:
+
+- освобождать тем API, которым выделили;
+- не считать pixel rows tightly packed;
+- проверять `rowbytes`;
+- не писать за extent/output bounds;
+- учитывать 8/16/32-bpc layouts;
+- не хранить frame-local buffer pointer после callback;
+- избегать per-pixel heap allocations.
+
+## Threading
+
+MFR означает, что разные frames одного и того же эффекта могут одновременно заходить в render code.
+
+Thread-safe означает:
+- mutable globals отсутствуют или синхронизированы;
+- render не пишет в обычный `global_data`;
+- `sequence_data` не мутируется в запрещённых фазах;
+- caches либо immutable, либо имеют безопасную concurrency model;
+- third-party libraries тоже thread-safe в выбранном режиме.
+
+### Deadlock rule
+
+**Не держать blocking lock, когда вызывается host callback/suite/checkout.** Host может реэнтерабельно вызвать код или ждать другой render path.
+
+## Errors
+
+Внутренний код может использовать `Result<T>`/exceptions — но на границе SDK:
+
+```cpp
+extern "C" PF_Err EffectMain(...) {
+    try {
+        return Dispatch(...);
+    } catch (const std::bad_alloc&) {
+        return PF_Err_OUT_OF_MEMORY;
+    } catch (...) {
+        return PF_Err_INTERNAL_STRUCT_DAMAGED; // choose the real appropriate error in your codebase
+    }
+}
+```
+
+Конкретный error code должен соответствовать реальной причине; пример выше — только архитектурный паттерн.
+
+## Logging
+
+Production logging должен быть:
+- bounded;
+- async/non-blocking where possible;
+- без secrets/license tokens;
+- с version/build/architecture/GPU backend;
+- с crash correlation id.
+
+Debug logging может включать:
+- `PF_Cmd`;
+- thread id;
+- frame/time;
+- render backend;
+- input/output dimensions;
+- cache hit/miss.
+
+
+---
+
+<!-- SOURCE: 01-ARCHITECTURE/03-PIPL-AND-LOADING.md -->
+
+# PiPL and plug-in loading
+
+PiPL — metadata resource, который Adobe host может прочитать до исполнения plug-in code.
+
+## Cross-platform rule
+
+Держать **один `.r` source** для macOS и Windows. Windows sample projects пропускают `.r` через PiPL tooling/custom build step, чтобы получить ресурс для `.aex`.
+
+Не строить Windows project «с нуля», если можно клонировать Skeleton/sample: именно PiPL build step часто забывают.
+
+## Entry points by architecture
+
+Mac:
+
+```text
+CodeMacARM64 {"EffectMain"}
+CodeMacIntel64 {"EffectMain"}
+```
+
+Windows:
+
+```text
+CodeWinARM64 {"EffectMain"}
+CodeWin64X86 {"EffectMain"}
+```
+
+Нужные строки зависят от фактических targets вашего продукта.
+
+## Consistency
+
+Capabilities/flags в PiPL должны быть согласованы с тем, что plug-in заявляет во время global setup. Несогласованность — источник странных load/render bugs.
+
+## Discovery locations
+
+Common MediaCore используется, когда plug-in должен быть доступен нескольким Adobe hosts.
+
+macOS common:
+`/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/`
+
+macOS per-user dev location часто удобнее:
+`~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/`
+
+Windows installer должен получать common path по Adobe registry entry, а не предполагать один hardcoded путь для всех версий/конфигураций.
+
+## Load failure checklist
+
+1. Архитектура binary совпадает с host?
+2. Bundle/.aex находится в реально сканируемой директории?
+3. PiPL собран и содержит нужный entry point?
+4. macOS signature валидна?
+5. Runtime DLL/dylib dependencies доступны?
+6. Нет ли unsupported host/API requirement?
+7. Plug-in не падает в global init?
+
+
+---
+
+<!-- SOURCE: 01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md -->
+
+# Version compatibility
+
+## Policy
+
+Собирать обычно разумно с новыми SDK headers, но **заявлять поддержку только тех AE versions, которые реально протестированы**.
+
+Новый SDK не означает обязательный новый binary на каждую версию AE, но новая функция может потребовать suite/API gating.
+
+## Runtime checks
+
+Effect plug-in может ориентироваться на host/API version из данных, передаваемых host. AEGP также получает version information. Для точного app version при необходимости можно использовать поддержанные host/script mechanisms.
+
+## Compatibility contract
+
+Для каждой release записывать:
+
+| AE | mac arm64 | mac x86_64 | Win x64 | Win ARM64 | Status |
+|---|---:|---:|---:|---:|---|
+| 25.x | ✅/❌ | ✅/❌ | ✅/❌ | ✅/❌ | tested |
+| 26.x | ✅/❌ | ✅/❌ | ✅/❌ | ✅/❌ | tested |
+| Beta | lab only | lab only | lab only | lab only | never claim from smoke only |
+
+## Forward compatibility rule
+
+При выходе нового AE:
+1. install on clean test system;
+2. load test;
+3. render golden projects;
+4. MFR on/off;
+5. GPU on/off and available backends;
+6. save/reopen project;
+7. render queue/export;
+8. performance comparison;
+9. only then update support statement.
+
+
+---
+
+<!-- SOURCE: 01-ARCHITECTURE/05-PERFORMANCE-ARCHITECTURE.md -->
+
+# Performance architecture
+
+## Оптимизировать по слоям
+
+1. **Algorithm** — убрать лишнюю работу до SIMD/GPU.
+2. **Region/extent** — не считать пиксели, которые не нужны.
+3. **Memory** — cache locality, reuse, no per-pixel allocation.
+4. **Threading/MFR** — concurrent frames без lock bottleneck.
+5. **Compute Cache** — повторно использовать дорогие расчёты, если корректно.
+6. **GPU** — только там, где transfer/dispatch overhead окупается.
+7. **Host interaction** — минимизировать checkouts/suite calls внутри hot loops.
+
+## Golden benchmark
+
+Хранить 3 класса проектов:
+- tiny: overhead-sensitive;
+- typical: real production comp;
+- stress: 4K/8K, long effect stack, extreme params.
+
+Снимать:
+- render wall time;
+- per-frame median/p95;
+- CPU utilization;
+- peak memory;
+- GPU time if measurable;
+- cache hit rate;
+- MFR scaling 1→N concurrent frames.
+
+Нельзя принимать optimization, если она ломает determinism, color precision или stability.
+
+
+---
+
+<!-- SOURCE: 01-ARCHITECTURE/06-BUILD-SYSTEM.md -->
+
+# Build system strategy
+
+## Baseline first
+
+For the first working native plug-in, prefer the build system shipped in Adobe's SDK samples:
+
+- Xcode project on macOS;
+- Visual Studio solution/project on Windows.
+
+This preserves PiPL/resource steps and host-specific settings.
+
+## CMake later, not first
+
+CMake can be valuable for a shared core library and cross-platform tests, but don't migrate the host plug-in target until you understand every sample build step.
+
+Good split:
+
+```text
+/core          C++ library, platform-neutral, CMake-friendly
+/tests         unit/golden tests
+/plugin-mac    thin AE adapter/Xcode target
+/plugin-win    thin AE adapter/VS target
+```
+
+or a carefully engineered unified CMake target once the native builds are proven equivalent.
+
+## Dependencies
+
+Every dependency gets a record:
+- license;
+- version;
+- source/hash;
+- mac architectures;
+- Windows architectures;
+- static/dynamic;
+- redistribution requirement;
+- thread-safety notes;
+- GPU/runtime requirement.
+
+Never discover a missing DLL/dylib only on the customer's machine.
+
+
+---
+
+<!-- SOURCE: 01-ARCHITECTURE/07-COMMUNICATION-ARCHITECTURE.md -->
+
+# Communication architecture — one-page rulebook
+
+## Host-owned channels
+
+- Effect: AE -> `PF_Cmd` -> `EffectMain`.
+- AEGP: AE -> registered hooks; AEGP -> AE via suites.
+- AEIO: AE -> registered function block.
+- Artisan: AE -> renderer entry points.
+- Script: JS -> AE scripting DOM.
+- CEP: panel JS -> `evalScript` -> ExtendScript -> AE.
+
+## Cross-component channels
+
+1. **AEGP -> Effect**: `AEGP_EffectCallGeneric` / `PF_Cmd_COMPLETELY_GENERAL`.
+2. **Native -> Native**: published PICA suite.
+3. **AEGP -> Script**: `AEGP_ExecuteScript`.
+4. **CEP -> Script**: `CSInterface.evalScript`.
+5. **CEP events**: event bus for UI/event notification, not bulk binary transfer.
+6. **External service**: explicit IPC you own; do not depend on undocumented AE internals.
+
+## Choose by payload
+
+| Payload | Best channel |
+|---|---|
+| effect parameter / render dependency | AE parameter stream / Effect API |
+| project mutation | AEGP or scripting DOM |
+| native control message | generic effect call or published suite |
+| UI command | CEP/UXP -> script/native command bridge |
+| large pixels/binary | native memory/GPU/file/IPC; not ExtendScript JSON |
+| cross-process batch metadata | JSON/protobuf over owned IPC |
+
+## Absolute rule
+
+The communication path must preserve **dependency visibility, thread rules and ownership**. Fast but hidden state is not an optimization; in AE it is a future cache/crash bug.
+
+
+---
+
+<!-- SOURCE: 02-EFFECT-PLUGINS/01-ANATOMY.md -->
+
+# Anatomy of an Effect plug-in
+
+## Entry point
+
+Host вызывает одну export-функцию, заданную PiPL. Точный signature берётся из SDK headers/sample вашей версии.
+
+Архитектурно dispatch выглядит так:
+
+```cpp
+PF_Err EffectMain(PF_Cmd cmd, ...) {
+    try {
+        switch (cmd) {
+            case PF_Cmd_GLOBAL_SETUP:   return GlobalSetup(...);
+            case PF_Cmd_PARAMS_SETUP:   return ParamsSetup(...);
+            case PF_Cmd_RENDER:         return Render(...);
+            // SmartFX/event/sequence selectors as required
+            default:                    return PF_Err_NONE;
+        }
+    } catch (...) {
+        return MapExceptionToPfErr();
+    }
+}
+```
+
+Не копировать signature из этого файла — использовать текущий SDK sample.
+
+## Global setup
+
+Здесь заявляются capabilities/outflags и создаётся только тот global state, который действительно нужен.
+
+Global state должен быть:
+- immutable после setup, либо concurrency-safe;
+- не зависеть от конкретного effect instance;
+- корректно освобождаться в global setdown.
+
+## Params setup
+
+Параметры — часть project compatibility contract. Изменение parameter index/order после релиза может ломать старые проекты.
+
+Для released plug-in:
+- параметрам давать стабильные IDs;
+- не переиспользовать старый ID для нового смысла;
+- migration старых sequence/project data тестировать отдельными fixtures.
+
+## Sequence data
+
+Использовать для per-instance state, но проектировать serialization/flattening заранее, если state должен переживать save/load/copy.
+
+Render path не должен «тихо» мутировать state так, что два concurrent frames видят гонку.
+
+## Frame data
+
+Frame-local scratch лучше frame-local и оставлять. Не превращать его в global cache ради «оптимизации» без lifetime design.
+
+## Output correctness
+
+Каждый render path должен учитывать:
+- actual input/output dimensions;
+- rowbytes;
+- extent/ROI;
+- alpha semantics;
+- pixel depth;
+- premultiplication assumptions;
+- pixel aspect/time information, если алгоритм от них зависит.
+
+
+---
+
+<!-- SOURCE: 02-EFFECT-PLUGINS/02-PARAMETERS-UI.md -->
+
+# Parameters and Effect UI
+
+## Native parameters first
+
+Если UI можно выразить стандартными AE controls — slider, checkbox, color, popup, layer и т.п. — сначала использовать их.
+
+Причины:
+- automation/keyframes работают естественно;
+- accessibility/host theme лучше;
+- меньше custom event code;
+- меньше platform-specific bugs;
+- проекты сохраняют значения стандартным путём.
+
+## Parameter stability
+
+После публичного релиза parameter layout — сериализованный контракт.
+
+Правила:
+- стабильные parameter IDs;
+- append/migrate вместо случайной перестановки;
+- тест открытия проекта из N-1 версии plug-in;
+- extreme/min/max/default values входят в fixtures.
+
+## Custom UI / Drawbot
+
+Custom UI нужен, когда стандартных controls недостаточно: overlay, handles, custom visualization.
+
+Drawbot предоставляет host abstraction для paths/fill/stroke/image/text capabilities. Drawing выполняется в предназначенной для этого draw event фазе, а не произвольно из drag/click callback.
+
+Custom UI должен:
+- не выполнять тяжёлый render;
+- отделять interaction state от render state;
+- invalidation/rerender запрашивать через поддержанный host mechanism;
+- соответствовать host theme, где доступна theme suite;
+- работать на HiDPI/Retina.
+
+## Full application-like UI
+
+Если нужен browser-like rich panel, asset list, settings, accounts, web content — это **panel technology (CEP/UXP)**, а не попытка превратить Effect Controls в приложение.
+
+
+---
+
+<!-- SOURCE: 02-EFFECT-PLUGINS/03-SMARTFX.md -->
+
+# SmartFX
+
+SmartFX — render model для более умной коммуникации effect ↔ host и basis для полноценной 32-bpc поддержки в AE effect SDK.
+
+## Зачем
+
+Обычный full-frame подход может заставлять эффект получать/обрабатывать намного больше input, чем реально нужно output region.
+
+SmartFX позволяет строить pipeline, где plug-in:
+- на prerender этапе описывает, что ему понадобится;
+- host предоставляет нужные inputs/regions;
+- render заполняет требуемый output.
+
+## Design pattern
+
+```text
+SMART_PRE_RENDER
+  determine dependencies / ROI / state
+  request required input region(s)
+      ↓
+SMART_RENDER
+  checkout requested data
+  execute pure render core
+  write only valid output
+```
+
+## 32-bpc
+
+Не считать «поддержкой 32-bit» простое преобразование float → 8-bit внутри эффекта. Алгоритм должен быть определён в float domain и иметь понятную политику clamp/negative/HDR values.
+
+## Cache identity
+
+Если output зависит от внешнего/sequence/UI state, который host сам не видит как обычную dependency, cache identity должен учитывать этот state через поддержанные SDK механизмы. Иначе возможны stale frames.
+
+## Test cases
+
+- full frame vs small ROI;
+- translated/offscreen layer;
+- masks;
+- 8/16/32-bpc;
+- alpha edge cases;
+- parameter animation;
+- cache invalidation after custom dialog/UI change;
+- CPU/GPU equivalence.
+
+
+---
+
+<!-- SOURCE: 02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md -->
+
+# Multi-Frame Rendering (MFR) and thread safety
+
+After Effects 2022+ может рендерить несколько кадров одновременно. Effect сообщает поддержку threaded rendering соответствующим SDK flag **только после того, как реализация стала thread-safe**.
+
+## Нельзя
+
+- mutable file-static/global variables без safe synchronization;
+- писать в `global_data` во время render;
+- обычным способом менять `sequence_data` во время render;
+- использовать singleton third-party state, который не thread-safe;
+- полагаться на «предыдущий кадр уже посчитался»;
+- держать mutex во время вызова host suite/checkout.
+
+## Можно
+
+- immutable globals;
+- per-render/per-frame scratch;
+- immutable precomputed tables;
+- thread-safe cache с ясным ownership;
+- Compute Cache API для подходящих дорогих вычислений;
+- documented mutable sequence mechanism, если действительно необходим и корректно включён.
+
+## Migration procedure
+
+1. Запустить current effect без MFR flag.
+2. Найти все globals/statics/singletons.
+3. Классифицировать: immutable / per-instance / per-frame / cache.
+4. Убрать write-on-render shared state.
+5. Проверить third-party libs.
+6. Добавить stress harness внутри AE: несколько instances + long comp + random seeks.
+7. Сравнить MFR off/on output hashes/images.
+8. Thread Sanitizer там, где применим к отдельной testable core library.
+9. Включить threaded-rendering flag.
+10. Повторить crash/perf/correctness matrix.
+
+## Performance trap
+
+Thread-safe код с одним глобальным mutex технически может «работать», но уничтожит scaling. Сначала correctness, затем lock contention profiling.
+
+## Required regression
+
+- render same frame repeatedly;
+- random frame order;
+- forward/backward scrubbing;
+- duplicate layer/effect;
+- multiple comps rendering;
+- render queue;
+- project close/reopen;
+- cache purge;
+- MFR toggle.
+
+
+---
+
+<!-- SOURCE: 02-EFFECT-PLUGINS/05-GPU.md -->
+
+# GPU effects
+
+GPU path — не отдельный продукт, а оптимизированный backend того же математического эффекта.
+
+## Сначала CPU reference
+
+CPU implementation должна быть:
+- правильной;
+- deterministic;
+- тестируемой;
+- достаточно простой, чтобы служить oracle для GPU comparison.
+
+## Build dependencies из актуального SDK Guide
+
+Adobe's GPU sample `SDK_Invert_ProcAmp` требует дополнительные зависимости.
+
+### macOS
+
+Guide указывает Boost для processing GPU kernel files в sample project. Конкретный path задаётся через Xcode custom path/environment настройки sample-а.
+
+### Windows
+
+Guide на 2025/2026 указывает:
+- Boost;
+- CUDA SDK версии, совместимой с используемым AE build;
+- DirectX Shader Compiler (DXC).
+
+Не фиксировать CUDA version навечно в библии продукта: проверять SDK Guide/release notes для каждого supported AE generation.
+
+## DirectX
+
+Если используется DirectX rendering path:
+- нужный capability flag должен быть заявлен;
+- PiPL должен соответствовать runtime flags;
+- generated DirectX assets должны быть установлены рядом/в ожидаемом runtime layout;
+- обязателен CPU fallback.
+
+## CUDA
+
+Adobe рекомендует Driver API для лучшей driver compatibility. Если используется Runtime API, осознанно выбрать static/dynamic strategy и контролировать deployment runtime libraries.
+
+## GPU correctness
+
+Сравнивать CPU ↔ GPU:
+- 8/16/32-bpc;
+- alpha 0/1/partial;
+- HDR/negative float values;
+- tiny images, odd widths, nontrivial rowbytes;
+- extreme parameters;
+- edge pixels;
+- multiple GPUs / unsupported GPU fallback where possible.
+
+Tolerance должна быть указана **до** теста, а не подобрана после расхождения.
+
+## GPU performance
+
+Профилировать отдельно:
+- upload/download;
+- kernel dispatch;
+- kernel time;
+- intermediate allocations;
+- synchronization;
+- shader compilation/cache warmup.
+
+На маленьком кадре CPU может быть быстрее. Backend selection может учитывать workload size, но не должен менять визуальную семантику.
+
+
+---
+
+<!-- SOURCE: 02-EFFECT-PLUGINS/06-COLOR-PIXELS.md -->
+
+# Pixels, color, alpha
+
+## Pixel depth
+
+Effect должен явно иметь policy для:
+- 8 bpc;
+- 16 bpc;
+- 32 bpc float.
+
+Нельзя считать, что float values лежат только в 0..1: HDR pipelines могут содержать значения выше 1 и ниже 0.
+
+## Rowbytes
+
+Итерировать строки через `rowbytes`, а не через `width * sizeof(pixel)` assumption.
+
+## Alpha
+
+Перед алгоритмом определить:
+- straight или premultiplied assumptions;
+- что делает эффект с RGB при alpha=0;
+- как interpolation/filtering работает на краях transparency.
+
+Fringing часто появляется не из-за «плохого blur», а из-за неверной alpha/color model.
+
+## Color management
+
+Не делать самодельные преобразования между spaces без необходимости. Если алгоритм зависит от color space, использовать поддержанные host facilities и фиксировать assumptions в spec.
+
+## Golden images
+
+Для color effect хранить:
+- neutral gray ramp;
+- saturated primaries/secondaries;
+- HDR ramp;
+- transparent colored edge;
+- alpha gradient;
+- checker/impulse image;
+- wide-gamut test image.
+
+
+---
+
+<!-- SOURCE: 02-EFFECT-PLUGINS/07-AUDIO.md -->
+
+# Audio effects
+
+After Effects SDK имеет отдельные audio selectors/data structures. Audio path нельзя проектировать как «те же pixels, только samples».
+
+## Checklist
+
+- sample rate/channel assumptions;
+- buffer length and requested range;
+- float/range semantics;
+- latency/stateful processing;
+- random access / non-linear timeline requests;
+- thread safety;
+- silence/empty input;
+- project sample-rate changes;
+- determinism after seeks.
+
+Если алгоритм имеет history (filter/delay), нельзя полагаться на то, что host будет вызывать samples строго последовательно от начала к концу.
+
+
+---
+
+<!-- SOURCE: 02-EFFECT-PLUGINS/README.md -->
+
+# Effect plug-ins
+
+Effect plug-in — основной путь, если инструмент должен обрабатывать/генерировать pixels или audio внутри стандартного effect pipeline AE.
+
+## Порядок разработки
+
+1. Взять **Skeleton** или максимально близкий SDK sample.
+2. Добиться clean build и загрузки без собственных изменений.
+3. Переименовать sample и PiPL identifiers.
+4. Реализовать CPU reference path.
+5. Добавить 8/16/32-bpc correctness.
+6. Перевести на SmartFX там, где это оправдано/необходимо.
+7. Сделать thread-safe.
+8. Только после этого включать MFR flag.
+9. Добавить GPU backend, если benchmark доказывает пользу.
+10. Custom UI — последним, после стабильной render core.
+
+## Production layers
+
+```text
+AE entry point / selectors
+        ↓
+Adapter: PF_* ↔ internal types
+        ↓
+Pure render core
+        ↓
+CPU backend / GPU backend
+        ↓
+Tests + golden images
+```
+
+Чем меньше AE-specific типов проходит в render core, тем проще тестировать алгоритм вне After Effects.
+
+
+---
+
+<!-- SOURCE: 03-AEGP/01-HOOKS-SUITES.md -->
+
+# AEGP hooks and suites
+
+После entry registration AEGP взаимодействует с AE через зарегистрированные hooks и versioned suites.
+
+## Suite discipline
+
+Каждый suite:
+- acquire требуемую version;
+- проверить success;
+- не использовать function pointer после release;
+- иметь fallback/unsupported path, если suite отсутствует.
+
+## Opaque handles
+
+AEGP APIs часто возвращают opaque handles. Их lifetime может меняться после host operations.
+
+Критический пример: операции с render queue могут invalidate ранее полученные render-queue references. Поэтому handle нельзя превращать в «вечный ID» без документации.
+
+## Begin/end transactions
+
+Некоторые host operations требуют start/begin → batch → end semantics. Это не cosmetic API: host таким образом сохраняет consistency/undo/state вокруг операции.
+
+## Hooks
+
+Hook callback должен:
+- быть коротким;
+- не блокировать UI без необходимости;
+- не хранить transient host data;
+- корректно работать при project switch/close;
+- защищать границу от exceptions.
+
+
+---
+
+<!-- SOURCE: 03-AEGP/02-PROJECT-RENDER-AUTOMATION.md -->
+
+# AEGP project and render automation
+
+## Native vs scripting
+
+Начинать с вопроса: нужен ли AEGP действительно?
+
+ExtendScript проще для:
+- создать comp/layers;
+- расставить keyframes;
+- add to render queue;
+- batch project operations.
+
+AEGP оправдан, если нужен:
+- native performance;
+- API, отсутствующий в scripting;
+- hooks/events;
+- тесная связь с другим C++ plug-in;
+- controlled native service layer.
+
+## Undo
+
+Любое изменение project state должно иметь понятную undo model. Если suite предоставляет begin/end undo group — использовать корректно.
+
+## Invalidations
+
+После операций add/remove:
+- не продолжать использовать handles, которые docs объявляют invalidated;
+- reacquire by stable host-supported identity, где возможно;
+- unit-test wrapper state machine отдельно.
+
+## UI thread assumptions
+
+Не переносить host calls на произвольный background thread, если API не говорит, что это допустимо. Background compute отделять от host mutation.
+
+
+---
+
+<!-- SOURCE: 03-AEGP/README.md -->
+
+# AEGP
+
+AEGP (After Effects General Plug-in) нужен для глубокой интеграции с host через PICA suites и hooks.
+
+## Когда выбирать
+
+- menu command;
+- project/item/layer manipulation на native уровне;
+- render queue integration;
+- keyframe/stream operations;
+- hooks/idle callbacks;
+- service, который должен предоставлять suites другим plug-ins;
+- foundation для AEIO/Artisan.
+
+## Когда не выбирать
+
+- обычный pixel effect → Effect API;
+- простая project automation → ExtendScript часто дешевле;
+- rich UI panel → CEP/UXP + AEGP/native core при необходимости.
+
+
+---
+
+<!-- SOURCE: 04-AEIO/README.md -->
+
+# AEIO — media import/export plug-ins
+
+AEIO — AEGP specialization для import/export media.
+
+## Import side
+
+AEIO может:
+- распознать/открыть файл;
+- хранить interpretation/options;
+- декодировать и отдавать AE frames;
+- отдавать audio;
+- сообщать metadata/capabilities.
+
+## Export side
+
+AEIO может:
+- предоставлять output options;
+- принимать rendered frames/audio от AE;
+- кодировать и писать собственный format/container.
+
+## Responsibility boundary
+
+AEIO не получает «готовый codec за бесплатно». Compression/decompression и file format correctness — ответственность plug-in/подключённой codec library.
+
+## Architecture
+
+```text
+AEIO callbacks
+   ↓
+Host adapter
+   ↓
+Format model / options
+   ↓
+Decoder / Encoder
+   ↓
+I/O abstraction
+```
+
+Decoder/encoder полезно сделать тестируемым вне AE.
+
+## Tests
+
+- corrupt/truncated files;
+- odd dimensions;
+- alpha/no alpha;
+- all supported bit depths;
+- audio only/video only;
+- seek/random access;
+- huge duration/files;
+- cancellation;
+- disk full/write errors;
+- Unicode paths;
+- network/removable storage errors if claimed supported.
+
+
+---
+
+<!-- SOURCE: 05-ARTISAN/README.md -->
+
+# Artisan
+
+Artisan — API для замены rendering behavior 3D layers в composition. Это не «просто 3D effect».
+
+Adobe SDK Guide подчёркивает сложность и рекомендует идти сюда только при сильной необходимости.
+
+## Use only if
+
+- продукт действительно должен стать renderer'ом AE 3D scene;
+- вам нужен render context для всей 3D composition semantics;
+- effect-level rendering недостаточно концептуально.
+
+## Do not use if
+
+- нужно отрендерить собственную 3D-модель внутри одного effect;
+- нужен GPU effect;
+- нужен viewport overlay;
+- нужен panel/tool для управления 3D assets.
+
+## Engineering cost
+
+Ожидать:
+- большое количество scene semantics;
+- камеры/свет/transform/material issues;
+- interactive vs final rendering behavior;
+- host version compatibility burden;
+- отдельные massive test scenes.
+
+
+---
+
+<!-- SOURCE: 06-SCRIPTING/01-OBJECT-MODEL.md -->
+
+# After Effects scripting object model
+
+Mental map:
+
+```text
+app
+└── project
+    ├── items
+    │   ├── CompItem
+    │   │   └── layers
+    │   │       └── properties / effects / masks / markers
+    │   ├── FootageItem
+    │   └── FolderItem
+    └── renderQueue
+        └── RenderQueueItem
+            └── OutputModule(s)
+```
+
+## Stable targeting
+
+UI display names могут быть локализованы/переименованы. Для effects/properties, где API предоставляет match-name semantics, предпочитать стабильный programmatic identifier.
+
+## Defensive scripting
+
+Перед каждым cast-like assumption:
+- item exists?;
+- type expected?;
+- layer index valid?;
+- property exists?;
+- canSetExpression/canVaryOverTime etc. если применимо?;
+- project saved, если требуется path?
+
+## Version gates
+
+Новые scripting methods появляются в конкретных AE versions. Если продукт заявляет старый AE, feature detection/version gate обязателен.
+
+
+---
+
+<!-- SOURCE: 06-SCRIPTING/02-SCRIPTUI.md -->
+
+# ScriptUI
+
+ScriptUI подходит для небольших native-looking script tools и floating/palette UI.
+
+## Use when
+
+- UI небольшой;
+- tool mostly scripting automation;
+- не нужен современный web layout;
+- важна минимальная упаковка.
+
+## Avoid when
+
+- сложные virtualized lists/grids;
+- account/web workflows;
+- modern responsive design;
+- сложная app-like state architecture.
+
+Для такого UI — panel technology.
+
+## Architecture
+
+Даже в ScriptUI:
+- UI callbacks → command layer;
+- command layer → AE scripting operations;
+- pure transforms/data logic отдельно.
+
+Это облегчает позже перенос UI на UXP/CEP.
+
+
+---
+
+<!-- SOURCE: 06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md -->
+
+# Expressions vs scripts
+
+**Script** говорит After Effects выполнить действия над проектом.  
+**Expression** вычисляет значение property во время evaluation.
+
+Не использовать expression как замену batch automation и не использовать script как per-frame expression engine.
+
+## Expression constraints
+
+- может вычисляться очень часто;
+- должна быть максимально pure/deterministic;
+- expensive project traversal быстро становится bottleneck;
+- side effects — неправильная модель.
+
+## Script constraints
+
+- запускается как операция/tool;
+- может создавать/менять project structure;
+- не является частью render callback для каждого pixel/frame.
+
+
+---
+
+<!-- SOURCE: 06-SCRIPTING/README.md -->
+
+# ExtendScript scripting
+
+After Effects scripting API отображает UI/project hierarchy в объектную модель: application → project → items/compositions → layers → properties/keyframes, плюс render queue и import options.
+
+## Best use cases
+
+- batch project construction;
+- repetitive layer/property operations;
+- render queue setup;
+- pipeline glue;
+- asset relinking/import;
+- one-click artist tools;
+- prototype logic before native implementation.
+
+## Not for
+
+- heavy per-pixel processing;
+- realtime frame algorithms;
+- low-level GPU work;
+- unrestricted modern Node/browser assumptions.
+
+## Script quality rules
+
+- `app.beginUndoGroup` / corresponding end where appropriate;
+- restore user state you temporarily change;
+- validate active project/item/layer;
+- never assume selected item type;
+- protect against missing effects/fonts/files;
+- use match names where localization/stability requires it;
+- handle cancel cleanly;
+- use progress UI only if operation genuinely long.
+
+
+---
+
+<!-- SOURCE: 07-PANELS/01-CEP.md -->
+
+# CEP development
+
+CEP panel — HTML/CSS/JS extension, интегрируемая в Creative Cloud host.
+
+## Core pieces
+
+Типичный bundle:
+
+```text
+MyPanel/
+├── CSXS/manifest.xml
+├── index.html
+├── js/
+├── css/
+└── jsx/        # host-side ExtendScript bridge
+```
+
+Host id After Effects в CEP manifests: `AEFT`.
+
+## Extension folders
+
+macOS:
+- system: `/Library/Application Support/Adobe/CEP/extensions`
+- user: `~/Library/Application Support/Adobe/CEP/extensions`
+
+Windows:
+- system: `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions`
+- user: `%AppData%\Roaming\Adobe\CEP\extensions`
+
+## Unsigned dev mode
+
+CEP development commonly uses `PlayerDebugMode` under the corresponding `CSXS.<major>` preference/registry key. Версию CSXS нельзя копировать вслепую: она должна соответствовать CEP runtime host-а.
+
+## Debugging
+
+CEP resources include:
+- `.debug` file with host/port mapping;
+- CSXS logs;
+- CEPHtmlEngine logs;
+- browser devtools connection.
+
+## Security
+
+Не считать CEP panel доверенным просто потому, что он локальный:
+- validate messages crossing UI ↔ JSX/native bridge;
+- no arbitrary `eval` of remote content;
+- escape paths/arguments;
+- secrets not in frontend source;
+- sign/package release artifact.
+
+
+---
+
+<!-- SOURCE: 07-PANELS/02-UXP-TRANSITION.md -->
+
+# UXP transition for After Effects
+
+## Published Adobe timeline snapshot
+
+As announced 2026-09-24:
+- After Effects UXP public beta: planned by **November 2026**;
+- AE/Illustrator/Media Encoder: stop accepting new CEP marketplace submissions and move CEP disabled-by-default together in **December 2028**;
+- overall CEP retirement: **end of 2029**.
+
+Timelines can change; re-check Adobe announcement/release docs before product planning.
+
+## What to do before AE UXP beta
+
+1. Separate domain/business logic from CEP APIs.
+2. Wrap filesystem/network/storage behind interfaces.
+3. Put all `evalScript` calls in one bridge module.
+4. Use typed/versioned command payloads.
+5. Remove implicit Node globals from core logic.
+6. Add contract tests for bridge commands.
+7. Maintain UI components with minimal CEP-specific code.
+
+## Migration readiness scorecard
+
+Good:
+
+```text
+React/UI → CommandBus → AeBridge interface
+                         ├─ CepAeBridge
+                         └─ FutureUxpAeBridge
+```
+
+Bad:
+
+```text
+button onclick → window.cep + fs + evalScript + business rule + DOM mutation
+```
+
+## Rule after beta launches
+
+Не мигрировать по announcement alone. Сначала проверить, что AE UXP beta/GA покрывает конкретно ваши requirements: host DOM/API, filesystem, networking, native bridge, packaging, marketplace/distribution.
+
+
+---
+
+<!-- SOURCE: 07-PANELS/README.md -->
+
+# Panels: CEP now, UXP next
+
+## Status — 2026-09-30
+
+Adobe объявила UXP для After Effects 24 сентября 2026. Public beta для AE запланирована **к ноябрю 2026**.
+
+CEP остаётся используемым сейчас, но Adobe объявила multi-year transition и retirement CEP к концу 2029.
+
+## Strategy
+
+Новый panel product, который должен выйти до зрелого UXP AE API:
+
+```text
+UI shell (CEP today)
+       ↓
+App services / commands  ← framework-agnostic
+       ↓
+AE bridge adapter (ExtendScript/native)
+       ↓
+After Effects
+```
+
+UXP migration тогда меняет shell/bridge, а не весь продукт.
+
+## Do not
+
+- завязывать domain model на `window.cep`;
+- раскидывать `evalScript()` по UI components;
+- хранить единственный source of truth в DOM;
+- делать direct filesystem/network access частью business logic без adapter abstraction.
+
+
+---
+
+<!-- SOURCE: 08-MACOS/01-XCODE-SETUP.md -->
+
+# macOS — Xcode setup
+
+## Start from SDK sample
+
+Для effect plug-in клонировать Skeleton или ближайший sample из After Effects SDK. Это сохраняет:
+- include/library configuration;
+- resource/PiPL generation;
+- bundle settings;
+- host-compatible entry point/export setup;
+- architecture config.
+
+## Development output
+
+SDK Guide рекомендует удобный per-user MediaCore path для development:
+
+```text
+~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
+```
+
+Это позволяет не писать каждый build внутрь `/Applications` или system `/Library`.
+
+## Xcode scheme
+
+Для Run scheme executable выбрать установленный After Effects. Тогда Build & Run может:
+1. собрать plug-in;
+2. положить его в dev plug-in location;
+3. запустить AE под debugger.
+
+Но debugger attach behavior зависит от версии AE и signing; см. `03-DEBUGGING.md`.
+
+## Build configurations
+
+Рекомендуется минимум:
+
+- `Debug` — symbols, assertions/logging, dev signing;
+- `RelWithDebInfo` или `Release-DebugSymbols` — production optimization + symbols archive;
+- `Release` — shipping binary.
+
+Хранить `.dSYM` для каждого shipped build по exact build id/version.
+
+## Deployment target
+
+Не выбирать минимальный macOS на глаз. Он должен совпадать с product support policy и реально поддерживаемыми AE versions.
+
+## Warnings
+
+Включать строгие compiler warnings постепенно, но third-party/Adobe headers изолировать так, чтобы warning debt SDK не заставлял отключать warnings во всём собственном коде.
+
+
+---
+
+<!-- SOURCE: 08-MACOS/02-UNIVERSAL-BINARY.md -->
+
+# macOS — Apple Silicon / Universal binary
+
+After Effects SDK Guide указывает, что Universal build требует arm64 + Intel slice и соответствующие PiPL entry declarations.
+
+## PiPL
+
+Для одного entry point:
+
+```text
+#if defined(AE_OS_MAC)
+  CodeMacARM64 {"EffectMain"},
+  CodeMacIntel64 {"EffectMain"},
+#endif
+```
+
+Использовать фактический entry point вашего sample/project.
+
+## Build
+
+Xcode target должен собирать `arm64` и `x86_64` для Universal artifact, если оба заявлены.
+
+Проверка:
+
+```bash
+lipo -info /path/to/MyPlugin.plugin/Contents/MacOS/MyPlugin
+```
+
+Ожидается список обеих architectures для Universal release.
+
+## Apple Silicon exception boundary
+
+SDK Guide отдельно предупреждает: не позволять C++ exception пройти через C entry point. На Apple Silicon это может закончиться `terminate()`.
+
+Правило:
+
+```cpp
+extern "C" PF_Err EffectMain(...) {
+    try {
+        return Dispatch(...);
+    } catch (...) {
+        return ConvertToPfError();
+    }
+}
+```
+
+## Third-party libraries
+
+Каждая linked static/dynamic dependency также должна иметь нужный architecture slice. Universal plug-in с x86_64-only dylib всё равно сломан на arm64.
+
+Проверять:
+- `lipo -info`;
+- `otool -L`;
+- actual load on clean Apple Silicon machine.
+
+## Intel deprecation policy
+
+Если в будущем Intel support убирается:
+- поднять major/minor support statement;
+- явно предупредить пользователей;
+- не оставлять `CodeMacIntel64` в PiPL, если binary больше не содержит slice;
+- сохранить последний Intel-compatible installer в archive policy, если бизнес этого требует.
+
+
+---
+
+<!-- SOURCE: 08-MACOS/03-DEBUGGING.md -->
+
+# macOS — debugging After Effects plug-ins
+
+## Normal workflow
+
+- Xcode scheme executable → After Effects;
+- breakpoints в plug-in;
+- Build & Run или Debug → Attach to Process;
+- plugin binary копируется в dev MediaCore folder.
+
+## macOS 15+ unsigned plug-ins
+
+Current SDK Guide указывает, что macOS 15+ не загружает unsigned plug-ins в обычном dev flow. Для development можно применять ad-hoc signing после build:
+
+```bash
+codesign --force --deep --sign - "/path/to/MyPlugin.plugin"
+```
+
+Для release этого недостаточно — см. signing/notarization.
+
+## AE 26.5+ non-Beta debugger restriction
+
+Current After Effects SDK Guide описывает отдельную проблему: debugger attach к официальной non-Beta/LTS сборке на macOS начиная с AE 26.5 может блокироваться code signing.
+
+Рекомендованный dev workflow:
+1. сделать **development copy** installation folder AE;
+2. извлечь entitlements;
+3. добавить `com.apple.security.get-task-allow = true`;
+4. re-sign development copy ad-hoc;
+5. запускать и debug только эту копию.
+
+Не модифицировать production AE installation, используемую для обычной работы/QA.
+
+## AE Beta 2027+
+
+SDK Guide сообщает новый developer-mode path для official Beta builds 2027+.
+
+Machine-level marker:
+
+```bash
+sudo mkdir -p "/Library/Application Support/Adobe/After Effects (Beta)"
+sudo touch "/Library/Application Support/Adobe/After Effects (Beta)/developer-mode"
+```
+
+После этого attach выполняется через Xcode или `lldb -p <pid>`.
+
+Поскольку это version-sensitive поведение, перед использованием сверять текущую страницу SDK Guide.
+
+## Crash investigation
+
+Сохранять:
+- exact plug-in build id;
+- AE version/build;
+- macOS version;
+- architecture;
+- crash report;
+- symbolicated stack;
+- minimal project;
+- MFR/GPU state.
+
+Без exact `.dSYM` shipped build symbolication может быть бесполезна.
+
+
+---
+
+<!-- SOURCE: 08-MACOS/04-GPU.md -->
+
+# macOS — GPU development
+
+## Principle
+
+Mac GPU backend не должен диктовать effect semantics. Один algorithm contract → CPU oracle + Mac GPU backend.
+
+## SDK sample setup
+
+Current After Effects GPU build guide для SDK sample указывает Boost dependency для processing kernel files и Xcode custom path `BOOST_BASE_PATH`.
+
+Не переносить sample dependency blindly в собственную архитектуру: сначала понять, какая часть toolchain реально нужна вашему backend.
+
+## Apple Silicon
+
+На Apple Silicon учитывать:
+- unified memory не отменяет synchronization/correctness costs;
+- arm64 CPU reference может иметь другую floating-point performance, но semantics должны совпадать;
+- third-party GPU/native libs должны поддерживать arm64;
+- Universal release не может содержать Intel-only helper binary.
+
+## Test matrix
+
+- Apple Silicon low/mid/high GPU classes available to team;
+- 8/16/32-bpc;
+- MFR + GPU simultaneously;
+- GPU fallback to CPU;
+- sleep/wake + relaunch;
+- project reopen;
+- extreme resolution.
+
+## Profiling
+
+Разделять:
+- host checkout cost;
+- buffer preparation;
+- GPU dispatch;
+- synchronization;
+- kernel time;
+- copy/readback;
+- teardown.
+
+Если «GPU effect медленный», без такой декомпозиции вывод бессмысленен.
+
+
+---
+
+<!-- SOURCE: 08-MACOS/05-SIGNING-NOTARIZATION.md -->
+
+# macOS — signing and notarization
+
+## Development signing
+
+Ad-hoc sign (`-`) подходит для local development/load testing. Это **не** release trust model.
+
+## Release signing
+
+Для внешней дистрибуции Apple рекомендует Developer ID signing. Plug-in bundle должен быть подписан после завершения всех изменений содержимого.
+
+Typical verification:
+
+```bash
+codesign -vvv --deep --strict "/path/to/MyPlugin.plugin"
+```
+
+Дополнительно проверять identity/entitlements по вашему release script.
+
+## Hardened Runtime / nested code
+
+Если package содержит helpers, dylibs, executables:
+- каждый nested code object должен быть корректно signed;
+- signing order: внутри → наружу;
+- release entitlements минимальны;
+- `get-task-allow` не должен случайно попасть в production artifact.
+
+## Notarization
+
+Apple больше не принимает старый `altool` workflow. Использовать `notarytool`/актуальный Apple workflow.
+
+Conceptual pipeline:
+
+```text
+build
+→ sign nested binaries
+→ sign plug-in bundle
+→ package (zip/pkg/dmg as chosen)
+→ submit with notarytool
+→ wait/check result
+→ staple ticket where applicable
+→ verify Gatekeeper/signature
+```
+
+Example submit shape:
+
+```bash
+xcrun notarytool submit MyPlugin.zip \
+  --keychain-profile "notary-profile" \
+  --wait
+```
+
+Credentials не хранить в repository или shell history.
+
+## Release gate
+
+Release job падает, если:
+- signature invalid;
+- wrong identity;
+- missing required architecture;
+- notarization rejected;
+- package differs after notarization/signing;
+- clean machine cannot load plug-in.
+
+
+---
+
+<!-- SOURCE: 08-MACOS/06-INSTALLATION-PACKAGING.md -->
+
+# macOS — installation and packaging
+
+## Common location
+
+Для plug-ins, которые должны быть доступны совместимым Adobe video hosts:
+
+```text
+/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
+```
+
+CC использует historical `7.0` directory convention.
+
+## AE-only location
+
+Если plug-in принципиально AE-specific:
+
+```text
+/Applications/Adobe After Effects [version]/Plug-ins/
+```
+
+Но installer, привязанный к app bundle/version path, требует больше maintenance при нескольких AE versions.
+
+## User dev path
+
+Для development удобно:
+
+```text
+~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
+```
+
+Release installer обычно использует system-level policy продукта.
+
+## Packaging choices
+
+- `.pkg` — хороший системный installer path;
+- signed/notarized `.dmg` как delivery container;
+- zip — только если manual install действительно является product decision.
+
+## Installer rules
+
+- no hidden destructive cleanup;
+- upgrade keeps user presets/license data unless explicitly intended;
+- uninstall removes only files owned by your product;
+- support side-by-side old/new only if designed;
+- log install result/path/version;
+- verify architecture and supported OS before install where appropriate.
+
+
+---
+
+<!-- SOURCE: 08-MACOS/07-CI.md -->
+
+# macOS — CI pipeline
+
+## Goal
+
+CI должен воспроизводимо выдавать тот же artifact, который QA тестирует и release подписывает.
+
+## Stages
+
+```text
+lint/static analysis
+→ build arm64+x86_64
+→ unit tests (pure core)
+→ verify Universal slices
+→ package plug-in
+→ ad-hoc load-test artifact (dev lane)
+→ Release: Developer ID sign
+→ notarize
+→ package integrity checks
+→ publish to QA/release storage
+```
+
+## SDK handling
+
+After Effects SDK licensing/distribution rules должны соблюдаться. Не коммитить SDK автоматически в public repo, если license этого не разрешает.
+
+Подходы:
+- private CI artifact;
+- secret-authenticated internal storage;
+- developer-provided SDK path for local build;
+- hash-pinned expected SDK bundle.
+
+## Secrets
+
+Apple signing certificate/private key/notary credentials:
+- CI secret store only;
+- ephemeral keychain;
+- delete keychain after job;
+- never print secrets;
+- restrict release environment approvals.
+
+## Artifact metadata
+
+Каждый artifact содержит рядом machine-readable manifest:
+
+```json
+{
+  "version": "1.2.3",
+  "git_sha": "...",
+  "ae_sdk": "...",
+  "architectures": ["arm64", "x86_64"],
+  "build_type": "Release"
+}
+```
+
+
+---
+
+<!-- SOURCE: 08-MACOS/08-NATIVE-SDK-VALIDATION.md -->
+
+# macOS — native SDK validation
+
+Перед Xcode build прогонять header-derived validation из `18-SDK-HEADER-TOOLS/`.
+
+```bash
+cd 18-SDK-HEADER-TOOLS
+./run-macos.sh "/path/to/After Effects SDK/Examples/Headers"
+```
+
+PASS означает только:
+
+- headers распарсились;
+- inventory создан;
+- suite symbols в наших cookbook C++ recipes существуют в указанном SDK.
+
+После этого обязательны Xcode compile/link и запуск plug-in внутри целевого After Effects. Signing/notarization проверяются отдельным release pipeline.
+
+
+---
+
+<!-- SOURCE: 08-MACOS/README.md -->
+
+# macOS developer bible
+
+## Target
+
+Коммерческий native AE plug-in на Mac в 2026 должен по умолчанию рассматриваться как:
+
+- **Universal binary:** arm64 + x86_64, если продукт всё ещё заявляет Intel support;
+- собранный в Xcode;
+- корректно PiPL-marked для обеих architectures;
+- ad-hoc signed в dev workflow на macOS 15+;
+- Developer ID signed + notarized для внешнего release;
+- проверенный отдельно на Apple Silicon native AE и Intel path, если Intel заявлен.
+
+## Read order
+
+1. `01-XCODE-SETUP.md`
+2. `02-UNIVERSAL-BINARY.md`
+3. `03-DEBUGGING.md`
+4. `04-GPU.md`
+5. `05-SIGNING-NOTARIZATION.md`
+6. `06-INSTALLATION-PACKAGING.md`
+7. `07-CI.md`
+
+
+---
+
+<!-- SOURCE: 09-WINDOWS/01-VISUAL-STUDIO-SETUP.md -->
+
+# Windows — Visual Studio setup
+
+## Start from Adobe sample
+
+Adobe SDK Guide прямо советует не реконструировать Windows effect project с нуля: custom PiPL resource generation step легко потерять.
+
+Для effect plug-in:
+1. скопировать Skeleton/closest sample;
+2. открыть solution в поддерживаемой Visual Studio;
+3. собрать untouched sample;
+4. убедиться, что `.aex` реально загружается AE;
+5. только потом переименовывать и менять код.
+
+## Configurations
+
+Минимум:
+- Debug x64;
+- Release x64;
+- ARM64 equivalents, если поддерживаются.
+
+Сохранять PDB каждого released build в symbol archive.
+
+## Output during development
+
+SDK Guide показывает common dev path вида:
+
+```text
+C:\Program Files\Adobe\Common\Plug-ins\7.0\MediaCore\
+```
+
+Но для installer path использовать Adobe registry guidance, а не предполагать, что одна строка подходит всегда.
+
+## Build hygiene
+
+- warning level высокий для собственного кода;
+- `/permissive-`/conformance changes вводить осознанно;
+- runtime library setting единообразно по зависимостям;
+- no accidental Debug CRT dependency in Release;
+- dependency audit before packaging.
+
+
+---
+
+<!-- SOURCE: 09-WINDOWS/02-X64-ARM64.md -->
+
+# Windows — x64 and ARM64
+
+## x64
+
+Основной historical Windows target для After Effects plug-ins.
+
+## ARM64
+
+Current AE SDK Guide рекомендует готовиться к Windows on Arm. Для ARM64 binary нужен Visual Studio 17.4+.
+
+PiPL example:
+
+```text
+#if defined(AE_OS_WIN)
+  CodeWinARM64 {"EffectMain"},
+  CodeWin64X86 {"EffectMain"},
+#endif
+```
+
+## Important
+
+Наличие ARM64 compile target ещё не означает, что:
+- нужный After Effects version работает native ARM64;
+- все third-party libraries имеют ARM64 builds;
+- GPU backend доступен так же, как x64;
+- installer выбирает правильный artifact.
+
+## Artifact strategy
+
+Windows обычно распространяет отдельные architecture binaries/installer payloads, а не Universal binary как macOS.
+
+Manifest:
+
+```text
+MyPlugin/win-x64/MyPlugin.aex
+MyPlugin/win-arm64/MyPlugin.aex
+```
+
+Installer выбирает совместимый target или ставит оба в корректно организованный layout, если host loader/product design это допускает.
+
+
+---
+
+<!-- SOURCE: 09-WINDOWS/03-DEBUGGING.md -->
+
+# Windows — debugging
+
+## Visual Studio launch
+
+Настроить project Debugging:
+- Command → `AfterFX.exe` нужной версии;
+- Working Directory → directory host-а;
+- plug-in output/copy step → dev MediaCore path.
+
+Путь к AfterFX.exe не зашивать в shared project навечно: использовать local property sheet/env variable.
+
+## Attach
+
+Можно:
+1. запустить AE;
+2. Visual Studio → Attach to Process → AfterFX.exe;
+3. убедиться, что symbols для вашего `.aex` loaded.
+
+## PDB discipline
+
+Для каждого release:
+- PDB сохраняется;
+- binary hash/version фиксируется;
+- PDB не заменяется новым build под тем же version label.
+
+## Crash dump
+
+При user crash запрашивать:
+- exact plug-in version/build;
+- AE version/build;
+- Windows build;
+- CPU architecture;
+- GPU + driver;
+- dump/crash report;
+- project/repro steps;
+- MFR/GPU state.
+
+Debugging без matching PDB часто превращается в угадывание.
+
+## Tools
+
+По необходимости:
+- Visual Studio debugger;
+- WinDbg for dumps;
+- Application Verifier/sanitizer-like tooling where compatible;
+- GPU vendor/profiling tools;
+- ETW/perf tools for contention/IO.
+
+
+---
+
+<!-- SOURCE: 09-WINDOWS/04-GPU.md -->
+
+# Windows — GPU
+
+Current AE GPU SDK build guide для sample предусматривает Boost, CUDA SDK и DirectX Shader Compiler.
+
+## CUDA
+
+Adobe guide рекомендует CUDA Driver API как наиболее устойчивый к будущим driver versions path.
+
+Если Runtime API необходим:
+- static linking runtime может снизить external runtime mismatch;
+- dynamic runtime требует контролировать DLL availability/version.
+
+Нельзя просто надеяться на CUDA DLL, случайно поставляемую текущим AE build.
+
+## DirectX
+
+Current guide указывает:
+- DXC dependency for sample/toolchain;
+- DirectX assets могут генерироваться рядом с binary и должны попасть в deployment;
+- effect должен заявить DirectX rendering support flag;
+- PiPL должен быть синхронизирован с capability;
+- без флага host может уйти на CPU path.
+
+## Multi-backend architecture
+
+```text
+RenderCore interface
+  ├── CPU
+  ├── CUDA
+  └── DirectX
+```
+
+Selection logic отдельно от mathematical algorithm.
+
+## GPU failure policy
+
+Если GPU backend init/compile/device step неуспешен:
+- fail gracefully;
+- CPU fallback, если продукт его обещает;
+- один понятный diagnostic, а не dialog на каждый frame;
+- не оставлять partially initialized global state.
+
+
+---
+
+<!-- SOURCE: 09-WINDOWS/05-CODE-SIGNING.md -->
+
+# Windows — code signing
+
+## Tool
+
+Microsoft SignTool входит в Windows SDK и используется для Authenticode signing/verification/timestamping.
+
+Современные SignTool версии требуют явно задавать digest algorithms; SHA-256 — нормальный baseline.
+
+## Conceptual command
+
+```bat
+signtool sign /fd SHA256 /td SHA256 /tr <RFC3161_TIMESTAMP_URL> /a MyPlugin.aex
+```
+
+Actual certificate selection (`/a`, `/n`, `/sha1`, PFX, Trusted Signing etc.) зависит от вашей release infrastructure.
+
+## Verify
+
+```bat
+signtool verify /pa /v MyPlugin.aex
+```
+
+## Sign what ships
+
+Подписывать:
+- `.aex`;
+- helper `.exe/.dll`;
+- installer executable/MSI as applicable.
+
+Signing должен быть после final binary mutation. Любой post-sign patch invalidates signature.
+
+## Certificate security
+
+- private key не хранить в repo;
+- CI credentials isolated;
+- access only release jobs;
+- timestamp releases so signatures remain verifiable after certificate expiry, subject to trust policy.
+
+
+---
+
+<!-- SOURCE: 09-WINDOWS/06-INSTALLATION-PACKAGING.md -->
+
+# Windows — installation and packaging
+
+## Adobe common install path
+
+After Effects SDK Guide рекомендует installer'у получать common plug-in path из registry, например family key:
+
+```text
+HKLM\SOFTWARE\Adobe\After Effects\[version]\CommonPluginInstallPath
+```
+
+AE-specific path также доступен через соответствующий Adobe registry value.
+
+Не полагаться только на hardcoded `C:\Program Files\...` в production installer.
+
+## Installer technology
+
+Подойдут, в зависимости от продукта:
+- MSI/WiX;
+- signed bootstrapper;
+- Inno Setup/другая зрелая installer system.
+
+Technology менее важна, чем корректные upgrade/uninstall/signing semantics.
+
+## Installer tests
+
+- fresh install;
+- upgrade N-1 → N;
+- downgrade policy;
+- repair;
+- uninstall;
+- multiple AE versions installed;
+- no AE installed;
+- no admin rights;
+- x64/ARM64 architecture selection;
+- antivirus/SmartScreen behavior;
+- long/Unicode user/profile paths where applicable.
+
+
+---
+
+<!-- SOURCE: 09-WINDOWS/07-CI.md -->
+
+# Windows — CI pipeline
+
+## Stages
+
+```text
+static analysis
+→ build x64 Debug/Release
+→ build ARM64 if supported
+→ unit tests
+→ inspect dependencies
+→ package .aex + runtime assets
+→ sign release binaries
+→ build installer
+→ sign installer
+→ verify signatures
+→ publish artifact + manifest + symbols
+```
+
+## SDK
+
+Не redistributing Adobe SDK в public repository без разрешения. CI получает SDK из approved private source/local runner setup.
+
+## Symbols
+
+PDB хранить отдельно от public installer, но навсегда связывать с:
+- semantic version;
+- git SHA;
+- binary hash;
+- architecture.
+
+## Signing
+
+Использовать protected release environment. Signing job не должен запускаться для untrusted pull requests.
+
+## Artifact manifest
+
+```json
+{
+  "version": "1.2.3",
+  "git_sha": "...",
+  "arch": "x64",
+  "signed": true,
+  "runtime_assets": ["..."]
+}
+```
+
+
+---
+
+<!-- SOURCE: 09-WINDOWS/08-NATIVE-SDK-VALIDATION.md -->
+
+# Windows — native SDK validation
+
+Перед Visual Studio build прогонять header-derived validation из `18-SDK-HEADER-TOOLS/`.
+
+```powershell
+cd 18-SDK-HEADER-TOOLS
+.\run-windows.ps1 "C:\path\to\After Effects SDK\Examples\Headers"
+```
+
+PASS означает только:
+
+- headers распарсились;
+- inventory создан;
+- suite symbols в наших cookbook C++ recipes существуют в указанном SDK.
+
+После этого обязательны MSVC compile/link и запуск plug-in внутри целевого After Effects. Code signing проверяется отдельным release pipeline.
+
+
+---
+
+<!-- SOURCE: 09-WINDOWS/README.md -->
+
+# Windows developer bible
+
+## Target
+
+Коммерческий native AE plug-in на Windows в 2026:
+
+- Visual Studio project based on Adobe SDK sample;
+- x64 как основной shipping target;
+- ARM64 target добавлять там, где target Adobe hosts работают native и продукт заявляет поддержку;
+- PiPL resource build step сохранён;
+- symbols/PDB архивируются;
+- release binaries Authenticode-signed;
+- installer использует корректный Adobe plug-in path policy/registry.
+
+## Read order
+
+1. `01-VISUAL-STUDIO-SETUP.md`
+2. `02-X64-ARM64.md`
+3. `03-DEBUGGING.md`
+4. `04-GPU.md`
+5. `05-CODE-SIGNING.md`
+6. `06-INSTALLATION-PACKAGING.md`
+7. `07-CI.md`
+
+
+---
+
+<!-- SOURCE: 10-TESTING/01-TEST-MATRIX.md -->
+
+# Test matrix
+
+## Minimal matrix
+
+| Axis | Values |
+|---|---|
+| AE | every claimed major/minor family |
+| OS | minimum supported + current stable |
+| CPU | mac arm64, mac x86_64 if claimed, Win x64, Win ARM64 if claimed |
+| BPC | 8 / 16 / 32 |
+| MFR | off / on |
+| GPU | off / each supported backend |
+| Resolution | tiny / HD / 4K / stress |
+| Project | new / migrated old project |
+
+Полный Cartesian product может быть дорогим. Делить на:
+- PR smoke matrix;
+- nightly expanded matrix;
+- pre-release full matrix.
+
+## Required project fixtures
+
+### `basic.aep`
+- one layer;
+- one effect;
+- defaults.
+
+### `animated-extremes.aep`
+- every param animated;
+- min/max/odd values;
+- time remap / random seeks.
+
+### `stacked.aep`
+- multiple instances;
+- masks/transforms/precomps;
+- other common effects around yours.
+
+### `mfr-stress.aep`
+- long duration;
+- multiple comps/layers/instances;
+- concurrent render pressure.
+
+### `color-depth.aep`
+- 8/16/32-bpc variants;
+- HDR and transparency fixtures.
+
+### `legacy-project.aep`
+- saved by previous shipped plug-in version.
+
+
+---
+
+<!-- SOURCE: 10-TESTING/02-RENDER-CORRECTNESS.md -->
+
+# Render correctness
+
+## Golden image strategy
+
+Не сравнивать screenshots UI. Сравнивать actual rendered pixel output.
+
+Для deterministic CPU path:
+- exact hash, если mathematically stable across platforms;
+- otherwise pixel diff with strict documented tolerance.
+
+Для GPU/float:
+- max absolute error;
+- mean/RMS error;
+- count of pixels above tolerance;
+- separate alpha tolerance.
+
+## Test patterns
+
+- impulse pixel;
+- horizontal/vertical gradient;
+- checkerboard 1px/2px;
+- transparent colored edges;
+- solid black/white/gray;
+- HDR negative→positive ramp;
+- odd dimensions (1x1, 3x5, 1919x1079);
+- very wide/tall image;
+- nontrivial alpha.
+
+## Temporal effects
+
+Если output зависит от time:
+- random seek order;
+- backwards render;
+- duplicate frames;
+- skipped frames;
+- render after cache purge;
+- same frame from different render contexts.
+
+## Pass condition
+
+Tolerance должна быть частью test spec до реализации backend-а.
+
+
+---
+
+<!-- SOURCE: 10-TESTING/03-MFR-STRESS.md -->
+
+# MFR stress tests
+
+## Purpose
+
+Поймать race/deadlock/state bleed, которые не проявляются в single-frame preview.
+
+## Scenarios
+
+1. Один effect instance, long comp, full render.
+2. 20+ instances одного effect.
+3. Несколько comps в render queue.
+4. Одновременно разные parameter values.
+5. Rapid cancel/restart renders.
+6. Cache purge между runs.
+7. MFR off → on → off.
+8. GPU backend вместе с MFR.
+9. Old project with migrated sequence data.
+10. Repeated render loop 50–100 раз для flaky races.
+
+## Observability
+
+Debug build log:
+- instance id;
+- frame/time;
+- thread id;
+- backend;
+- sequence/global state revision;
+- cache key/hit.
+
+Лог должен позволять доказать, что два frames не пишут один unsafe state.
+
+## Failures
+
+Любой из этих симптомов — release blocker:
+- nondeterministic pixels;
+- sporadic crash;
+- hang/deadlock;
+- state from another layer/instance;
+- increasing memory every render;
+- corrupted project after save/reopen.
+
+
+---
+
+<!-- SOURCE: 10-TESTING/04-PERFORMANCE.md -->
+
+# Performance testing
+
+## Metrics
+
+- cold first frame;
+- warm frame;
+- full comp render time;
+- per-frame median/p95;
+- peak RSS/memory;
+- MFR scaling;
+- CPU utilization;
+- GPU kernel + synchronization time;
+- cache hit rate.
+
+## Baseline
+
+Каждый release сравнивать с last shipped version на одной машине/AE build/project.
+
+Пример gate:
+
+```text
+Typical project: no >5% regression without explicit approval
+Stress project: no OOM / unbounded growth
+MFR scaling: no global-lock serialization regression
+GPU: must beat CPU on target workload class or have another justified benefit
+```
+
+Numbers — product-specific; главное, чтобы threshold был заранее определён.
+
+## Profiling order
+
+1. time whole render;
+2. locate slow selector/backend;
+3. profile algorithm;
+4. allocation profile;
+5. lock contention;
+6. GPU transfers/sync;
+7. host callbacks/checkouts.
+
+Не оптимизировать по ощущениям.
+
+
+---
+
+<!-- SOURCE: 10-TESTING/05-CRASH-DIAGNOSTICS.md -->
+
+# Crash diagnostics
+
+## Every build needs identity
+
+Минимум:
+- semantic version;
+- internal build number;
+- git SHA;
+- platform/arch;
+- build timestamp or reproducible build ID;
+- SDK generation.
+
+## macOS bundle
+
+Хранить exact `.dSYM` release artifact.
+
+Crash ticket:
+- `.ips`/crash report;
+- AE build;
+- OS;
+- architecture;
+- project;
+- repro;
+- GPU/MFR state.
+
+## Windows
+
+Хранить exact PDB.
+
+Crash ticket:
+- dump;
+- AE build;
+- Windows build;
+- CPU/GPU/driver;
+- project;
+- repro;
+- GPU/MFR.
+
+## Triage classification
+
+1. load/init crash;
+2. params/UI event crash;
+3. render CPU;
+4. render GPU;
+5. MFR race;
+6. project serialization/migration;
+7. third-party dependency;
+8. host-only reproducible without plug-in modification.
+
+Если bug воспроизводится unmodified Adobe sample при тех же условиях — это важный сигнал для отделения SDK/host issue от собственного кода.
+
+
+---
+
+<!-- SOURCE: 10-TESTING/README.md -->
+
+# Testing strategy
+
+AE plug-in нельзя тестировать одной фразой «открыл AE, эффект работает».
+
+## Layers
+
+1. **Pure core unit tests** — math/data logic без AE.
+2. **Adapter tests** — conversion between SDK types and internal model.
+3. **Golden render tests** — known inputs → known outputs.
+4. **Host integration tests** — actual AE.
+5. **Cross-version matrix** — каждый supported AE.
+6. **Platform/architecture matrix**.
+7. **Performance regression**.
+8. **Installer/upgrade/uninstall**.
+9. **Crash/recovery**.
+
+## Release principle
+
+Каждая заявленная capability должна иметь проверку:
+- MFR supported → test MFR concurrency;
+- GPU supported → CPU/GPU equivalence + fallback;
+- 32 bpc supported → float fixtures;
+- Apple Silicon supported → arm64 real host test;
+- Windows ARM64 supported → real/native host test.
+
+
+---
+
+<!-- SOURCE: 11-DISTRIBUTION/01-VERSIONING-COMPATIBILITY.md -->
+
+# Versioning and compatibility
+
+## Semantic product version
+
+Recommended:
+
+```text
+MAJOR.MINOR.PATCH+build
+```
+
+Отдельно хранить:
+- marketing version;
+- binary/build number;
+- schema/sequence-data version;
+- bridge protocol version, если panel ↔ native.
+
+## Project compatibility
+
+Если старый project содержит effect instance:
+- parameter IDs/order должны интерпретироваться правильно;
+- sequence data versioned;
+- migration deterministic;
+- downgrade expectations documented.
+
+## Compatibility statement
+
+Писать:
+
+> Tested with After Effects 25.x and 26.x on macOS arm64 and Windows x64.
+
+а не:
+
+> Works with all After Effects versions.
+
+## Beta versions
+
+Beta smoke tests полезны для раннего detection, но не заменяют GA validation и не должны автоматически менять official support matrix.
+
+
+---
+
+<!-- SOURCE: 11-DISTRIBUTION/02-SECURITY-LICENSING.md -->
+
+# Security and licensing architecture
+
+## Principle
+
+Licensing code не должен ухудшать host stability.
+
+## Never in render hot path
+
+Не делать на каждый frame:
+- network license call;
+- filesystem license scan;
+- crypto-heavy handshake;
+- UI dialog;
+- blocking mutex around licensing state.
+
+License state должен быть resolved/cached безопасно вне hot loop.
+
+## Offline behavior
+
+Заранее определить:
+- offline grace;
+- machine changes;
+- clock changes;
+- server unavailable;
+- license revoked;
+- render farm / headless policy.
+
+## Secrets
+
+Клиентский plug-in нельзя считать secret storage. Любой embedded secret потенциально извлекаем.
+
+Не помещать server master keys/API admin secrets в binary/panel.
+
+## Tamper resistance
+
+Obfuscation/anti-debugging не должна ломать AE, crash diagnostics или легальных пользователей. Stability важнее агрессивной защиты.
+
+
+---
+
+<!-- SOURCE: 11-DISTRIBUTION/03-RELEASE-CHECKLIST.md -->
+
+# Release checklist
+
+## Code
+
+- [ ] clean working tree / tagged commit
+- [ ] version/build/schema numbers correct
+- [ ] compiler warnings reviewed
+- [ ] no debug backdoors/test endpoints
+- [ ] exceptions contained at host boundaries
+- [ ] dependency licenses reviewed
+
+## Effect correctness
+
+- [ ] 8-bpc
+- [ ] 16-bpc
+- [ ] 32-bpc if claimed
+- [ ] alpha/transparency
+- [ ] extreme params
+- [ ] animated params
+- [ ] save/reopen
+- [ ] old project migration
+
+## MFR
+
+- [ ] MFR off passes
+- [ ] MFR on passes
+- [ ] repeated stress run passes
+- [ ] no mutable unsafe globals
+- [ ] no lock held across host calls
+
+## GPU
+
+- [ ] CPU path passes
+- [ ] every GPU backend passes
+- [ ] CPU/GPU diff within defined tolerance
+- [ ] CPU fallback works
+- [ ] missing/unsupported GPU handled cleanly
+
+## macOS
+
+- [ ] arm64 slice
+- [ ] x86_64 slice if claimed
+- [ ] PiPL entry declarations correct
+- [ ] release Developer ID signature valid
+- [ ] notarization accepted
+- [ ] clean-machine install/load
+- [ ] dSYM archived
+
+## Windows
+
+- [ ] x64 build
+- [ ] ARM64 build if claimed
+- [ ] PiPL resource generated
+- [ ] runtime dependencies packaged
+- [ ] Authenticode signature valid
+- [ ] installer signature valid
+- [ ] clean-machine install/load
+- [ ] PDB archived
+
+## AE versions
+
+- [ ] every supported AE version load test
+- [ ] render golden project
+- [ ] render queue
+- [ ] MFR
+- [ ] GPU
+- [ ] new AE version compatibility statement accurate
+
+## Installer
+
+- [ ] fresh install
+- [ ] upgrade
+- [ ] uninstall
+- [ ] multiple AE versions
+- [ ] no destructive user-data deletion
+
+## Release assets
+
+- [ ] changelog
+- [ ] known issues
+- [ ] support matrix
+- [ ] checksums/build manifest
+- [ ] rollback artifact retained
+
+
+---
+
+<!-- SOURCE: 11-DISTRIBUTION/04-INSTALL-LOCATIONS.md -->
+
+# Install locations cheat sheet
+
+## Native C++ — macOS
+
+Common MediaCore:
+
+```text
+/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
+```
+
+Per-user development:
+
+```text
+~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
+```
+
+AE-specific:
+
+```text
+/Applications/Adobe After Effects [version]/Plug-ins/
+```
+
+## Native C++ — Windows
+
+Installer should use Adobe registry path guidance:
+
+```text
+HKLM\SOFTWARE\Adobe\After Effects\[version]\CommonPluginInstallPath
+```
+
+Typical common dev path:
+
+```text
+C:\Program Files\Adobe\Common\Plug-ins\7.0\MediaCore\
+```
+
+## CEP — macOS
+
+System:
+
+```text
+/Library/Application Support/Adobe/CEP/extensions
+```
+
+User:
+
+```text
+~/Library/Application Support/Adobe/CEP/extensions
+```
+
+## CEP — Windows
+
+System:
+
+```text
+C:\Program Files (x86)\Common Files\Adobe\CEP\extensions
+```
+
+User:
+
+```text
+%AppData%\Roaming\Adobe\CEP\extensions
+```
+
+Paths are version/platform sensitive. Installer code should prefer official registry/platform rules over string guessing.
+
+
+---
+
+<!-- SOURCE: 12-RECIPES/01-FIRST-EFFECT.md -->
+
+# Recipe — first native effect
+
+## Goal
+
+Получить минимальный effect, который reliably loads/renders on both platforms before writing product logic.
+
+## Steps
+
+1. Download/use the target After Effects SDK.
+2. Copy `Skeleton` sample.
+3. Build untouched sample on one platform.
+4. Install/copy it to dev MediaCore.
+5. Launch AE and apply sample.
+6. Repeat on second platform.
+7. Rename product identifiers/entry metadata carefully.
+8. Build again before touching render algorithm.
+9. Create pure internal `RenderCore` function.
+10. Map AE pixels → internal view → RenderCore → output.
+11. Add golden test outside AE for RenderCore.
+12. Add 8/16/32 support as required.
+13. Only then SmartFX/MFR/GPU/UI.
+
+## Done means
+
+- both OS load it;
+- no warnings/errors at startup;
+- project saves/reopens;
+- Debugger symbols work;
+- release path not yet needed, but dev signing/loading works.
+
+
+---
+
+<!-- SOURCE: 12-RECIPES/02-MFR-MIGRATION.md -->
+
+# Recipe — migrate an existing effect to MFR
+
+1. Disable/not set MFR support flag.
+2. Inventory every global/static/singleton.
+3. Inventory writes to global/sequence state during render.
+4. Inventory third-party library global state.
+5. Move scratch to frame-local structures.
+6. Convert reusable tables to immutable state.
+7. Replace unsafe cache with explicit concurrent/cache API design.
+8. Ensure no lock survives a host callback/suite call.
+9. Create MFR stress project.
+10. Compare MFR off/on output.
+11. Run repeated renders and cancellation.
+12. Enable MFR support flag.
+13. Measure scaling and lock contention.
+14. Ship only if correctness + stability + performance all pass.
+
+
+---
+
+<!-- SOURCE: 12-RECIPES/03-DEBUG-PLUGIN-NOT-LOADING.md -->
+
+# Recipe — plug-in does not load
+
+## 1. File is discovered?
+
+- correct folder;
+- folder actually scanned;
+- no accidental disabled folder naming convention;
+- right package suffix/layout.
+
+## 2. Architecture?
+
+macOS:
+```bash
+lipo -info MyPlugin.plugin/Contents/MacOS/MyPlugin
+```
+
+Windows:
+- inspect PE architecture/dependencies.
+
+## 3. PiPL?
+
+- resource present;
+- correct entry point;
+- correct architecture entry declaration;
+- PiPL flags match runtime setup.
+
+## 4. Signing?
+
+macOS:
+```bash
+codesign -vvv --deep --strict MyPlugin.plugin
+```
+
+Windows:
+```bat
+signtool verify /pa /v MyPlugin.aex
+```
+
+## 5. Dependencies?
+
+- missing dylib/DLL;
+- wrong architecture;
+- wrong runtime library;
+- missing GPU assets.
+
+## 6. Initialization crash?
+
+Attach debugger before/at launch or inspect crash report. Minimize global constructors; defer optional subsystem init until needed.
+
+
+---
+
+<!-- SOURCE: 12-RECIPES/04-CPU-GPU-EQUIVALENCE.md -->
+
+# Recipe — CPU/GPU equivalence
+
+1. Freeze CPU reference implementation.
+2. Define test images and parameter vectors.
+3. Define numeric tolerance before GPU comparison.
+4. Render CPU outputs to raw/high-precision fixtures.
+5. Render GPU outputs.
+6. Compute per-channel diff stats.
+7. Visualize heatmap for failed pixels.
+8. Fix edge/alpha/clamp/order issues.
+9. Repeat for 8/16/32-bpc.
+10. Repeat under MFR.
+11. Test fallback after simulated GPU init failure.
+
+Do not accept «на глаз одинаково» for core render correctness.
+
+
+---
+
+<!-- SOURCE: 12-RECIPES/05-HYBRID-PANEL-NATIVE.md -->
+
+# Recipe — panel + native core
+
+## Architecture
+
+```text
+UI (CEP today / UXP later)
+       ↓ JSON-like command contract
+Bridge adapter
+       ↓
+Native service / effect / AEGP
+       ↓
+After Effects + compute core
+```
+
+## Protocol rules
+
+Every command:
+- `version`;
+- `type`;
+- request id;
+- validated payload;
+- success/error response.
+
+Example conceptual payload:
+
+```json
+{
+  "version": 1,
+  "type": "analyzeFrame",
+  "requestId": "123",
+  "payload": {"layerId": 42, "time": 1.25}
+}
+```
+
+## Why
+
+UXP migration then replaces `CepBridge`, not product domain logic.
+
+## Avoid
+
+- arbitrary code strings;
+- panel directly poking native memory/state;
+- one giant unversioned command;
+- synchronous blocking UI for long native jobs.
+
+
+---
+
+<!-- SOURCE: 12-RECIPES/06-PROFILING.md -->
+
+# Recipe — profiling a slow effect
+
+1. Reproduce on fixed project/machine/AE build.
+2. Measure full render baseline.
+3. Disable GPU: compare.
+4. Disable MFR: compare.
+5. Time selectors/render stages.
+6. Separate checkout/host time from own compute.
+7. Profile allocations.
+8. Profile lock contention.
+9. For GPU: transfers, dispatch, sync, kernel.
+10. Optimize one bottleneck.
+11. Re-run correctness tests.
+12. Re-run baseline.
+13. Keep change only if measurable and no regression.
+
+
+---
+
+<!-- SOURCE: 13-TEMPLATES/BUG-REPORT.md -->
+
+# Bug report template
+
+## Summary
+
+One sentence.
+
+## Environment
+
+- Plug-in version/build:
+- Git SHA if internal:
+- After Effects version/build:
+- OS version:
+- CPU architecture:
+- CPU:
+- GPU:
+- GPU driver:
+- MFR on/off:
+- GPU backend:
+- project bit depth:
+
+## Reproduction
+
+1.
+2.
+3.
+
+Frequency: always / often / rare.
+
+## Expected
+
+## Actual
+
+## Artifacts
+
+- project:
+- source media:
+- rendered frame:
+- log:
+- crash report/dump:
+
+## Regression
+
+Last known good version:
+
+
+---
+
+<!-- SOURCE: 13-TEMPLATES/COMPATIBILITY-MATRIX.md -->
+
+# Compatibility matrix template
+
+| AE version | macOS arm64 | macOS x86_64 | Windows x64 | Windows ARM64 | CPU render | GPU render | MFR | Notes |
+|---|---|---|---|---|---|---|---|---|
+| 25.x | | | | | | | | |
+| 26.x | | | | | | | | |
+| 27.x Beta | lab | lab | lab | lab | | | | never claim production from beta only |
+
+
+---
+
+<!-- SOURCE: 13-TEMPLATES/PERFORMANCE-REPORT.md -->
+
+# Performance report template
+
+## Build
+
+- version:
+- git SHA:
+- compiler:
+- AE build:
+- machine:
+
+## Scenario
+
+- project:
+- resolution:
+- duration:
+- bpc:
+- MFR:
+- GPU:
+
+## Results
+
+| Metric | Baseline | Candidate | Delta |
+|---|---:|---:|---:|
+| First frame | | | |
+| Full render | | | |
+| Median frame | | | |
+| p95 frame | | | |
+| Peak memory | | | |
+
+## Correctness
+
+- golden diff:
+- tolerance:
+- pass/fail:
+
+## Conclusion
+
+Ship / investigate / reject optimization.
+
+
+---
+
+<!-- SOURCE: 13-TEMPLATES/PLUGIN-SPEC.md -->
+
+# Plug-in specification template
+
+## Product
+
+- Name:
+- Version target:
+- Owner:
+- Repository:
+
+## Problem
+
+What artist/user problem is solved?
+
+## Extension type
+
+- [ ] Effect
+- [ ] AEGP
+- [ ] AEIO
+- [ ] Artisan
+- [ ] ExtendScript
+- [ ] CEP
+- [ ] UXP
+- [ ] Hybrid
+
+Why this type?
+
+## Support matrix
+
+### After Effects
+- Minimum:
+- Maximum tested:
+
+### macOS
+- Minimum OS:
+- arm64: yes/no
+- x86_64: yes/no
+
+### Windows
+- x64: yes/no
+- ARM64: yes/no
+
+## Render
+
+- 8 bpc:
+- 16 bpc:
+- 32 bpc:
+- SmartFX:
+- MFR:
+- GPU backends:
+- CPU fallback:
+
+## State
+
+- global_data:
+- sequence_data:
+- serialization version:
+- caches:
+
+## UI
+
+- standard params:
+- custom Drawbot:
+- panel:
+
+## Performance budget
+
+- target frame/resolution:
+- target latency/render time:
+- memory budget:
+
+## Failure behavior
+
+- unsupported GPU:
+- missing license/network:
+- corrupt project state:
+
+## Test plan
+
+- unit:
+- golden render:
+- MFR:
+- GPU:
+- cross-version:
+- installer:
+
+
+---
+
+<!-- SOURCE: 13-TEMPLATES/RELEASE-NOTES.md -->
+
+# Release notes template
+
+# Product X.Y.Z
+
+## Added
+
+## Changed
+
+## Fixed
+
+## Performance
+
+## Compatibility
+
+Tested with:
+- After Effects:
+- macOS:
+- Windows:
+- architectures:
+
+## Known issues
+
+## Upgrade notes
+
+## Checksums
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/01-TAXONOMY.md -->
+
+# Native SDK taxonomy
+
+## Effect plug-ins
+
+### Core image effect
+Получает input world + parameters и пишет output world. Host инициирует все вызовы.
+
+### SmartFX
+Использует `PF_Cmd_SMART_PRE_RENDER` и `PF_Cmd_SMART_RENDER`. Нужен для корректного deep/floating-point pipeline и сложной dependency/ROI логики.
+
+### MFR-aware effect
+Не отдельный API. Effect объявляет поддержку MFR только после того, как render path и sequence state безопасны для нескольких одновременно рендерящихся кадров.
+
+### GPU effect
+Не отдельный plug-in type. CPU effect получает GPU lifecycle/render selectors и `PF_GPUDeviceSuite`/GPU-specific context.
+
+### Custom UI effect
+Effect получает `PF_Cmd_EVENT`; рисует/обрабатывает custom controls в Effect Controls и/или Composition/Layer panels. Drawbot — рекомендуемый host drawing layer.
+
+### Arbitrary parameter effect
+Хранит свой data type внутри parameter stream и реализует copy/flatten/compare/interpolate/print callbacks.
+
+### Audio effect
+Effect API, но render contract оперирует `PF_SoundWorld`/samples вместо image world.
+
+## AEGP family
+
+### General tool
+Меню, команды, проект, composition, items, layers, streams, masks, text, effects, render queue, preferences.
+
+### Keyframer
+Пакетно читает/создаёт/изменяет keyframes. Обычно виден в Animation > Keyframe Assistant.
+
+### Native panel
+Dockable panel, построенная через native panel APIs. Рабочий путь, но значительно тяжелее HTML panel.
+
+### Suite provider
+Публикует собственный PICA suite, чтобы другие native plug-ins вызывали стабильный C ABI без прямого линкования.
+
+### File/project importer helper
+AEGP может регистрироваться с File Import Manager Suite для специализированного import workflow.
+
+## Specialized AEGP
+
+### AEIO
+Регистрирует `AEIO_ModuleInfo` и `AEIO_FunctionBlock*`; получает import/export callbacks.
+
+### Artisan
+Регистрирует `PR_ArtisanEntryPoints`; получает render context и берёт на себя 3D render композиции.
+
+### Interactive Artisan
+Вариант Artisan для интерактивного preview/render.
+
+## Display / output hooks
+
+### BlitHook
+AE пушит отображаемые frames в plug-in. Подходит для внешнего display/monitor-like поведения. Не превращать его в скрытый render engine.
+
+## Legacy native APIs
+
+- Photoshop format plug-ins/filters — поддерживаются исторически, но не являются рекомендуемым путём нового AE integration.
+- Foreign Project Format (FPF) — deprecated в пользу более современных integration APIs.
+- ADM-based palette UI — исторический путь; не стартовать новый UI на ADM.
+
+## Почему эта taxonomy важна
+
+Если продукт одновременно делает несколько вещей, он может состоять из **нескольких модулей**:
+
+```text
+[CEP/UXP panel]
+      |
+      v
+[ExtendScript / command bridge]
+      |
+      v
+[AE project model]
+
+[Native AEGP service] <----PICA----> [Effect plug-in]
+        |
+        +---- AEGP suites ----> project/layers/keyframes
+
+[Effect plug-in] <---- PF selectors ---- [AE render graph]
+```
+
+Не надо пытаться заставить один Effect выполнять работу AEGP или наоборот.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/02-HOST-CALL-FLOWS.md -->
+
+# Host call flows
+
+## Effect
+
+```text
+AE loads module / reads PiPL
+        |
+        v
+PluginDataEntryFunction* -> registers effect metadata
+        |
+        v
+EffectMain(PF_Cmd_GLOBAL_SETUP)
+        |
+        v
+EffectMain(PF_Cmd_PARAM_SETUP)
+        |
+        +---- per instance ---> SEQUENCE_SETUP / RESETUP / FLATTEN / SETDOWN
+        |
+        +---- render ----------> FRAME_SETUP -> RENDER -> FRAME_SETDOWN
+        |                       or SMART_PRE_RENDER -> SMART_RENDER
+        |
+        +---- UI --------------> EVENT / USER_CHANGED_PARAM / UPDATE_PARAMS_UI
+        |
+        v
+GLOBAL_SETDOWN
+```
+
+Главное: plug-in **не крутит свой loop** и не «спрашивает AE, есть ли работа». AE вызывает plug-in тогда, когда render graph или UI нуждается в нём.
+
+## AEGP
+
+```text
+AE launch
+  |
+  v
+AEGP EntryPointFunc(pica_basicP, version, plugin_id, global_refcon)
+  |
+  +-- register CommandHook
+  +-- register UpdateMenuHook
+  +-- register IdleHook
+  +-- register DeathHook
+  +-- optionally RegisterIO / RegisterArtisan / panel callbacks
+  |
+  v
+EntryPointFunc returns
+  |
+  v
+AE later invokes registered hooks
+  |
+  v
+hook -> acquire/call AEGP suites -> mutate/query AE
+```
+
+AEGP entry point — регистрационная фаза. Основная работа происходит позднее в hooks.
+
+## AEIO
+
+```text
+AE launch -> AEGP entry -> AEGP_RegisterIO()
+                       |
+                       v
+User imports file -> VerifyFileImportable -> InitInSpecFromFile
+                       |
+                       v
+AE asks metadata / frame / audio through AEIO function block
+
+Render/output -> AE creates OutSpec -> AEIO callbacks -> encoded file
+```
+
+## Artisan
+
+```text
+AE launch -> AEGP entry -> AEGP_RegisterArtisan()
+                       |
+                       v
+User selects renderer for composition
+                       |
+                       v
+AE creates render context -> Artisan callbacks -> rendered 3D result
+```
+
+## BlitHook
+
+```text
+AE Composition panel displays frame
+              |
+              v
+         BlitHook callback
+              |
+              v
+     consume/copy/send frame
+```
+
+Это display-time stream, не замена normal Effect/Render Queue pipeline.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md -->
+
+# PICA suites — внутренний native service bus After Effects
+
+## Что это
+
+PICA (Plug-In Component Architecture) — versioned function-suite mechanism. `SPBasicSuite` даёт `AcquireSuite`/`ReleaseSuite`; конкретные API After Effects организованы в suites.
+
+Для C++ effect обычно используется `AEFX_SuiteScoper`, который RAII-способом acquire/release нужный suite.
+
+```cpp
+AEFX_SuiteScoper<PF_GPUDeviceSuite1> gpu(
+    in_data,
+    kPFGPUDeviceSuite,
+    kPFGPUDeviceSuiteVersion1,
+    out_data);
+
+gpu->GetDeviceInfo(in_data->effect_ref, device_index, &info);
+```
+
+## Почему suite имеет номер версии
+
+Имя + версия — часть ABI contract. Новый suite version может добавлять/менять signature, при этом старые версии могут оставаться доступными.
+
+Правильный pattern:
+
+```text
+try newest suite
+  -> available: use it
+  -> missing: acquire older supported version
+  -> still missing: disable feature or fail explicitly
+```
+
+## Основные AEGP suite-группы
+
+- Memory
+- Command / Register
+- Project / Item / Collection
+- Composition / Layer / Stream / Dynamic Stream
+- Effect / Mask / Keyframe / Marker
+- Footage / File Import
+- Text / Text Layer
+- Utility / Persistent Data
+- Render / World / Composite
+- Render Queue / Render Queue Item / Output Module / Render Options
+- Color Settings
+- PF Interface
+- Iterate
+- Guide / Item View (26.5 additions include Guide APIs)
+
+Список версий всегда сверять с headers конкретного SDK.
+
+## Thread rule
+
+По умолчанию считать suite calls **не thread-safe**, пока документация конкретной функции не говорит обратное. AEGP project/UI mutations — main/UI thread only.
+
+## Plug-in published suite
+
+AEGP может опубликовать свой suite для других plug-ins. Это лучший native in-process bridge, когда несколько модулей одного продукта должны совместно использовать сервис:
+
+```text
+Effect A ----AcquireSuite("com.acme.CoreSuite", v1)---> AEGP Core
+Effect B ----AcquireSuite("com.acme.CoreSuite", v1)---> AEGP Core
+```
+
+Преимущества:
+- ABI contract явный;
+- нет зависимости от load order на уровне прямых pointers;
+- можно versioning suite;
+- меньше hidden globals.
+
+См. `16-WORKING-TEMPLATES/pica-shared-suite/`.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/04-EFFECTS.md -->
+
+# Effect plug-ins — полный native map
+
+## Host contract
+
+After Effects инициирует всё через `EffectMain` и `PF_Cmd` selectors. `PF_InData` — входной host context; `PF_OutData` — capabilities/state обратно в AE; `PF_ParamDef[]` — parameters; `PF_LayerDef` / `PF_EffectWorld` — image buffers.
+
+## Категории поведения
+
+### Registration / metadata
+- PiPL / runtime registration
+- display name, match name, category, version
+- out flags / out flags 2
+- current SDK 26.5 adds effect search keywords/description support in the current registration/PiPL model; exact macro/version сверять с current SDK.
+
+### Parameters
+- sliders/fixed/float
+- checkbox
+- angle
+- point / 3D point
+- color
+- popup
+- layer
+- button
+- arbitrary data
+- groups/topics
+
+### Render
+- classic `PF_Cmd_RENDER`
+- SmartFX pre-render/render
+- output resizing
+- layer checkout at arbitrary time
+- ROI/extent hints
+- iteration suites
+- 8/16/32-bpc paths
+- premultiplication / color management
+
+### Lifecycle state
+- global data: module-wide
+- sequence data: effect-instance state
+- frame data: render-local
+- parameters: AE-owned persistent project state
+
+### UI/events
+- Effect Controls custom control
+- Composition/Layer overlay controls
+- Drawbot drawing
+- parameter supervision
+
+### Performance
+- MFR
+- host iterate suites
+- GPU render
+- async frame acquisition for passive custom UI in newer SDKs
+
+## Data ownership rule
+
+| Data | Owner | Safe lifetime |
+|---|---|---|
+| `PF_InData*` | AE | current selector only |
+| `PF_ParamDef*` passed in | AE | current selector only |
+| `PF_EffectWorld` | AE | callback scope unless documented otherwise |
+| global/sequence handles allocated through AE | plug-in + AE handle system | documented lifecycle |
+| raw pointer inside locked handle | temporary | only while handle locked |
+
+## Render determinism
+
+Effect output must be a deterministic function of declared dependencies. If render depends on hidden project state queried via AEGP, AE cache invalidation may be wrong. Do not use AEGP queries as invisible render inputs.
+
+## Minimal production rule
+
+1. parameter IDs stable forever after release;
+2. match name stable forever;
+3. catch all C++ exceptions before `extern "C"` return;
+4. CPU path correct before GPU optimization;
+5. MFR declared only after stress test;
+6. suite calls from render thread only when explicitly safe.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/05-AEGP-TOOLS.md -->
+
+# AEGP tools — native automation and deep AE integration
+
+AEGP — основной C++ путь для инструментов, которые работают **с проектом**, а не только с пикселями одного эффекта.
+
+## Что AEGP умеет
+
+- создавать/открывать/сохранять project-level structures;
+- читать/создавать compositions и project items;
+- добавлять/удалять/переупорядочивать layers;
+- работать с footage;
+- находить и добавлять effects;
+- читать/писать property streams;
+- keyframes, markers, masks;
+- text data;
+- render queue, output modules, render options;
+- preferences/persistent data;
+- menu commands + command hooks;
+- idle/death hooks;
+- запускать ExtendScript через `AEGP_ExecuteScript`;
+- получать rendered frames через Render suites;
+- регистрировать специализированные AEIO/Artisan modules;
+- публиковать собственные suites.
+
+## Menu tool pattern
+
+```text
+EntryPoint
+  -> GetUniqueCommand
+  -> InsertMenuCommand
+  -> RegisterCommandHook
+  -> RegisterUpdateMenuHook
+
+User opens menu
+  -> UpdateMenuHook: enable/disable
+
+User clicks
+  -> CommandHook
+     -> StartUndoGroup
+     -> query selection/project
+     -> mutate project
+     -> EndUndoGroup
+```
+
+## UI-thread rule
+
+AEGP не является general multithreaded API. Проектные изменения выполняются из host callback/main thread. Для фоновой тяжёлой работы отделяйте pure compute от AE handles, а commit обратно в AE делайте в разрешённом host callback.
+
+## Native tool examples by capability
+
+| Продуктовая задача | AEGP suites/pattern |
+|---|---|
+| Batch rename layers | Collection + Layer + Stream + Undo |
+| Add keyframes | Stream + Keyframe |
+| Build comp from files | Project + Footage + Comp + Layer |
+| Render queue manager | Render Queue + RQ Item + Output Module |
+| Replace footage | Footage suite |
+| Inspect installed effects | Effect suite |
+| Run helper JSX | Utility `AEGP_ExecuteScript` |
+| Native menu action | Command + Register |
+| Native service for several plugins | publish PICA suite |
+
+См. рабочий drop-in шаблон: `16-WORKING-TEMPLATES/aegp-menu-command/`.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md -->
+
+# Keyframers
+
+Keyframer — specialization AEGP, обычно видимый как команда в **Animation > Keyframe Assistant**.
+
+## Основная модель
+
+1. Получить selection/property stream.
+2. Проверить, keyframe-able ли stream.
+3. Начать undo transaction.
+4. Для массового добавления использовать begin/add/end family API, а не много независимых insert calls.
+5. Изменить interpolation/ease/value/time.
+6. Закончить undo transaction.
+
+## Почему batching важен
+
+Каждый отдельный insert может создавать дорогую undo/update работу. Для массовых операций использовать `AEGP_StartAddKeyframes` → add/set → `AEGP_EndAddKeyframes`.
+
+## Что хранить
+
+Не хранить `AEGP_StreamRefH` дольше, чем гарантирует API. Многие opaque handles становятся невалидными после структурных изменений проекта.
+
+## Reference sample
+
+Adobe SDK sample **Easy Cheese** — базовый ориентир Keyframe Assistant. Исторический **Mangler** показывает более сложный keyframer UI, но его старые ADM UI решения не следует переносить в новый продукт.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md -->
+
+# Native dockable panels
+
+AEGP может создать панель, которая dock/resize ведёт себя как стандартные панели AE. SDK sample **Panelator** демонстрирует этот путь.
+
+## Когда native panel оправдана
+
+- нужна tight native integration;
+- нужен C++ UI/rendering path без browser runtime;
+- UI маленький, специализированный и долгоживущий;
+- команда готова поддерживать platform-specific windowing/painting lifecycle.
+
+## Когда не нужна
+
+Для обычного продуктового panel UX это значительно дороже, чем HTML panel. В 2026 для уже выпускаемого AE panel UI практический production путь остаётся CEP с архитектурой, готовой к UXP migration.
+
+## Архитектура
+
+```text
+Native panel callback
+     |
+     +--> local UI state
+     |
+     +--> AEGP suites (main thread)
+     |
+     +--> pure C++ core (can be separated)
+```
+
+Нельзя обращаться к project model из произвольного worker thread только потому, что UI написан на C++.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/08-AEIO.md -->
+
+# AEIO — native input/output modules
+
+AEIO — specialized AEGP для media I/O.
+
+## Registration
+
+В AEGP entry point plug-in формирует:
+
+- `AEIO_ModuleInfo` — capabilities/file type metadata;
+- `AEIO_FunctionBlock*` — callback table;
+- вызывает `AEGP_RegisterIO()`.
+
+## Import lifecycle
+
+```text
+VerifyFileImportable
+   -> InitInSpecFromFile
+   -> AE stores InSpec/options
+   -> GetInSpecInfo / dimensions / duration / alpha / audio...
+   -> GetSourceVideo / audio callbacks as AE needs media
+```
+
+`AEIO_InSpecH` — opaque handle, через который AEIO и AE обмениваются import state/metadata.
+
+## Output lifecycle
+
+```text
+AE creates OutSpec
+  -> AEIO queries dimensions/time/audio/etc
+  -> open/create output
+  -> receive frames/audio
+  -> encode/write
+  -> close/finalize
+```
+
+## Default callback pattern
+
+Если API разрешает, callback может вернуть `AEIO_Err_USE_DFLT_CALLBACK` и передать поведение AE. Это полезно и как incremental development strategy.
+
+## Современный выбор
+
+Для ряда обычных media importer задач Adobe рекомендует рассматривать MediaCore/Premiere importer путь, если нужен shared importer across Adobe video apps. AEIO нужен, когда нужна именно AE-specific I/O integration/capability.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/09-ARTISAN.md -->
+
+# Artisan — custom 3D renderer
+
+Artisan — specialized AEGP, который может заменить rendering 3D layers композиции.
+
+## Registration
+
+AEGP entry point вызывает `AEGP_RegisterArtisan()` или interactive variant и передаёт `PR_ArtisanEntryPoints`.
+
+## Contract
+
+- After Effects владеет composition/project model;
+- Artisan получает render context;
+- через Artisan/AEGP suites извлекает scene information;
+- возвращает rendered result по host contract.
+
+## Почему это отдельный класс сложности
+
+Effect работает на изображении/слое внутри graph. Artisan получает ответственность за **3D compositing/rendering scheme композиции**. Это архитектурно ближе к renderer integration, чем к обычному effect.
+
+## Когда использовать
+
+Только если продукт реально должен быть новым 3D renderer. Для 3D effect, particles, relighting одного слоя и т.п. сначала рассмотреть обычный Effect API/GPU.
+
+Reference: Adobe SDK sample **Artie**.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/10-BLITHOOK.md -->
+
+# BlitHook
+
+BlitHook получает frames, когда они выводятся/«blit»-ятся в Composition panel.
+
+## Mental model
+
+```text
+render/cache -> AE display pipeline -> Composition panel
+                                |
+                                +--> BlitHook
+```
+
+Он полезен для external display / monitoring / frame consumer behavior.
+
+## Не путать
+
+- не Effect: не участвует в обычном per-layer effect stack;
+- не AEIO: не декодирует/кодирует media file format;
+- не Artisan: не становится 3D renderer;
+- не Render Queue replacement.
+
+## Performance rule
+
+Display callback нельзя блокировать тяжёлой синхронной работой. Если frame надо отправить наружу, копировать/queue минимально необходимое и отдавать тяжёлую работу worker/service с корректным lifetime management.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md -->
+
+# Legacy / deprecated native integration
+
+Эти пути надо знать при поддержке старого кода, но не выбирать как основу нового продукта без специальной причины.
+
+## Photoshop format plug-ins / filters
+
+After Effects исторически поддерживает часть Photoshop plug-in formats. Для нового AE-native media integration выбирать современные AEIO/MediaCore paths.
+
+## Foreign Project Format (FPF)
+
+Исторический project import path, deprecated в пользу более современных APIs.
+
+## ADM UI
+
+Старый Adobe Dialog Manager использовался некоторыми keyframer/palette samples. Новый продукт не должен начинаться с ADM.
+
+## Старые fixed assumptions
+
+Не переносить в новый код:
+- 32-bit-only assumptions;
+- Carbon/CFM era platform code;
+- устаревшие command IDs как стабильный API;
+- global mutable state, рассчитанный на single-frame rendering;
+- hard-coded Intel-only binary assumptions.
+
+## Правило библии
+
+Legacy API документируется только с тремя метками:
+
+- **support-only** — чтобы чинить существующий продукт;
+- **migration-source** — откуда мигрировать;
+- **do-not-start** — не использовать для нового проекта.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/12-AEGP-SUITES-CATALOG.md -->
+
+# AEGP suites catalog — After Effects 26.5 snapshot
+
+Это практическая карта native capabilities. Точный compile-time contract всегда проверять в headers того SDK, которым собирается plug-in.
+
+> **Важно:** номер suite в заголовке публичного guide не всегда равен «самому новому struct version в любых bindings». Для AE 26.5 официально подтверждены как новые `GuideSuite2`, `ItemViewSuite2`, `CompSuite13`, `StreamSuite7`. Остальные version-sensitive номера проверяются в headers конкретного SDK. См. [`13-DOCS-ERRATA.md`](14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md).
+
+| Suite | Current documented version | Что контролирует |
+|---|---:|---|
+| Memory | `AEGP_MemorySuite1` | host-managed memory handles |
+| Command | `AEGP_CommandSuite1` | menu commands |
+| Register | `AEGP_RegisterSuite5` | hooks, AEIO, Artisan, idle/death registration |
+| Project | `AEGP_ProjSuite6` | project lifecycle/data |
+| Time Display | `AEGP_TimeDisplay2` | time display settings |
+| Item | `AEGP_ItemSuite9` | project items |
+| Guide | `AEGP_GuideSuite2` | guides; 26.5 current generation |
+| Item View | `AEGP_ItemViewSuite2` | guide visibility/snap/lock per view |
+| Collection | `AEGP_CollectionSuite2` | selection/collections |
+| Composition | `AEGP_CompSuite13` | comps, solids, current 26.5 parametric mesh creation |
+| Footage | `AEGP_FootageSuite5` | footage/import interpretation |
+| Layer | `AEGP_LayerSuite9` | layers and layer timing/object type |
+| Effect | `AEGP_EffectSuite4` | effects on layers + generic calls |
+| Stream | `AEGP_StreamSuite7` | property/effect streams; 26.5 render-stage control for layer param |
+| Dynamic Stream | `AEGP_DynamicStreamSuite4` | dynamic stream hierarchy |
+| Keyframe | `AEGP_KeyframeSuite3` | keyframes/interpolation/ease |
+| Marker | `AEGP_MarkerSuite2` | markers |
+| Mask | `AEGP_MaskSuite6` | masks |
+| Mask Outline | `AEGP_MaskOutlineSuite3` | mask path geometry/feather data |
+| Text Document | `AEGP_TextDocumentSuite1` | text document data |
+| Text Layer | `AEGP_TextLayerSuite1` | text outlines |
+| Utility | `AEGP_UtilitySuite6` | undo, reporting, scripting, registration helpers |
+| Persistent Data | `AEGP_PersistentDataSuite4` | AE preferences/persistent plug-in data |
+| Color Settings | `AEGP_ColorSettingsSuite5` | project/AE color management info |
+| Render Options | `AEGP_RenderOptionsSuite4` | render option objects |
+| Layer Render Options | `AEGP_LayerRenderOptionsSuite1` | layer-specific render options |
+| Render | `AEGP_RenderSuite4` | request/render frames/audio |
+| World | `AEGP_WorldSuite3` | allocate/query image worlds |
+| Composite | `AEGP_CompositeSuite2` | host compositing/transfer/matte operations |
+| Sound Data | `AEGP_SoundDataSuite1` | audio data |
+| Render Queue | `AEGP_RenderQueueSuite1` | queue-level operations |
+| Render Queue Item | `AEGP_RQItemSuite4` | render queue items |
+| Render Queue Monitor | `AEGP_RenderQueueMonitorSuite1` | render queue monitoring callbacks/data |
+| Output Module | `AEGP_OutputModuleSuite4` | output modules |
+| PF Interface | `AEGP_PFInterfaceSuite1` | bridge used by effects into AEGP world |
+| Iterate | `AEGP_IterateSuite1` | host parallel iteration for AEGP workloads |
+| File Import Manager | `AEGP_FIMSuite3` | file/project importer registration |
+
+## Capability groups
+
+### Project graph
+`Proj` → `Item` → `Comp` → `Layer` → `Stream` / `DynamicStream`.
+
+### Animation
+`Stream` + `Keyframe` + `Marker` + `Mask` + `Text`.
+
+### Effects
+`EffectSuite4` finds/adds/removes effects and can issue generic calls to prepared Effect plug-ins.
+
+### Render
+`RenderOptions` + `LayerRenderOptions` + `RenderSuite` + `World` + `Composite` + `SoundData`.
+
+### Delivery
+`RenderQueue` + `RQItem` + `OutputModule` + `RenderQueueMonitor`.
+
+### Host integration
+`Command` + `Register` + `Utility` + `PersistentData` + panel APIs.
+
+## Suite acquisition rule
+
+Do not encode “suite version 7 exists everywhere” into product logic. Acquire the version you need and degrade gracefully on older hosts. Public SDK guide explicitly recommends trying an earlier suite version when a newer one is missing.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md -->
+
+# Public SDK docs errata / verification notes
+
+Research snapshot: **2026-09-30**
+
+Публичный C++ SDK Guide — основной reference, но code всегда должен компилироваться против **реальных headers установленного SDK**. В HTML бывают typographical/stale-signature проблемы.
+
+## Подтверждённые/наблюдаемые расхождения
+
+### Project Suite
+
+Публичная страница в одном месте отображает имя:
+
+```text
+AEGP_GetProjectProjectByIndex
+```
+
+В header-derived bindings и реальном API используется:
+
+```text
+AEGP_GetProjectByIndex
+```
+
+### Item Suite — CreateNewFolder
+
+В части публичной HTML-документации исторически показывался лишний `AEGP_ProjectH` в сигнатуре. Header/community sample shape современных SDK:
+
+```cpp
+AEGP_CreateNewFolder(
+    const A_UTF16Char* nameZ,
+    AEGP_ItemH parent_folderH0,
+    AEGP_ItemH* new_folderPH);
+```
+
+### Layer Suite — AddLayer
+
+Некоторые HTML renders показывали третий argument как `A_Boolean*`. Header-derived contract:
+
+```cpp
+AEGP_AddLayer(
+    AEGP_ItemH itemH,
+    AEGP_CompH compH,
+    AEGP_LayerH* new_layerPH);
+```
+
+## Suite version labels
+
+Не считать заголовок старой секции документации доказательством «latest version». На 26.5 официально подтверждены новые:
+- `AEGP_GuideSuite2`;
+- `AEGP_ItemViewSuite2`;
+- `AEGP_CompSuite13`;
+- `AEGP_StreamSuite7`.
+
+Для остальных suite generations source of truth при сборке:
+1. SDK headers;
+2. `AEGP_SuiteHandler` из той же SDK distribution;
+3. official sample compiled from той же версии.
+
+## Policy для Bible
+
+Каждый executable-looking snippet:
+- либо проверяется по официальному published signature;
+- либо помечается `host-test-required`;
+- не выдумывает undocumented struct layout;
+- не заявляется binary-tested без AE host.
+
+
+---
+
+<!-- SOURCE: 14-NATIVE-INTEGRATIONS/README.md -->
+
+# Native integrations — карта всего нативного SDK After Effects
+
+Research baseline: **After Effects 26.5 SDK (September 2026)**.
+
+Этот раздел отвечает на вопрос: **какие типы нативных расширений реально существуют в After Effects, кто вызывает кого и для каких задач нужен каждый тип**.
+
+## 1. Нативные категории
+
+| Категория | Кто инициирует работу | Главный контракт | Для чего |
+|---|---|---|---|
+| Effect plug-in | After Effects | `EffectMain(PF_Cmd, ...)` | Пиксели, аудио, параметры, custom UI, SmartFX/GPU |
+| AEGP | After Effects + hooks | PICA suites + registered hooks | Проект, слои, keyframes, меню, render queue, automation |
+| Keyframer | AEGP specialization | AEGP stream/keyframe suites | Keyframe Assistant / пакетная работа с keyframes |
+| Native dockable panel | AEGP/panel API | native panel callbacks | Нативная dockable UI-панель |
+| AEIO | specialized AEGP | `AEGP_RegisterIO()` + function block | Собственный media input/output |
+| Artisan | specialized AEGP | `AEGP_RegisterArtisan()` + render entry points | Замена 3D renderer композиции |
+| Interactive Artisan | specialized AEGP | `AEGP_RegisterInteractiveArtisan()` | Interactive 3D preview/render |
+| BlitHook | native display hook | frame/display callback stream | Получать кадры, выводимые Composition panel |
+| Shared PICA suite provider | AEGP/native module | published function suite | Общая native-служба для нескольких plug-ins |
+| Legacy format/filter APIs | legacy | старые Photoshop/FPF contracts | Только поддержка старого кода; не начинать новый продукт |
+
+## 2. Что не является отдельным native plug-in type
+
+- **SmartFX** — расширенный render path Effect API, а не отдельный тип plug-in.
+- **MFR** — модель многокадрового исполнения Effect API.
+- **GPU effect** — Effect plug-in с GPU selectors/suites.
+- **Custom UI / Drawbot** — UI-механизм Effect API.
+- **Audio effect** — режим Effect API.
+- **CEP / UXP / ExtendScript** — отдельный JS-слой, не C++ native plug-in type.
+
+## 3. Правильный выбор
+
+```text
+Нужно менять изображение/аудио?
+  -> Effect
+
+Нужно менять проект, слои, keyframes, меню, render queue?
+  -> AEGP
+
+Нужно добавить формат медиа?
+  -> AEIO (или современный MediaCore importer, если подходит задача)
+
+Нужно заменить 3D renderer композиции?
+  -> Artisan
+
+Нужно получать отображаемые кадры?
+  -> BlitHook
+
+Нужно красивое HTML UI + automation?
+  -> CEP сейчас / UXP после production readiness
+
+Нужно высокоскоростное ядро + удобная панель?
+  -> Native C++ core + panel/script bridge
+```
+
+## 4. Главное правило архитектуры
+
+Не выбирать API по привычному языку программирования. Сначала определить, **кто владеет данными и кто должен инициировать вызов**:
+
+- кадр и параметры эффекта принадлежат render graph AE → Effect API;
+- project model принадлежит AE → AEGP suites;
+- файл и его decoding/encoding lifecycle → AEIO;
+- UI HTML → CEP/UXP, а изменение проекта выполняет ExtendScript/native bridge;
+- shared high-performance service → native suite/IPC, но не чтение случайной общей памяти между plug-ins.
+
+## Дальше
+
+- [`01-TAXONOMY.md`](14-NATIVE-INTEGRATIONS/01-TAXONOMY.md) — полный taxonomy.
+- [`02-HOST-CALL-FLOWS.md`](14-NATIVE-INTEGRATIONS/02-HOST-CALL-FLOWS.md) — жизненные циклы.
+- [`03-PICA-SUITES.md`](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md) — внутренний «bus» C++ SDK.
+- [`04-EFFECTS.md`](14-NATIVE-INTEGRATIONS/04-EFFECTS.md) — все подвиды Effect API.
+- [`05-AEGP-TOOLS.md`](14-NATIVE-INTEGRATIONS/05-AEGP-TOOLS.md) — native tools через AEGP.
+- [`06-KEYFRAMERS.md`](14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md) — Keyframe Assistant.
+- [`07-NATIVE-PANELS.md`](14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md) — native dockable panel.
+- [`08-AEIO.md`](14-NATIVE-INTEGRATIONS/08-AEIO.md), [`09-ARTISAN.md`](14-NATIVE-INTEGRATIONS/09-ARTISAN.md), [`10-BLITHOOK.md`](14-NATIVE-INTEGRATIONS/10-BLITHOOK.md).
+- [`11-LEGACY-NATIVE.md`](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) — deprecated/legacy.
+- [`12-AEGP-SUITES-CATALOG.md`](14-NATIVE-INTEGRATIONS/12-AEGP-SUITES-CATALOG.md) — полный AEGP suite map 26.5.
+
+Sources: Adobe C++ SDK Guide — What Can I Do, AEGP Overview, Sample Projects, AEIO, Artisan; SDK 26.5 history.
+
+- [`13-DOCS-ERRATA.md`](14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md) — known public-doc mismatches and verification policy.
+
+
+---
+
+<!-- SOURCE: 15-COMMUNICATION/01-AE-TO-EFFECT.md -->
+
+# After Effects -> Effect
+
+## Единственная точка входа поведения
+
+After Effects посылает Effect selector-команды в `EffectMain`:
+
+```cpp
+PF_Err EffectMain(
+    PF_Cmd cmd,
+    PF_InData* in_data,
+    PF_OutData* out_data,
+    PF_ParamDef* params[],
+    PF_LayerDef* output,
+    void* extra);
+```
+
+`cmd` определяет meaning остальных arguments.
+
+## Входящий канал
+
+- `PF_InData` — host/time/context/callbacks/suite access.
+- `PF_ParamDef[]` — текущее значение parameter streams.
+- `output` — destination world, когда selector подразумевает render.
+- `extra` — selector-specific payload: events, SmartFX structures, parameter supervision и т.п.
+
+## Исходящий канал
+
+- return `PF_Err`;
+- `PF_OutData` flags/state/version/messages;
+- заполненный output world;
+- host callback calls / suite calls.
+
+## Важная мысль
+
+Effect — **reactive component**. Он не должен иметь произвольный background loop, меняющий AE. Если нужна host/project automation — вынести её в AEGP/panel/script layer.
+
+
+---
+
+<!-- SOURCE: 15-COMMUNICATION/02-AE-TO-AEGP.md -->
+
+# After Effects -> AEGP
+
+AEGP имеет два этапа.
+
+## 1. Registration
+
+AE вызывает entry point один раз при launch:
+
+```cpp
+A_Err EntryPointFunc(
+    SPBasicSuite* pica_basicP,
+    A_long major_versionL,
+    A_long minor_versionL,
+    AEGP_PluginID aegp_plugin_id,
+    AEGP_GlobalRefcon* global_refconP);
+```
+
+Здесь регистрируются hooks/специализации.
+
+## 2. Host callbacks
+
+После entry point AE вызывает зарегистрированные функции:
+
+- command hook;
+- update-menu hook;
+- idle hook;
+- death hook;
+- AEIO callbacks;
+- Artisan callbacks;
+- panel callbacks;
+- другие documented hooks.
+
+Внутри callback plug-in обращается к AE через PICA suites.
+
+## Load-order rule
+
+AEGP modules не гарантируют порядок загрузки. Не acquire чужой third-party suite в entry point, если его provider мог ещё не загрузиться. Делать acquire в момент фактического использования и поддерживать отсутствие dependency.
+
+
+---
+
+<!-- SOURCE: 15-COMMUNICATION/03-AEGP-TO-EFFECT.md -->
+
+# AEGP -> Effect
+
+Есть documented direct path для согласованной пары AEGP + Effect.
+
+## Generic call
+
+AEGP Effect Suite предоставляет `AEGP_EffectCallGeneric()`. Подготовленный effect получает `PF_Cmd_COMPLETELY_GENERAL`; `extra` указывает на payload, который договорились понимать обе стороны.
+
+```text
+AEGP
+  |
+  | AEGP_EffectCallGeneric(effect_ref, payload)
+  v
+AE
+  |
+  | PF_Cmd_COMPLETELY_GENERAL
+  v
+EffectMain(..., extra=payload)
+```
+
+## Для чего подходит
+
+- команда «invalidate/reload internal resource»;
+- запрос/передача small control state;
+- handshake между двумя модулями одного продукта;
+- действия, не являющиеся скрытым render dependency.
+
+## Для чего НЕ подходит
+
+Не использовать generic call как обход dependency graph, чтобы render зависел от неописанного внешнего state. Это ведёт к cache invalidation bugs.
+
+## Protocol design
+
+Payload должен иметь explicit version + size + opcode:
+
+```cpp
+struct BridgeMessageV1 {
+    uint32_t size;
+    uint32_t version;
+    uint32_t opcode;
+    uint32_t flags;
+    uint64_t request_id;
+};
+```
+
+Никогда не передавать STL objects/`std::string` через module boundary как ABI contract.
+
+См. `16-WORKING-TEMPLATES/effect-aegp-generic-bridge/`.
+
+
+---
+
+<!-- SOURCE: 15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md -->
+
+# Plug-in -> Plug-in через published PICA suite
+
+Если несколько native modules должны использовать общую службу, предпочтительный in-process contract — versioned suite.
+
+## Provider
+
+AEGP/native provider публикует структуру function pointers под стабильным suite name/version.
+
+## Consumer
+
+Effect/AEGP делает `AcquireSuite(name, version, ...)`, вызывает функции и `ReleaseSuite`.
+
+## ABI rules
+
+- C-compatible structs/function pointers;
+- fixed-width primitive types where possible;
+- caller-owned / callee-owned memory documented explicitly;
+- no C++ exceptions across boundary;
+- no STL types across boundary;
+- version every incompatible change;
+- old suite version сохранять, пока поддерживаются старые consumers.
+
+## Failure mode
+
+Consumer обязан нормально переживать `suite unavailable`: disable optional feature или показать понятную ошибку, а не dereference null pointer.
+
+
+---
+
+<!-- SOURCE: 15-COMMUNICATION/05-SCRIPT-TO-AE.md -->
+
+# ExtendScript -> After Effects
+
+ExtendScript выполняется внутри scripting engine AE и работает через scripting DOM (`app`, project, items, comps, layers, properties, renderQueue...).
+
+## Типичный flow
+
+```jsx
+app.beginUndoGroup("My Tool");
+try {
+    var comp = app.project.activeItem;
+    if (comp && comp.numLayers > 0) {
+        comp.layer(1).name = "Renamed by Tool";
+    }
+} finally {
+    app.endUndoGroup();
+}
+```
+
+## Main-thread implication
+
+Script execution — host-side operation; длинный script блокирует interactive responsiveness. Делить тяжёлый workflow на небольшие операции, а heavy compute выносить наружу только с ясным protocol/lifetime.
+
+## Script -> menu command
+
+`app.executeCommand(id)` может запускать host command, но numeric command IDs не являются хорошим стабильным public contract между версиями/локалями. Использовать осторожно.
+
+## Native -> script
+
+AEGP Utility Suite имеет `AEGP_ExecuteScript`, поэтому native AEGP может выполнить ExtendScript, когда scripting DOM предоставляет capability, отсутствующую в C API. Это полезный, но синхронный bridge; не превращать его в основное high-frequency IPC.
+
+
+---
+
+<!-- SOURCE: 15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md -->
+
+# CEP panel <-> ExtendScript
+
+На production AE 26.5 CEP остаётся рабочим panel runtime; UXP announced, но AE public beta заявлена позже 2026.
+
+## HTML/JS -> AE
+
+Основной bridge:
+
+```js
+const cs = new CSInterface();
+cs.evalScript('$._myTool.renameSelected()', function(result) {
+  console.log(result);
+});
+```
+
+Вызванный код выполняется в ExtendScript engine host application.
+
+## AE/ExtendScript -> panel
+
+CEP events / CSXS events:
+
+```text
+ExtendScript/native side -> event dispatch -> CSInterface.addEventListener(...) -> panel JS
+```
+
+CEP также поддерживает `dispatchEvent/addEventListener` между extensions; native point product communication uses PlugPlug event infrastructure where host supports it.
+
+## Production protocol
+
+Не строить API из строк-конкатенаций типа:
+
+```js
+cs.evalScript('doThing("' + userText + '")');
+```
+
+Вместо этого сериализовать JSON, escape один раз и иметь одну dispatcher function:
+
+```js
+cs.evalScript('$._myTool.dispatch(' + JSON.stringify(JSON.stringify(msg)) + ')', cb);
+```
+
+ExtendScript разбирает JSON и возвращает JSON envelope.
+
+## Response envelope
+
+```json
+{"ok":true,"requestId":"42","result":{"changed":3}}
+```
+
+или
+
+```json
+{"ok":false,"requestId":"42","error":{"code":"NO_COMP","message":"No active comp"}}
+```
+
+См. `16-WORKING-TEMPLATES/cep-panel-bridge/`.
+
+
+---
+
+<!-- SOURCE: 15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md -->
+
+# Native <-> script/panel: как собирать гибридный продукт
+
+## Рекомендуемая layered architecture
+
+```text
+UI layer
+  CEP now / UXP later
+       |
+       | commands + JSON
+       v
+Automation layer
+  ExtendScript dispatcher
+       |
+       +---- simple project edits ----> AE scripting DOM
+       |
+       +---- invoke native behavior --> effect params / menu / file IPC
+
+Native layer
+  Effect plug-in / AEGP service
+       |
+       +---- PICA suites ---> AE C++ APIs
+       +---- shared suite --> other native modules
+```
+
+## Когда нужен AEGP bridge
+
+Если panel должен часто обращаться к high-performance native core, не заставлять ExtendScript сериализовать большие pixel/binary datasets. Panel отправляет control command; native core хранит/обрабатывает heavy data.
+
+## IPC наружу
+
+Когда UI/native/service находятся в разных processes, использовать явный versioned IPC:
+
+- localhost socket / named pipe / Unix domain socket;
+- child process stdin/stdout protocol;
+- temporary file + atomic rename для больших batch payloads;
+- shared memory только после profiling и с explicit ownership.
+
+Нельзя считать undocumented AE internal IPC стабильным API.
+
+
+---
+
+<!-- SOURCE: 15-COMMUNICATION/08-THREADING-BOUNDARIES.md -->
+
+# Threading boundaries
+
+## Effect render
+
+Effect render callbacks могут выполняться concurrent при MFR. Render code должен быть re-entrant; immutable shared resources preferable.
+
+## Pixel iteration
+
+Host iteration suites могут сами распараллеливать pixel callback. Pixel callback не должен зависеть от iteration order и должен быть re-entrant.
+
+## AEGP
+
+Считать AEGP project manipulation main-thread-only. Документация прямо предупреждает, что AEGP в целом не предоставляет обычную threading model; единственные thread-safe исключения должны быть явно документированы.
+
+## CEP / ExtendScript
+
+`evalScript` исполняет ExtendScript на host side; длинные script calls блокируют host scheduling. Разбивать работу.
+
+## Golden rule
+
+```text
+worker thread:
+  pure math / decode / encode / ML / filesystem / network
+
+host callback thread:
+  touch AE handles / project model / UI / suites unless specifically documented safe
+```
+
+
+---
+
+<!-- SOURCE: 15-COMMUNICATION/09-DATA-OWNERSHIP.md -->
+
+# Data ownership and lifetime
+
+Большая часть тяжёлых AE plug-in bugs — не «неправильная формула», а неправильный lifetime.
+
+## Rules
+
+1. Opaque AE handles не считать вечными.
+2. После structural project mutation заново получать references, которые API считает invalidated.
+3. `PF_InData`, params, worlds и selector-specific `extra` — callback-scoped, если docs не обещают больше.
+4. Передавать через module boundary POD/versioned messages, а не pointers на temporary C++ objects.
+5. Большой buffer — owner должен быть указан в protocol.
+6. Любой acquire должен иметь парный release; checkout — checkin; lock — unlock.
+7. Render cache dependency должна быть видна AE, а не прятаться в global singleton.
+
+## Recommended message header
+
+```cpp
+struct MsgHeader {
+    uint32_t size;
+    uint32_t version;
+    uint32_t opcode;
+    uint32_t flags;
+    uint64_t request_id;
+};
+```
+
+Сначала валидировать `size/version`, затем читать payload.
+
+
+---
+
+<!-- SOURCE: 15-COMMUNICATION/README.md -->
+
+# Как компоненты общаются друг с другом и с After Effects
+
+Это центральный раздел архитектуры AE Developer Bible.
+
+## Карта
+
+```text
+                           +-----------------------+
+                           |     After Effects     |
+                           | project + render host |
+                           +----+-------------+----+
+                                |             |
+                        PF_Cmd  |             | PICA suites / hooks
+                                v             v
+                         +------+----+   +----+------+
+                         |  Effect   |   |   AEGP    |
+                         +----+------+   +----+------+
+                              |               |
+                 generic call |               | publish/acquire suite
+                              +-------+-------+
+                                      |
+                                native bridge
+
+        +-------------+      evalScript      +----------------+
+        | CEP/HTML UI | -------------------> | ExtendScript   |
+        +------+------+                      +-------+--------+
+               |                                     |
+               +-------------- CEP events -----------+
+                                                     |
+                                                     v
+                                              AE scripting DOM
+```
+
+## Разделы
+
+- [`01-AE-TO-EFFECT.md`](15-COMMUNICATION/01-AE-TO-EFFECT.md)
+- [`02-AE-TO-AEGP.md`](15-COMMUNICATION/02-AE-TO-AEGP.md)
+- [`03-AEGP-TO-EFFECT.md`](15-COMMUNICATION/03-AEGP-TO-EFFECT.md)
+- [`04-PLUGIN-TO-PLUGIN-PICA.md`](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md)
+- [`05-SCRIPT-TO-AE.md`](15-COMMUNICATION/05-SCRIPT-TO-AE.md)
+- [`06-CEP-TO-EXTENDSCRIPT.md`](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md)
+- [`07-NATIVE-TO-SCRIPT-PANEL.md`](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md)
+- [`08-THREADING-BOUNDARIES.md`](15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
+- [`09-DATA-OWNERSHIP.md`](15-COMMUNICATION/09-DATA-OWNERSHIP.md)
+
+
+---
+
+<!-- SOURCE: 16-WORKING-TEMPLATES/README.md -->
+
+# Working templates
+
+Цель этого раздела — не псевдокод, а **минимальные production-shaped куски**, которые можно graft/вставлять в официальный SDK sample соответствующего типа.
+
+## Почему это не один «универсальный CMake проект»
+
+Adobe сама рекомендует стартовать от ближайшего SDK sample, потому что PiPL/resource build steps и platform project settings уже настроены. Поэтому шаблоны здесь делятся на:
+
+- **drop-in C++ source** — вставляется в конкретный official sample;
+- **protocol headers** — полностью наши, platform-neutral;
+- **JSX/CEP mini projects** — самостоятельные файлы;
+- **integration recipe** — какой Adobe sample копировать и какой файл заменить.
+
+## Templates
+
+| Template | Base | Что доказывает |
+|---|---|---|
+| `effect-basic/` | SDK Skeleton | Effect registration, param, render, 8/16 bpc |
+| `aegp-menu-command/` | SDK Persisto/Projector-style AEGP | menu + command hook + undo-safe mutation |
+| `effect-aegp-generic-bridge/` | paired Effect + AEGP | `AEGP_EffectCallGeneric` ↔ `PF_Cmd_COMPLETELY_GENERAL` protocol |
+| `pica-shared-suite/` | SDK Sweetie-style provider | stable native service ABI |
+| `native-panel-registration/` | SDK Panelator | native Window-menu + dockable panel registration |
+| `keyframer-batch/` | SDK Easy Cheese | correct batch keyframe transaction |
+| `aeio-registration/` | SDK IO/FBIO | AEIO registration contract |
+| `artisan-registration/` | SDK Artie | Artisan registration contract |
+| `jsx-tool/` | Scripts folder | undo-safe ExtendScript tool |
+| `cep-panel-bridge/` | CEP extension | panel JS ↔ JSX JSON dispatcher |
+
+## Validation status labels
+
+- **SDK-contract exact** — signatures/patterns follow public current SDK guide; still compile against headers you ship with.
+- **drop-in** — intended to replace logic inside named Adobe sample, retaining its PiPL/project files.
+- **standalone** — no Adobe SDK compile needed (JSX/HTML).
+
+Нельзя честно назвать C++ binary «compiled/tested in AE» внутри этой sandbox без установленного proprietary SDK + AE host. Поэтому эта библия отличает **working contract template** от **host-verified binary**.
+
+
+---
+
+<!-- SOURCE: 16-WORKING-TEMPLATES/aegp-menu-command/README.md -->
+
+# AEGP menu command template
+
+Status: **drop-in pattern** for current AEGP sample project.
+
+Start from an official AEGP sample such as Persisto/Projector. Keep its PiPL/project/export plumbing; use this file as the architecture for entry registration + command/update hooks.
+
+The example intentionally performs a harmless operation: reports info to the user. Replace `DoWork()` with project mutation inside an undo group.
+
+
+---
+
+<!-- SOURCE: 16-WORKING-TEMPLATES/aeio-registration/README.md -->
+
+# AEIO registration skeleton
+
+Status: **registration contract template**. Start from the current official `IO`/`FBIO` SDK sample because `AEIO_FunctionBlock` contains many version-specific callbacks.
+
+```cpp
+A_Err RegisterMyIO(
+    AEGP_SuiteHandler& suites,
+    AEGP_PluginID plugin_id,
+    AEGP_IORefcon refcon,
+    AEIO_ModuleInfo* module_info,
+    AEIO_FunctionBlock4* funcs)
+{
+    // Fill module_info: signature, file type/description/capabilities.
+    // Fill funcs: verify/init/info/frame/audio/output callbacks.
+    return suites.RegisterSuite5()->AEGP_RegisterIO(
+        plugin_id,
+        refcon,
+        module_info,
+        funcs);
+}
+```
+
+For optional operations where the current SDK permits it, return `AEIO_Err_USE_DFLT_CALLBACK` and let AE do its default processing.
+
+Why this template does not fabricate the whole callback table: exact function-block revision and required callbacks are SDK-version-sensitive. A “complete” table copied from an old SDK is less useful than the current official `IO` sample.
+
+
+---
+
+<!-- SOURCE: 16-WORKING-TEMPLATES/artisan-registration/README.md -->
+
+# Artisan registration skeleton
+
+Status: **registration contract template**. Start from the current SDK `Artie` sample.
+
+```cpp
+A_Err RegisterMyArtisan(
+    AEGP_SuiteHandler& suites,
+    AEGP_PluginID plugin_id,
+    void* refcon,
+    PR_ArtisanEntryPoints* entry_points)
+{
+    return suites.RegisterSuite5()->AEGP_RegisterArtisan(
+        /* api version */      ARTISAN_API_VERSION,
+        /* plugin version */   MY_ARTISAN_VERSION,
+        plugin_id,
+        refcon,
+        "com.myco.renderer",
+        "My Renderer",
+        entry_points);
+}
+```
+
+`render_func` is the fundamental required behavior; other Artisan callbacks depend on the current `PR_ArtisanEntryPoints` contract.
+
+Do not substitute guessed constants for `ARTISAN_API_VERSION`/your version. Use the exact definitions from the SDK headers/sample you compile against.
+
+
+---
+
+<!-- SOURCE: 16-WORKING-TEMPLATES/cep-panel-bridge/README.md -->
+
+# CEP -> ExtendScript JSON bridge
+
+Standalone logic files for a CEP panel.
+
+To package as an actual extension, add:
+- Adobe `CSInterface.js` from the CEP Resources version you target;
+- `CSXS/manifest.xml` matching the AE/CEP versions you support;
+- load `host/index.jsx` from manifest or panel startup;
+- signing/packaging config.
+
+The important reusable piece is the **single dispatcher protocol**. It avoids arbitrary code generation and gives every call a version + request ID + JSON response.
+
+
+---
+
+<!-- SOURCE: 16-WORKING-TEMPLATES/effect-aegp-generic-bridge/README.md -->
+
+# Effect <-> AEGP generic bridge
+
+Use this only for a pair of plug-ins you control.
+
+## Effect side
+
+Handle `PF_Cmd_COMPLETELY_GENERAL`. Validate payload size/version before reading it.
+
+```cpp
+case PF_Cmd_COMPLETELY_GENERAL: {
+    auto* msg = static_cast<bible_bridge::MessageV1*>(extra);
+    if (!msg || msg->size < sizeof(*msg) || msg->version != bible_bridge::kVersion)
+        return PF_Err_BAD_CALLBACK_PARAM;
+
+    switch (msg->op) {
+        case bible_bridge::Op::Ping:
+            msg->result_code = 0;
+            return PF_Err_NONE;
+        case bible_bridge::Op::ReloadResources:
+            // Update NON-render-dependent resource/control state here.
+            msg->result_code = 0;
+            return PF_Err_NONE;
+        default:
+            msg->result_code = -1;
+            return PF_Err_NONE;
+    }
+}
+```
+
+## AEGP side
+
+Resolve the target effect reference, then use `AEGP_EffectCallGeneric()` from the current Effect Suite version. Pass a `MessageV1` pointer as the generic payload according to the exact signature in the SDK header you compile against.
+
+## Do not
+
+- send STL types;
+- send pointer to temporary object that dies before call returns;
+- use this as hidden render dependency;
+- assume struct packing without static assertions/platform checks.
+
+
+---
+
+<!-- SOURCE: 16-WORKING-TEMPLATES/effect-basic/README.md -->
+
+# Minimal Gain effect — drop-in for SDK Skeleton
+
+Status: **drop-in / SDK-contract exact pattern**.
+
+## Base
+
+Copy the official SDK `Skeleton` sample first. Keep its Xcode/Visual Studio project, PiPL `.r`, `entry.h`, SDK utils and build steps.
+
+Replace the effect implementation with `EffectMain.cpp`, then update PiPL display/match/category strings consistently.
+
+## Behavior
+
+- one float Gain parameter;
+- 8-bpc and 16-bpc processing;
+- uses host Iterate suites;
+- catches exceptions at C ABI boundary;
+- no global mutable render state;
+- MFR flag deliberately **not** claimed until tested.
+
+## Why not hand-create project files
+
+Windows PiPL resource generation and platform SDK settings are easy to get subtly wrong. Adobe recommends cloning Skeleton rather than reconstructing the build.
+
+
+---
+
+<!-- SOURCE: 16-WORKING-TEMPLATES/jsx-tool/README.md -->
+
+# Standalone JSX tool
+
+`rename-selected-layers.jsx` is a complete Script menu script:
+
+1. Put it in the appropriate After Effects Scripts folder for your installation/user setup.
+2. Restart AE if required by the script location.
+3. Open a comp, select layers, run the script.
+
+Pattern demonstrated: validation + one undo group + no persistent globals.
+
+
+---
+
+<!-- SOURCE: 16-WORKING-TEMPLATES/keyframer-batch/README.md -->
+
+# Keyframer batch pattern
+
+Status: **API recipe** for an AEGP based on the official `Easy Cheese` sample.
+
+For many keyframes, do not call independent insert operations in a loop if the batch API fits. Use the Keyframe Suite transaction pattern:
+
+```text
+AEGP_StartUndoGroup
+  AEGP_StartAddKeyframes(stream)
+    for each desired time/value:
+      AEGP_AddKeyframes(...time... -> new_index)
+      AEGP_SetAddKeyframe(...new_index, value...)
+  AEGP_EndAddKeyframes(...)
+AEGP_EndUndoGroup
+```
+
+This avoids repeatedly pushing the whole stream through undo/update machinery and is the correct architectural starting point for a Keyframe Assistant tool.
+
+Before modifying:
+- verify the selected stream is keyframe-able;
+- read expression state if it matters to the product;
+- avoid retaining stream handles across structural project changes.
+
+
+---
+
+<!-- SOURCE: 16-WORKING-TEMPLATES/native-panel-registration/README.md -->
+
+# Native dockable panel registration — Panelator-shaped template
+
+Status: **registration drop-in**. Platform painting/view implementation remains macOS/Windows-specific.
+
+Use the official SDK `Panelator` sample as the base. The reusable registration sequence is:
+
+```cpp
+// 1. command for Window menu
+suites.CommandSuite1()->AEGP_GetUniqueCommand(&command);
+suites.CommandSuite1()->AEGP_InsertMenuCommand(
+    command, "My Native Panel", AEGP_Menu_WINDOW, AEGP_MENU_INSERT_SORTED);
+
+// 2. Window menu click -> toggle visibility
+suites.RegisterSuite5()->AEGP_RegisterCommandHook(
+    plugin_id, AEGP_HP_BeforeAE, command, CommandHook, command_refcon);
+
+// 3. update menu/checkmark
+suites.RegisterSuite5()->AEGP_RegisterUpdateMenuHook(
+    plugin_id, UpdateMenuHook, update_refcon);
+
+// 4. register panel factory using AEGP_PanelSuite1
+panel_suite->AEGP_RegisterCreatePanelHook(
+    plugin_id,
+    stable_match_name,
+    CreatePanelHook,
+    create_refcon,
+    TRUE);
+```
+
+`CreatePanelHook` receives the host container view, panel handle and function table to fill. Keep `stable_match_name` unlocalized and unchanged across releases because AE uses it to identify the panel/workspace state.
+
+The actual native view class is deliberately not faked here: Cocoa/AppKit and Win32/platform view code differs, so clone the matching current Panelator platform implementation and replace only your UI logic.
+
+
+---
+
+<!-- SOURCE: 16-WORKING-TEMPLATES/pica-shared-suite/README.md -->
+
+# Published PICA suite contract
+
+Status: **ABI template**; wire provider/registration calls using the current SDK Sweetie sample / SP suite APIs.
+
+`SharedSuite.h` is intentionally C-ABI-shaped: no STL, no exceptions, explicit buffer ownership.
+
+## Provider requirements
+
+- register `BIBLE_CORE_SUITE_NAME`, version 1;
+- function table must stay valid for the advertised lifetime;
+- return integer error codes, never throw across call boundary;
+- validate every pointer/size.
+
+## Consumer requirements
+
+- acquire by exact name+version through `SPBasicSuite`;
+- if missing, disable dependent feature cleanly;
+- release after use;
+- never cache a pointer beyond the provider/suite lifetime guarantee.
+
+Reference sample: Adobe SDK **Sweetie**, which demonstrates publishing a PICA function suite for other plug-ins.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/00-HOW-TO-USE.md -->
+
+# Как пользоваться cookbook
+
+## 1. Начинать с официального sample
+
+Adobe прямо рекомендует не собирать native plug-in с пустого проекта:
+
+- Effect → `Skeleton`
+- project creation / project graph → `Projector`
+- keyframe assistant → `Easy Cheese`
+- importer → `IO`
+- preferences/menu → `Persisto`
+- render queue → `QueueBert`
+- streams → `Streamie`
+- shared PICA suite → `Sweetie`
+- native dockable panel → `Panelator`
+- renderer → `Artie`
+- frame grab / rendering → `Grabba`
+
+Cookbook предполагает, что platform/PiPL plumbing уже взят из подходящего sample.
+
+## 2. Оборачивать mutation в Undo Group
+
+```cpp
+AEGP_SuiteHandler suites(SPBasicSuiteP);
+
+ERR(suites.UtilitySuite6()->AEGP_StartUndoGroup("My Operation"));
+// mutating calls
+ERR2(suites.UtilitySuite6()->AEGP_EndUndoGroup());
+```
+
+Для production-кода нужен guard, который вызывает `EndUndoGroup()` даже при раннем выходе.
+
+## 3. Проверять ownership
+
+Типичные пары:
+
+```text
+GetNew... / New...          → обычно dispose нужен
+Get... (borrowed handle)    → обычно dispose не нужен
+RenderAndCheckoutFrame      → CheckinFrame
+GetNewStreamValue           → DisposeStreamValue
+GetNewLayerStream           → DisposeStream
+GetLayerEffectByIndex       → DisposeEffect
+GetItemName / GetExpression → MemorySuite FreeMemHandle
+```
+
+Смотреть контракт конкретной функции, а не угадывать по имени.
+
+## 4. Handle != стабильный ID
+
+После add/remove/reorder:
+
+- dynamic stream refs могут инвалидироваться;
+- RQ item/output module refs могут инвалидироваться;
+- project graph handles нельзя считать вечными.
+
+Если действие меняет структуру — **re-query**.
+
+## 5. Не мутировать project state из render worker
+
+MFR/render callbacks и UI/project mutation — разные миры. Состояние проекта меняется из разрешённого host/UI контекста. Render path должен быть thread-safe и не использовать AEGP как скрытый источник render dependency.
+
+## 6. Проверять доступность suite
+
+Если функция нужна только в новом AE:
+
+```text
+Acquire newest required suite
+    ↓ unavailable?
+try older supported suite
+    ↓
+disable only unsupported feature
+```
+
+Не падать всем plug-in из-за одной новой возможности.
+
+## 7. Использовать match name вместо display name
+
+Display name локализуется и может меняться. Для поиска effect/property group используйте documented `match name` там, где API его предоставляет.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/01-PROJECT-ITEMS.md -->
+
+# Project + Item recipes
+
+**Suites:** `AEGP_ProjSuite6`, `AEGP_ItemSuite9`  
+**Confidence:** SDK-verified + sample-derived (`Projector`)
+
+## Получить текущий project и root folder
+
+```cpp
+A_Err GetProjectRoot(
+    SPBasicSuite* pica,
+    AEGP_ProjectH* projectPH,
+    AEGP_ItemH* rootPH)
+{
+    A_Err err = A_Err_NONE;
+    AEGP_SuiteHandler suites(pica);
+
+    A_long project_count = 0;
+    ERR(suites.ProjSuite6()->AEGP_GetNumProjects(&project_count));
+
+    if (project_count < 1) {
+        return A_Err_GENERIC;
+    }
+
+    ERR(suites.ProjSuite6()->AEGP_GetProjectByIndex(0, projectPH));
+    ERR(suites.ProjSuite6()->AEGP_GetProjectRootFolder(*projectPH, rootPH));
+    return err;
+}
+```
+
+### Важно
+
+В публичной HTML-документации встречается typo `AEGP_GetProjectProjectByIndex`. Фактическое имя в SDK/header bindings — `AEGP_GetProjectByIndex`.
+
+---
+
+## Обойти project items
+
+```cpp
+A_Err VisitItems(
+    SPBasicSuite* pica,
+    AEGP_ProjectH projectH,
+    void (*visit)(AEGP_ItemH))
+{
+    A_Err err = A_Err_NONE;
+    AEGP_SuiteHandler suites(pica);
+
+    AEGP_ItemH itemH = nullptr;
+    ERR(suites.ItemSuite9()->AEGP_GetFirstProjItem(projectH, &itemH));
+
+    while (!err && itemH) {
+        visit(itemH);
+
+        AEGP_ItemH nextH = nullptr;
+        ERR(suites.ItemSuite9()->AEGP_GetNextProjItem(projectH, itemH, &nextH));
+        itemH = nextH;
+    }
+    return err;
+}
+```
+
+Не удалять текущий `itemH` и затем слепо использовать старый `nextH`. Для destructive iteration сначала собрать stable IDs либо повторно получить graph.
+
+---
+
+## Узнать тип item
+
+```cpp
+AEGP_ItemType type = AEGP_ItemType_NONE;
+ERR(suites.ItemSuite9()->AEGP_GetItemType(itemH, &type));
+
+if (type == AEGP_ItemType_COMP) {
+    // composition
+}
+```
+
+---
+
+## Получить имя item
+
+`AEGP_GetItemName` возвращает host memory handle. Его надо освободить через Memory Suite.
+
+Паттерн:
+
+```cpp
+AEGP_MemHandle nameH = nullptr;
+ERR(suites.ItemSuite9()->AEGP_GetItemName(
+    plugin_id,
+    itemH,
+    &nameH));
+
+if (!err && nameH) {
+    // lock/read with MemorySuite according to SDK sample
+    // ...
+    ERR2(suites.MemorySuite1()->AEGP_FreeMemHandle(nameH));
+}
+```
+
+Не сохранять указатель, полученный после lock, после unlock/free.
+
+---
+
+## Переименовать item
+
+```cpp
+const A_UTF16Char new_name[] = { 'R','e','n','a','m','e','d',0 };
+ERR(suites.ItemSuite9()->AEGP_SetItemName(itemH, new_name));
+```
+
+На практике используйте собственный UTF-8→UTF-16 helper, а не ASCII initializer.
+
+---
+
+## Создать folder
+
+Фактический header contract для современных SDK:
+
+```cpp
+AEGP_ItemH folderH = nullptr;
+ERR(suites.ItemSuite9()->AEGP_CreateNewFolder(
+    utf16_name,
+    parent_folderH,   // nullptr → root where API permits
+    &folderH));
+```
+
+В части публичной HTML-документации исторически встречалась лишняя `projH`-позиция. Проверять установленный `AE_GeneralPlug.h`.
+
+---
+
+## Удалить item
+
+```cpp
+ERR(suites.ItemSuite9()->AEGP_DeleteItem(itemH));
+itemH = nullptr; // не использовать после удаления
+```
+
+После structural mutation re-query graph.
+
+---
+
+## Практический pattern: найти comp по item ID
+
+Лучше сохранять `AEGP_ItemID`, а не `AEGP_ItemH`.
+
+```text
+iterate current project items
+→ GetItemID()
+→ compare stable stored ID
+→ use fresh ItemH
+```
+
+Это устойчивее к большинству изменений project graph.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/02-COMPOSITIONS.md -->
+
+# Composition recipes
+
+**Suite:** `AEGP_CompSuite13` for AE 26.5-specific features; older functions remain available through the current suite.  
+**Confidence:** SDK-verified.
+
+## Создать comp
+
+```cpp
+A_Time duration{10, 1}; // 10 seconds
+A_Ratio par{1, 1};
+A_Ratio fps{25, 1};
+
+AEGP_CompH compH = nullptr;
+ERR(suites.CompSuite13()->AEGP_CreateComp(
+    parent_folderH,
+    utf16_name,
+    1920,
+    1080,
+    &par,
+    &duration,
+    &fps,
+    &compH));
+```
+
+Порядок: parent folder → name → dimensions → PAR → duration → frame rate → output handle.
+
+---
+
+## Получить comp из project item
+
+```cpp
+AEGP_CompH compH = nullptr;
+ERR(suites.CompSuite13()->AEGP_GetCompFromItem(itemH, &compH));
+```
+
+И обратно:
+
+```cpp
+AEGP_ItemH comp_itemH = nullptr;
+ERR(suites.CompSuite13()->AEGP_GetItemFromComp(compH, &comp_itemH));
+```
+
+---
+
+## Создать solid
+
+```cpp
+AEGP_LayerH solid_layerH = nullptr;
+PF_Pixel color{};
+color.alpha = 255;
+color.red   = 255;
+color.green = 0;
+color.blue  = 0;
+
+ERR(suites.CompSuite13()->AEGP_CreateSolidInComp(
+    utf16_name,
+    500,
+    500,
+    &color,
+    compH,
+    nullptr,          // duration: use host/default contract as appropriate
+    &solid_layerH));
+```
+
+Точную optional-duration семантику сверять с headers версии SDK.
+
+---
+
+## Создать camera / light / text layer
+
+```cpp
+AEGP_LayerH cameraH = nullptr;
+AEGP_LayerH lightH  = nullptr;
+AEGP_LayerH textH   = nullptr;
+
+ERR(suites.CompSuite13()->AEGP_CreateCameraInComp(
+    utf16_camera_name, center_point, compH, &cameraH));
+
+ERR(suites.CompSuite13()->AEGP_CreateLightInComp(
+    utf16_light_name, center_point, compH, &lightH));
+
+ERR(suites.CompSuite13()->AEGP_CreateTextLayerInComp(
+    compH, TRUE, &textH));
+```
+
+`center_point` type/coordinates брать из installed SDK declaration; не подменять screen-space и comp-space координаты.
+
+---
+
+## 26.5: parametric mesh layer
+
+`AEGP_CompSuite13` добавляет `AEGP_CreateParametricMeshLayerInComp`. Это **feature-gated** recipe:
+
+```text
+Acquire/compile against CompSuite13
+→ call CreateParametricMeshLayerInComp
+→ older host? disable this command
+```
+
+Не делайте весь plug-in AE 26.5-only, если mesh — необязательная функция.
+
+---
+
+## Получить marker stream composition
+
+В актуальном CompSuite доступен comp marker stream. Дальше он обрабатывается обычными Stream/Keyframe/Marker suites.
+
+Архитектура:
+
+```text
+CompH
+→ GetNewCompMarkerStream
+→ StreamRefH
+→ KeyframeSuite (times)
+→ StreamSuite (values)
+→ MarkerSuite (marker contents)
+→ DisposeStream
+```
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/03-LAYERS.md -->
+
+# Layer recipes
+
+**Suites:** `AEGP_LayerSuite9`, `AEGP_CompSuite13`  
+**Confidence:** SDK-verified. `AEGP_AddLayer` signature additionally checked against header-derived bindings.
+
+## Количество слоёв и layer по index
+
+```cpp
+A_long count = 0;
+ERR(suites.LayerSuite9()->AEGP_GetCompNumLayers(compH, &count));
+
+for (A_long i = 0; i < count && !err; ++i) {
+    AEGP_LayerH layerH = nullptr;
+    ERR(suites.LayerSuite9()->AEGP_GetCompLayerByIndex(compH, i, &layerH));
+    // use layerH now
+}
+```
+
+Не полагаться на index как на persistent identity.
+
+---
+
+## Добавить footage/project item как layer
+
+Сначала проверить legality:
+
+```cpp
+A_Boolean validB = FALSE;
+ERR(suites.LayerSuite9()->AEGP_IsAddLayerValid(itemH, compH, &validB));
+
+if (validB) {
+    AEGP_LayerH new_layerH = nullptr;
+    ERR(suites.LayerSuite9()->AEGP_AddLayer(
+        itemH,
+        compH,
+        &new_layerH));
+}
+```
+
+### Docs erratum
+
+В некоторых версиях публичной HTML-страницы третий аргумент `AEGP_AddLayer` отображался как `A_Boolean*`. Header-derived contract — `AEGP_LayerH*`.
+
+---
+
+## Stable identity: Layer ID
+
+```cpp
+AEGP_LayerIDVal id = 0;
+ERR(suites.LayerSuite9()->AEGP_GetLayerID(layerH, &id));
+```
+
+Позже:
+
+```cpp
+AEGP_LayerH freshH = nullptr;
+ERR(suites.LayerSuite9()->AEGP_GetLayerFromLayerID(compH, id, &freshH));
+```
+
+Это предпочтительнее хранения `LayerH` через длинную цепочку UI операций.
+
+---
+
+## Переименовать layer
+
+```cpp
+ERR(suites.LayerSuite9()->AEGP_SetLayerName(layerH, utf16_name));
+```
+
+---
+
+## Duplicate
+
+```cpp
+AEGP_LayerH duplicateH = nullptr;
+ERR(suites.LayerSuite9()->AEGP_DuplicateLayer(
+    layerH,
+    &duplicateH));
+```
+
+После duplicate пересчитать layer indices.
+
+---
+
+## Parent layer
+
+```cpp
+AEGP_LayerH parentH = nullptr;
+ERR(suites.LayerSuite9()->AEGP_GetLayerParent(layerH, &parentH));
+
+ERR(suites.LayerSuite9()->AEGP_SetLayerParent(
+    layerH,
+    new_parentH));
+```
+
+Перед parent operation проверять cycle/host legality, если API предоставляет соответствующую проверку.
+
+---
+
+## Delete
+
+```cpp
+ERR(suites.LayerSuite9()->AEGP_DeleteLayer(layerH));
+layerH = nullptr;
+```
+
+Никаких вызовов по удалённому handle.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/04-EFFECTS.md -->
+
+# Effect recipes
+
+**Suite:** `AEGP_EffectSuite4` (compatibility-oriented documented contract)  
+**Confidence:** SDK-verified + sample/community sanity check.
+
+## Перечислить effects на layer
+
+```cpp
+A_long count = 0;
+ERR(suites.EffectSuite4()->AEGP_GetLayerNumEffects(layerH, &count));
+
+for (A_long i = 0; i < count && !err; ++i) {
+    AEGP_EffectRefH effectH = nullptr;
+    ERR(suites.EffectSuite4()->AEGP_GetLayerEffectByIndex(
+        plugin_id, layerH, i, &effectH));
+
+    // use effectH
+
+    ERR2(suites.EffectSuite4()->AEGP_DisposeEffect(effectH));
+}
+```
+
+`AEGP_EffectRefH` из `GetLayerEffectByIndex` — disposable reference.
+
+---
+
+## Найти installed effect по match name
+
+```cpp
+#include <cstring>
+
+A_Err FindInstalledEffect(
+    SPBasicSuite* pica,
+    const char* wanted_match_name,
+    AEGP_InstalledEffectKey* out_key)
+{
+    A_Err err = A_Err_NONE;
+    AEGP_SuiteHandler suites(pica);
+
+    AEGP_InstalledEffectKey key = AEGP_InstalledEffectKey_NONE;
+    ERR(suites.EffectSuite4()->AEGP_GetNextInstalledEffect(
+        AEGP_InstalledEffectKey_NONE, &key));
+
+    while (!err && key != AEGP_InstalledEffectKey_NONE) {
+        A_char match_name[AEGP_MAX_EFFECT_MATCH_NAME_SIZE] = {};
+        ERR(suites.EffectSuite4()->AEGP_GetEffectMatchName(key, match_name));
+
+        if (!err && std::strcmp(match_name, wanted_match_name) == 0) {
+            *out_key = key;
+            return A_Err_NONE;
+        }
+
+        AEGP_InstalledEffectKey next = AEGP_InstalledEffectKey_NONE;
+        ERR(suites.EffectSuite4()->AEGP_GetNextInstalledEffect(key, &next));
+        key = next;
+    }
+    return err ? err : A_Err_GENERIC;
+}
+```
+
+Использовать **match name**, не локализованный display name.
+
+---
+
+## Применить effect
+
+```cpp
+AEGP_InstalledEffectKey key = AEGP_InstalledEffectKey_NONE;
+ERR(FindInstalledEffect(pica, "ADBE Gaussian Blur 2", &key));
+
+AEGP_EffectRefH effectH = nullptr;
+ERR(suites.EffectSuite4()->AEGP_ApplyEffect(
+    plugin_id,
+    layerH,
+    key,
+    &effectH));
+
+// use effectH...
+ERR2(suites.EffectSuite4()->AEGP_DisposeEffect(effectH));
+```
+
+Не хардкодить installed key между AE sessions. Installed effect key — host enumeration result, не ваш permanent identifier.
+
+---
+
+## Удалить effect
+
+```cpp
+ERR(suites.EffectSuite4()->AEGP_DeleteLayerEffect(effectH));
+effectH = nullptr;
+```
+
+Не `DisposeEffect` после successful delete, если delete уже уничтожил referenced effect; следовать точному ownership контракту SDK/sample вашей версии.
+
+---
+
+## AEGP → ваш Effect plug-in
+
+Если Effect специально поддерживает generic command:
+
+```cpp
+MyBridgeMessage msg{};
+msg.version = 1;
+msg.op = MyBridgeOp::Ping;
+
+A_Time t{0, 1};
+
+ERR(suites.EffectSuite4()->AEGP_EffectCallGeneric(
+    plugin_id,
+    effectH,
+    &t,
+    PF_Cmd_COMPLETELY_GENERAL,
+    &msg));
+```
+
+Effect принимает это в `PF_Cmd_COMPLETELY_GENERAL`.
+
+Обязательно:
+
+- ABI version;
+- `struct_size`;
+- fixed-width integer fields;
+- никаких STL/string/vector через binary boundary;
+- ownership явно в протоколе.
+
+См. `16-WORKING-TEMPLATES/effect-aegp-generic-bridge/`.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md -->
+
+# Streams / properties / expressions
+
+**Suites:** `AEGP_StreamSuite7`, `AEGP_DynamicStreamSuite4`  
+**Confidence:** SDK-verified.
+
+В AEGP «property» обычно представлен `AEGP_StreamRefH`.
+
+## Получить Position stream слоя
+
+```cpp
+AEGP_StreamRefH streamH = nullptr;
+ERR(suites.StreamSuite7()->AEGP_GetNewLayerStream(
+    plugin_id,
+    layerH,
+    AEGP_LayerStream_POSITION,
+    &streamH));
+
+// use...
+ERR2(suites.StreamSuite7()->AEGP_DisposeStream(streamH));
+```
+
+Перед запросом незнакомого stream:
+
+```cpp
+A_Boolean legalB = FALSE;
+ERR(suites.StreamSuite7()->AEGP_IsStreamLegal(
+    layerH, AEGP_LayerStream_POSITION, &legalB));
+```
+
+---
+
+## Прочитать value в момент времени
+
+```cpp
+A_Time t{0, 1};
+AEGP_StreamValue2 value{};
+
+ERR(suites.StreamSuite7()->AEGP_GetNewStreamValue(
+    plugin_id,
+    streamH,
+    AEGP_LTimeMode_CompTime,
+    &t,
+    FALSE,      // post-expression
+    &value));
+
+// read value according to stream type
+
+ERR2(suites.StreamSuite7()->AEGP_DisposeStreamValue(&value));
+```
+
+Не читать неправильное union field. Сначала:
+
+```cpp
+AEGP_StreamType type = AEGP_StreamType_NO_DATA;
+ERR(suites.StreamSuite7()->AEGP_GetStreamType(streamH, &type));
+```
+
+---
+
+## Записать non-time-varying value
+
+`AEGP_SetStreamValue` допустим для stream, который не time-varying.
+
+```cpp
+A_Boolean timevaryingB = FALSE;
+ERR(suites.StreamSuite7()->AEGP_IsStreamTimevarying(
+    streamH, &timevaryingB));
+
+if (!timevaryingB) {
+    A_Time t{0, 1};
+    AEGP_StreamValue2 value{};
+
+    ERR(suites.StreamSuite7()->AEGP_GetNewStreamValue(
+        plugin_id, streamH,
+        AEGP_LTimeMode_CompTime,
+        &t, TRUE, &value));
+
+    value.val.one_d = 50.0;
+
+    ERR(suites.StreamSuite7()->AEGP_SetStreamValue(
+        plugin_id, streamH, &value));
+
+    ERR2(suites.StreamSuite7()->AEGP_DisposeStreamValue(&value));
+}
+```
+
+Для animated property — Keyframe Suite.
+
+---
+
+## Effect parameter stream
+
+```cpp
+AEGP_StreamRefH paramH = nullptr;
+ERR(suites.StreamSuite7()->AEGP_GetNewEffectStreamByIndex(
+    plugin_id,
+    effectH,
+    param_index,
+    &paramH));
+
+// read/write/keyframe
+ERR2(suites.StreamSuite7()->AEGP_DisposeStream(paramH));
+```
+
+`param_index` должен соответствовать effect parameter contract.
+
+---
+
+## Expression
+
+```cpp
+A_Boolean enabledB = FALSE;
+ERR(suites.StreamSuite7()->AEGP_GetExpressionState(
+    plugin_id, streamH, &enabledB));
+
+ERR(suites.StreamSuite7()->AEGP_SetExpression(
+    plugin_id, streamH, utf16_expression));
+
+ERR(suites.StreamSuite7()->AEGP_SetExpressionState(
+    plugin_id, streamH, TRUE));
+```
+
+`GetExpression` возвращает memory handle — освободить по контракту через Memory Suite.
+
+---
+
+## Dynamic stream traversal
+
+Dynamic Stream Suite нужен для hierarchy вроде Effects, masks и property groups.
+
+Паттерн:
+
+```text
+root StreamRefH
+→ GetNumStreamsInGroup
+→ GetNewStreamRefByIndex
+→ GetMatchName
+→ recurse
+→ DisposeStream
+```
+
+После `AddStream`, `DeleteStream`, `ReorderStream` или duplicate **не использовать старые child refs** — повторно пройти hierarchy.
+
+---
+
+## Match name first
+
+Для automation:
+
+```text
+display name = UI/localized/user-visible
+match name   = stable programmatic identity (где предусмотрен)
+```
+
+Искать dynamic property group по match name, а не по UI строке.
+
+---
+
+## AE 26.5: layer-param render stage
+
+`AEGP_StreamSuite7` добавляет отдельный get/set render stage для `PF_Param_LAYER`: source before masks / after masks / через конкретный effect stage.
+
+Это новый feature. Делать runtime/host gating и не требовать StreamSuite7 для функций, которым достаточно старого stream API.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md -->
+
+# Keyframe recipes
+
+**Suites:** `AEGP_KeyframeSuite3+`, `AEGP_StreamSuite`  
+**Confidence:** SDK-verified + official `Easy Cheese` pattern.
+
+## Узнать число keyframes
+
+```cpp
+A_long count = 0;
+ERR(suites.KeyframeSuite3()->AEGP_GetStreamNumKFs(
+    streamH, &count));
+```
+
+---
+
+## Время keyframe
+
+```cpp
+A_Time t{};
+ERR(suites.KeyframeSuite3()->AEGP_GetKeyframeTime(
+    streamH,
+    key_index,
+    AEGP_LTimeMode_CompTime,
+    &t));
+```
+
+---
+
+## Добавить один keyframe
+
+```cpp
+A_Time t{1, 1};
+A_long key_index = 0;
+
+ERR(suites.KeyframeSuite3()->AEGP_InsertKeyframe(
+    streamH,
+    AEGP_LTimeMode_CompTime,
+    &t,
+    &key_index));
+```
+
+После этого задать value через Keyframe Suite.
+
+---
+
+## Правильный batch insert
+
+Официальный guide отдельно предупреждает: одиночные inserts могут быть дорогими для undo. Для серии keyframes использовать begin/end cookie.
+
+```cpp
+AEGP_AddKeyframesInfoH addH = nullptr;
+ERR(suites.KeyframeSuite3()->AEGP_StartAddKeyframes(
+    streamH, &addH));
+
+A_long idx0 = 0;
+A_Time t0{0, 1};
+ERR(suites.KeyframeSuite3()->AEGP_AddKeyframes(
+    addH, AEGP_LTimeMode_CompTime, &t0, &idx0));
+
+AEGP_StreamValue2 v0{};
+// v0 must be valid for stream type;
+// safest pattern is derive correctly-typed value via StreamSuite.
+ERR(suites.KeyframeSuite3()->AEGP_SetAddKeyframe(
+    addH, idx0, &v0));
+
+// ... more keys ...
+
+ERR(suites.KeyframeSuite3()->AEGP_EndAddKeyframes(
+    TRUE,   // commit
+    addH));
+addH = nullptr;
+```
+
+Если операция прерывается — `EndAddKeyframes(FALSE, addH)` для отмены transaction по контракту suite.
+
+---
+
+## Production pattern: derive typed value
+
+Не строить `AEGP_StreamValue2` вслепую:
+
+```text
+GetStreamType
+→ GetNewStreamValue at nearby/current time
+→ modify correct union member
+→ SetAddKeyframe / SetKeyframeValue
+→ DisposeStreamValue
+```
+
+Так `streamH`/type-specific data корректно заполнены.
+
+---
+
+## Интерполяция и ease
+
+После вставки:
+
+```text
+GetValidInterpolations
+→ SetKeyframeInterpolation
+→ SetKeyframeTemporalEase
+→ optional spatial tangents / flags
+```
+
+Сначала проверять поддерживаемые interpolation flags — не каждая property поддерживает spatial/ease одинаково.
+
+---
+
+## Удаление
+
+```cpp
+ERR(suites.KeyframeSuite3()->AEGP_DeleteKeyframe(
+    streamH, key_index));
+```
+
+Удаление сдвигает subsequent indices. При массовом delete идти с конца к началу либо каждый раз re-query.
+
+---
+
+## Undo
+
+Batch keyframe edit обычно всё равно следует помещать в один `AEGP_StartUndoGroup` / `AEGP_EndUndoGroup` на уровне пользовательской команды.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/07-MASKS.md -->
+
+# Mask recipes
+
+**Suites:** `AEGP_MaskSuite6`, `AEGP_MaskOutlineSuite3`, `AEGP_StreamSuite7`  
+**Confidence:** SDK-verified.
+
+## Сколько masks на layer
+
+```cpp
+A_long count = 0;
+ERR(suites.MaskSuite6()->AEGP_GetLayerNumMasks(
+    layerH, &count));
+```
+
+## Получить mask
+
+```cpp
+AEGP_MaskRefH maskH = nullptr;
+ERR(suites.MaskSuite6()->AEGP_GetLayerMaskByIndex(
+    layerH, index, &maskH));
+
+// ...
+ERR2(suites.MaskSuite6()->AEGP_DisposeMask(maskH));
+```
+
+---
+
+## Создать mask
+
+```cpp
+AEGP_MaskRefH maskH = nullptr;
+A_long mask_index = 0;
+ERR(suites.MaskSuite6()->AEGP_CreateNewMask(
+    layerH,
+    &maskH,
+    &mask_index));
+```
+
+После создания mask path живёт как stream, а не как «vector<point> внутри mask handle».
+
+---
+
+## Получить Outline stream
+
+```cpp
+AEGP_StreamRefH outline_streamH = nullptr;
+ERR(suites.StreamSuite7()->AEGP_GetNewMaskStream(
+    plugin_id,
+    maskH,
+    AEGP_MaskStream_OUTLINE,
+    &outline_streamH));
+```
+
+Затем `GetNewStreamValue` возвращает mask outline value/handle по соответствующему stream type. Геометрию читать/писать через Mask Outline Suite.
+
+Dispose:
+
+```cpp
+ERR2(suites.StreamSuite7()->AEGP_DisposeStream(outline_streamH));
+```
+
+---
+
+## Opacity / Feather / Expansion
+
+Те же mechanics:
+
+```text
+GetNewMaskStream(maskH, AEGP_MaskStream_OPACITY)
+GetNewMaskStream(maskH, AEGP_MaskStream_FEATHER)
+GetNewMaskStream(maskH, AEGP_MaskStream_EXPANSION)
+```
+
+Дальше это обычные stream/keyframe operations.
+
+---
+
+## Изменить mask mode / invert
+
+Mask Suite предоставляет metadata-level operations: mode, invert, lock и прочее. Их не надо пытаться менять через outline geometry.
+
+---
+
+## Удалить mask
+
+После delete mask reference считается invalid:
+
+```cpp
+ERR(suites.MaskSuite6()->AEGP_DeleteMaskFromLayer(maskH));
+maskH = nullptr;
+```
+
+Если после этого нужны соседние masks — re-query их по текущему layer state.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/08-TEXT-MARKERS.md -->
+
+# Text + marker recipes
+
+## Text
+
+**Suites:** `AEGP_StreamSuite7`, `AEGP_TextDocumentSuite1`  
+**Confidence:** SDK-verified.
+
+Text document — значение специального stream.
+
+Pipeline:
+
+```text
+Text LayerH
+→ layer TEXT_DOCUMENT stream
+→ GetNewStreamValue
+→ TextDocumentH
+→ TextDocumentSuite GetNewText / SetText
+→ DisposeStreamValue
+→ DisposeStream
+```
+
+### Получить текст
+
+`AEGP_TextDocumentSuite1::AEGP_GetNewText` возвращает host memory handle с Unicode text.
+
+```text
+Get text document handle from stream value
+→ AEGP_GetNewText(plugin_id, text_docH, &unicode_memH)
+→ lock/read
+→ unlock
+→ AEGP_FreeMemHandle
+```
+
+### Задать текст
+
+```cpp
+ERR(suites.TextDocumentSuite1()->AEGP_SetText(
+    text_docH,
+    reinterpret_cast<const A_u_short*>(utf16_text),
+    utf16_length));
+```
+
+Не передавать `strlen()` UTF-8 как UTF-16 length.
+
+---
+
+## Markers
+
+**Suites:** `AEGP_MarkerSuite2`, `AEGP_StreamSuite`, `AEGP_KeyframeSuite`  
+**Confidence:** SDK-verified.
+
+Marker stream — time-varying stream. Времена marker'ов — keyframe mechanics, marker payload — Marker Suite.
+
+Pipeline:
+
+```text
+layer/comp marker StreamRefH
+→ GetStreamNumKFs
+→ GetKeyframeTime
+→ GetNewKeyframeValue
+→ MarkerValP
+→ MarkerSuite read/write strings, duration, flags
+```
+
+### Создать marker value
+
+```text
+MarkerSuite.NewMarker
+→ set comment/chapter/url/cue strings as needed
+→ set duration
+→ write into marker stream keyframe
+→ MarkerSuite.DisposeMarker
+```
+
+Следить за ownership marker object отдельно от stream value.
+
+---
+
+## Правильная модель
+
+Marker — не «отдельный объект на timeline». Это **value в marker stream в keyframe time**. Поэтому массовые операции удобно строить на Keyframe Suite.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/09-FOOTAGE-IMPORT.md -->
+
+# Footage / import recipes
+
+**Suites:** `AEGP_FootageSuite5`, `AEGP_ItemSuite9`, `AEGP_CompSuite13`, `AEGP_LayerSuite9`  
+**Confidence:** architecture SDK-verified; exact import flags/path structs must be compiled against installed 26.5 headers.
+
+## Два разных сценария
+
+### A. Импорт уже поддерживаемого AE media
+
+Использовать Footage Suite:
+
+```text
+path + interpretation/import options
+→ NewFootage / AddFootageToProject
+→ ItemH
+→ optionally AddLayer(item, comp)
+```
+
+### B. Новый file format
+
+Не Footage Suite recipe. Нужен **AEIO** или File Import Manager path — см. `04-AEIO/` и `14-NATIVE-INTEGRATIONS/08-AEIO.md`.
+
+---
+
+## Production checklist
+
+Для footage учитывать:
+
+- sequence vs single file;
+- alpha interpretation;
+- frame rate / conform rate;
+- proxy;
+- missing/relinked footage;
+- UTF-16/native paths;
+- Windows/macOS path conventions;
+- still duration;
+- color/profile interpretation.
+
+---
+
+## Почему здесь нет «универсальной 10-строчной функции»
+
+Footage constructors используют version-specific structures/options и являются местом, где особенно опасно выдавать псевдо-compile код без proprietary headers. Для реально собираемого импортера стартовать от Adobe `Projector`/`IO` sample и graft-ить business logic.
+
+Cookbook фиксирует lifecycle и suite ownership, но exact struct initializers должны идти из установленного SDK той версии, которую вы реально собираете.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/10-RENDER-FRAMES.md -->
+
+# Render frame → pixels
+
+**Suites:** `AEGP_RenderOptionsSuite4`, `AEGP_RenderSuite4`, `AEGP_WorldSuite3`  
+**Confidence:** SDK-verified.
+
+## Pipeline
+
+```text
+ItemH
+→ RenderOptions.NewFromItem
+→ configure time / world / field / downsample
+→ RenderAndCheckoutFrame
+→ FrameReceiptH
+→ GetReceiptWorld
+→ WorldH
+→ GetBaseAddr8/16/32 + dimensions/rowbytes
+→ read/copy pixels
+→ CheckinFrame
+→ Dispose RenderOptions
+```
+
+## Checkout frame
+
+```cpp
+AEGP_FrameReceiptH receiptH = nullptr;
+
+ERR(suites.RenderSuite4()->AEGP_RenderAndCheckoutFrame(
+    render_optionsH,
+    nullptr,     // optional cancel callback
+    nullptr,     // cancel refcon
+    &receiptH));
+```
+
+`receiptH` — не pixels.
+
+## Получить world
+
+```cpp
+AEGP_WorldH worldH = nullptr;
+ERR(suites.RenderSuite4()->AEGP_GetReceiptWorld(
+    receiptH,
+    &worldH));
+```
+
+`worldH` принадлежит frame receipt/host. Не dispose-ить его как ваш allocated world.
+
+## Получить pixels
+
+Через World Suite:
+
+```text
+GetType → 8/16/float world
+GetSize
+GetRowBytes
+GetBaseAddr8 / GetBaseAddr16 / GetBaseAddr32
+```
+
+Никогда не считать `rowbytes == width * sizeof(pixel)`.
+
+## Обязательный check-in
+
+```cpp
+ERR2(suites.RenderSuite4()->AEGP_CheckinFrame(receiptH));
+receiptH = nullptr;
+```
+
+AE делает caching decisions на основе checked-out receipts. Держать receipt дольше нужного нельзя.
+
+## Rendered region
+
+Partial rendering/caching означает, что полезно проверять:
+
+```cpp
+A_LRect rendered{};
+ERR(suites.RenderSuite4()->AEGP_GetRenderedRegion(
+    receiptH, &rendered));
+```
+
+Не предполагать автоматически, что весь world содержит новый render.
+
+## Не мутировать полученный cached world
+
+Если нужно изменять pixels — копировать в собственный world/buffer. Receipt world — результат host render/cache, не ваша scratch-память.
+
+## Threading
+
+Некоторые исторические render calls на UI thread deprecated/ограничиваются. Не строить новую архитектуру на синхронном UI-thread render loop. Для UI thumbnails/analysis продумать asynchronous/cache-friendly design и сверить актуальные 26.5 ограничения.
+
+## Infinite render recursion
+
+Если Effect A рендерит layer, содержащий Effect B, который делает симметричный checkout обратно, можно получить recursive render/deadlock. Особенно осторожно с `RenderAndCheckoutLayerFrame`.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/11-RENDER-QUEUE.md -->
+
+# Render Queue recipes
+
+**Suites:** `AEGP_RenderQueueSuite1`, `AEGP_RQItemSuite4`, `AEGP_OutputModuleSuite4`  
+**Confidence:** SDK-verified + `QueueBert` sample-derived.
+
+## Добавить comp в queue
+
+```cpp
+ERR(suites.RenderQueueSuite1()->AEGP_AddCompToRenderQueue(
+    compH,
+    output_path_utf8_or_host_expected_path));
+```
+
+После add **старые Render Queue references могут стать invalid**. Re-query queue.
+
+---
+
+## Получить queue items
+
+```text
+GetNumRQItems
+→ GetRQItemByIndex / GetNextRQItem
+→ GetCompFromRQItem
+→ GetRenderState / SetRenderState
+```
+
+Используйте именно indexing semantics вашей версии/sample; не переносите undocumented community assumptions между версиями.
+
+---
+
+## Output modules
+
+```text
+RQItem
+→ GetNumOutputModulesForRQItem
+→ GetOutputModuleByIndex
+→ SetOutputFilePath
+→ configure enabled outputs / channels / crop / stretch / sound
+```
+
+После add/remove output module re-query references/indices.
+
+---
+
+## Установить output path
+
+```cpp
+ERR(suites.OutputModuleSuite4()->AEGP_SetOutputFilePath(
+    rq_item_refH,
+    output_module_refH,
+    utf16_pathZ));
+```
+
+`AEGP_SetOutputFilePath` принимает NULL-terminated UTF-16 path (`A_UTF16Char*`). `AEGP_GetOutputFilePath` возвращает `AEGP_MemHandle`, который надо освободить через Memory Suite.
+
+---
+
+## Запустить queue
+
+Сначала item должен иметь допустимый output path и быть включён для рендера:
+
+```cpp
+ERR(suites.RQItemSuite4()->AEGP_SetRenderState(
+    rq_itemH,
+    TRUE));
+
+ERR(suites.RenderQueueSuite1()->AEGP_SetRenderQueueState(
+    AEGP_RenderQueueState_RENDERING));
+```
+
+`AEGP_SetRenderState` принимает `A_Boolean`, а не enum статуса render item.
+
+Host может передать управление render pipeline и UI; команда не должна ожидать «обычный синхронный цикл» после старта.
+
+---
+
+## Invalidation rule
+
+Официальный SDK guide отдельно предупреждает:
+
+- `AddCompToRenderQueue` или пользовательский add/remove инвалидирует RQ item references;
+- add/remove output module инвалидирует output-module references для item.
+
+Production code:
+
+```text
+mutation
+→ drop old refs
+→ query count again
+→ fetch fresh refs
+```
+
+---
+
+## Для сложных preset/template операций
+
+Некоторые render settings/output module template actions проще/надёжнее делаются через scripting (`applyTemplate`) поверх native controller. Hybrid допустим, если:
+- boundary документирован;
+- script failure возвращается как structured error;
+- native core не зависит от UI language strings.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/12-MEMORY-UNDO-PERSISTENCE.md -->
+
+# Memory / Undo / Persistent Data
+
+## Undo
+
+**Suite:** `AEGP_UtilitySuite6`
+
+Каждая пользовательская mutation-команда должна выглядеть как одна операция:
+
+```cpp
+class ScopedUndo {
+public:
+    ScopedUndo(AEGP_SuiteHandler& s, const char* name)
+        : suites_(s), active_(false)
+    {
+        if (suites_.UtilitySuite6()->AEGP_StartUndoGroup(name) == A_Err_NONE) {
+            active_ = true;
+        }
+    }
+
+    ~ScopedUndo() {
+        if (active_) {
+            suites_.UtilitySuite6()->AEGP_EndUndoGroup();
+        }
+    }
+
+    ScopedUndo(const ScopedUndo&) = delete;
+    ScopedUndo& operator=(const ScopedUndo&) = delete;
+
+private:
+    AEGP_SuiteHandler& suites_;
+    bool active_;
+};
+```
+
+В реальном codebase лучше сохранить ошибку EndUndoGroup через явный `Close()`; destructor не должен бросать exception.
+
+---
+
+## Host memory
+
+**Suite:** `AEGP_MemorySuite1`
+
+Если suite возвращает `AEGP_MemHandle`:
+
+```text
+lock
+→ use pointer briefly
+→ unlock
+→ FreeMemHandle
+```
+
+Не:
+- `free()`;
+- `delete`;
+- сохранять locked pointer;
+- передавать pointer в другой thread после unlock.
+
+---
+
+## Native allocations
+
+Ваш `new/delete`, `std::vector` и т.д. допустимы внутри вашего модуля, но не передавайте STL object через plug-in ABI/PICA generic bridge. Межмодульный ABI: POD + explicit ownership callbacks.
+
+---
+
+## Persistent Data
+
+**Suite:** `AEGP_PersistentDataSuite4`
+
+Подходит для:
+- preferences;
+- feature flags;
+- last-used settings;
+- migration version.
+
+Не подходит для:
+- pointer;
+- host handle;
+- live layer/effect/stream ref;
+- секреты в plaintext без threat model.
+
+Ключи должны быть namespaced вашим vendor/product ID.
+
+---
+
+## Error reporting
+
+Для AEGP пользовательское сообщение — через host Utility/Report API. Не показывать native modal alert из render thread.
+
+Ошибки внутри core лучше представлять:
+
+```cpp
+struct Error {
+    int32_t domain;
+    int32_t code;
+    char message[256];
+};
+```
+
+и конвертировать в AE-facing `A_Err` только на boundary.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/13-GUIDES-VIEWS-SELECTION.md -->
+
+# Guides / Item Views / Selection
+
+## AE 26.5 Guide Suite
+
+**Suites:** `AEGP_GuideSuite2`, `AEGP_ItemViewSuite2`  
+**Confidence:** 26.5 SDK release verified.
+
+GuideSuite2 умеет:
+- horizontal/vertical guide;
+- pixel/percentage position;
+- per-guide color;
+- edge pinning.
+
+ItemViewSuite2 управляет per-view:
+- guides visible;
+- snap;
+- locked.
+
+## Feature gating
+
+Это новый API. Архитектура:
+
+```text
+host supports GuideSuite2?
+  yes → full percentage/color/pinning
+  no, GuideSuite1? → basic orientation/pixel position
+  no → disable guide feature only
+```
+
+Не падать загрузкой всего AEGP.
+
+---
+
+## Почему Guide и ItemView разные
+
+Guide object/data относится к item/layer guide model. `ItemViewSuite` — к конкретному view/UI state. Поэтому «создать guide» и «показывать guides в этом view» — разные операции.
+
+---
+
+## Selection / Collection
+
+**Suite:** `AEGP_CollectionSuite2`
+
+Collection API используется для selection-like host collections. Не хранить collection handle как долговечную модель приложения. Считать его snapshot/host object с собственным lifecycle.
+
+Для бизнес-логики лучше переводить selection в:
+- ItemID;
+- LayerID;
+- effect match name + layer identity;
+- собственную immutable command model.
+
+---
+
+## Command pattern
+
+UI callback:
+
+```text
+query current selection
+→ normalize to stable IDs
+→ validate
+→ StartUndoGroup
+→ mutate
+→ EndUndoGroup
+→ drop temporary collection/refs
+```
+
+Так native panel/menu command не становится зависимым от stale UI handles.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md -->
+
+# Lifetime + threading rules
+
+Это самый важный cross-cutting раздел cookbook.
+
+## 1. Borrowed vs owned
+
+Нельзя придумать универсальное правило «все handles надо dispose». В AE API есть:
+
+- borrowed host handle;
+- plug-in-owned reference;
+- checkout receipt;
+- memory handle;
+- begin/end cookie.
+
+Каждая категория закрывается **своей парой**.
+
+## 2. Structural invalidation
+
+Особенно опасны:
+- Dynamic Stream hierarchy;
+- Render Queue items/output modules;
+- effect refs при delete/reorder;
+- layer refs после delete;
+- project/item graph после destructive changes.
+
+После structural mutation считать соседние transient refs подозрительными и re-query.
+
+## 3. Begin/end transactions
+
+Примеры:
+- `StartUndoGroup` / `EndUndoGroup`;
+- `StartAddKeyframes` / `EndAddKeyframes`;
+- render `Checkout` / `Checkin`.
+
+Production code должен гарантировать закрытие пары на каждом error path.
+
+## 4. UI/project state vs render
+
+Не делать project mutation из:
+- MFR worker;
+- effect render callback;
+- arbitrary background thread.
+
+Command/idle/panel callback должен передавать immutable work в background core, а mutation результата — возвращаться в допустимый host context.
+
+## 5. AEGP из Effect render
+
+AE позволяет effects использовать некоторые AEGP suites, но официальный guide предупреждает о hidden dependency/caching bugs. Если AEGP query влияет на пиксели, AE может не знать, что cache invalid.
+
+Правило:
+
+```text
+render result depends on data?
+→ data must be represented in effect dependency/state contract
+→ otherwise do not query it ad hoc from AEGP during render
+```
+
+## 6. Не держать mutex во время host call
+
+Плохо:
+
+```text
+lock(global_mutex)
+→ AE suite call
+→ host re-enters your code
+→ tries same mutex
+→ deadlock
+```
+
+Правильно:
+- copy state under lock;
+- unlock;
+- call host;
+- merge result under lock if needed.
+
+## 7. Plugin unload
+
+Death hook:
+- отменить/закрыть ваш background work;
+- отцепить callbacks;
+- освободить собственные resources;
+- не обращаться к уже уничтоженным host objects.
+
+## 8. Versioned feature boundaries
+
+Compile-time availability != runtime host availability.
+
+Если поддерживается несколько AE:
+- собрать против выбранного minimum/SDK strategy;
+- acquire/check suite;
+- feature gate;
+- test matrix по каждому host.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/15-RECIPE-INDEX.md -->
+
+# Native recipe index
+
+## Project graph
+
+- get current project → `01-PROJECT-ITEMS.md`
+- root folder → `01-PROJECT-ITEMS.md`
+- iterate items → `01-PROJECT-ITEMS.md`
+- create folder → `01-PROJECT-ITEMS.md`
+- rename/delete item → `01-PROJECT-ITEMS.md`
+- create composition → `02-COMPOSITIONS.md`
+- create solid/camera/light/text → `02-COMPOSITIONS.md`
+- get layers → `03-LAYERS.md`
+- add/duplicate/delete layer → `03-LAYERS.md`
+- stable LayerID → `03-LAYERS.md`
+
+## Effects + properties
+
+- enumerate effects → `04-EFFECTS.md`
+- find installed effect → `04-EFFECTS.md`
+- apply/delete effect → `04-EFFECTS.md`
+- AEGP→Effect generic call → `04-EFFECTS.md`
+- get layer property stream → `05-STREAMS-PROPERTIES.md`
+- get effect parameter stream → `05-STREAMS-PROPERTIES.md`
+- read/set property → `05-STREAMS-PROPERTIES.md`
+- expressions → `05-STREAMS-PROPERTIES.md`
+- dynamic hierarchy → `05-STREAMS-PROPERTIES.md`
+
+## Animation
+
+- enumerate/add/delete keyframes → `06-KEYFRAMES.md`
+- batch keyframes → `06-KEYFRAMES.md`
+- masks → `07-MASKS.md`
+- text → `08-TEXT-MARKERS.md`
+- markers → `08-TEXT-MARKERS.md`
+
+## Render
+
+- render item/frame to pixels → `10-RENDER-FRAMES.md`
+- receipt/world ownership → `10-RENDER-FRAMES.md`
+- add comp to Render Queue → `11-RENDER-QUEUE.md`
+- configure output module → `11-RENDER-QUEUE.md`
+- start queue → `11-RENDER-QUEUE.md`
+
+## Host infrastructure
+
+- undo → `12-MEMORY-UNDO-PERSISTENCE.md`
+- host memory → `12-MEMORY-UNDO-PERSISTENCE.md`
+- preferences → `12-MEMORY-UNDO-PERSISTENCE.md`
+- 26.5 guides → `13-GUIDES-VIEWS-SELECTION.md`
+- selection → `13-GUIDES-VIEWS-SELECTION.md`
+- stale handles/threading → `14-LIFETIME-THREADING.md`
+
+## Drop-in code
+
+См. [`code/`](17-NATIVE-SUITE-COOKBOOK/code/README.md):
+- common RAII patterns;
+- project/item traversal;
+- comp/layer operations;
+- effect/stream operations;
+- keyframe batch transaction;
+- render receipt transaction.
+
+## Full suite function map
+
+- suite/function capability index → `16-SUITE-FUNCTION-MAP.md`
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/16-SUITE-FUNCTION-MAP.md -->
+
+# AEGP Suite function map — native capability index
+
+**Purpose:** быстрый указатель «какая suite / какая функция нужна».  
+**Not a header replacement:** exact types, optional arguments and version macros always come from the SDK headers used for the build.
+
+## Host / registration
+
+### Memory Suite
+Core:
+- allocate/resize/free host memory handle;
+- lock/unlock host memory;
+- query size.
+
+Use for memory handles returned by host APIs. Never `free()` an `AEGP_MemHandle`.
+
+### Command Suite
+Core:
+- `AEGP_GetUniqueCommand`
+- `AEGP_InsertMenuCommand`
+- `AEGP_RemoveMenuCommand`
+- `AEGP_EnableCommand`
+- `AEGP_DisableCommand`
+- `AEGP_CheckMarkMenuCommand`
+- rename/set menu command name where available.
+
+### Register Suite
+Core registration families:
+- command hook;
+- update-menu hook;
+- death hook;
+- idle hook;
+- AEIO registration;
+- Artisan / Interactive Artisan registration;
+- death/shutdown cleanup;
+- other host hooks exposed by the target suite generation.
+
+Register Suite is entry-point territory; most other suites are used later from callbacks.
+
+---
+
+## Project graph
+
+### Project Suite
+High-value:
+- `AEGP_GetNumProjects`
+- `AEGP_GetProjectByIndex`
+- `AEGP_GetProjectRootFolder`
+- project name/path access
+- save project / save-as
+- project dirty state
+- project time display settings
+- create/new project where host permits.
+
+### Item Suite
+High-value:
+- `AEGP_GetFirstProjItem`
+- `AEGP_GetNextProjItem`
+- `AEGP_GetActiveItem`
+- `AEGP_GetItemType`
+- `AEGP_GetItemName`
+- `AEGP_SetItemName`
+- `AEGP_GetItemID`
+- item flags / dimensions / duration / current time
+- parent folder get/set
+- `AEGP_CreateNewFolder`
+- `AEGP_DeleteItem`
+- label/proxy/comment-related access where exposed.
+
+### Collection Suite
+Use for host selection/collections:
+- create/dispose collection;
+- get number of collection items;
+- inspect collection item type/union;
+- append/set collection;
+- query current selection via comp/project APIs that return collections.
+
+### Composition Suite
+High-value:
+- `AEGP_GetCompFromItem`
+- `AEGP_GetItemFromComp`
+- comp background / flags / frame rate / work area / shutter
+- `AEGP_CreateComp`
+- `AEGP_CreateSolidInComp`
+- `AEGP_CreateCameraInComp`
+- `AEGP_CreateLightInComp`
+- text/box-text creation
+- vector/null creation where available
+- comp marker stream
+- selection collection
+- AE 26.5: `AEGP_CreateParametricMeshLayerInComp`.
+
+### Footage Suite
+High-value families:
+- create/new footage from path/solid;
+- add footage to project;
+- dispose footage not adopted by project;
+- replace/relink footage;
+- proxy get/set;
+- interpretation options;
+- solid color/dimensions;
+- footage sound format.
+
+---
+
+## Layers / effects / property graph
+
+### Layer Suite
+High-value:
+- `AEGP_GetCompNumLayers`
+- `AEGP_GetCompLayerByIndex`
+- active layer
+- source item / parent comp
+- layer name / quality / flags
+- in point / duration / offset / stretch
+- transfer mode
+- `AEGP_IsAddLayerValid`
+- `AEGP_AddLayer`
+- `AEGP_ReorderLayer`
+- layer bounds / object type / 2D/3D
+- time conversion comp↔layer
+- `AEGP_GetLayerID`
+- `AEGP_GetLayerFromLayerID`
+- set parent
+- `AEGP_DeleteLayer`
+- `AEGP_DuplicateLayer`
+- track matte get/set/remove
+- layer label/sampling quality.
+
+### Effect Suite
+High-value:
+- `AEGP_GetLayerNumEffects`
+- `AEGP_GetLayerEffectByIndex`
+- `AEGP_GetInstalledKeyFromLayerEffect`
+- effect parameter metadata
+- flags
+- reorder
+- `AEGP_ApplyEffect`
+- `AEGP_DeleteLayerEffect`
+- `AEGP_DuplicateEffect`
+- enumerate installed effects
+- `AEGP_GetEffectName`
+- `AEGP_GetEffectMatchName`
+- effect category
+- `AEGP_EffectCallGeneric`
+- `AEGP_DisposeEffect`.
+
+### Stream Suite
+High-value:
+- `AEGP_IsStreamLegal`
+- `AEGP_CanVaryOverTime`
+- valid interpolations
+- `AEGP_GetNewLayerStream`
+- `AEGP_GetEffectNumParamStreams`
+- `AEGP_GetNewEffectStreamByIndex`
+- `AEGP_GetNewMaskStream`
+- `AEGP_DisposeStream`
+- stream name / units / properties / type
+- `AEGP_IsStreamTimevarying`
+- `AEGP_GetNewStreamValue`
+- `AEGP_DisposeStreamValue`
+- `AEGP_SetStreamValue`
+- expression get/set/enable
+- duplicate stream ref
+- unique stream ID in newer generations
+- AE 26.5 StreamSuite7: layer-param render-stage accessors.
+
+### Dynamic Stream Suite
+High-value:
+- get grouping type / dynamic flags;
+- number of children in group;
+- `AEGP_GetNewStreamRefByIndex`
+- `AEGP_GetNewStreamRefByMatchname`
+- parent stream ref;
+- match name;
+- add/delete/reorder/duplicate child stream;
+- set stream name;
+- separation/follower operations where supported.
+
+Structural edit → old child refs should be treated as invalid and re-queried.
+
+---
+
+## Animation
+
+### Keyframe Suite
+High-value:
+- `AEGP_GetStreamNumKFs`
+- `AEGP_GetKeyframeTime`
+- `AEGP_InsertKeyframe`
+- `AEGP_DeleteKeyframe`
+- get/set keyframe value
+- get/set interpolation
+- temporal ease
+- spatial tangents
+- keyframe flags
+- `AEGP_StartAddKeyframes`
+- `AEGP_AddKeyframes`
+- `AEGP_SetAddKeyframe`
+- `AEGP_EndAddKeyframes`.
+
+### Marker Suite
+High-value:
+- `AEGP_NewMarker`
+- `AEGP_DisposeMarker`
+- `AEGP_DuplicateMarker`
+- marker flags;
+- marker strings (comment/chapter/url/cue);
+- cue-point params;
+- marker duration.
+
+### Mask Suite
+High-value:
+- `AEGP_GetLayerNumMasks`
+- `AEGP_GetLayerMaskByIndex`
+- `AEGP_DisposeMask`
+- invert/mode/motion blur/feather falloff
+- `AEGP_GetMaskID`
+- `AEGP_CreateNewMask`
+- `AEGP_DeleteMaskFromLayer`
+- mask color / lock / roto-bezier
+- duplicate mask.
+
+### Mask Outline Suite
+High-value:
+- open/closed state;
+- number of segments;
+- get/set vertex info;
+- create/delete vertices;
+- feather count/data.
+
+Mask geometry normally arrives through outline stream value, then Mask Outline Suite edits its structure.
+
+### Text Document Suite
+Core:
+- `AEGP_GetNewText`
+- `AEGP_SetText`.
+
+### Text Layer Suite
+Core families:
+- request text outlines at time;
+- count outlines;
+- get indexed outline/path;
+- dispose outline collection according to suite contract.
+
+---
+
+## Utility / preferences / color
+
+### Utility Suite
+High-value:
+- `AEGP_ReportInfo`
+- `AEGP_ReportInfoUnicode`
+- driver/spec version
+- quiet errors begin/end
+- `AEGP_StartUndoGroup`
+- `AEGP_EndUndoGroup`
+- `AEGP_RegisterWithAEGP`
+- main host window access where platform-relevant
+- idle triggering
+- scripting availability
+- `AEGP_ExecuteScript`
+- debug log / OS console helpers
+- last-error access.
+
+### Persistent Data Suite
+Families:
+- section/key existence;
+- get/set typed values;
+- strings;
+- blobs/data;
+- delete key/section where available.
+
+Use for preferences, not live host handles.
+
+### Color Settings Suite
+Families:
+- working space / project color settings;
+- color profile descriptions/transforms;
+- OCIO-related queries in newer generations.
+
+Color API is version-sensitive: acquire the generation you actually require.
+
+---
+
+## Render / pixels / audio
+
+### Render Options Suite
+High-value:
+- create render options from item;
+- duplicate/dispose;
+- time;
+- time step;
+- field render;
+- world/pixel type;
+- downsample factor;
+- ROI/matte/channel related options where exposed.
+
+### Layer Render Options Suite
+Families:
+- create from layer / upstream of effect;
+- time/time step;
+- world type;
+- downsample;
+- matte mode;
+- duplicate/dispose.
+
+### Render Suite
+High-value:
+- `AEGP_RenderAndCheckoutFrame`
+- `AEGP_RenderAndCheckoutLayerFrame`
+- `AEGP_CheckinFrame`
+- `AEGP_GetReceiptWorld`
+- `AEGP_GetRenderedRegion`
+- rendered-frame sufficiency
+- timestamp/change tests
+- item sound render.
+
+### World Suite
+Families:
+- create/dispose world;
+- world type;
+- dimensions;
+- rowbytes;
+- base address 8/16/float;
+- convert effect world ↔ AEGP world where supported.
+
+### Composite Suite
+Families:
+- copy/blit;
+- transfer/composite;
+- matte operations;
+- transform/composite host helpers.
+
+### Sound Data Suite
+Families:
+- allocate/dispose/access sound data;
+- lock/unlock samples;
+- number of samples;
+- sound format.
+
+---
+
+## Render Queue
+
+### Render Queue Suite
+- `AEGP_AddCompToRenderQueue`
+- `AEGP_SetRenderQueueState`
+- `AEGP_GetRenderQueueState`.
+
+### RQ Item Suite
+High-value:
+- `AEGP_GetNumRQItems`
+- `AEGP_GetRQItemByIndex`
+- `AEGP_GetNextRQItem`
+- output module count;
+- render enable state;
+- started/elapsed time;
+- log type;
+- remove output module;
+- comment;
+- comp from RQ item;
+- `AEGP_DeleteRQItem`.
+
+### Render Queue Monitor Suite
+Callback/listener families:
+- register listener;
+- job started/ended;
+- item started/updated/ended;
+- frame events;
+- query job/item/frame/output-module properties;
+- thumbnails.
+
+### Output Module Suite
+High-value:
+- `AEGP_GetOutputModuleByIndex`
+- embedding options;
+- post-render action;
+- enabled video/audio;
+- output channels;
+- stretch;
+- crop;
+- sound format;
+- `AEGP_GetOutputFilePath`
+- `AEGP_SetOutputFilePath`
+- `AEGP_AddDefaultOutputModule`
+- extra output module info.
+
+---
+
+## Effect ↔ AEGP bridge / parallel work / import
+
+### PF Interface Suite
+For Effect plug-ins:
+- `AEGP_GetEffectLayer`
+- `AEGP_GetNewEffectForEffect`
+- effect-time → comp-time conversion
+- effect camera
+- camera matrix/context.
+
+### Iterate Suite
+Host-assisted parallel iteration for AEGP workloads. Use only callbacks that obey the suite's thread-safety contract; do not mutate project state from worker iterations.
+
+### File Import Manager Suite
+Registration/callback surface for file/project importers. This is not the same as simply importing ordinary footage via Footage Suite.
+
+---
+
+## AE 26.5 UI guide APIs
+
+### Guide Suite2
+Families:
+- enumerate/read guides;
+- add/update/delete;
+- orientation;
+- pixel/percentage position;
+- color;
+- edge pinning.
+
+### Item View Suite2
+- playback/current view time;
+- guides visible;
+- guides snap;
+- guides locked.
+
+---
+
+## Как этим пользоваться
+
+1. Найти operation здесь.
+2. Перейти в recipe в `17-NATIVE-SUITE-COOKBOOK/`.
+3. Для exact signature открыть 26.5 header.
+4. Для lifecycle посмотреть ближайший официальный Adobe sample.
+5. Добавить ownership + invalidation + undo.
+6. Только потом писать business logic.
+
+---
+
+## Полный список функций конкретного SDK
+
+Этот файл — human-oriented capability map, а не попытка вручную продублировать все headers. Для **полного exact inventory Suite → every function → signature** используйте `18-SDK-HEADER-TOOLS/tools/ae_sdk_inventory.py` на той версии Adobe SDK, которой реально собирается проект.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/README.md -->
+
+# Native Suite Cookbook
+
+**Edition:** v0.3  
+**Target snapshot:** After Effects 26.5 SDK, 2026-09-30
+
+Этот раздел — практический слой над AEGP/native API: **какую suite брать, какой handle получить, кто им владеет, что надо dispose-ить и в каком порядке вызывать функции**.
+
+## Карта
+
+| Задача | Основные suites | Recipe |
+|---|---|---|
+| проект / root folder / project items | Proj + Item | [01](17-NATIVE-SUITE-COOKBOOK/01-PROJECT-ITEMS.md) |
+| создать composition / solid / camera / light | Comp | [02](17-NATIVE-SUITE-COOKBOOK/02-COMPOSITIONS.md) |
+| найти / добавить / дублировать / удалить layer | Layer + Comp | [03](17-NATIVE-SUITE-COOKBOOK/03-LAYERS.md) |
+| найти / применить / удалить effect | Effect | [04](17-NATIVE-SUITE-COOKBOOK/04-EFFECTS.md) |
+| читать / писать properties и expressions | Stream + DynamicStream | [05](17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md) |
+| keyframes, interpolation, batch insert | Keyframe + Stream | [06](17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md) |
+| masks / mask path | Mask + MaskOutline + Stream | [07](17-NATIVE-SUITE-COOKBOOK/07-MASKS.md) |
+| text / markers | TextDocument + Marker + Stream | [08](17-NATIVE-SUITE-COOKBOOK/08-TEXT-MARKERS.md) |
+| import footage / interpretation | Footage | [09](17-NATIVE-SUITE-COOKBOOK/09-FOOTAGE-IMPORT.md) |
+| render frame → pixels | RenderOptions + Render + World | [10](17-NATIVE-SUITE-COOKBOOK/10-RENDER-FRAMES.md) |
+| render queue / output modules | RenderQueue + RQItem + OutputModule | [11](17-NATIVE-SUITE-COOKBOOK/11-RENDER-QUEUE.md) |
+| undo / memory / persistent data | Utility + Memory + PersistentData | [12](17-NATIVE-SUITE-COOKBOOK/12-MEMORY-UNDO-PERSISTENCE.md) |
+| guides / views / selection | Guide + ItemView + Collection | [13](17-NATIVE-SUITE-COOKBOOK/13-GUIDES-VIEWS-SELECTION.md) |
+| handles / invalidation / UI thread | cross-cutting | [14](17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md) |
+| copy/paste index | — | [15](17-NATIVE-SUITE-COOKBOOK/15-RECIPE-INDEX.md) |
+| suite → function map | all AEGP suites | [16](17-NATIVE-SUITE-COOKBOOK/16-SUITE-FUNCTION-MAP.md) |
+
+## Уровни доверия
+
+- **SDK-verified** — имя и shape вызова сверены с публичным AE SDK Guide / 26.5 notes.
+- **sample-derived** — порядок работы соответствует официальным sample-проектам Adobe.
+- **host-test-required** — архитектура корректная, но бинарная проверка требует установленного proprietary SDK + конкретного AE host.
+
+> В этой песочнице нет proprietary Adobe SDK headers и After Effects host, поэтому здесь **не заявляется бинарный host-test**. C++ куски специально оформлены как drop-in код для официального SDK sample, а не как «самодельный SDK».
+
+## Базовый pipeline AEGP
+
+```text
+AE loads .aex/.plugin
+    ↓
+EntryPointFunc()
+    ↓
+AEGP_PluginID + SPBasicSuite
+    ↓
+Acquire/use suite
+    ↓
+Get host-owned handle/ref
+    ↓
+Perform operation
+    ↓
+Dispose only what API says plug-in owns
+    ↓
+Return A_Err
+```
+
+## Главное правило
+
+Не хранить в долгоживущем состоянии `AEGP_StreamRefH`, `AEGP_EffectRefH`, RQ/output-module refs и подобные ссылки без явной гарантии API. Структурное изменение проекта часто делает их невалидными. Долговременно хранить лучше **stable IDs / match names / собственные данные**, а handles получать заново.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/VERIFICATION.md -->
+
+# Verification matrix
+
+| Area | Public SDK signature checked | Adobe sample pattern | Host executed here |
+|---|---:|---:|---:|
+| Project / Item | yes | Projector | no |
+| Composition / Layer | yes | Projector | no |
+| Effect / Stream | yes | Streamie-style | no |
+| Keyframes | yes | Easy Cheese-style | no |
+| Masks / Text / Markers | yes | SDK guide | no |
+| Frame checkout | yes | Grabba/render samples | no |
+| Render Queue | yes | QueueBert | no |
+| Guide / ItemView 26.5 | release-notes + guide | n/a/new | no |
+
+## Meaning
+
+`yes` in the first column means the public declaration/contract used by the recipe was checked. It does **not** mean the snippet was compiled against Adobe's proprietary 26.5 headers inside this sandbox.
+
+The final engineering verification step is:
+
+```text
+official 26.5 SDK headers
+→ build macOS
+→ build Windows x64
+→ build Windows ARM64 where targeted
+→ launch target AE
+→ exercise recipe
+→ record result in compatibility matrix
+```
+
+Until then, code is **compile-shaped and SDK-contract verified**, not falsely labelled as host-tested.
+
+
+---
+
+<!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/code/README.md -->
+
+# v0.3 drop-in C++ code
+
+Эти файлы предназначены для **graft в официальный AEGP sample project**, где уже есть:
+- Adobe headers;
+- `AEGP_SuiteHandler.h`;
+- `ERR` / `ERR2` convention;
+- PiPL/platform build steps.
+
+Они не пытаются переопределить proprietary SDK.
+
+## Files
+
+- `BibleAegpCommon.h` — no-throw undo guard.
+- `ProjectItemRecipes.cpp` — project/root/item traversal.
+- `CompLayerRecipes.cpp` — create comp, enumerate layers, stable LayerID.
+- `EffectStreamRecipes.cpp` — find/apply effect, read/write scalar stream.
+- `KeyframeRecipes.cpp` — batch keyframe transaction pattern.
+- `RenderRecipes.cpp` — checkout/get-world/checkin pattern.
+- `RenderQueueRecipes.cpp` — add comp, re-query queue, set output path, enable render.
+
+## Verification label
+
+**Compile-shaped / SDK-contract verified; host-test-required.**
+
+В песочнице нет Adobe SDK distribution и AE host, поэтому финальная гарантия — build + run в вашей реальной matrix macOS/Windows.
+
+
+---
+
+<!-- SOURCE: 18-SDK-HEADER-TOOLS/01-NATIVE-CONTRACT-FAMILIES.md -->
+
+# Native contract families — кто кого вызывает
+
+## 1. Effect plug-in
+
+**Модель:** AE → ваш entry point → `PF_Cmd_*` selector.
+
+Ваш effect не «крутит AE сам». Host вызывает effect в нужные моменты: global setup, params setup, sequence lifecycle, render/SmartFX, UI events, audio и т.д. Для дополнительных host-сервисов effect получает/приобретает PF/PICA suites.
+
+## 2. AEGP
+
+**Модель:** AE → registered hooks вашего AEGP; AEGP → AE через `AEGP_*SuiteN`.
+
+AEGP подходит для project graph, items, comps, layers, streams, effects, keyframes, render queue, native commands/hooks и другой глубокой автоматизации.
+
+## 3. AEIO
+
+**Модель:** AEGP register → AE хранит ваш `AEIO_FunctionBlockN` → AE вызывает callbacks для import/output lifecycle.
+
+Это callback table, а не обычная «suite, которую дергает бизнес-логика».
+
+## 4. Artisan
+
+**Модель:** AEGP register → AE вызывает `PR_ArtisanEntryPoints` для host-controlled 3D rendering pipeline.
+
+Не использовать как универсальный render replacement для обычных 2D comps.
+
+## 5. PICA/SweetPea
+
+**Модель:** `SPBasicSuite::AcquireSuite(name, version, &ptr)` → вызовы function table → `ReleaseSuite`.
+
+Это транспорт большинства native service contracts. Suite pointer нельзя считать вечным глобальным объектом вне host lifetime.
+
+## 6. Drawbot
+
+Effect/host UI получает Drawbot suites и рисует через supplier/surface/path/font contracts. Это host-integrated custom UI, а не произвольный Cocoa/Win32 canvas.
+
+## 7. Script / panel
+
+ExtendScript и CEP/UXP находятся **выше** native ABI. Они общаются с scripting object model, а не напрямую с `AEGP_LayerSuite9*`.
+
+Если hybrid продукту нужен bridge в native core, контракт bridge должен быть явным: command/protocol + version + validation + threading boundary. См. `15-COMMUNICATION/`.
+
+
+---
+
+<!-- SOURCE: 18-SDK-HEADER-TOOLS/02-INVENTORY-WORKFLOW.md -->
+
+# Workflow: от SDK headers до рабочего recipe
+
+1. Установить/распаковать целевой AE SDK.
+2. Запустить `ae_sdk_inventory.py` на Include/Headers.
+3. Зафиксировать JSON inventory рядом с build artifacts конкретной версии SDK.
+4. Запустить `verify_recipe_symbols.py` на C++ recipes.
+5. Если обновился SDK — построить новый JSON и прогнать `diff_sdk_inventory.py`.
+6. Любой changed signature вручную проверить в header и ближайшем Adobe sample.
+7. Только после этого обновлять compatibility matrix и минимальную AE version.
+
+## Почему это важнее статического справочника
+
+Suite API versioned. Даже если имя функции не меняется, меняется generation таблицы, availability host version и иногда соседние types/macros. Статический Markdown неизбежно стареет; header-derived inventory привязан к реальной сборке.
+
+## CI gate
+
+Минимальный native CI gate:
+
+```text
+inventory generation
+  ↓
+recipe symbol verification
+  ↓
+compile Debug
+  ↓
+compile Release
+  ↓
+unit tests pure C++
+  ↓
+package/sign
+  ↓
+host smoke test (отдельный runner/машина с AE)
+```
+
+Host smoke test нельзя заменить компиляцией: PiPL, loader, missing suites, signing, MFR и GPU ошибки проявляются уже внутри AE.
+
+
+---
+
+<!-- SOURCE: 18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md -->
+
+# SDK diff policy
+
+При переходе на новый SDK не начинать с «починим compiler errors». Сначала сравнить native contracts.
+
+## Классификация diff
+
+- **Added table/function** — можно использовать только после поднятия minimum host requirement или runtime feature gate.
+- **Removed table/function** — blocker; нужен compatibility path.
+- **Changed signature** — high risk; проверить ownership, constness, enum/type width и lifecycle.
+- **Only version macro changed** — проверить release notes и host availability.
+- **No header diff** — всё равно прогнать host regression: поведение AE может измениться без ABI change.
+
+## Release rule
+
+Новая SDK версия не считается принятой в проект, пока не обновлены:
+
+- generated inventory;
+- SDK diff artifact;
+- build matrix;
+- host smoke results;
+- compatibility statement.
+
+
+---
+
+<!-- SOURCE: 18-SDK-HEADER-TOOLS/04-HEADER-FIRST-RULES.md -->
+
+# Header-first rules
+
+1. Exact function name/signature → **build SDK header**.
+2. Ownership/lifecycle → header comments + official sample + guide.
+3. Host availability → suite/version macro + release notes + runtime acquisition test.
+4. Public HTML guide полезен для контекста, но найденные расхождения фиксируются в `14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md`.
+5. Никогда не «исправлять» вызов так, чтобы он совпал с HTML, если compiler/header говорит обратное.
+6. Никогда не кастовать неподходящую suite generation только ради компиляции.
+7. Если `AcquireSuite` не дал нужную version — graceful fallback или понятная ошибка, но не dereference `nullptr`.
+
+
+---
+
+<!-- SOURCE: 18-SDK-HEADER-TOOLS/README.md -->
+
+# SDK Header Tools — полный native API без ручного копирования
+
+Это слой, который делает библию **самопроверяемой относительно конкретного Adobe After Effects SDK**.
+
+Главное правило: HTML guide удобен для объяснений, но **точный контракт сборки задают headers той версии SDK, с которой собирается plug-in**. Поэтому здесь нет вручную переписанного «вечного» списка сотен функций. Вместо этого есть генератор, который читает локальные headers и строит точный inventory.
+
+## Что генерируется
+
+`tools/ae_sdk_inventory.py` находит C ABI function tables:
+
+- `AEGP_*SuiteN` — AEGP host-control API;
+- `PF_*SuiteN` — Effect plug-in suites;
+- `DRAWBOT_*SuiteN` — native custom UI/Drawbot;
+- `AEIO_*FunctionBlockN` — callbacks import/export plug-ins;
+- `PR_*EntryPoints` — Artisan/native renderer callbacks;
+- другие SDK function tables с типичными именами `Suite`, `FunctionBlock`, `EntryPoints`, `Callbacks`.
+
+Для каждой таблицы сохраняются:
+
+- имя/семейство;
+- header-источник и SHA-256;
+- все function-pointer names;
+- normalized header signatures;
+- найденные рядом suite/version macros;
+- parser diagnostics для подозрительных таблиц, которые не удалось разобрать.
+
+## Запуск
+
+macOS:
+
+```bash
+python3 tools/ae_sdk_inventory.py \
+  "/path/to/After Effects SDK/Examples/Headers" \
+  --json generated/ae-sdk-inventory.json \
+  --markdown generated/ae-sdk-inventory.md
+```
+
+Windows PowerShell:
+
+```powershell
+py tools\ae_sdk_inventory.py `
+  "C:\path\to\After Effects SDK\Examples\Headers" `
+  --json generated\ae-sdk-inventory.json `
+  --markdown generated\ae-sdk-inventory.md
+```
+
+## Проверка наших recipes против SDK
+
+После генерации inventory:
+
+```bash
+python3 tools/verify_recipe_symbols.py \
+  generated/ae-sdk-inventory.json \
+  ../17-NATIVE-SUITE-COOKBOOK/code
+```
+
+Скрипт проверяет реальные suite call-sites вида `suite->AEGP_Foo(...)` / `suite->PF_Foo(...)` и выдаёт `UNKNOWN`, если такого function pointer нет в локальных headers.
+
+## Сравнение двух SDK
+
+Сгенерировать JSON для старого и нового SDK, затем:
+
+```bash
+python3 tools/diff_sdk_inventory.py old.json new.json --markdown sdk-diff.md
+```
+
+Получим added/removed tables, added/removed functions и changed signatures.
+
+## Что уже протестировано здесь
+
+В `tests/fixture_header.h` лежит маленький **синтетический** SDK header. Он не содержит Adobe SDK code, но повторяет ABI-форму function tables. Unit test проверяет named suite, anonymous suite и AEIO-style function block.
+
+```bash
+python3 tests/test_inventory.py
+```
+
+## Что нельзя честно заявить в песочнице
+
+Здесь нет лицензированного актуального Adobe SDK и самого After Effects, поэтому я не называю generated inventory «проверенным на AE host». На машине разработчика критерий готовности такой:
+
+1. inventory успешно строится из фактических headers;
+2. `verify_recipe_symbols.py` не показывает неизвестных calls;
+3. код компилируется внутри ближайшего официального Adobe sample;
+4. binary загружается в целевой AE;
+5. smoke tests проходят на заявленных macOS/Windows + architecture + AE versions.
+
+
+---
+
+<!-- SOURCE: 19-NATIVE-CODE-FOUNDATION/01-SUITE-ACQUISITION.md -->
+
+# Suite acquisition
+
+PICA suite имеет reference-counted acquire/release contract.
+
+Правильный шаблон:
+
+```text
+SPBasicSuite alive
+  → AcquireSuite(name, version)
+  → validate err + pointer
+  → use suite
+  → ReleaseSuite(name, version)
+```
+
+Не хранить suite pointer после release. Не предполагать, что newest version есть в старом AE. Версия suite — часть compatibility contract.
+
+`code/PicaSuiteRef.h` автоматизирует баланс пары acquire/release, но его lifetime всё равно обязан находиться внутри host lifetime.
+
+
+---
+
+<!-- SOURCE: 19-NATIVE-CODE-FOUNDATION/02-RAII-OWNERSHIP.md -->
+
+# AEGP ownership / RAII
+
+Главная причина утечек в AEGP — не C++ heap, а host-owned handles/refs с отдельными dispose/checkin вызовами.
+
+## Типичные пары
+
+- `GetNew...Stream` → `AEGP_DisposeStream`;
+- effect ref, который API требует dispose → `AEGP_DisposeEffect`;
+- `RenderAndCheckoutFrame` receipt → `AEGP_CheckinFrame`;
+- `AEGP_MemHandle` → `AEGP_FreeMemHandle`.
+
+`code/AegpOwners.h` содержит move-only owners для этих четырёх случаев. Это уменьшает количество early-return leaks.
+
+Не оборачивать borrowed handle в owner. Перед созданием owner всегда проверить ownership contract конкретной функции.
+
+
+---
+
+<!-- SOURCE: 19-NATIVE-CODE-FOUNDATION/03-UNDO-TRANSACTIONS.md -->
+
+# Undo transaction
+
+Любая пользовательская операция, меняющая project state несколькими вызовами, должна выглядеть как одна понятная undo operation, если host API для этих изменений undoable.
+
+`UndoScope`:
+
+- открывает undo group;
+- закрывает только если start прошёл успешно;
+- не бросает exceptions;
+- не скрывает ошибку business operation.
+
+Не растягивать undo scope на background/render работу и не держать его открытым через event loop.
+
+
+---
+
+<!-- SOURCE: 19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md -->
+
+# Host callback ABI boundary
+
+C++ exception не должен пересечь C callback/entry point, который вызвал After Effects.
+
+Граница:
+
+```text
+AE C ABI → noexcept wrapper → C++ implementation
+```
+
+Внутри можно использовать обычный C++, но верхний wrapper обязан поймать exception и вернуть валидный `A_Err`, выбранный проектом. `HostCallbackGuard.h` специально принимает fallback error извне и не придумывает SDK constant.
+
+
+---
+
+<!-- SOURCE: 19-NATIVE-CODE-FOUNDATION/README.md -->
+
+# Native C++ foundation — повторно используемые безопасные куски
+
+Эта папка — не ещё один sample plug-in, а маленький слой для типовых ошибок native AE разработки: suite ownership, handle cleanup, undo и exception boundary.
+
+**Как использовать правильно:** graft этих файлов в ближайший официальный Adobe sample и заменить suite generations на те, которые реально есть в вашем target SDK.
+
+## Файлы
+
+- `code/PicaSuiteRef.h` — acquire/release одной PICA suite через `SPBasicSuite`.
+- `code/AegpOwners.h` — move-only owners для часто возвращаемых AEGP resources.
+- `code/UndoScope.h` — balanced `StartUndoGroup/EndUndoGroup` без исключений.
+- `code/HostCallbackGuard.h` — не выпускает C++ exception через host callback ABI.
+
+## Важное ограничение
+
+RAII работает только пока соответствующая host suite жива. Не оставлять объект, который в static destructor попытается вызвать AE после shutdown. Освобождение long-lived state выполнять из normal lifecycle/death hook **до** teardown host API.
+
+
+---
+
+<!-- SOURCE: NAVIGATION.md -->
+
+# Navigation
+
+## 00-START-HERE
+- [Decision tree — что именно вы разрабатываете?](00-START-HERE/00-DECISION-TREE.md)
+- [Extension types](00-START-HERE/01-EXTENSION-TYPES.md)
+- [Environment matrix](00-START-HERE/02-ENVIRONMENT-MATRIX.md)
+
+## 01-ARCHITECTURE
+- [Native plug-in lifecycle](01-ARCHITECTURE/01-LIFECYCLE.md)
+- [Memory, threading, errors](01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md)
+- [PiPL and plug-in loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md)
+- [Version compatibility](01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md)
+- [Performance architecture](01-ARCHITECTURE/05-PERFORMANCE-ARCHITECTURE.md)
+- [Build system strategy](01-ARCHITECTURE/06-BUILD-SYSTEM.md)
+- [Communication architecture — one-page rulebook](01-ARCHITECTURE/07-COMMUNICATION-ARCHITECTURE.md)
+
+## 02-EFFECT-PLUGINS
+- [Anatomy of an Effect plug-in](02-EFFECT-PLUGINS/01-ANATOMY.md)
+- [Parameters and Effect UI](02-EFFECT-PLUGINS/02-PARAMETERS-UI.md)
+- [SmartFX](02-EFFECT-PLUGINS/03-SMARTFX.md)
+- [Multi-Frame Rendering (MFR) and thread safety](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md)
+- [GPU effects](02-EFFECT-PLUGINS/05-GPU.md)
+- [Pixels, color, alpha](02-EFFECT-PLUGINS/06-COLOR-PIXELS.md)
+- [Audio effects](02-EFFECT-PLUGINS/07-AUDIO.md)
+- [Effect plug-ins](02-EFFECT-PLUGINS/README.md)
+
+## 03-AEGP
+- [AEGP hooks and suites](03-AEGP/01-HOOKS-SUITES.md)
+- [AEGP project and render automation](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md)
+- [AEGP](03-AEGP/README.md)
+
+## 04-AEIO
+- [AEIO — media import/export plug-ins](04-AEIO/README.md)
+
+## 05-ARTISAN
+- [Artisan](05-ARTISAN/README.md)
+
+## 06-SCRIPTING
+- [After Effects scripting object model](06-SCRIPTING/01-OBJECT-MODEL.md)
+- [ScriptUI](06-SCRIPTING/02-SCRIPTUI.md)
+- [Expressions vs scripts](06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md)
+- [ExtendScript scripting](06-SCRIPTING/README.md)
+
+## 07-PANELS
+- [CEP development](07-PANELS/01-CEP.md)
+- [UXP transition for After Effects](07-PANELS/02-UXP-TRANSITION.md)
+- [Panels: CEP now, UXP next](07-PANELS/README.md)
+
+## 08-MACOS
+- [macOS — Xcode setup](08-MACOS/01-XCODE-SETUP.md)
+- [macOS — Apple Silicon / Universal binary](08-MACOS/02-UNIVERSAL-BINARY.md)
+- [macOS — debugging After Effects plug-ins](08-MACOS/03-DEBUGGING.md)
+- [macOS — GPU development](08-MACOS/04-GPU.md)
+- [macOS — signing and notarization](08-MACOS/05-SIGNING-NOTARIZATION.md)
+- [macOS — installation and packaging](08-MACOS/06-INSTALLATION-PACKAGING.md)
+- [macOS — CI pipeline](08-MACOS/07-CI.md)
+- [macOS — native SDK validation](08-MACOS/08-NATIVE-SDK-VALIDATION.md)
+- [macOS developer bible](08-MACOS/README.md)
+
+## 09-WINDOWS
+- [Windows — Visual Studio setup](09-WINDOWS/01-VISUAL-STUDIO-SETUP.md)
+- [Windows — x64 and ARM64](09-WINDOWS/02-X64-ARM64.md)
+- [Windows — debugging](09-WINDOWS/03-DEBUGGING.md)
+- [Windows — GPU](09-WINDOWS/04-GPU.md)
+- [Windows — code signing](09-WINDOWS/05-CODE-SIGNING.md)
+- [Windows — installation and packaging](09-WINDOWS/06-INSTALLATION-PACKAGING.md)
+- [Windows — CI pipeline](09-WINDOWS/07-CI.md)
+- [Windows — native SDK validation](09-WINDOWS/08-NATIVE-SDK-VALIDATION.md)
+- [Windows developer bible](09-WINDOWS/README.md)
+
+## 10-TESTING
+- [Test matrix](10-TESTING/01-TEST-MATRIX.md)
+- [Render correctness](10-TESTING/02-RENDER-CORRECTNESS.md)
+- [MFR stress tests](10-TESTING/03-MFR-STRESS.md)
+- [Performance testing](10-TESTING/04-PERFORMANCE.md)
+- [Crash diagnostics](10-TESTING/05-CRASH-DIAGNOSTICS.md)
+- [Testing strategy](10-TESTING/README.md)
+
+## 11-DISTRIBUTION
+- [Versioning and compatibility](11-DISTRIBUTION/01-VERSIONING-COMPATIBILITY.md)
+- [Security and licensing architecture](11-DISTRIBUTION/02-SECURITY-LICENSING.md)
+- [Release checklist](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
+- [Install locations cheat sheet](11-DISTRIBUTION/04-INSTALL-LOCATIONS.md)
+
+## 12-RECIPES
+- [Recipe — first native effect](12-RECIPES/01-FIRST-EFFECT.md)
+- [Recipe — migrate an existing effect to MFR](12-RECIPES/02-MFR-MIGRATION.md)
+- [Recipe — plug-in does not load](12-RECIPES/03-DEBUG-PLUGIN-NOT-LOADING.md)
+- [Recipe — CPU/GPU equivalence](12-RECIPES/04-CPU-GPU-EQUIVALENCE.md)
+- [Recipe — panel + native core](12-RECIPES/05-HYBRID-PANEL-NATIVE.md)
+- [Recipe — profiling a slow effect](12-RECIPES/06-PROFILING.md)
+
+## 13-TEMPLATES
+- [Bug report template](13-TEMPLATES/BUG-REPORT.md)
+- [Compatibility matrix template](13-TEMPLATES/COMPATIBILITY-MATRIX.md)
+- [Performance report template](13-TEMPLATES/PERFORMANCE-REPORT.md)
+- [Plug-in specification template](13-TEMPLATES/PLUGIN-SPEC.md)
+- [Release notes template](13-TEMPLATES/RELEASE-NOTES.md)
+
+## 14-NATIVE-INTEGRATIONS
+- [Native SDK taxonomy](14-NATIVE-INTEGRATIONS/01-TAXONOMY.md)
+- [Host call flows](14-NATIVE-INTEGRATIONS/02-HOST-CALL-FLOWS.md)
+- [PICA suites — внутренний native service bus After Effects](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md)
+- [Effect plug-ins — полный native map](14-NATIVE-INTEGRATIONS/04-EFFECTS.md)
+- [AEGP tools — native automation and deep AE integration](14-NATIVE-INTEGRATIONS/05-AEGP-TOOLS.md)
+- [Keyframers](14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md)
+- [Native dockable panels](14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md)
+- [AEIO — native input/output modules](14-NATIVE-INTEGRATIONS/08-AEIO.md)
+- [Artisan — custom 3D renderer](14-NATIVE-INTEGRATIONS/09-ARTISAN.md)
+- [BlitHook](14-NATIVE-INTEGRATIONS/10-BLITHOOK.md)
+- [Legacy / deprecated native integration](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md)
+- [AEGP suites catalog — After Effects 26.5 snapshot](14-NATIVE-INTEGRATIONS/12-AEGP-SUITES-CATALOG.md)
+- [Public SDK docs errata / verification notes](14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md)
+- [Native integrations — карта всего нативного SDK After Effects](14-NATIVE-INTEGRATIONS/README.md)
+
+## 15-COMMUNICATION
+- [After Effects -> Effect](15-COMMUNICATION/01-AE-TO-EFFECT.md)
+- [After Effects -> AEGP](15-COMMUNICATION/02-AE-TO-AEGP.md)
+- [AEGP -> Effect](15-COMMUNICATION/03-AEGP-TO-EFFECT.md)
+- [Plug-in -> Plug-in через published PICA suite](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md)
+- [ExtendScript -> After Effects](15-COMMUNICATION/05-SCRIPT-TO-AE.md)
+- [CEP panel <-> ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md)
+- [Native <-> script/panel: как собирать гибридный продукт](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md)
+- [Threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
+- [Data ownership and lifetime](15-COMMUNICATION/09-DATA-OWNERSHIP.md)
+- [Как компоненты общаются друг с другом и с After Effects](15-COMMUNICATION/README.md)
+
+## 16-WORKING-TEMPLATES
+- [Working templates](16-WORKING-TEMPLATES/README.md)
+- [AEGP menu command template](16-WORKING-TEMPLATES/aegp-menu-command/README.md)
+- [AEIO registration skeleton](16-WORKING-TEMPLATES/aeio-registration/README.md)
+- [Artisan registration skeleton](16-WORKING-TEMPLATES/artisan-registration/README.md)
+- [CEP -> ExtendScript JSON bridge](16-WORKING-TEMPLATES/cep-panel-bridge/README.md)
+- [Effect <-> AEGP generic bridge](16-WORKING-TEMPLATES/effect-aegp-generic-bridge/README.md)
+- [Minimal Gain effect — drop-in for SDK Skeleton](16-WORKING-TEMPLATES/effect-basic/README.md)
+- [Standalone JSX tool](16-WORKING-TEMPLATES/jsx-tool/README.md)
+- [Keyframer batch pattern](16-WORKING-TEMPLATES/keyframer-batch/README.md)
+- [Native dockable panel registration — Panelator-shaped template](16-WORKING-TEMPLATES/native-panel-registration/README.md)
+- [Published PICA suite contract](16-WORKING-TEMPLATES/pica-shared-suite/README.md)
+
+## 17-NATIVE-SUITE-COOKBOOK
+- [Как пользоваться cookbook](17-NATIVE-SUITE-COOKBOOK/00-HOW-TO-USE.md)
+- [Project + Item recipes](17-NATIVE-SUITE-COOKBOOK/01-PROJECT-ITEMS.md)
+- [Composition recipes](17-NATIVE-SUITE-COOKBOOK/02-COMPOSITIONS.md)
+- [Layer recipes](17-NATIVE-SUITE-COOKBOOK/03-LAYERS.md)
+- [Effect recipes](17-NATIVE-SUITE-COOKBOOK/04-EFFECTS.md)
+- [Streams / properties / expressions](17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md)
+- [Keyframe recipes](17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md)
+- [Mask recipes](17-NATIVE-SUITE-COOKBOOK/07-MASKS.md)
+- [Text + marker recipes](17-NATIVE-SUITE-COOKBOOK/08-TEXT-MARKERS.md)
+- [Footage / import recipes](17-NATIVE-SUITE-COOKBOOK/09-FOOTAGE-IMPORT.md)
+- [Render frame → pixels](17-NATIVE-SUITE-COOKBOOK/10-RENDER-FRAMES.md)
+- [Render Queue recipes](17-NATIVE-SUITE-COOKBOOK/11-RENDER-QUEUE.md)
+- [Memory / Undo / Persistent Data](17-NATIVE-SUITE-COOKBOOK/12-MEMORY-UNDO-PERSISTENCE.md)
+- [Guides / Item Views / Selection](17-NATIVE-SUITE-COOKBOOK/13-GUIDES-VIEWS-SELECTION.md)
+- [Lifetime + threading rules](17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md)
+- [Native recipe index](17-NATIVE-SUITE-COOKBOOK/15-RECIPE-INDEX.md)
+- [AEGP Suite function map — native capability index](17-NATIVE-SUITE-COOKBOOK/16-SUITE-FUNCTION-MAP.md)
+- [Native Suite Cookbook](17-NATIVE-SUITE-COOKBOOK/README.md)
+- [Verification matrix](17-NATIVE-SUITE-COOKBOOK/VERIFICATION.md)
+- [v0.3 drop-in C++ code](17-NATIVE-SUITE-COOKBOOK/code/README.md)
+
+## 18-SDK-HEADER-TOOLS
+- [Native contract families — кто кого вызывает](18-SDK-HEADER-TOOLS/01-NATIVE-CONTRACT-FAMILIES.md)
+- [Workflow: от SDK headers до рабочего recipe](18-SDK-HEADER-TOOLS/02-INVENTORY-WORKFLOW.md)
+- [SDK diff policy](18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md)
+- [Header-first rules](18-SDK-HEADER-TOOLS/04-HEADER-FIRST-RULES.md)
+- [SDK Header Tools — полный native API без ручного копирования](18-SDK-HEADER-TOOLS/README.md)
+
+## 19-NATIVE-CODE-FOUNDATION
+- [Suite acquisition](19-NATIVE-CODE-FOUNDATION/01-SUITE-ACQUISITION.md)
+- [AEGP ownership / RAII](19-NATIVE-CODE-FOUNDATION/02-RAII-OWNERSHIP.md)
+- [Undo transaction](19-NATIVE-CODE-FOUNDATION/03-UNDO-TRANSACTIONS.md)
+- [Host callback ABI boundary](19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md)
+- [Native C++ foundation — повторно используемые безопасные куски](19-NATIVE-CODE-FOUNDATION/README.md)
+
+
+---
+
+<!-- SOURCE: GLOSSARY.md -->
+
+# Glossary
+
+- **Effect plug-in** — native C/C++ effect loaded by AE; receives command selectors and renders image/audio output.
+- **AEGP** — After Effects General Plug-in; broad host integration using PICA suites and registered hooks.
+- **AEIO** — import/export plug-in implemented as an AEGP specialization.
+- **Artisan** — custom renderer for AE 3D layer environment; advanced and rarely appropriate.
+- **PICA suite** — versioned group of host callbacks/functions acquired from After Effects.
+- **PiPL** — Plug-In Property List; resource metadata used by Adobe hosts when discovering/loading native plug-ins.
+- **SmartFX** — effect rendering model that supports smarter region requests and 32-bpc workflows.
+- **MFR** — Multi-Frame Rendering; AE can render multiple frames concurrently.
+- **Compute Cache** — SDK mechanism for caching expensive computations safely across renders.
+- **PF_EffectWorld** — pixel buffer descriptor used by effects.
+- **sequence_data** — per-effect-instance state, with strict lifecycle/threading rules.
+- **global_data** — plug-in-global state managed through global setup/setdown.
+- **Drawbot** — Adobe drawing abstraction used for custom effect UI.
+- **ExtendScript** — Adobe's legacy JavaScript dialect/runtime used for AE scripting.
+- **ScriptUI** — UI toolkit available to ExtendScript scripts.
+- **CEP** — Chromium/HTML/JS-based Creative Cloud extensibility platform; legacy and on a retirement path.
+- **UXP** — Adobe's newer extensibility platform replacing CEP over time.
+- **Universal binary** — macOS binary containing Intel x86_64 and Apple Silicon arm64 slices.
+- **MFR-safe** — implementation proven safe under concurrent frame rendering, not merely one that compiles with the flag enabled.
+
+
+---
+
+<!-- SOURCE: KNOWN-PITFALLS.md -->
+
+# Known pitfalls
+
+## Native C++
+
+- Creating a project from scratch and forgetting the PiPL build step.
+- PiPL flags disagree with flags returned during `PF_Cmd_GLOBAL_SETUP`.
+- Exception leaks through an `extern "C"` boundary; especially dangerous on Apple Silicon.
+- Static/global mutable state makes an effect unsafe under MFR.
+- Writing `sequence_data` during render without using the correct MFR-safe mechanism.
+- Holding a mutex while calling host suites/checkouts — deadlock risk.
+- Caching pointers/handles longer than their documented lifetime.
+- Assuming rowbytes equals width × pixel size.
+- Assuming 8-bpc only and then corrupting 16/32-bpc output.
+- Assuming a GPU path exists just because a GPU is present.
+- CPU and GPU paths diverge numerically or in edge behavior.
+- Using a suite version without checking/acquiring it correctly.
+
+## macOS
+
+- Shipping Intel-only binary.
+- Forgetting `CodeMacARM64` in PiPL.
+- Unsigned plug-in no longer loads on macOS 15+ development setups.
+- Modifying a bundle after signing.
+- Notarizing with obsolete `altool` instead of `notarytool`.
+- Attempting debugger attach to current non-Beta AE without accounting for AE 26.5+ signing restrictions.
+
+## Windows
+
+- Hardcoding MediaCore path instead of reading installer registry path when appropriate.
+- Missing PiPL resource generation in Visual Studio custom build step.
+- Forgetting `CodeWinARM64` for ARM64 build.
+- Signing without explicit SHA-256 digest/timestamp parameters.
+- Shipping CUDA runtime dependency that doesn't match your loading strategy.
+- Forgetting DirectX assets generated next to the effect binary.
+
+## CEP / panels
+
+- Putting core product logic directly inside panel UI code.
+- Depending on Node/CEF behavior that will not port cleanly to UXP.
+- Forgetting to bump/debug the correct `CSXS.<version>` setting.
+- Treating CEP's future as indefinite despite Adobe's published migration timeline.
+
+## Release
+
+- Testing only the newest AE version.
+- Testing only one CPU architecture.
+- Testing only GPU-enabled path.
+- No project with extreme parameter/keyframe values.
+- No MFR on/off comparison.
+- No clean-machine install test.
+- No uninstall/upgrade test.
+
+
+---
+
+<!-- SOURCE: SOURCES.md -->
+
+# Sources registry
+
+Research snapshot: 2026-09-30.
+
+## Tier A — Adobe / platform vendor
+
+- Adobe After Effects Developer Portal  
+  https://developer.adobe.com/after-effects/
+- Adobe Developer Blog — UXP / CEP migration announcement, 2026-09-24  
+  https://blog.developer.adobe.com/en/publish/2026/09/investing-in-the-future-of-creative-cloud-extensibility-uxp-comes-to-our-flagship-applications
+- Adobe CEP Resources  
+  https://github.com/Adobe-CEP/CEP-Resources
+- Adobe CEP Samples  
+  https://github.com/Adobe-CEP/Samples
+- Apple — Creating distribution-signed code for macOS  
+  https://developer.apple.com/documentation/xcode/creating-distribution-signed-code-for-the-mac/
+- Apple — Notarizing macOS software  
+  https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution
+- Apple — Customizing notarization workflow  
+  https://developer.apple.com/documentation/security/customizing-the-notarization-workflow
+- Microsoft — SignTool  
+  https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool
+- Microsoft — Windows on Arm development  
+  https://learn.microsoft.com/en-us/windows/arm/
+
+## Tier B — Adobe SDK material maintained at Docs for Adobe
+
+- After Effects C++ SDK Guide  
+  https://ae-plugins.docsforadobe.dev/
+- After Effects Scripting Guide  
+  https://ae-scripting.docsforadobe.dev/
+- Source repository for C++ guide  
+  https://github.com/docsforadobe/after-effects-plugin-guide
+
+Important: Docs for Adobe is community-maintained. For shipping decisions, validate version-sensitive facts against the actual SDK headers/samples and Adobe release notes you build against.
+
+## Tier C — useful existing knowledge base
+
+- pushREC / after-effects-sdk-kb  
+  https://github.com/pushREC/after-effects-sdk-kb
+
+Used as a map of coverage/gaps, not as the canonical API contract.
+
+## High-value pages
+
+- Start creating plug-ins  
+  https://ae-plugins.docsforadobe.dev/intro/how-to-start-creating-plug-ins/
+- Sample projects  
+  https://ae-plugins.docsforadobe.dev/intro/sample-projects/
+- PiPL resources  
+  https://ae-plugins.docsforadobe.dev/intro/pipl-resources/
+- Compatibility across AE versions  
+  https://ae-plugins.docsforadobe.dev/intro/compatibility-across-multiple-versions/
+- Apple Silicon support  
+  https://ae-plugins.docsforadobe.dev/intro/apple-silicon-support/
+- Windows on Arm support  
+  https://ae-plugins.docsforadobe.dev/intro/windows-on-arm-support/
+- Debugging plug-ins  
+  https://ae-plugins.docsforadobe.dev/intro/debugging-plug-ins/
+- macOS debugger attach  
+  https://ae-plugins.docsforadobe.dev/intro/debugging-ae-macos/
+- GPU build instructions  
+  https://ae-plugins.docsforadobe.dev/intro/gpu-build-instructions/
+- MFR  
+  https://ae-plugins.docsforadobe.dev/effect-details/multi-frame-rendering-in-ae/
+- SmartFX  
+  https://ae-plugins.docsforadobe.dev/smartfx/smartfx/
+- Custom UI / Drawbot  
+  https://ae-plugins.docsforadobe.dev/effect-ui-events/custom-ui-and-drawbot/
+- AEGP overview  
+  https://ae-plugins.docsforadobe.dev/aegps/overview/
+- AEIO  
+  https://ae-plugins.docsforadobe.dev/aeios/aeios/
+- Artisan  
+  https://ae-plugins.docsforadobe.dev/artisans/artisans/
+- Where installers put plug-ins  
+  https://ae-plugins.docsforadobe.dev/intro/where-installers-should-put-plug-ins/
+- ExtendScript object model  
+  https://ae-scripting.docsforadobe.dev/introduction/objectmodel/
+
+## Source quality rule
+
+When sources disagree:
+
+1. Actual SDK headers/sample shipped with the target SDK win for compile-time/API facts.
+2. Current Adobe platform/security documentation wins for signing/notarization/distribution.
+3. Adobe developer announcements win for migration timelines.
+4. Docs for Adobe is the practical explanatory guide.
+5. Third-party articles are hints only until reproduced or verified.
+
+## v0.2 native architecture sources
+
+- Native integration map / What Can I Do
+  https://ae-plugins.docsforadobe.dev/intro/what-can-i-do/
+- Effect entry point
+  https://ae-plugins.docsforadobe.dev/effect-basics/entry-point/
+- Effect command selectors
+  https://ae-plugins.docsforadobe.dev/effect-basics/command-selectors/
+- AEGP implementation and entry point
+  https://ae-plugins.docsforadobe.dev/aegps/implementation/
+- AEGP suites / command hooks / generic effect calls
+  https://ae-plugins.docsforadobe.dev/aegps/aegp-suites/
+- Effect use of AEGP suites and dependency caveats
+  https://ae-plugins.docsforadobe.dev/aegps/cheating-effect-usage-of-aegp-suites/
+- AEIO calling sequence
+  https://ae-plugins.docsforadobe.dev/aeios/calling-sequence/
+- Artisan registration/data types
+  https://ae-plugins.docsforadobe.dev/artisans/artisan-data-types/
+- CEP official samples / AfterEffectsPanel
+  https://github.com/Adobe-CEP/Samples
+- CEP official resources/cookbook
+  https://github.com/Adobe-CEP/CEP-Resources
+- SDK 26.5 history (updated September 2026)
+  https://ae-plugins.docsforadobe.dev/history/
+
+
+## v0.3 native cookbook sources
+
+- AEGP Suites — complete public function reference  
+  https://ae-plugins.docsforadobe.dev/aegps/aegp-suites/
+- AEGP data types / handle model  
+  https://ae-plugins.docsforadobe.dev/aegps/data-types/
+- AEGP details / invalidation / begin-end patterns  
+  https://ae-plugins.docsforadobe.dev/aegps/aegp-details/
+- Effect use of AEGP suites / cache dependency warning  
+  https://ae-plugins.docsforadobe.dev/aegps/cheating-effect-usage-of-aegp-suites/
+- Official sample project index (`Projector`, `Streamie`, `QueueBert`, `Easy Cheese`, `Sweetie`, etc.)  
+  https://ae-plugins.docsforadobe.dev/intro/sample-projects/
+- How to start / graft from official samples  
+  https://ae-plugins.docsforadobe.dev/intro/how-to-start-creating-plug-ins/
+- SDK 26.5 version history  
+  https://ae-plugins.docsforadobe.dev/history/
+
+### Secondary signature sanity checks
+
+Used only where the rendered HTML guide appears inconsistent; actual Adobe SDK headers still win:
+
+- Header-derived Rust bindings (`after_effects_sys`)  
+  https://docs.rs/after-effects-sys/
+- Adobe Community SDK discussions for known signature/documentation mismatches  
+  https://community.adobe.com/
+
+
+## v0.4 contract-verification sources
+
+- AEGP Suites / PICA-style function tables  
+  https://ae-plugins.docsforadobe.dev/aegps/aegp-suites/
+- SDK version history / suite generation changes  
+  https://ae-plugins.docsforadobe.dev/history/
+- Public Adobe SDK sample index / recommended graft workflow  
+  https://ae-plugins.docsforadobe.dev/intro/sample-projects/
+
+The v0.4 tooling deliberately does **not** bundle Adobe SDK headers. Exact inventories are generated from the SDK headers present on the developer's own machine; those headers remain the compile-time source of truth.
+
+
+---
+
+<!-- SOURCE: STATUS.md -->
+
+# Status
+
+Research snapshot: **2026-09-30**
+
+Current edition: **v0.4 — self-verifying native SDK contracts + reusable native foundation**
+
+## Completed
+
+- Core Effect / AEGP / AEIO / Artisan documentation.
+- macOS and Windows branches.
+- Testing/distribution/recipes/templates.
+- Native taxonomy: Effect, AEGP, Keyframer, native panels, AEIO, Artisan, BlitHook, shared PICA suites and legacy paths.
+- Communication model between AE, Effect, AEGP, scripts and CEP.
+- Working drop-in templates and protocol headers.
+- Native Suite Cookbook for project graph, layers, effects, properties, animation, masks/text, render and render queue.
+- AEGP suite → function capability map.
+- Public SDK docs errata / header-verification policy.
+- Additional C++ drop-ins for common native operations.
+- Header-derived native SDK inventory generator (AEGP/PF/AEIO/Artisan/Drawbot/function tables).
+- Recipe symbol verifier and SDK-to-SDK contract diff.
+- macOS/Windows native validation launchers.
+- Reusable PICA/AEGP ownership + undo + ABI-boundary helpers with stub compile test.
+
+## Verification level
+
+- Current-version facts cross-checked against the public After Effects C++ SDK Guide and 26.5 release notes.
+- High-risk signatures in v0.3 were re-checked individually against published SDK declarations/header-derived contracts.
+- v0.4 inventory tooling is tested on synthetic ABI-shaped headers; C++ foundation compiles under C++17 against a synthetic host ABI stub.
+- JS/HTML templates are self-contained logic.
+- C++ templates are designed as drop-ins for official Adobe SDK samples.
+- The sandbox does **not** contain the proprietary Adobe SDK distribution or an After Effects host, so no claim of compiled/host-executed binaries is made.
+
+## Next engineering wave
+
+- Run the header-derived inventory against a locally supplied current Adobe SDK header set.
+- Compile the drop-ins against the official SDK on macOS and Windows.
+- Add SmartFX/MFR/GPU complete starter variants.
+- Add host verification matrix across supported AE versions/architectures.
+
+
+---
+
+<!-- SOURCE: CHANGELOG.md -->
+
+# Changelog
+
+## v0.4 — 2026-09-30
+
+- Added `18-SDK-HEADER-TOOLS/`: exact native contract inventory generated from local SDK headers.
+- Added recipe symbol verification and SDK inventory diff tooling.
+- Added macOS and Windows validation launchers and platform-specific validation docs.
+- Added `19-NATIVE-CODE-FOUNDATION/`: PICA suite lifetime helper, AEGP resource owners, undo scope, and host callback exception guard.
+- Added unit tests for the inventory parser and C++17 stub compile test for foundation headers.
+- Regenerated navigation and MASTER edition; preserved v0.3 as a separate release.
+
+## v0.3 — 2026-09-30
+
+- Added `17-NATIVE-SUITE-COOKBOOK/`.
+- Added recipes for Project/Item, Composition, Layer, Effect, Stream/Dynamic Stream, Keyframe, Mask, Text/Marker, Footage, frame rendering, Render Queue, memory/undo/persistence, Guide/ItemView/selection.
+- Added AEGP suite function capability index.
+- Added C++ drop-ins: project traversal, comp/layer, effect/stream, keyframes, render frame, render queue.
+- Added public SDK docs errata and header-first verification policy.
+- Re-verified high-risk signatures; corrected frame-rate type for `AEGP_CreateComp`, mask calls, `AEGP_SetRenderState`, and `AEGP_LayerIDVal`.
+- Added verification labels so examples distinguish published-contract verification from host execution.
+
+## v0.2 — 2026-09-30
+
+- Added complete native integration taxonomy: Effect, AEGP, Keyframer, native panel, AEIO, Artisan, Interactive Artisan, BlitHook, shared PICA suites and legacy paths.
+- Added AE 26.5 AEGP suite catalog.
+- Added communication architecture: AE↔Effect, AE↔AEGP, AEGP↔Effect, PICA suite bridge, scripting and CEP bridges, threading and ownership.
+- Added working/drop-in templates for native effect, AEGP menu tool, generic bridge, shared suite ABI, native panel registration, keyframer batch pattern, AEIO/Artisan registration, JSX and CEP JSON dispatcher.
+- Updated status/sources/navigation/master edition.
+
+## v0.1 — 2026-09-30
+
+- Initial developer bible structure with macOS and Windows branches, effect/AEGP/AEIO/Artisan fundamentals, testing, distribution, recipes and templates.
+
+
+---
+
+<!-- SOURCE: NOTICE.md -->
+
+# Notice
+
+AE Developer Bible is an independently authored practical engineering guide assembled from public documentation and platform vendor guidance. It is not affiliated with or endorsed by Adobe.
+
+Adobe, After Effects, Premiere Pro, Creative Cloud, CEP and UXP are trademarks or product names of Adobe and their respective owners.
+
+The Bible intentionally summarizes rather than republishes SDK documentation. API signatures, SDK headers, samples and vendor documentation remain subject to their original licenses and terms.

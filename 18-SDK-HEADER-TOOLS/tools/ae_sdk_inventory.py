@@ -1,0 +1,271 @@
+#!/usr/bin/env python3
+"""Build a native After Effects SDK contract inventory from local C/C++ headers.
+
+No Adobe headers are bundled. Point this tool at the SDK Include/Headers directory
+that you are legally using on your machine. The output is a machine-readable JSON
+plus a Markdown index of suite/function-table contracts found in that SDK version.
+
+The parser intentionally targets C ABI function-pointer tables instead of trying to
+be a full C++ parser. It handles named and anonymous typedef structs and normalizes
+multiline function-pointer declarations. For unusual macro-heavy headers, inspect
+`unparsed_candidate_tables` in the JSON and use the SDK headers as source of truth.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+import sys
+from dataclasses import asdict, dataclass, field
+from pathlib import Path
+from typing import Iterable, Sequence
+
+TABLE_NAME_RE = re.compile(
+    r"(?:Suite\d*|FunctionBlock\d*|EntryPoints\d*|EntryPoints|Callbacks\d*|Callbacks)$"
+)
+FUNC_PTR_RE = re.compile(
+    r"(?P<ret>(?:[A-Za-z_][\w]*|const|unsigned|signed|long|short|\s|\*)+?)"
+    r"\(\s*\*\s*(?P<name>[A-Za-z_][\w]*)\s*\)\s*"
+    r"\((?P<args>.*?)\)\s*;",
+    re.S,
+)
+NAMED_STRUCT_RE = re.compile(
+    r"typedef\s+struct\s+(?P<tag>[A-Za-z_][\w]*)\s*\{(?P<body>.*?)\}\s*(?P<alias>[A-Za-z_][\w]*)\s*;",
+    re.S,
+)
+ANON_STRUCT_RE = re.compile(
+    r"typedef\s+struct\s*\{(?P<body>.*?)\}\s*(?P<alias>[A-Za-z_][\w]*)\s*;",
+    re.S,
+)
+DEFINE_RE = re.compile(r"^\s*#\s*define\s+(?P<name>[A-Za-z_][\w]*)\s+(?P<value>.+?)\s*$", re.M)
+
+
+@dataclass
+class FunctionDecl:
+    name: str
+    return_type: str
+    arguments: str
+    signature: str
+
+
+@dataclass
+class ContractTable:
+    name: str
+    tag: str
+    family: str
+    source_file: str
+    source_sha256: str
+    functions: list[FunctionDecl] = field(default_factory=list)
+    nearby_defines: dict[str, str] = field(default_factory=dict)
+
+
+def strip_comments(text: str) -> str:
+    # Preserve newlines so diagnostics remain roughly line-correlated.
+    text = re.sub(r"/\*.*?\*/", lambda m: "\n" * m.group(0).count("\n"), text, flags=re.S)
+    text = re.sub(r"//[^\n]*", "", text)
+    return text
+
+
+def normalize_ws(text: str) -> str:
+    text = re.sub(r"\s+", " ", text.strip())
+    text = re.sub(r"\s*,\s*", ", ", text)
+    text = re.sub(r"\(\s+", "(", text)
+    text = re.sub(r"\s+\)", ")", text)
+    return text
+
+
+def family_for(name: str) -> str:
+    prefixes = (
+        ("AEGP_", "AEGP"),
+        ("PF_", "PF/Effect"),
+        ("AEIO_", "AEIO"),
+        ("PR_", "Artisan/PR"),
+        ("DRAWBOT_", "Drawbot"),
+        ("SP", "PICA/SP"),
+    )
+    for prefix, family in prefixes:
+        if name.startswith(prefix):
+            return family
+    return "Other"
+
+
+def iter_headers(inputs: Sequence[str]) -> list[Path]:
+    out: set[Path] = set()
+    for raw in inputs:
+        p = Path(raw).expanduser().resolve()
+        if not p.exists():
+            raise FileNotFoundError(p)
+        if p.is_file():
+            out.add(p)
+        else:
+            for ext in ("*.h", "*.hpp", "*.hh"):
+                out.update(x.resolve() for x in p.rglob(ext))
+    return sorted(out)
+
+
+def parse_functions(body: str) -> list[FunctionDecl]:
+    funcs: list[FunctionDecl] = []
+    # Adobe tables frequently prefix fields with SPAPI. Remove only the calling-convention token.
+    body = re.sub(r"\bSPAPI\b", "", body)
+    for m in FUNC_PTR_RE.finditer(body):
+        ret = normalize_ws(m.group("ret"))
+        name = m.group("name")
+        args = normalize_ws(m.group("args"))
+        sig = f"{ret} (*{name})({args});"
+        funcs.append(FunctionDecl(name=name, return_type=ret, arguments=args, signature=sig))
+    return funcs
+
+
+def nearby_defines(raw_text: str, start: int, table_name: str) -> dict[str, str]:
+    window = raw_text[max(0, start - 2500):start]
+    defs = {m.group("name"): normalize_ws(m.group("value")) for m in DEFINE_RE.finditer(window)}
+    # Keep likely suite/table metadata plus any exact family stem versions.
+    stem = re.sub(r"(?:Suite|FunctionBlock|EntryPoints|Callbacks)\d*$", "", table_name)
+    selected = {}
+    for k, v in defs.items():
+        if (
+            "Suite" in k
+            or "Version" in k
+            or "VERSION" in k
+            or (stem and stem.replace("_", "").lower() in k.replace("_", "").lower())
+        ):
+            selected[k] = v
+    return dict(sorted(selected.items()))
+
+
+def parse_header(path: Path, base: Path | None = None) -> tuple[list[ContractTable], list[str]]:
+    raw = path.read_text("utf-8", errors="replace")
+    clean = strip_comments(raw)
+    sha = hashlib.sha256(path.read_bytes()).hexdigest()
+    rel = str(path.relative_to(base)) if base and path.is_relative_to(base) else str(path)
+    found: list[ContractTable] = []
+    seen_spans: set[tuple[int, int]] = set()
+
+    for rx in (NAMED_STRUCT_RE, ANON_STRUCT_RE):
+        for m in rx.finditer(clean):
+            span = m.span()
+            if span in seen_spans:
+                continue
+            seen_spans.add(span)
+            alias = m.group("alias")
+            tag = m.groupdict().get("tag") or alias
+            if not TABLE_NAME_RE.search(alias):
+                continue
+            funcs = parse_functions(m.group("body"))
+            if not funcs:
+                continue
+            found.append(
+                ContractTable(
+                    name=alias,
+                    tag=tag,
+                    family=family_for(alias),
+                    source_file=rel,
+                    source_sha256=sha,
+                    functions=funcs,
+                    nearby_defines=nearby_defines(clean, m.start(), alias),
+                )
+            )
+
+    # Candidate tables whose names look right but yielded no fields are useful diagnostics.
+    candidate_names = set(re.findall(r"}\s*([A-Za-z_][\w]*(?:Suite\d*|FunctionBlock\d*|EntryPoints\d*))\s*;", clean))
+    parsed_names = {t.name for t in found}
+    unparsed = sorted(candidate_names - parsed_names)
+    return found, unparsed
+
+
+def inventory(inputs: Sequence[str]) -> dict:
+    headers = iter_headers(inputs)
+    if not headers:
+        raise RuntimeError("No .h/.hpp/.hh files found")
+    common_base = Path(Path(*Path(headers[0]).parts[:1]))
+    try:
+        import os
+        common_base = Path(os.path.commonpath([str(p.parent) for p in headers]))
+    except Exception:
+        common_base = None
+
+    tables: list[ContractTable] = []
+    unparsed: dict[str, list[str]] = {}
+    for h in headers:
+        ts, bad = parse_header(h, common_base)
+        tables.extend(ts)
+        if bad:
+            unparsed[str(h)] = bad
+
+    # A given table can appear in more than one header subtree. Prefer one unique contract per
+    # table name+signature set, but preserve different generations (Suite6, Suite7, ...).
+    dedup: dict[tuple[str, tuple[str, ...]], ContractTable] = {}
+    for t in tables:
+        key = (t.name, tuple(f.signature for f in t.functions))
+        dedup.setdefault(key, t)
+    tables = sorted(dedup.values(), key=lambda t: (t.family, t.name, t.source_file))
+
+    return {
+        "schema_version": 1,
+        "header_count": len(headers),
+        "table_count": len(tables),
+        "function_count": sum(len(t.functions) for t in tables),
+        "families": sorted({t.family for t in tables}),
+        "tables": [asdict(t) for t in tables],
+        "unparsed_candidate_tables": unparsed,
+    }
+
+
+def markdown(data: dict) -> str:
+    lines = [
+        "# Generated After Effects native SDK contract inventory",
+        "",
+        "> Generated from local SDK headers. Do not hand-edit. The headers used for your build remain the source of truth.",
+        "",
+        f"- Headers scanned: **{data['header_count']}**",
+        f"- Contract tables: **{data['table_count']}**",
+        f"- Function-pointer entries: **{data['function_count']}**",
+        "",
+    ]
+    families: dict[str, list[dict]] = {}
+    for t in data["tables"]:
+        families.setdefault(t["family"], []).append(t)
+    for family in sorted(families):
+        lines += [f"## {family}", ""]
+        for t in families[family]:
+            lines += [f"### `{t['name']}`", "", f"Source: `{t['source_file']}`", ""]
+            if t["nearby_defines"]:
+                lines.append("Nearby SDK macros:")
+                for k, v in t["nearby_defines"].items():
+                    lines.append(f"- `{k}` = `{v}`")
+                lines.append("")
+            lines += ["| Function | Header signature |", "|---|---|"]
+            for f in t["functions"]:
+                sig = f["signature"].replace("|", "\\|")
+                lines.append(f"| `{f['name']}` | `{sig}` |")
+            lines.append("")
+    if data.get("unparsed_candidate_tables"):
+        lines += ["## Parser diagnostics", "", "The following table-like declarations matched by name but were not parsed. Inspect them manually:", ""]
+        for src, names in sorted(data["unparsed_candidate_tables"].items()):
+            lines.append(f"- `{src}`: " + ", ".join(f"`{n}`" for n in names))
+        lines.append("")
+    return "\n".join(lines)
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("inputs", nargs="+", help="SDK header file(s) or directories")
+    ap.add_argument("--json", dest="json_path", default="ae-sdk-inventory.json")
+    ap.add_argument("--markdown", dest="md_path", default="ae-sdk-inventory.md")
+    args = ap.parse_args(argv)
+    try:
+        data = inventory(args.inputs)
+    except Exception as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    Path(args.json_path).write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", "utf-8")
+    Path(args.md_path).write_text(markdown(data), "utf-8")
+    print(f"headers={data['header_count']} tables={data['table_count']} functions={data['function_count']}")
+    print(f"json={args.json_path}")
+    print(f"markdown={args.md_path}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

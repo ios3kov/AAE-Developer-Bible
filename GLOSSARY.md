@@ -1,0 +1,21 @@
+# Glossary
+
+- **Effect plug-in** — native C/C++ effect loaded by AE; receives command selectors and renders image/audio output.
+- **AEGP** — After Effects General Plug-in; broad host integration using PICA suites and registered hooks.
+- **AEIO** — import/export plug-in implemented as an AEGP specialization.
+- **Artisan** — custom renderer for AE 3D layer environment; advanced and rarely appropriate.
+- **PICA suite** — versioned group of host callbacks/functions acquired from After Effects.
+- **PiPL** — Plug-In Property List; resource metadata used by Adobe hosts when discovering/loading native plug-ins.
+- **SmartFX** — effect rendering model that supports smarter region requests and 32-bpc workflows.
+- **MFR** — Multi-Frame Rendering; AE can render multiple frames concurrently.
+- **Compute Cache** — SDK mechanism for caching expensive computations safely across renders.
+- **PF_EffectWorld** — pixel buffer descriptor used by effects.
+- **sequence_data** — per-effect-instance state, with strict lifecycle/threading rules.
+- **global_data** — plug-in-global state managed through global setup/setdown.
+- **Drawbot** — Adobe drawing abstraction used for custom effect UI.
+- **ExtendScript** — Adobe's legacy JavaScript dialect/runtime used for AE scripting.
+- **ScriptUI** — UI toolkit available to ExtendScript scripts.
+- **CEP** — Chromium/HTML/JS-based Creative Cloud extensibility platform; legacy and on a retirement path.
+- **UXP** — Adobe's newer extensibility platform replacing CEP over time.
+- **Universal binary** — macOS binary containing Intel x86_64 and Apple Silicon arm64 slices.
+- **MFR-safe** — implementation proven safe under concurrent frame rendering, not merely one that compiles with the flag enabled.

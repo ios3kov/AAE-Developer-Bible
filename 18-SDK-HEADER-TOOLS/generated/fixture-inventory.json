@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "header_count": 1,
+  "table_count": 3,
+  "function_count": 4,
+  "families": [
+    "AEGP",
+    "AEIO",
+    "PF/Effect"
+  ],
+  "tables": [
+    {
+      "name": "AEGP_ExampleSuite2",
+      "tag": "AEGP_ExampleSuite2",
+      "family": "AEGP",
+      "source_file": "fixture_header.h",
+      "source_sha256": "4d6cfbdf109d6573258a9505b3aa918bf0cb35750509146c306be02fb1ef0ba8",
+      "functions": [
+        {
+          "name": "AEGP_DoThing",
+          "return_type": "A_Err",
+          "arguments": "AEGP_ItemH itemH, A_long valueL",
+          "signature": "A_Err (*AEGP_DoThing)(AEGP_ItemH itemH, A_long valueL);"
+        },
+        {
+          "name": "AEGP_GetThing",
+          "return_type": "A_Err",
+          "arguments": "AEGP_ItemH itemH, A_long *valuePL",
+          "signature": "A_Err (*AEGP_GetThing)(AEGP_ItemH itemH, A_long *valuePL);"
+        }
+      ],
+      "nearby_defines": {
+        "kAEGPExampleSuite": "\"AEGP Example Suite\"",
+        "kAEGPExampleSuiteVersion2": "2"
+      }
+    },
+    {
+      "name": "AEIO_FunctionBlock4",
+      "tag": "AEIO_FunctionBlock4",
+      "family": "AEIO",
+      "source_file": "fixture_header.h",
+      "source_sha256": "4d6cfbdf109d6573258a9505b3aa918bf0cb35750509146c306be02fb1ef0ba8",
+      "functions": [
+        {
+          "name": "AEIO_InitInSpecFromFile",
+          "return_type": "A_Err",
+          "arguments": "void *basic_dataP, void *fileP",
+          "signature": "A_Err (*AEIO_InitInSpecFromFile)(void *basic_dataP, void *fileP);"
+        }
+      ],
+      "nearby_defines": {
+        "kAEGPExampleSuite": "\"AEGP Example Suite\"",
+        "kAEGPExampleSuiteVersion2": "2"
+      }
+    },
+    {
+      "name": "PF_TestSuite1",
+      "tag": "PF_TestSuite1",
+      "family": "PF/Effect",
+      "source_file": "fixture_header.h",
+      "source_sha256": "4d6cfbdf109d6573258a9505b3aa918bf0cb35750509146c306be02fb1ef0ba8",
+      "functions": [
+        {
+          "name": "PF_TestCallback",
+          "return_type": "A_Err",
+          "arguments": "PF_InData *in_data, PF_OutData *out_data",
+          "signature": "A_Err (*PF_TestCallback)(PF_InData *in_data, PF_OutData *out_data);"
+        }
+      ],
+      "nearby_defines": {
+        "kAEGPExampleSuite": "\"AEGP Example Suite\"",
+        "kAEGPExampleSuiteVersion2": "2"
+      }
+    }
+  ],
+  "unparsed_candidate_tables": {}
+}
