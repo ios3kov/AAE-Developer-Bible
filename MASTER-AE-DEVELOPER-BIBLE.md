@@ -9091,6 +9091,15 @@ The first Render Queue item reached DONE, but AE emitted two TIFF sequence files
 Root cause: the requested duration equaled one composition frame while the recorded frame-aligned start/duration values straddled AE's Render Queue frame-boundary interpretation, so two sequence files were produced. Build `ACX-EDGE-20260930-02` uses a half-frame render duration after setting the aligned start; this preserves a single target frame while avoiding the boundary ambiguity. Host validation of v02 remains pending.
 
 
+## Sequence-output correction — build v04
+
+The subsequent v03 host run reproduced the same boundary behavior: Render Queue reached DONE and emitted more than one non-empty TIFF sequence member. This establishes that the previous exactly-one-file assertion was a collector assumption, not evidence of an Adobe effect/render failure.
+
+Build `ACX-EDGE-20260930-04` therefore keeps the full-frame Render Queue interval required by AE, requires at least one matching non-empty output, validates the signature of every matching sequence member, and records every member plus `framesProduced`. It does not silently choose one frame or weaken path/format validation.
+
+Host execution of v04 remains pending.
+
+
 ---
 
 <!-- SOURCE: 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/FILTERMAIN-FUNCTION-MAP-MACOS-AE25.6.md -->
