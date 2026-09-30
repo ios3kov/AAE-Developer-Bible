@@ -194,3 +194,21 @@ With Invert Depth Map enabled, the visible depth ordering reverses relative to t
 This runtime result is consistent with the statically reconstructed endpoint/range inversion path. It proves observable inversion of the depth visualization for this fixture. Screenshot colors are qualitative evidence only; bit-exact complement values remain for output sampling.
 
 - [x] Invert Depth Map behavior: qualitative runtime PASS.
+
+
+## Runtime observation 2026-09-30 — degenerate depth range
+
+Fixture: validated nested Classic 3D depth source.
+
+Parameters:
+- Black Point = 1000.0
+- White Point = 1000.0
+- Invert Depth Map = OFF
+- Anti-alias = OFF
+- Clamp Output stored ON
+
+Observed result: the composition becomes a uniform mid-gray field; the previously visible depth regions disappear. AE does not visibly crash or present an error dialog in this observation.
+
+This confirms that the Black == White path has an explicit finite fallback rather than exposing an obvious divide-by-zero failure. The screenshot alone does not establish the exact numeric fallback value, so the static constant and runtime pixel value must remain separate until sampled from rendered output.
+
+- [x] Black Point == White Point: qualitative runtime PASS.
