@@ -65,7 +65,8 @@ function QueueItem(comp,existing,status){
   if(opts.stopRender){this.status=RQItemStatus.USER_STOPPED;return;}
   this.status=RQItemStatus.DONE;flag=false;if(opts.missingOutput)return;
   var p=outFile.fsName.replace('[#####]','00021'),ext=p.split('.').pop(),magic=ext==='exr'?'\x76\x2f\x31\x01':ext==='png'?'\x89PNG\r\n\x1a\n':'8BPS';
-  log.files[p]=(opts.badMagic?'BAD!':magic)+'TEST-PAYLOAD';if(opts.duplicateOutput)log.files[p.replace('00021','00022')]=magic+'TEST-PAYLOAD';
+  log.files[p]=(opts.badMagic?'BAD!':magic)+'TEST-PAYLOAD';
+  if(opts.duplicateOutput||opts.badSecond||opts.emptySecond)log.files[p.replace('00021','00022')]=opts.emptySecond?'':(opts.badSecond?'BAD!':magic)+'TEST-PAYLOAD';
  };
 }
 var originalQueued=new QueueItem(orig,'queued',RQItemStatus.QUEUED),originalDone=new QueueItem(orig,'done',RQItemStatus.DONE);queue.push(originalQueued,originalDone);
@@ -90,15 +91,16 @@ test('no destructive save, purge, preference, shell or MFR APIs',()=>{
 });
 test('edge pairs and six actual queue exports, not 28 repeated cases',()=>{
  const x=run();assert.equal(x.r.status,'COLLECTED');assert.equal(x.r.cases.length,6);assert.equal(x.r.exports.length,6);assert.equal(x.log.renders.length,6);
- assert(x.r.exports.every(r=>r.status==='EXPORTED'&&r.file.bytes>8));assert(x.r.cases.every(c=>c.samples.length>0&&c.samples.length<=1344));
+ assert(x.r.exports.every(r=>r.status==='EXPORTED'&&r.files.length>=1&&r.framesProduced===r.files.length&&r.files.every(f=>f.bytes>8)));
+ assert(x.r.cases.every(c=>c.samples.length>0&&c.samples.length<=1344));
  assert(x.r.cases[1].comparisonWithAA0.changedLocations>0);assert(!JSON.stringify(x.r).includes('"status":"PASS"'));restored(x);
  assert.equal(x.ctx.project.renderQueue.numItems,2);assert.equal(x.log.compRemoved,1);
 });
-test('exactly one aligned frame per render',()=>{
+test('one full-frame interval requested; actual sequence count is separate',()=>{
  const x=run();assert(x.log.frameRanges.every(v=>v[0]===.84&&v[1]===.04));assert.deepEqual(Array.from(x.log.frameRanges,v=>v[2]),[8,8,16,16,32,32]);
 });
 test('scanline bounds and quarter-pixel pairs are explicit',()=>{
- const x=run();assert(x.r.edges.points.some(p=>p[0]%1!==0||p[1]%1!==0));assert(x.r.edges.points.every(p=>p[0]>=0&&p[0]<=1919&&p[1]>=0&&p[1]<=1079));
+ const x=run();assert(x.r.edges.points.some(p=>p[0]%1!==0||p[1]%1!==0));assert(x.r.edges.points.every(p=>p[0]>=0&&p[0]<=1919&&p[1]<=1079&&p[1]>=0));
  for(let i=0;i<x.r.cases.length;i+=2)assert.deepEqual(x.r.cases[i].samples.map(s=>s.point),x.r.cases[i+1].samples.map(s=>s.point));
 });
 test('zero discovered edges is BLOCKED, not AA acceptance',()=>{const x=run({noEdges:true});assert.equal(x.r.status,'PARTIAL');assert.equal(x.r.edgeStatus,'BLOCKED_NO_TRANSITIONS');assert.equal(x.r.cases.length,0);restored(x);});
@@ -127,8 +129,12 @@ test('render readback mismatch, path escape or multiple outputs refuses render',
  for(const opt of [{wrongDepth:true},{escape:true},{multiOutput:true}]){const x=run(opt);assert.equal(x.r.status,'ERROR');assert.equal(x.log.renders.length,0);restored(x);}
 });
 test('user stopped render does not run remaining exports',()=>{const x=run({stopRender:true});assert.equal(x.r.status,'ERROR');assert.equal(x.log.renders.length,1);restored(x);});
-test('DONE alone without a valid single frame is not success',()=>{
- for(const opt of [{missingOutput:true},{badMagic:true},{duplicateOutput:true}]){const x=run(opt);assert.equal(x.r.status,'ERROR');assert.equal(x.log.renders.length,1);assert.equal(x.r.exports[0].status,'ERROR');restored(x);}
+test('DONE without an image or with corrupt members is not success',()=>{
+ for(const opt of [{missingOutput:true},{badMagic:true},{badSecond:true},{emptySecond:true}]){const x=run(opt);assert.equal(x.r.status,'ERROR');assert.equal(x.log.renders.length,1);assert.equal(x.r.exports[0].status,'ERROR');restored(x);}
+});
+test('every valid sequence member is recorded without claiming exact frame count',()=>{
+ const x=run({duplicateOutput:true});assert.equal(x.r.status,'COLLECTED');assert.equal(x.log.renders.length,6);
+ assert(x.r.exports.every(r=>r.framesRequested===1&&r.framesProduced===2&&r.files.length===2&&new Set(r.files.map(f=>f.relativePath)).size===2));restored(x);
 });
 test('only queued originals toggled; DONE and original effect untouched',()=>{
  const x=run();assert.deepEqual(Array.from(x.log.flagWrites,v=>Array.from(v)),[['queued',false],['queued',true]]);restored(x);
