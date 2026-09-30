@@ -523,3 +523,54 @@ PiPL EntryPointName = FilterMain
 ```
 
 Next: reverse engineer `PLUG_RegisterRoutine` in `PLUG.dylib` and identify how `FilterMain` resolves for hardcoded/bundled effects.
+
+
+## PLUG registration defers entry-point resolution
+
+Inspection of `PLUG.dylib` shows that both overloads of `PLUG_RegisterRoutine(...)` allocate a `PLUG_RoutineDescPriv` and wrap it in a `boost::shared_ptr<PLUG_RoutineDesc>`.
+
+Observed constructors:
+
+```text
+PLUG_RoutineDescPriv(IPiPL, pluginFilePath)
+PLUG_RoutineDescPriv(IPiPL, IPlugin)
+```
+
+The registration functions themselves do not directly resolve the PiPL entry-point string to a callable address. Instead, `PLUG.dylib` contains dedicated later-stage machinery:
+
+```text
+PLUG_PrepRoutine(...)
+PLUGp_LoadPlatRoutine(...)
+PLUG_RoutineDescPriv::GetEntryPoint(...)
+```
+
+This indicates that registration stores the PiPL/plugin metadata first, while actual routine resolution/loading is deferred until preparation.
+
+### Updated proven chain
+
+```text
+PiPL
+  → FLTp_FiltSetup
+  → PLUG_RegisterRoutine(...)
+  → PLUG_RoutineDescPriv(IPiPL, path/IPlugin)
+  → FLT_FCSpec::SetRoutineDescH
+  → FLT_FCSpec::ReadyFilter
+  → PLUG_PrepRoutine
+  → platform routine loading / entry-point resolution
+  → PLUG_RoutineDesc + 0x08
+  → FLT_FCSpec + 0xD0
+  → GetEffectProc()
+  → host BLR
+```
+
+### Next target
+
+Reverse engineer:
+
+```text
+PLUG_PrepRoutine
+PLUGp_LoadPlatRoutine
+PLUG_RoutineDescPriv::GetEntryPoint
+```
+
+to prove how PiPL `EntryPointName = FilterMain` becomes the concrete function pointer.
