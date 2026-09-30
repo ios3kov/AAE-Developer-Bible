@@ -8867,6 +8867,85 @@ EntryPointName = FilterMain
 ```
 
 
+## Complete hardcoded AE Library → FLT setup chain proven
+
+The final missing static invocation bridge has now been recovered in `MEE.dylib`.
+
+### AELibraryVideoFilterModule::SetupFilter invokes the stored AELib plugin setter
+
+`ML::AELibraryVideoFilterModule::SetupFilter(IPlugin, IPiPL)` begins by retrieving the globally registered callback:
+
+```text
+MEE_GetAELibPluginSetter()
+```
+
+It then queries:
+
+```text
+MEE_HardcodedPluginsCache::GetOutflagsFromHardcodedCache(IPlugin, IPiPL, AELibPluginCachedInfos&)
+```
+
+and finally invokes the returned `boost::function<int(IPlugin, IPiPL, AELibPluginCachedInfos&)>` with the same plugin/PiPL pair.
+
+Recovered core:
+
+```asm
+0xBC30  bl  MEE_GetAELibPluginSetter
+...
+0xBC3C  bl  MEE_HardcodedPluginsCache::GetInstance
+...
+0xBC4C  bl  MEE_HardcodedPluginsCache::GetOutflagsFromHardcodedCache
+...
+0xBD14  add x0, sp, #0x88   ; stored boost::function
+0xBD18  add x1, sp, #0x60   ; IPlugin
+0xBD1C  add x2, sp, #0x48   ; IPiPL
+0xBD20  add x3, sp, #0x78   ; AELibPluginCachedInfos
+0xBD24  bl  boost::function3<...>::operator()
+```
+
+Since the registered callback was already proven to be:
+
+```text
+aelib::SetupAEPlugin @ 0x63AA0
+```
+
+the generic hardcoded-effect setup chain is now complete.
+
+### Fully proven static chain
+
+```text
+aelib Resource/txt/hardcodedpipls.txt
+  → initializeHardcodedPluginsCache
+  → MEE_HardcodedPluginsCache::Initialize
+  → ML::AELibraryVideoFilterFactory::GetPiPLFromHardcodedCache
+  → MEE_HardcodedPluginsCache::GetPiPLFromHardcodedCache
+  → ML::AELibraryVideoFilterModule::SetupFilter
+  → MEE_GetAELibPluginSetter
+  → aelib::SetupAEPlugin
+  → FLT_SetupAEPlugin
+  → FLTp_FiltSetup
+  → PLUG_RegisterRoutine
+  → PLUG_RoutineDescPriv::GetEntryPointName
+  → PiPL EntryPointName
+  → PLUG_RoutineDescPriv::GetEntryPoint
+  → PLUG_RoutineDesc + 0x08
+  → FLT_FCSpec + 0xD0
+  → GetEffectProc
+  → PluginDispatch
+  → concrete EffectProc invocation
+```
+
+### Target-specific work remaining
+
+The architecture is complete. The only remaining task for `ADBE AUX CHANNEL EXTRACT` is to identify the exact callable address returned for:
+
+```text
+EntryPointName = FilterMain
+```
+
+and map that address to its containing image/function implementation.
+
+
 ---
 
 <!-- SOURCE: 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/EXECUTION-PLAN.md -->
