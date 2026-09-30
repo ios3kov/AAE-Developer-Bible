@@ -185,8 +185,8 @@ Already captured: physical module, FilterMain, selector table, named function bo
 Remaining:
 - [x] Complete static capture + binary hash (`412a6deefc1d7a710a9019b6a068180556417b0548d0703d34852bcd395dcab8`).
 - [x] Decode ACX_Power2 (`2^n` over its signed-char input).
-- [ ] Map parameters/defaults/ranges.
-- [ ] Map channel cases with evidence.
+- [ ] Map parameters/defaults/ranges. **Slots 1–6 and labels decoded; defaults/ranges still open.**
+- [x] Map channel cases with evidence. **Stored selector values 1–8 → OBID/TEXR/NRML/COVR/BKCR/UNCP/MATR/depth(DPTH|DPAA) decoded; UI/value translation caveat documented.**
 - [ ] Reconstruct 8/16/32-bpc pseudocode.
 - [ ] Missing-channel, range reversal/equal-limit, clamp and alpha behavior.
 - [ ] Controlled AE fixtures + output hashes.
