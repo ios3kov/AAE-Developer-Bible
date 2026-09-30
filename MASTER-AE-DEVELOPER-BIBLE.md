@@ -8992,112 +8992,82 @@ This closes the remaining target-specific gap for 3D Channel Extract on macOS Af
 
 # 3D Channel Extract — edge sampling and frame export
 
-Date: **2026-09-30**. Gate 8 remains OPEN.
+Date: **2026-09-30**. **Collection reviewed; full-effect acceptance and Gate 8 OPEN. No new run requested.**
 
-Build: **ACX-EDGE-20260930-01**. Implementation and portable tests are recorded; **execution of this new collector inside After Effects is NOT RUN**. This is a test artifact, not a production plug-in or a completed host-acceptance report.
+This page supersedes stale v01 NOT RUN statements, the failed half-frame proposal and the exactly-one-file assertion in [the historical version](https://github.com/ios3kov/AAE-Developer-Bible/blob/b9db3cd30fabb0c164a6dacf28674af304d5d403/21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/EDGE-AND-RENDER-PROBE.md). Full methodology, hashes and corrections are in [the evidence audit](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/EVIDENCE-AUDIT-2026-09-30.md).
 
-Script: [ACX_Edge_Render_Probe.jsx](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/../../../scripts/ACX_Edge_Render_Probe.jsx). Portable tests: [test_acx_edge_render_probe.js](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/../../../scripts/test_acx_edge_render_probe.js).
+## Why the edge run existed
 
-## Why this run exists
+The first [28-case numerical report](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/NUMERICAL-OBSERVATIONS-2026-09-30.md) did not deliberately sample boundaries. The Edge collector added adaptive boundary samples and actual Render Queue exports. This was useful for nested-composition Z-Depth, not all auxiliary channels.
 
-The [previous numerical report](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/NUMERICAL-OBSERVATIONS-2026-09-30.md) contains 28 records and 1260 RGBA observations. Anti-alias ON/OFF did not differ on its 45-point grid. That grid did not deliberately sample object boundaries, and no raw frame export was performed. The existing results remain valid within their documented scope; this script does **not** repeat that 28-case matrix.
+The source renderer identifier was recorded as `ADBE Advanced 3d`. The name alone is not proof of effect-level GPU execution. Geometry was not independently archived from the dirty live project; the uploaded AEP must not silently stand in for a live-project hash.
 
-The prior report records the renderer identifier `ADBE Advanced 3d`. The new script records the actual current identifier and does not change the source renderer or silently substitute a different renderer. It does not infer a renderer name or effect-level GPU behavior from a project setting.
+## Measurement contract
 
-## Run once
+All AA comparisons use Black 5000, White 0, Invert OFF, Collapse OFF and effect ON; Clamp is requested ON at 32 project bpc. Edge discovery samples six scanlines at 16-pixel spacing, then up to 16 transition brackets at integer and quarter-pixel positions. Six paired records cover AA OFF/ON at 8, 16 and 32 project bpc.
 
-Keep the existing `3dextract.aep` open, with `DEPTH_TEST` containing one 2D precomp layer and only `3D Channel Extract` on that layer. Use **File > Scripts > Run Script File** to run the JSX. No new scene is required. The playhead must be within the layer duration; the script records and uses the nearest valid frame-aligned time.
+`sampleImage(point,[0.5,0.5],true,time)` is alpha-weighted layer-space sampling, not an internal raw buffer. Fractional-position intermediates alone do not establish AA. The paired differences are the evidence. No observed difference would not prove that AA is absent.
 
-A unique `AE_Edge_Render_...` folder is created on Desktop. Return the **whole folder as ZIP**, including `report.json` and exported images. A PARTIAL or ERROR report is useful evidence: retain it instead of repeating the run or resetting the effect.
+Render Queue files include composition transforms and output-module processing. File coordinates and layer-space sample coordinates are not automatically equivalent. Project bpc and stored file precision must be checked separately.
 
-## Exact matrix
+## Reviewed host runs
 
-All measurements use Black 5000, White 0, Invert OFF, Collapse OFF, effect ON. Clamp is explicitly requested ON at 32 bpc. The disabled channel menu is never forced; Z-Depth value 1 is required and checked.
+| Build / suffix | Report status | Retained output |
+|---|---|---|
+| Edge v01 / 767655 | ERROR | six edge records; two TIFFs after DONE; exactly-one-file assertion failed |
+| Edge v02 / 126368 | ERROR | six edge records; half-frame duration rejected before rendering |
+| Edge v03 / 381415 | ERROR | six edge records; two TIFFs; old assertion remained |
+| Edge v03 / 990482 | ERROR | another v03 run, not v04; same assertion |
+| Edge v04 / 508263 | COLLECTED | six edge records; six exports containing twelve images |
+| Mega v01 / 853739 | COLLECTED | same scoped depth evidence; its all-channel claim is withdrawn |
 
-| Phase | Work |
-|---|---|
-| Edge discovery | At 32 project bpc and AA OFF, sample three horizontal and three vertical scanlines, at quarter/half/three-quarter positions, with 16-pixel spacing. |
-| Edge selection | Select up to 16 adjacent-sample brackets whose maximum RGBA change exceeds 0.02. Record all discovery samples and selected brackets. |
-| Paired edge measurements | Sample the selected brackets, plus two pixels on either side, at integer and quarter-pixel positions. Use exactly the same locations for AA OFF/ON at each of 8, 16 and 32 project bpc. Six records. |
-| Native frame exports | Request one full-resolution frame with AA OFF and one with AA ON at each of 8, 16 and 32 project bpc. Six planned image exports through the Render Queue. |
+`COLLECTED` is an acquisition status, not final acceptance. All six reports contain empty cleanup-error lists, which is a recorded result rather than independent proof of the entire user project state.
 
-No transition found is `BLOCKED_NO_TRANSITIONS`, not a successful anti-alias test. At most 16 brackets and six scanlines are examined; thin features or some edges may be missed. The script does not generate or alter geometry to manufacture an anti-alias difference.
+The v02 duration change was incorrect: AE rejected 0.02 seconds below its one-frame minimum 0.04 seconds. v04 retains a full-frame request, validates every nonempty matching sequence member, and records all produced files instead of selecting one silently.
 
-## Sampling and export are different measurements
+Two files do not demonstrate exact single-frame timing. Recorded start/duration readbacks were 0.319986979/0.04000651 seconds for a requested 0.32/0.04. Timing quantization is a supported explanation, not a universal AE rule. Sequence members must remain separately identified.
 
-Edge observations use `sampleImage(point, [0.5,0.5], true, time)` in layer space. These are alpha-weighted area samples, including at fractional positions. An intermediate value at a fractional point does not itself prove renderer anti-aliasing. The report compares **paired** AA OFF/ON observations, retaining non-finite values explicitly. A zero difference is not proof that anti-aliasing is absent or broken.
+## AA findings recomputed from existing artifacts
 
-Render Queue output is the full outer composition, including its layer transforms and output-module processing. It is not the plug-in's internal raw pixel buffer. Do not equate a layer-space sample coordinate with an output-file coordinate without accounting for the outer transform.
+Each run has 1342 paired locations at each depth, with 84 changed locations and no non-finite pairs. Maximum sampleImage RGBA differences:
 
-## Output-template handling
+| Project bpc | Maximum difference |
+|---:|---:|
+| 8 | 0.12549018859863997 |
+| 16 | 0.12442016601562 |
+| 32 | 0.12439665198325994 |
 
-The script inspects up to 128 installed output-module templates by their actual `Format` and settings, rather than inventing a template name or trying to write the read-only Format setting. It prefers OpenEXR, then TIFF, PNG or Photoshop image formats. An 8-bit-only template is not silently used for 16/32-bit project output. For 32-bpc output it requires EXR or an explicitly floating/32-bit template; for 16 bpc it requires EXR or higher-capacity depth metadata.
+Repeated runs corroborate these observations but do not expand fixture coverage or identify DPTH/DPAA callbacks.
 
-**Project bpc and file precision are separate.** EXR may contain half-float or full-float components; template color-management, alpha and compression settings can affect the exported values. All available template settings and chosen render/output settings are retained. Full image decoding, channel depth, alpha representation, compression, dimensions, SHA-256 and numerical comparisons must be checked after the returned artifacts are available. File-format selection is not a claim of bit-exact or lossless output.
+## Full image decode, not just a signature check
 
-If a suitable image template is absent, that bpc export is `BLOCKED`, the template inventory is saved and edge observations are retained. No codec installation, template creation or preference mutation is attempted.
+All 30 images in the six supplied ZIPs were decoded offline. Completed v04 and Mega collections each contain:
 
-## Safety contract
+| Project bpc | Actual component storage | Size / planes |
+|---:|---|---|
+| 8 | TIFF unsigned 8-bit | 1920 × 1080 × 4 |
+| 16 | PNG unsigned 16-bit, color type 6 | 1920 × 1080 × 4 |
+| 32 | PSD 32-bit float, RGB mode, raw planar composite | 1920 × 1080 × 4 |
 
-- File-write permission is checked before project changes.
-- Only a disposable duplicate of the outer composition is edited. The nested source, its renderer and geometry are read-only.
-- The script does not save the AEP, close the project, purge caches, change preferences, modify plug-ins or run shell commands.
-- Existing QUEUED items are temporarily disabled for export and restored in `finally`. DONE/other unqueued items are not toggled or re-rendered. A queued item with an existing status callback blocks export before its flags are changed.
-- Only the script-owned Render Queue item may be queued at render start. There is exactly one output module and one requested frame.
-- Output paths must remain inside the unique run folder. Crop/resize are disabled when exposed; unexpected readbacks stop export. Post-render import/replacement and source XMP are disabled.
-- OutputModule is reacquired after changing its settings because the documented API can invalidate the old object.
-- A stopped/failed render ends further export attempts. DONE alone is insufficient: the case also requires exactly one nonempty expected image with a matching signature. Signature screening is not a complete file decoder.
-- Temporary queue items/composition are removed and original project bpc/queued flags restored. Cleanup failures produce ERROR. Temporary edits may still leave the project dirty; the original on-disk AEP is not overwritten.
-- Checkpoints precede host calls. The 300-second limit is a soft between-call budget, not a watchdog capable of interrupting a hung AE.
+For both sequence members 00007 and 00008, in both completed collections, AA ON/OFF changes **3072 of 2073600 RGB pixels**. Maximum stored RGB differences are 45 at 8-bit, 11521 at 16-bit, and 0.16127513349056244 at float32. The changed bounding box is x=468–1451, y=263–816 inclusive. Fourth-plane difference is zero.
 
-## Acceptance after the returned report
+Within a case, the two sequence members have identical decoded pixels even where their file hashes differ. Corresponding v04/Mega decoded-pixel hashes also match. These are same-session/corresponding-output observations, not MFR, cold-cache or restart tests.
 
-Check parameter before/after readbacks, known Collapse state, paired coordinates, all finite/non-finite outcomes, cleanup and queue results. Decode every exported image and verify dimensions, precision and alpha before comparing AA variants or bpc outputs. Retain the selected source renderer and output pipeline in any conclusion.
+**Do not claim raw-buffer or cross-depth equivalence:** PSD RGB ranges approximately 0.05125763–0.56794423 while the layer-space 32-bit baseline samples range approximately 0.29–0.79. The pipeline difference needs isolation. Output/color processing is a hypothesis, not a proven cause. Same-format AA comparisons remain useful.
 
-`RECORDED`, `EXPORTED`, and top-level `COLLECTED` describe acquisition. They are **not** a verdict on every effect feature. This run does not close private DPTH/DPAA tracing, other auxiliary channels, controlled infinity/ID fixtures, MFR, cold-cache determinism, loaded-binary identity or independent-implementation equivalence. See the [full runtime protocol](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/RUNTIME-ACCEPTANCE-MACOS-AE25.6.md).
+Four stored planes and an opaque fourth plane do not test transparent-source behavior. In particular, PSD template settings reported Channels=RGB; plane count alone must not become an alpha-preservation claim.
 
-## Portable validation and identity
+## Collector safety and validation boundaries
 
-Source script introduced at `e9b512d1ecffdbed983275f1fb31451844465a28`; tests at `fbfe4d86a5b120c916af52b2538591d00fb61449`.
+The reviewed Edge implementation duplicates only the outer comp, leaves source geometry read-only, never saves the original AEP, and restores project depth and queued-item flags in cleanup. It checks settings, output paths and signatures. It does not patch binaries, purge caches or claim a hardware execution path. These are code-contract statements; report cleanupErrors is the separate observation.
 
-- Script Git blob: `415e3dbfa3fe132176817d954b7b071fe7088294`.
-- Script SHA-256: `f4e27a52a446ccda1d19d8f13aec643fbae578586454c996fbca11cb5257621e`.
-- Local Node 22.16: **21 portable orchestration/safety checks PASS** using `node scripts/test_acx_edge_render_probe.js`.
-- The JSX parses as ECMAScript 3 using Node's bundled Acorn 8.14.1 after removing the Adobe `#target` directive.
+The historical 21 portable tests covered the original v01 orchestration using a mock host. They did not prove Adobe rendering. After v04 changed `file` to `files` and allowed multiple sequence members, the old test assertions became stale; the audit must not carry the old green result forward to an untested revision. Tests should explicitly cover valid multi-member output and corruption of any member.
 
-The tests use a synthetic host/queue/filesystem and synthetic sample values. They exercise failure, cancellation, settings readback, stale output-module references, template absence, non-finite samples, output absence/corruption and state restoration. They do **not** simulate or verify Adobe's pixel algorithm. New collector host execution and actual frame decoding remain NOT RUN.
+## What is retained and what remains open
 
-## API sources consulted
+Retain the observed AA-dependent boundary change and decoded file identities/precision. Do not repeat the six AA cases merely to rename a collector.
 
-[OutputModule API](https://ae-scripting.docsforadobe.dev/renderqueue/outputmodule/) documents template enumeration/application, read-only Format access and object invalidation after settings changes. [RenderQueueItem API](https://ae-scripting.docsforadobe.dev/renderqueue/renderqueueitem/) documents render flags, statuses, time-span settings and settings readback. These sources inform the new automation code; they are not substituted for measurements of the user's fixture.
-
-
-## Partial host run — 2026-09-30
-
-Run `ACX-EDGE-20260930-01-1790789109165-767655` reached edge sampling successfully and then stopped during the first frame-export validation.
-
-Preserved evidence identity:
-- supplied ZIP: `AE_Edge_Render_ACX-EDGE-20260930-01-1790789109165-767655.zip`;
-- report SHA-256: `0bd7ca686f6e4617ce07ea106bbd43951a2da6b261200a7a9cfc78ccf2c2d2a1`;
-- report status: `ERROR`; cleanup errors: 0;
-- six AA edge records are present, 1342 samples each;
-- at each of 8/16/32 bpc, AA ON differs from AA OFF at 84/1342 sampled locations;
-- maximum observed RGBA delta: 8 bpc `0.1254901886`, 16 bpc `0.1244201660`, 32 bpc `0.1243966520`.
-
-This is positive runtime evidence that the Anti-alias switch changes Z-Depth output at deliberately sampled boundaries in this fixture. It does not by itself identify DPTH versus DPAA callbacks.
-
-The first Render Queue item reached DONE, but AE emitted two TIFF sequence files (`frame_00007.tif` and `frame_00008.tif`) for the requested interval. The v01 collector expected exactly one file and correctly stopped rather than silently accepting ambiguous output. Both files were non-empty (8,313,088 bytes). Their SHA-256 values are `dab1c4123afab941051ed69a4ac749b5ea70bfded5e578113f96939e8d7bf4d9` and `2669082a4b639d9d9480dcb636094a4e22ea3188d3e2908218797885c2c0d4d1`.
-
-Root cause: the requested duration equaled one composition frame while the recorded frame-aligned start/duration values straddled AE's Render Queue frame-boundary interpretation, so two sequence files were produced. Build `ACX-EDGE-20260930-02` uses a half-frame render duration after setting the aligned start; this preserves a single target frame while avoiding the boundary ambiguity. Host validation of v02 remains pending.
-
-
-## Sequence-output correction — build v04
-
-The subsequent v03 host run reproduced the same boundary behavior: Render Queue reached DONE and emitted more than one non-empty TIFF sequence member. This establishes that the previous exactly-one-file assertion was a collector assumption, not evidence of an Adobe effect/render failure.
-
-Build `ACX-EDGE-20260930-04` therefore keeps the full-frame Render Queue interval required by AE, requires at least one matching non-empty output, validates the signature of every matching sequence member, and records every member plus `framesProduced`. It does not silently choose one frame or weaken path/format validation.
-
-Host execution of v04 remains pending.
+Still OPEN: private FourCC tracing, loaded binary identity for each batch, single-frame timing identity, output-pipeline equivalence, transparent/ROI inputs, other auxiliary channels, controlled non-finite/ID data, real CPU/GPU/MFR comparisons and independent implementation equivalence. See [runtime acceptance](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/RUNTIME-ACCEPTANCE-MACOS-AE25.6.md). Mega v01 is [withdrawn](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/MEGA-PROBE.md).
 
 
 ---
