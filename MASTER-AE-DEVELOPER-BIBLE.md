@@ -10007,6 +10007,38 @@ A checked item requires recorded evidence. Documentation presence alone is not c
 - [ ] MkDocs strict build passes.
 - [ ] Historical logs remain preserved but separated from current conclusions.
 
+## Gate 3A — Reuse audit: FSTR Line and AE Hot Loader
+
+**Required before creating new examples in Gates 5–6. Status: OPEN.**
+
+Primary extraction and pinned sources: [project case studies](22-PROJECT-CASE-STUDIES/README.md). This audit does not require completion of either product and does not automatically make any Bible example host-verified.
+
+- [x] Pin the reviewed document snapshots: FSTR Line `c69e3663de59dc44cbdef18042891f6dd1ce5ee6`, AE Hot Loader `cf338bcd861504d695c3181767c18bb423575814`.
+- [x] Preserve architecture lessons, negative experiments and reported host results with their limitations in section 22.
+- [ ] Map each candidate below to actual code files, source commits, related tests and build identity. A documentation snapshot is not necessarily the tested build.
+- [ ] Review original test records/artifacts; identify missing raw evidence and separate project-reported results from independently repeated tests.
+- [ ] Run applicable portable tests for the selected source snapshot and record commands/results without calling them AE host tests.
+- [ ] Record reuse / adapt / do not transfer decisions with reasons for every candidate.
+- [ ] Check provenance before copying code; keep licensed third-party headers/binaries outside Bible.
+- [ ] Specify Bible-side regression and host acceptance tests for every selected adaptation; actual acceptance remains in Gates 4–7.
+- [ ] Link accepted general lessons into their target chapters, keeping private-loader experiments separate from supported SDK recipes.
+
+### Initial candidate register
+
+| ID | Source candidate | Intended Bible destination | Current state / acceptance boundary |
+|---|---|---|---|
+| FL-01 | UI/Core/Host Adapter separation; normalized snapshots | 07-PANELS, 15-COMMUNICATION | Architecture extracted; code/test mapping open. |
+| FL-02 | Stale-command rejection, refresh coalescing and request invalidation | 15-COMMUNICATION, 10-TESTING | Project-reported behavior; implementation audit and portable regression open. |
+| FL-03 | FakeHostAdapter and controlled fixtures | 10-TESTING, 16-WORKING-TEMPLATES | Identify reusable tests; no automatic transfer of host readiness. |
+| FL-04 | Command-hook negative experiment and probe ABI correction | 03-AEGP, 08-MACOS, section 22 | Source report extracted. Preserve tested ExtendScript-only scope and NOT RUN cases; SYNC-001 remains blocked in the source snapshot. |
+| HL-01 | ScriptUI request/response protocol and AEGP Agent | 15-COMMUNICATION, 16-WORKING-TEMPLATES | PoC protocol extracted; inspect file-write behavior, request correlation, lifecycle and tests. |
+| HL-02 | Loaded-module lookup, diagnostics and failed callback experiments | 08-MACOS, 01-ARCHITECTURE | Project-reported findings extracted; code/artifact audit open. |
+| HL-03 | New-bundle late-loading experiment through internal ML::LoadPlugins | section 22, research cross-reference | Reported live PoC, not general hot replacement. Match experiment branch/build and raw evidence before any readiness promotion. |
+
+**Gate 3A acceptance:** candidate audit is complete; each candidate has source evidence, limitations and a justified transfer decision. For selected code, destinations and Bible-side tests are defined. Completion of SYNC-001 or production Hot Loader is not a prerequisite. After adaptation, the relevant build/host gates must still pass.
+
+Do not infer absence of all AE notification mechanisms from one negative probe. Do not infer unloading or replacing an already-loaded plugin from successful late loading of a new bundle. Internal loader code must not become a hidden dependency of the safe installer or ordinary SDK examples.
+
 ## Gate 4 — SDK verification
 
 - [ ] Required SDK 25.6 contract families parse without unresolved required declarations.
@@ -10112,7 +10144,7 @@ For every agreed entry in MASTER-EFFECT-LIST.md:
 ## Gate 9 — Release
 
 ### Release 1 — verified practical Bible
-- [ ] Gates 1–7 complete.
+- [ ] Gates 1–7, including Gate 3A, complete.
 - [ ] Clean-machine reproduction.
 - [ ] No blocking known defects.
 - [ ] Site/navigation/MASTER/manifest agree.
@@ -10129,15 +10161,18 @@ For every agreed entry in MASTER-EFFECT-LIST.md:
 
 Every host report records: repository commit; exact AE build; SDK; OS; architecture; compiler; build/install/test commands; fixture; expected and observed results; hashes where applicable; PASS/FAIL; known limitations.
 
+For cross-project lessons also record the source repository, pinned document/code commit, tested build identity when known, and whether the result is source-reported or independently reproduced. Preserve missing evidence explicitly.
+
 ## Immediate execution order
 
 1. Gate 2: repair host_cycle.py and add destructive/failure tests.
 2. Gate 3: resolve documentation contradictions and expose section 21.
-3. Gate 4: strengthen exact-SDK verification.
-4. Gate 5: host-verify Minimal Gain, SmartFX Copy and MenuTool.
-5. Gates 6–7: complete families and correctness/stress coverage.
-6. Gate 8: finish 3D Channel Extract pilot, then catalog.
-7. Gate 9: release audits.
+3. Gate 3A: audit FSTR Line / AE Hot Loader candidates before creating new examples; preserve accepted lessons and transfer decisions in section 22.
+4. Gate 4: strengthen exact-SDK verification.
+5. Gate 5: host-verify Minimal Gain, SmartFX Copy and MenuTool using audited reusable components where appropriate.
+6. Gates 6–7: complete families and correctness/stress coverage.
+7. Gate 8: finish 3D Channel Extract pilot, then catalog.
+8. Gate 9: release audits.
 
 
 ---
