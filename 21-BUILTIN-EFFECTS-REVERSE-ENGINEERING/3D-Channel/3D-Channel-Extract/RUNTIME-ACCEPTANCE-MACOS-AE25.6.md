@@ -172,3 +172,14 @@ This proves a UI dependency on channel/source state and confirms that the stored
 - [x] Non-depth disabled-control behavior observed on plain Black Solid.
 - [ ] Exact popup stored integer ↔ FourCC still requires LLDB observation.
 - [ ] Enabled-state/default/range behavior on an actual 3D auxiliary source remains open.
+
+
+## Runtime observation 2026-09-30 — nested Classic 3D source
+
+A controlled nested composition was created with a camera and three 3D solids at different Z positions, then used as a single precomp layer in DEPTH_TEST with 3D Channel Extract set to Z-Depth.
+
+Observed result: the effect produces distinct grayscale regions instead of the uniform output seen on a plain solid. This confirms that the nested Classic 3D composition exposes usable depth auxiliary data to 3D Channel Extract and that the recovered depth render path is active in the tested host.
+
+Visible stored values remain Black Point 5000.0, White Point 0.0, Anti-alias OFF, Clamp Output ON, Invert Depth Map OFF.
+
+This screenshot is qualitative evidence only. Display-managed screenshot RGB values are not accepted as bit-exact pixel evidence; exact 8/16/32 values still require controlled render/output sampling.
