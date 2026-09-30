@@ -212,3 +212,21 @@ Observed result: the composition becomes a uniform mid-gray field; the previousl
 This confirms that the Black == White path has an explicit finite fallback rather than exposing an obvious divide-by-zero failure. The screenshot alone does not establish the exact numeric fallback value, so the static constant and runtime pixel value must remain separate until sampled from rendered output.
 
 - [x] Black Point == White Point: qualitative runtime PASS.
+
+
+## Runtime observation 2026-09-30 — reversed Black/White endpoints
+
+Fixture: validated nested Classic 3D depth source.
+
+Parameters:
+- Black Point = 0.0
+- White Point = 5000.0
+- Invert Depth Map = OFF
+- Anti-alias = OFF
+- Clamp Output stored ON
+
+Observed result: the depth ordering is visually the same orientation as the prior Invert-ON test with endpoints 5000→0: background/outside is white, the larger region is light gray, and the nearer central region is darker gray.
+
+This confirms that swapping the Black/White endpoints reverses the displayed depth ramp independently of the Invert checkbox. It is consistent with the reconstructed code that orders the clipping interval separately from the mapped output endpoints.
+
+- [x] Reversed Black/White points: qualitative runtime PASS.
