@@ -171,6 +171,7 @@ nav:
       - "Workflow: от SDK headers до рабочего recipe": 18-SDK-HEADER-TOOLS/02-INVENTORY-WORKFLOW.md
       - "SDK diff policy": 18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md
       - "Header-first rules": 18-SDK-HEADER-TOOLS/04-HEADER-FIRST-RULES.md
+      - "Gate 4 — exact SDK acceptance runbook": 18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md
       - "SDK Header Tools — полный native API без ручного копирования": 18-SDK-HEADER-TOOLS/README.md
   - 19-NATIVE-CODE-FOUNDATION:
       - "Suite acquisition": 19-NATIVE-CODE-FOUNDATION/01-SUITE-ACQUISITION.md
