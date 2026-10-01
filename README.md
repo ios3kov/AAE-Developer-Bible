@@ -3,7 +3,8 @@
 **Практическая библия разработчика инструментов, скриптов, панелей и нативных plug-in'ов для Adobe After Effects.**
 
 Research snapshot: **2026-09-30**  
-Status: **v1.1 — SDK syntax-checked baseline and reproducible documentation**
+Status: **v1.1 — SDK syntax-checked baseline and reproducible documentation**  
+Completion gates: **Gate 1 and Gate 2 closed; later documentation/reuse/compiler/host/release gates remain open.**
 
 ## Проверенность v1.1
 
@@ -63,6 +64,8 @@ Status: **v1.1 — SDK syntax-checked baseline and reproducible documentation**
 18-SDK-HEADER-TOOLS/     generate/verify/diff exact native SDK contracts
 19-NATIVE-CODE-FOUNDATION/ reusable suite/ownership/undo ABI helpers
 20-REFERENCE-IMPLEMENTATIONS/ native-first copyable reference implementations
+21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/ installed-effect evidence/reconstruction atlas
+22-PROJECT-CASE-STUDIES/ lessons and reuse audit from real AE projects
 ```
 
 
