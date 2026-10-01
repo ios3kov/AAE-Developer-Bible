@@ -6,7 +6,7 @@
 
 ## Место в плане
 
-Работа продолжает editorial/source-contract часть этапов 3–4 `COMPLETION-PLAN.md`. Она не закрывает Gate 3A, exact compiler gate, AEGP keyframer/import host acceptance или remaining integration gates.
+Работа продолжает editorial/source-contract review текущей редакции Bible. Она фиксирует exact SDK contracts и source findings; compiler/host evidence конкретных products остаётся отдельным evidence class.
 
 Обновлены:
 
@@ -135,4 +135,4 @@ Placeholder-with-path contract отдельно предупреждает: `AEI
 | Leak diagnostics / failure rollback | NOT RUN |
 | Windows host checks | NOT RUN |
 
-Следующий editorial block после этого может охватить AEIO/Artisan или оставшиеся Cookbook families, но general completion gates остаются источником истины.
+Следующий editorial block после этого может охватить AEIO/Artisan или оставшиеся Cookbook families; editorial readiness определяется полнотой и согласованностью документации.
