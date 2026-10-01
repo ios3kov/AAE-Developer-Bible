@@ -386,3 +386,31 @@ Editorial/source conclusions:
 Old “host acceptance matrix/pending” wording was replaced with product-validation guidance consistent with `EDITORIAL-GUIDE.md`.
 
 **Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new AE runtime import/mask/text/marker result is claimed.
+
+
+## AEIO lifecycle / options / sparse I/O block (2026-10-01)
+
+The AEIO documentation/reference block was reconciled around the supplied SDK 25.6 contracts:
+
+```text
+AEGP_RegisterIO
+→ AEIO_ModuleInfo
+→ AEIO_FunctionBlock4
+→ IOInSuite7 / IOOutSuite6
+→ module-owned spec/options/codec state
+```
+
+Editorial/source conclusions:
+
+- `AEIO_FunctionBlock4` is frozen while surrounding IOIn/IOOut suites have later current generations;
+- host-owned InSpec/OutSpec identity is separated from module-owned options/private state;
+- live options and flat persisted options are different representations;
+- sparse/random/repeated frame requests must not be modeled as guaranteed sequential access;
+- callback cancellation is a normal lifecycle path and cleanup must tolerate partial initialization;
+- source verification/sniffing is bounded/untrusted-input work, not full decode by default;
+- audio, metadata, markers, color and aux channels are capability-specific contracts rather than flags alone;
+- output lifecycle tracks open/header/frame/audio/finalization state so failure/cancel cleanup is explicit;
+- Footage Suite remains for host-supported media/project adoption; new file-format decoding belongs to AEIO;
+- working/reference docs use product-validation guidance rather than mandatory Bible host-test language.
+
+**Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new AEIO importer/exporter host run is claimed.
