@@ -1,6 +1,6 @@
 # Artisan reference workspace
 
-Status: **SDK sample workspace: Artie / runtime result not claimed**.
+Status: **Artie sample-derived workspace plan / RUNTIME-NOT-CLAIMED**.
 
 Artisan replaces/customizes parts of After Effects 3D rendering and carries a substantially larger host contract than a normal effect.
 
@@ -79,9 +79,9 @@ Do not infer renderer thread safety from Effect MFR rules; Artisan has its own c
 
 If external GPU/renderer work is used, keep host object access on documented paths and define cancellation/device teardown explicitly.
 
-## Failure behavior
+## Product failure-validation cases
 
-Test:
+If a concrete product claims recovery/support, useful cases include:
 
 - unsupported scene feature;
 - resource allocation failure;
@@ -93,6 +93,18 @@ Test:
 
 A renderer failure must not corrupt the AE project.
 
+## Persistence/cache separation
+
+When adapting Artie, separate:
+
+- versioned instance settings;
+- runtime scene cache;
+- frame-local render data;
+- interactive viewport state;
+- backend/GPU resources.
+
+Do not flatten runtime cache/backend handles into project data.
+
 ## Verification boundary
 
-The Bible deliberately does not provide a registrar stub and label it a renderer. This entry becomes an implementation only when a meaningful Artie-derived render path is compiled, loaded and validated with scene fixtures.
+The Bible deliberately does not provide a registrar stub and label it a renderer. This is a source/workspace plan; runtime support belongs to a concrete product's evidence. Bible editorial completion does not require building the reference workspace.
