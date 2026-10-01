@@ -5873,6 +5873,9 @@ If header tool fails:
 The Bible has historical macOS arm64 syntax/type evidence for parts of the repository. This file does not upgrade any reference implementation to linked/signed/host-verified status.
 
 
+For the exact PASS/FAIL evidence contract, see [Gate 4 — exact SDK acceptance runbook](08-MACOS/../18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
+
+
 ---
 
 <!-- SOURCE: 08-MACOS/09-PRODUCTION-BUILD-PIPELINE.md -->
@@ -7031,6 +7034,9 @@ Do not cast or suppress a native mismatch to keep the validation lane green.
 ## Verification boundary
 
 Windows compiler/link/sign/install/host acceptance remains separate. A header PASS must never be copied into the compatibility matrix as Windows PASS.
+
+
+For the exact PASS/FAIL evidence contract, see [Gate 4 — exact SDK acceptance runbook](09-WINDOWS/../18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
 
 
 ---
@@ -21944,6 +21950,11 @@ It pins contract-table generations used by the reviewed chapters and native exam
 This prevents a parser run from becoming green merely because it returned *some* tables.
 
 The manifest is **necessary, not sufficient** evidence. Real compiler and host gates still follow.
+
+
+## Gate 4 acceptance
+
+The exact acceptance criteria and evidence-retention rules are in [Gate 4 — exact SDK acceptance runbook](18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
 
 
 ---
