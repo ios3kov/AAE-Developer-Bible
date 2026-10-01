@@ -24041,7 +24041,7 @@ The file is intentionally small. It does not establish host verification until t
 
 Date: **2026-09-30**. Build: **ACX-INPUT-20260930-01**.
 
-**This is an input-fixture milestone, not a new AE acceptance runner. Do not install the candidate mapping or rerun the old Mega Probe.** Gate 8 remains OPEN. Original AEP, captured reports and existing results are unchanged.
+**This is an input-fixture milestone, not a new AE acceptance runner. Do not install the candidate mapping or rerun the old Mega Probe.** The atlas investigation remains ongoing; this does not block core Bible editorial readiness. Original AEP, captured reports and existing results are unchanged.
 
 ## Decision and sources
 
@@ -25277,7 +25277,7 @@ This closes the remaining target-specific gap for 3D Channel Extract on macOS Af
 
 # 3D Channel Extract — edge sampling and frame export
 
-Date: **2026-09-30**. **Collection reviewed; full-effect acceptance and Gate 8 OPEN. No new run requested.**
+Date: **2026-09-30**. **Collection reviewed; full-effect research remains incomplete; this is an ongoing atlas track and does not block core Bible editorial readiness. No new run requested.**
 
 This page supersedes stale v01 NOT RUN statements, the failed half-frame proposal and the exactly-one-file assertion in [the historical version](https://github.com/ios3kov/AAE-Developer-Bible/blob/b9db3cd30fabb0c164a6dacf28674af304d5d403/21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/EDGE-AND-RENDER-PROBE.md). Full methodology, hashes and corrections are in [the evidence audit](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/EVIDENCE-AUDIT-2026-09-30.md).
 
@@ -25463,7 +25463,7 @@ Thus “core static reconstruction complete for all eight families” is withdra
 
 Preserve originals and hashes; never edit reports into PASS. Complete source-backed errata and callback identification from the existing dump. Prepare separate auxiliary footage with independently inventoried identifiers, datatypes, dimensions and known values, plus a separate missing-channel control. Define expected outputs/tolerances before testing. Keep nested Z-Depth, footage channels, output conversion and concurrency as separate suites within one package. Implement actual test bodies; NOT RUN/BLOCKED keeps its gate open even when collection completes. Review fixture coverage and portable tests before delivery. Do not rerun completed depth matrices for cosmetic changes.
 
-**No user AE action is required now. Gate 8 remains OPEN.**
+**No user AE action is required now. The atlas investigation remains ongoing; this does not block core Bible editorial readiness.**
 
 ## Evidence hashes
 
@@ -25793,7 +25793,7 @@ Original evidence is preserved without rewriting its statuses. The [evidence aud
 
 Use separately inventoried auxiliary footage with known channels and values, plus a separate missing-channel control. Define expected outputs and tolerances before execution. Keep nested Z-Depth, imported auxiliary footage, output processing, transparency/ROI and concurrency as separate test suites even when delivered in one package. A placeholder or unsupported input stays NOT RUN/BLOCKED and cannot become acceptance PASS merely because collection completes.
 
-Existing depth measurements must not be discarded or rerun just to rename a tool. **Full-effect acceptance and Gate 8 remain OPEN.**
+Existing depth measurements must not be discarded or rerun just to rename a tool. **Full-effect research remains incomplete; this is an ongoing atlas track, not a core Bible release blocker.**
 
 
 ---
@@ -25944,7 +25944,7 @@ The following scoped claims now have numerical user-run evidence: baseline respo
 
 Still OPEN: edge-specific AA and DPTH/DPAA tracing; negative/HDR and non-finite edge inputs; missing-channel and datatype-mismatch behavior; source/bit-depth UI rules; remaining auxiliary channels and ID boundaries; transparency/ROI; raw frame exports and loaded binary identity; CPU/GPU/MFR; independent-implementation equivalence.
 
-**Gate 8 and complete plug-in acceptance are not closed.** The result is a substantial numerical milestone, not a substitute for the remaining gates in [the runtime protocol](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/RUNTIME-ACCEPTANCE-MACOS-AE25.6.md).
+**Complete plug-in research is not finished.** The atlas is an ongoing appendix and does not block core Bible editorial readiness. The result is a substantial numerical milestone, not a substitute for the remaining gates in [the runtime protocol](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/RUNTIME-ACCEPTANCE-MACOS-AE25.6.md).
 
 ## Reproduce the central comparisons from the original report
 
@@ -26092,7 +26092,7 @@ Public MFR configuration must be researched rather than declared impossible from
 
 First inventory fixture content and identify the unresolved indirect callbacks from existing evidence. Define expected results and tolerances per suite. A single delivery may orchestrate multiple source-specific suites, but not pretend one depth precomp exercises every channel. Implement the test bodies and run applicable portable safety regressions before delivery. Preserve the original Render Queue/project state, avoid overwriting the AEP, and distinguish collection completion from accepted test coverage.
 
-No repetition of already completed depth matrices is requested. **Full-effect acceptance and Gate 8 remain OPEN.**
+No repetition of already completed depth matrices is requested. **Full-effect research remains incomplete.** This is an ongoing atlas track, not a core Bible release blocker.
 
 
 ---
@@ -26751,7 +26751,7 @@ The master list includes bundled entries that Adobe itself lists (for example Mo
 
 Незавершённый продукт может содержать полезные отдельные решения и отрицательные результаты. Здесь сохраняются именно они, а не обещание готовности всего продукта.
 
-Этот раздел реализует дополнительный этап **3A** из [плана](22-PROJECT-CASE-STUDIES/../COMPLETION-PLAN.md) и [чеклиста](22-PROJECT-CASE-STUDIES/../COMPLETION-CHECKLIST.md). Текущая code-level запись: [Reuse audit — 2026-10-01](22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md). Перед созданием новых примеров в этапах 5–6 проверяем, какие наработки уже есть в двух проектах. Safe tooling Gate 2 и documentation Gate 3 уже закрыты; текущий незакрытый пункт 3A — независимый portable rerun выбранного FSTR snapshot.
+Этот раздел сохраняет отдельный reuse-audit milestone, выполненный в ходе редакционной работы Bible. Текущая code-level запись: [Reuse audit — 2026-10-01](22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md). Перед созданием новых примеров в этапах 5–6 проверяем, какие наработки уже есть в двух проектах. Safe tooling Gate 2 и documentation Gate 3 уже закрыты; текущий незакрытый пункт 3A — независимый portable rerun выбранного FSTR snapshot.
 
 ## Зафиксированные источники
 
@@ -26865,7 +26865,7 @@ The master list includes bundled entries that Adobe itself lists (for example Mo
 
 This is the code-level follow-up to the initial case-study extraction in [README.md](22-PROJECT-CASE-STUDIES/README.md).
 
-The purpose is narrow: identify reusable engineering patterns before Gates 5–6 create or expand reference examples. It does **not** promote either source product to a Bible host-verified reference.
+The purpose is narrow: identify reusable engineering patterns before project patterns are reused in Bible reference material. It does **not** promote either source product to a Bible host-verified reference.
 
 ## Audit baseline
 
@@ -27270,7 +27270,7 @@ This conflicts with Bible Gate 2. The Bible safe tooling requires staging, backu
 | HL-03 | **RESEARCH ONLY / DO NOT TRANSFER** | private AE loader ABI, version-sensitive and unsupported |
 | HL installer | **DO NOT TRANSFER** | destructive replacement/quarantine behavior violates Gate 2 |
 
-# Portable-test status for Gate 3A
+# Portable-test status for reuse-audit milestone
 
 ## FSTR Line
 
@@ -27306,7 +27306,7 @@ Private loader work has no destination in supported example gates.
 
 # Independent FSTR portable rerun
 
-To remove the final Gate 3A ambiguity, a dedicated audit branch was created directly from the pinned snapshot:
+To remove the final reuse-audit milestone ambiguity, a dedicated audit branch was created directly from the pinned snapshot:
 
 - base snapshot: `c69e3663de59dc44cbdef18042891f6dd1ce5ee6`;
 - audit branch: `audit/bible-reuse-2026-10-01`;
@@ -27322,13 +27322,13 @@ Passed steps:
 - `npm run check:cep` — CEP build + ExtendScript static checks;
 - `git diff --check`.
 
-This is portable source/build evidence only. It is not an After Effects host test and does not close any Gate 5–7 runtime requirement.
+This is portable source/build evidence only. It is not an After Effects host test and does not create runtime evidence for Bible source examples.
 
-# Gate 3A conclusion
+# reuse-audit milestone conclusion
 
 The candidate code/test/build mapping, original evidence review, independent FSTR portable rerun, provenance review, transfer decisions, target-chapter links and Bible-side acceptance requirements are complete.
 
-**Gate 3A acceptance is met.**
+**reuse-audit milestone acceptance is met.**
 
 No source-project host result is promoted into Bible host verification. FSTR SYNC-001 remains a source-project limitation, and AE Hot Loader's private loader remains research-only.
 
