@@ -19,6 +19,7 @@ def load(name):
 inventory = load("ae_sdk_inventory")
 verify = load("verify_recipe_symbols")
 diff = load("diff_sdk_inventory")
+required = load("verify_required_contracts")
 
 
 class ValidationTests(unittest.TestCase):
@@ -170,6 +171,53 @@ class ValidationTests(unittest.TestCase):
         self.assertIn("AEGP_DoThing", report)
         self.assertIn("A_Boolean", report)
         self.assertNotIn("No indexed", report)
+
+    def test_required_contract_manifest_fails_on_missing_table(self):
+        inventory_data = {
+            "schema_version": 1,
+            "unparsed_candidate_tables": {},
+            "partial_candidate_tables": {},
+            "tables": [{
+                "name": "AEGP_ProjSuite6",
+                "functions": [{
+                    "name": "AEGP_GetNumProjects",
+                    "signature": "A_Err (*AEGP_GetNumProjects)(A_long*);",
+                }],
+            }],
+        }
+        manifest_data = {
+            "schema_version": 1,
+            "target_sdk": "fixture",
+            "required_tables": [
+                {"name": "AEGP_ProjSuite6", "area": "projects"},
+                {"name": "AEGP_StreamSuite6", "area": "streams"},
+            ],
+        }
+        count, missing = required.verify_required(inventory_data, manifest_data)
+        self.assertEqual(count, 2)
+        self.assertEqual([entry["name"] for entry in missing], ["AEGP_StreamSuite6"])
+
+    def test_required_contract_manifest_passes_when_all_present(self):
+        inventory_data = {
+            "schema_version": 1,
+            "unparsed_candidate_tables": {},
+            "partial_candidate_tables": {},
+            "tables": [
+                {"name": "AEGP_ProjSuite6", "functions": [{"name": "A", "signature": "void (*A)(void);"}]},
+                {"name": "AEGP_StreamSuite6", "functions": [{"name": "B", "signature": "void (*B)(void);"}]},
+            ],
+        }
+        manifest_data = {
+            "schema_version": 1,
+            "target_sdk": "fixture",
+            "required_tables": [
+                {"name": "AEGP_ProjSuite6", "area": "projects"},
+                {"name": "AEGP_StreamSuite6", "area": "streams"},
+            ],
+        }
+        count, missing = required.verify_required(inventory_data, manifest_data)
+        self.assertEqual(count, 2)
+        self.assertEqual(missing, [])
 
     def test_large_unsupported_declaration_is_bounded(self):
         self.assertEqual(inventory.parse_functions("A_ " * 20000 + ";"), [])
