@@ -20,7 +20,7 @@ AEGP finds target effect instance
 → caller releases target references
 ~~~
 
-For the supplied SDK 25.6, current EffectSuite4 includes an explicit PF_Cmd argument. Historical ProjDumper syntax is older and must not be copied as the current signature.
+For the supplied SDK 25.6, current EffectSuite5 includes the explicit PF_Cmd argument. Historical ProjDumper/older-suite syntax is pattern evidence and must not be copied as the current signature.
 
 ## Protocol rules
 
@@ -97,4 +97,4 @@ This makes diagnostics distinguish target missing from command rejected.
 
 ## Verification boundary
 
-The contract is source-reviewed against SDK 25.6 and sample history, but the Bible bridge remains runtime result not claimed until the actual caller/effect pair is compiled and run.
+The contract is source-reviewed against SDK 25.6 and sample history. Bible labels the reference RUNTIME-NOT-CLAIMED unless a separate runtime record exists; compilation/host execution is product evidence, not a documentation-completion requirement.
