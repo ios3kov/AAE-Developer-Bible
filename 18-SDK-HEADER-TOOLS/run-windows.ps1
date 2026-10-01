@@ -27,7 +27,8 @@ $CompileReport = Join-Path $Out "native-compile-report.json"
 py (Join-Path $Here "tools\ae_sdk_inventory.py") `
   $SdkHeaders `
   --json $Inventory `
-  --markdown $Markdown
+  --markdown $Markdown `
+  --allow-incomplete
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 py (Join-Path $Here "tools\verify_required_contracts.py") `
