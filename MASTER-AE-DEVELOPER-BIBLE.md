@@ -26432,11 +26432,12 @@ For cross-project lessons also record the source repository, pinned document/cod
 
 # Coverage and verification matrix
 
-Edition: **v1.1**, 2026-09-30. A chapter being present does not mean its API family is fully implemented.
+Edition: **v1.1 working line**, updated 2026-10-01. A chapter being present does not mean its API family is fully implemented.
 
 | Area | Documentation | Implementation | Verification |
 |---|---|---|---|
-| Extension selection, architecture, communication | Architectural guidance | Protocol headers and recipes | Manual review |
+| Extension selection, architecture, communication | Architectural guidance | Protocol headers and recipes | Source/editorial review; host behavior separate |
+| Safe tooling | Transactional install/materialization and fail-closed render harness guidance | `host_cycle.py`, SDK sample materializer, portable regression tests | Gate 2 closed: Validate `36839553520` on `22095cd86a74`; not an AE host PASS |
 | Classic Effect | Lifecycle and rendering guidance | Minimal Gain, 8/16-bpc | SDK 25.6 macOS syntax/type check; host pending |
 | SmartFX | ROI/checkout guidance | Host-copy pass-through, 8/16/32-bpc intent | SDK syntax/type check; pixel/ROI host tests pending; MFR disabled |
 | Custom UI / Drawbot | Event and lifetime guidance | Drawing-reference acquisition skeleton | SDK syntax/type check; no drawing implementation |
@@ -26451,7 +26452,8 @@ Edition: **v1.1**, 2026-09-30. A chapter being present does not mean its API fam
 | GPU | Backend design and testing guidance | SDK_Invert_ProcAmp sample path | GPU comparison pending |
 | SDK tooling | Reproducible commands and limits | Declaration index, symbol-name check, textual/order diff | Synthetic regression tests; full SDK index incomplete |
 | C++ foundation | Ownership/undo/callback guidance | Helpers | Behavioral stub tests and SDK syntax/type check |
-| macOS / Windows | Build/distribution guidance | Sample materializer + syntax drivers | macOS checked; Windows runner requires SDK |
+| macOS / Windows | Build/sign/package plus clean-machine release pipelines | Sample materializer + syntax drivers | historical macOS syntax baseline; Windows native compile/host still pending |
+| Built-in effect research atlas | Evidence levels, execution plan and effect catalog | 3D Channel Extract evidence/function-map pilot | partial static/runtime evidence; full-effect acceptance and catalog completion remain open |
 
 ## Vocabulary
 
