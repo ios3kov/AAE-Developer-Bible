@@ -181,3 +181,10 @@ source revision → build configuration → produced artifact + hash
 Приватные эксперименты с поздней загрузкой из [проектных кейсов](../22-PROJECT-CASE-STUDIES/README.md) не заменяют эти требования. Registration callback, успешная поздняя загрузка нового модуля и безопасная замена уже загруженного кода — разные утверждения. Рассмотренные declarations не дают общего контракта hot reload.
 
 Далее: [инициализация AEGP, hooks и suites](../03-AEGP/01-HOOKS-SUITES.md). Точные исходники этой главы перечислены в [записи сверки](../18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md); непроведённые host-проверки остаются открытыми.
+
+
+## Private loader boundary
+
+The [AE Hot Loader case study](../22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md) records a successful AE 25.6 ARM64 experiment using the internal `ML::LoadPlugins` path to late-load a new diagnostic effect bundle. That result is intentionally **not** converted into a supported loading recipe here.
+
+Public PiPL/registration/loading guidance in this chapter remains based on the documented SDK/sample model. Private loader ABI, image-relative offsets and version-specific host internals belong to research case studies unless separately supported and revalidated for the exact AE build.
