@@ -71,4 +71,4 @@ EMP sample MyBlit returns success with no pixel work; death is a cleanup comment
 | Preview performance/backpressure | NOT RUN |
 | macOS/Windows host matrix | NOT RUN |
 
-Next editorial work can cover shared PICA suite providers and legacy/native boundaries; completion gates remain unchanged.
+Next editorial work can cover shared PICA suite providers and legacy/native boundaries; runtime/product evidence remains separate from Bible editorial readiness.
