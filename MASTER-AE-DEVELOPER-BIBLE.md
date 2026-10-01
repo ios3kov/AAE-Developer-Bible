@@ -22525,95 +22525,258 @@ Exact import flags/behavior считаются host-verified только пос
 
 # Render frame → pixels
 
-**Suites:** `AEGP_RenderOptionsSuite4`, `AEGP_RenderSuite4`, `AEGP_WorldSuite3`  
-**Confidence:** SDK-verified.
+**Primary Bible baseline:** Adobe After Effects SDK **25.6 build 61**.
 
-## Pipeline
+**Current suites:** `AEGP_RenderOptionsSuite4`, `AEGP_RenderSuite5`, `AEGP_WorldSuite3`.
+
+The existing `RenderRecipes.cpp` source example uses the older-compatible `RenderSuite4` subset. Treat that as compatibility-shaped source, not current-suite authority.
+
+## Core pipeline
 
 ```text
 ItemH
 → RenderOptions.NewFromItem
-→ configure time / world / field / downsample
+→ configure time / field / world / downsample / ROI
 → RenderAndCheckoutFrame
 → FrameReceiptH
 → GetReceiptWorld
-→ WorldH
-→ GetBaseAddr8/16/32 + dimensions/rowbytes
-→ read/copy pixels
+→ borrowed read-only WorldH
+→ inspect type/size/rowbytes/base address
+→ copy/consume pixels
 → CheckinFrame
 → Dispose RenderOptions
 ```
+
+## Render options are product-owned
+
+`NewFromItem` creates render options that the caller owns and must dispose through the matching RenderOptions suite.
+
+Do not confuse:
+
+- RenderOptionsH ownership;
+- FrameReceiptH checkout;
+- borrowed WorldH from receipt.
+
+They have different cleanup.
+
+## Defaults are not your intent
+
+`NewFromItem` creates a defined initial configuration, but a production feature should set/read the values it depends on explicitly.
+
+Consider:
+
+- time;
+- time step;
+- field mode;
+- world type;
+- downsample;
+- ROI;
+- matte/render-guide options where relevant.
+
+Do not let current UI state silently choose render semantics unless feature explicitly wants that.
+
+## ROI sentinel
+
+In the reviewed RenderOptions contract, ROI `{0,0,0,0}` means full area, not empty result.
+
+Do not copy sentinel semantics from unrelated APIs.
 
 ## Checkout frame
 
 ```cpp
 AEGP_FrameReceiptH receiptH = nullptr;
 
-ERR(suites.RenderSuite4()->AEGP_RenderAndCheckoutFrame(
+ERR(suites.RenderSuite5()->AEGP_RenderAndCheckoutFrame(
     render_optionsH,
-    nullptr,     // optional cancel callback
-    nullptr,     // cancel refcon
+    cancel_callbackP0,
+    cancel_refconP0,
     &receiptH));
 ```
 
-`receiptH` — не pixels.
+`receiptH` is not pixel memory. It represents the checked-out render result/lifetime.
 
-## Получить world
+## Receipt world
 
 ```cpp
 AEGP_WorldH worldH = nullptr;
-ERR(suites.RenderSuite4()->AEGP_GetReceiptWorld(
-    receiptH,
-    &worldH));
+ERR(suites.RenderSuite5()->AEGP_GetReceiptWorld(receiptH, &worldH));
 ```
 
-`worldH` принадлежит frame receipt/host. Не dispose-ить его как ваш allocated world.
+The reviewed contract describes this world as borrowed/read-only within receipt lifetime.
 
-## Получить pixels
+Do **not** dispose it through World Suite as if you allocated it.
 
-Через World Suite:
+## Pixel access
+
+Through `WorldSuite3` inspect:
+
+- type;
+- dimensions;
+- rowbytes;
+- typed base address: 8/16/32.
+
+Never assume:
 
 ```text
-GetType → 8/16/float world
-GetSize
-GetRowBytes
-GetBaseAddr8 / GetBaseAddr16 / GetBaseAddr32
+rowbytes == width * sizeof(pixel)
 ```
 
-Никогда не считать `rowbytes == width * sizeof(pixel)`.
+Never select pixel type from project settings alone; inspect returned world type.
 
-## Обязательный check-in
+## Copy if data must outlive receipt
+
+If worker/helper needs pixels after host callback:
+
+```text
+while receipt valid
+→ inspect metadata
+→ copy required rows into product-owned buffer
+→ CheckinFrame
+→ hand copied buffer to worker
+```
+
+Do not keep base-address pointer after checkin.
+
+## Checkin is mandatory
 
 ```cpp
-ERR2(suites.RenderSuite4()->AEGP_CheckinFrame(receiptH));
+ERR2(suites.RenderSuite5()->AEGP_CheckinFrame(receiptH));
 receiptH = nullptr;
 ```
 
-AE делает caching decisions на основе checked-out receipts. Держать receipt дольше нужного нельзя.
+Receipt release participates in host cache/resource lifecycle.
+
+Use cleanup even if pixel consumer fails.
+
+## Preserve primary error
+
+Pattern:
+
+```text
+render succeeds
+→ consumer fails
+→ checkin also fails
+```
+
+Report consumer/primary error as primary cause, while logging cleanup failure separately.
+
+Do not overwrite the real error accidentally with cleanup status.
 
 ## Rendered region
 
-Partial rendering/caching означает, что полезно проверять:
+`AEGP_GetRenderedRegion` can describe the useful rendered region.
 
-```cpp
-A_LRect rendered{};
-ERR(suites.RenderSuite4()->AEGP_GetRenderedRegion(
-    receiptH, &rendered));
-```
+Do not assume whole world contains newly-computed full-frame output for every caching/partial-render scenario.
 
-Не предполагать автоматически, что весь world содержит новый render.
+## Do not mutate receipt world
 
-## Не мутировать полученный cached world
+If algorithm needs writable pixels, allocate/copy into your own buffer/world.
 
-Если нужно изменять pixels — копировать в собственный world/buffer. Receipt world — результат host render/cache, не ваша scratch-память.
+Borrowed cached world is not scratch memory.
 
-## Threading
+## Layer render boundaries
 
-Некоторые исторические render calls на UI thread deprecated/ограничиваются. Не строить новую архитектуру на синхронном UI-thread render loop. Для UI thumbnails/analysis продумать asynchronous/cache-friendly design и сверить актуальные 26.5 ограничения.
+Layer render options can represent different boundaries:
 
-## Infinite render recursion
+- normal layer with configured effects-to-render;
+- upstream of effect;
+- downstream of effect.
 
-Если Effect A рендерит layer, содержащий Effect B, который делает симметричный checkout обратно, можно получить recursive render/deadlock. Особенно осторожно с `RenderAndCheckoutLayerFrame`.
+These are not equivalent to:
+
+- final composition frame;
+- UI viewer pixels;
+- Render Queue encoded output.
+
+Document which boundary your feature needs.
+
+## RenderSuite5 async layer rendering
+
+Current SDK 25.6 RenderSuite5 includes async layer-frame request/cancel APIs.
+
+Async architecture requires:
+
+- request ID;
+- refcon lifetime;
+- cancellation state;
+- callback result;
+- shutdown behavior.
+
+Header notes callback guarantee has shutdown exception. Therefore do not design cleanup assuming callback always arrives during AE shutdown.
+
+## UI-thread blocking
+
+Current source comments steer long UI workflows toward async behavior, with only narrow cases appropriate for synchronous UI-thread render.
+
+Do not put synchronous render checkout in every panel refresh/paint event.
+
+## Cancellation
+
+For synchronous APIs with cancel callback:
+
+- keep callback cheap;
+- make product consumer abortable;
+- still release receipt/options correctly.
+
+Cancel is not permission to leak checked-out resources.
+
+## Recursive render danger
+
+Be careful if a plug-in requests rendering of content whose dependency graph can call back into the requesting plug-in.
+
+Potential outcomes:
+
+- recursive render;
+- cycle;
+- deadlock;
+- huge repeated work.
+
+Model dependency boundary explicitly.
+
+## Current RenderSuite5 vs source recipe RenderSuite4
+
+The SDK 25.6 header exposes current `AEGP_RenderSuite5`.
+
+`RenderRecipes.cpp` uses `RenderSuite4` for a smaller compatibility-shaped receipt/world/checkin pattern.
+
+Do not cast suite generations.
+
+For new current-baseline documentation use Suite5; when reading the recipe, read its declared Suite4 dependency literally.
+
+## Cache-related APIs
+
+Render Suite also includes timestamp/change/usefulness/checkin-rendered-frame functionality.
+
+Do not confuse:
+
+- `CheckinFrame(receipt)` — release checked-out frame;
+- `CheckinRenderedFrame(...)` — submit/adopt a separately rendered platform world.
+
+Similar names, different ownership semantics.
+
+## Product workflow
+
+1. Decide item/layer render boundary.
+2. Create owned render options.
+3. Set explicit time/format/ROI.
+4. Render/checkout.
+5. Validate receipt/world/type.
+6. Copy data if needed beyond callback.
+7. Checkin receipt on every path.
+8. Dispose options.
+9. Preserve primary + cleanup errors.
+
+## Related chapters
+
+- [Project/render automation](17-NATIVE-SUITE-COOKBOOK/../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md)
+- [Pixels/color](17-NATIVE-SUITE-COOKBOOK/../02-EFFECT-PLUGINS/06-COLOR-PIXELS.md)
+- [Render Queue](17-NATIVE-SUITE-COOKBOOK/11-RENDER-QUEUE.md)
+- [Memory/undo](17-NATIVE-SUITE-COOKBOOK/12-MEMORY-UNDO-PERSISTENCE.md)
+- [SDK 25.6 project/render review](17-NATIVE-SUITE-COOKBOOK/../18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md)
+
+## Evidence boundary
+
+`RenderOptionsSuite4`/`RenderSuite5`/`WorldSuite3` current-baseline contracts are source-reviewed against SDK 25.6. Source examples do not imply a host-observed frame result.
 
 
 ---
@@ -22882,104 +23045,308 @@ Suite4 baseline and enum/invalidation rules are source-reviewed against SDK 25.6
 
 # Memory / Undo / Persistent Data
 
+These three topics look unrelated, but they meet at one architectural rule:
+
+> **state must have explicit owner, lifetime and failure semantics.**
+
 ## Undo
 
-**Suite:** `AEGP_UtilitySuite6`
+**Suite:** `AEGP_UtilitySuite6`.
 
-Каждая пользовательская mutation-команда должна выглядеть как одна операция:
+For user-visible project mutation, group semantic operation into one undo group where appropriate.
+
+Conceptual RAII shape:
 
 ```cpp
 class ScopedUndo {
 public:
-    ScopedUndo(AEGP_SuiteHandler& s, const char* name)
-        : suites_(s), active_(false)
-    {
-        if (suites_.UtilitySuite6()->AEGP_StartUndoGroup(name) == A_Err_NONE) {
-            active_ = true;
-        }
-    }
-
-    ~ScopedUndo() {
-        if (active_) {
-            suites_.UtilitySuite6()->AEGP_EndUndoGroup();
-        }
-    }
-
-    ScopedUndo(const ScopedUndo&) = delete;
-    ScopedUndo& operator=(const ScopedUndo&) = delete;
-
-private:
-    AEGP_SuiteHandler& suites_;
-    bool active_;
+    ScopedUndo(AEGP_UtilitySuite6* suite, const char* name);
+    A_Err Close();
+    ~ScopedUndo() noexcept;
 };
 ```
 
-В реальном codebase лучше сохранить ошибку EndUndoGroup через явный `Close()`; destructor не должен бросать exception.
+Destructor should not throw. If `EndUndoGroup` error matters, expose explicit `Close()` and preserve its result.
 
----
+## Undo is not transaction rollback
 
-## Host memory
-
-**Suite:** `AEGP_MemorySuite1`
-
-Если suite возвращает `AEGP_MemHandle`:
+Important:
 
 ```text
-lock
-→ use pointer briefly
+StartUndoGroup
+→ mutation A succeeds
+→ mutation B succeeds
+→ mutation C fails
+→ EndUndoGroup
+```
+
+does not mean A/B were automatically rolled back at the moment C failed.
+
+Product must decide partial-failure policy.
+
+## Validate before mutate
+
+Reduce partial changes:
+
+1. resolve all targets;
+2. validate legality/capabilities;
+3. compute pure plan;
+4. open undo;
+5. mutate.
+
+Do not discover obvious invalid input halfway through destructive batch.
+
+## Nested undo
+
+Do not assume your tool owns global undo context.
+
+Keep groups at semantic command boundary and avoid opening/closing groups in low-level helper functions that can be composed unpredictably.
+
+## Host memory handles
+
+**Suite:** `AEGP_MemorySuite1`.
+
+Common pattern:
+
+```text
+receive AEGP_MemHandle
+→ lock
+→ use/copy pointer briefly
 → unlock
 → FreeMemHandle
 ```
 
-Не:
+Never:
+
 - `free()`;
 - `delete`;
-- сохранять locked pointer;
-- передавать pointer в другой thread после unlock.
+- keep pointer after unlock;
+- move locked pointer to worker after unlock;
+- double-free handle.
 
----
+## Copy before async work
 
-## Native allocations
+If worker needs returned string/data:
 
-Ваш `new/delete`, `std::vector` и т.д. допустимы внутри вашего модуля, но не передавайте STL object через plug-in ABI/PICA generic bridge. Межмодульный ABI: POD + explicit ownership callbacks.
+```text
+lock host memory
+→ copy into std::string/vector/owned buffer
+→ unlock
+→ free host handle
+→ worker uses owned copy
+```
 
----
+Host handle and copied data have separate ownership.
+
+## Host refs vs memory handles
+
+Do not create one generic `DisposeAnything()` abstraction.
+
+Examples of different cleanup families:
+
+- `AEGP_MemHandle` → Memory Suite;
+- StreamRefH → Stream Suite;
+- EffectRefH → Effect Suite;
+- FrameReceiptH → Render Suite checkin;
+- FootageH → Footage adoption/dispose rules;
+- MaskRefH → Mask Suite;
+- PICA suite → ReleaseSuite.
+
+Type determines cleanup contract.
+
+## Product-native allocations
+
+`new/delete`, `std::vector`, smart pointers etc. are fine inside your module.
+
+But do not expose C++ standard-library objects across long-lived module ABI unless both sides deliberately share exact toolchain/runtime/allocator contract.
+
+Prefer C-shaped/versioned POD interface for independently versioned components.
 
 ## Persistent Data
 
-**Suite:** `AEGP_PersistentDataSuite4`
+**Suite:** `AEGP_PersistentDataSuite4`.
 
-Подходит для:
+Useful for:
+
 - preferences;
-- feature flags;
 - last-used settings;
-- migration version.
+- feature toggles;
+- migration version;
+- small product configuration.
 
-Не подходит для:
-- pointer;
-- host handle;
-- live layer/effect/stream ref;
-- секреты в plaintext без threat model.
+Not appropriate for:
 
-Ключи должны быть namespaced вашим vendor/product ID.
+- raw pointers;
+- host handles;
+- live layer/effect/stream refs;
+- frame receipt/world;
+- secrets without threat model;
+- huge cache blobs that can be rebuilt.
 
----
+## Namespace keys
+
+Use vendor/product namespace.
+
+Bad:
+
+```text
+lastPath
+version
+enabled
+```
+
+Better conceptual namespace:
+
+```text
+com.vendor.product/settings/schema
+com.vendor.product/ui/lastPath
+```
+
+Avoid collision with other components/products.
+
+## Persistent schema version
+
+Version your own stored data.
+
+```text
+schema version
+→ parse known version
+→ migrate
+→ write current version
+```
+
+Do not reinterpret old bytes/string format as new struct without migration.
+
+## Project state vs preferences
+
+Do not store project-essential render state only in global preferences.
+
+Ask:
+
+- should this travel with project?
+- should it be per-user?
+- can it be regenerated?
+- does it affect render output?
+
+Render-affecting state needs a host/project-visible persistence/dependency strategy, not a hidden preference.
+
+## Secrets
+
+PersistentData is not automatically secure secret storage.
+
+License token/credential design needs a separate threat model and platform storage strategy.
+
+Do not document plaintext preference storage as secure merely because API persists it.
+
+## Quiet errors
+
+Utility quiet-error APIs can suppress/report UI noise for expected operations, but they do not make failed host calls successful.
+
+Always inspect returned `A_Err`.
+
+Suppressed error UI and operation result are separate concerns.
 
 ## Error reporting
 
-Для AEGP пользовательское сообщение — через host Utility/Report API. Не показывать native modal alert из render thread.
+Inside product core use structured errors:
 
-Ошибки внутри core лучше представлять:
-
-```cpp
-struct Error {
-    int32_t domain;
-    int32_t code;
-    char message[256];
-};
+```text
+domain
+code
+context
+message
+cause
 ```
 
-и конвертировать в AE-facing `A_Err` только на boundary.
+At AE boundary convert to `A_Err` and optionally report user-facing context through supported host/UI layer.
+
+## First-error preservation
+
+Pattern:
+
+```text
+operation fails
+→ cleanup also fails
+```
+
+Usually preserve primary operation failure as main result and record cleanup error separately.
+
+Do not lose root cause because destructor cleanup returned another code.
+
+## C++ exception boundary
+
+Never let exception escape `extern "C"` / host callback.
+
+Use boundary guard:
+
+```text
+try implementation
+catch known error
+catch std::exception
+catch ...
+→ A_Err
+```
+
+## Threading
+
+Memory ownership does not imply thread permission.
+
+A product-owned buffer may be thread-safe to move to worker; a host ref/handle may not be legal to use there.
+
+Separate:
+
+- lifetime;
+- ownership;
+- thread-affinity.
+
+## Shutdown
+
+On shutdown:
+
+- stop new requests;
+- release product-owned global state;
+- drain/drop work by policy;
+- avoid host calls after lifetime;
+- do not rely on exceptions for cleanup.
+
+## RAII design
+
+Good RAII wrappers:
+
+- are move-only for unique ownership;
+- have explicit `release()` when ownership transfers;
+- never throw in destructor;
+- expose cleanup error when it materially matters;
+- encode correct cleanup family in type.
+
+Bad RAII wrapper:
+
+```text
+void* + one generic free callback for all AEGP resources
+```
+
+because semantic lifetime differs.
+
+## Product workflow
+
+1. Classify state.
+2. Define owner.
+3. Define cleanup pair.
+4. Define thread use.
+5. Define persistence/reload behavior.
+6. Define partial failure.
+7. Add RAII only after contract is understood.
+
+## Related chapters
+
+- [Memory/threading/errors](17-NATIVE-SUITE-COOKBOOK/../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md)
+- [Undo transactions](17-NATIVE-SUITE-COOKBOOK/../19-NATIVE-CODE-FOUNDATION/03-UNDO-TRANSACTIONS.md)
+- [RAII ownership](17-NATIVE-SUITE-COOKBOOK/../19-NATIVE-CODE-FOUNDATION/02-RAII-OWNERSHIP.md)
+- [Host call boundary](17-NATIVE-SUITE-COOKBOOK/../19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md)
+
+## Evidence boundary
+
+Suite families/ownership patterns are source-reviewed. Security/persistence architecture recommendations are product guidance unless tied to a specific host contract.
 
 
 ---
