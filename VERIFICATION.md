@@ -1,5 +1,14 @@
 # Verification — v1.1
 
+## Scripting, panels and platform distribution chapter review (2026-10-01)
+
+Expanded the ExtendScript object model and ScriptUI chapters, CEP/UXP panel guidance, Script/CEP/native communication chapters, macOS and Windows build/sign/package/CI chapters, and the distribution compatibility/security/release checklist. The [dated source-review record](11-DISTRIBUTION/05-PLATFORM-SOURCE-REVIEW-2026-10-01.md) lists the public Adobe CEP/SDK, Adobe UXP-transition, Apple Developer ID/notarization and Microsoft SignTool sources used for this pass.
+
+The review records the CEP two-engine boundary and host-main-thread evalScript/event scheduling; treats the November 2026 AE UXP beta as a future dated milestone rather than an available API; distinguishes development plug-in paths from installer policy; preserves Windows PiPL resource-generation and architecture declarations; separates macOS ad-hoc development signing from Developer ID/notarized release distribution; and expands Authenticode, installer ownership, upgrade, provenance, symbol and release-evidence rules.
+
+**Verification level: public-source review and documentation.** No new exact-SDK compilation, native link, CEP host run, UXP host run, Developer ID signature, notarization submission, Authenticode signature, installer run, clean-machine load or Windows x64/ARM64 host test was performed. Existing completion gates are unchanged by this editorial work.
+
+
 ## GPU, audio and Custom UI / Drawbot chapter review (2026-10-01)
 
 Expanded [GPU effects](02-EFFECT-PLUGINS/05-GPU.md), [Audio effects](02-EFFECT-PLUGINS/07-AUDIO.md), added [Custom UI / Drawbot](02-EFFECT-PLUGINS/09-CUSTOM-UI-DRAWBOT.md), and aligned the Effect capability map to the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md) records relevant header/sample hashes and line ranges.
