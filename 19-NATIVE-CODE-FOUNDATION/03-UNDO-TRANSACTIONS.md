@@ -129,20 +129,21 @@ Current tests prove:
 - failed start does not call end;
 - null suite produces inactive scope.
 
-Product host tests still need to verify:
+For a concrete product, useful runtime checks include:
 
 - actual Undo menu behavior;
-- multiple host mutations appear as intended;
+- multiple mutations appear as intended;
 - command failure behavior;
 - project state after undo/redo;
 - nested command policy if used.
 
-## Acceptance rule
+## Product acceptance guidance
 
-A user-facing multi-step command is not accepted until:
+A product should not claim reliable multi-step undo semantics until it has:
 
-- prerequisites are validated;
-- undo start failure is handled;
-- one meaningful undo entry is observed when expected;
-- undo/redo restores expected project state;
-- partial-failure behavior is documented/tested.
+- validated prerequisites;
+- handled undo-start failure;
+- defined partial-failure behavior;
+- observed the intended undo/redo behavior in its supported host environment.
+
+Bible's helper/source guidance does not require creating a separate host-test plug-in to be editorially complete.
