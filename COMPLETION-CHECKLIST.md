@@ -111,7 +111,7 @@ Do not infer absence of all AE notification mechanisms from one negative probe. 
 
 **Status: OPEN. Portable tooling is hardened; fresh licensed-SDK compiler evidence is still required after the current source changes.**
 
-- [ ] Required SDK 25.6 contract families parse without unresolved required declarations. A fail-closed required-table/function manifest now exists; fresh exact-SDK inventory run remains required.
+- [x] Required SDK 25.6 contract families parse without unresolved required declarations. Exact SDK run on 2026-10-01: 35 required tables/functions, 0 missing; 39 cookbook call-sites, 0 unknown. Four non-required partial diagnostics remain visible.
 - [x] Parser diagnostics cannot masquerade as ABI/signature validation. Inventory diagnostics, unsupported schema and malformed declarations are rejected by downstream verification.
 - [ ] Recipes are checked by real compilation against the declared SDK. Historical macOS SDK 25.6 syntax evidence exists, but current recipe sources must be recompiled.
 - [ ] Native source set compiles with strict warnings on the current revision. Historical macOS baseline does not automatically transfer after source changes.
