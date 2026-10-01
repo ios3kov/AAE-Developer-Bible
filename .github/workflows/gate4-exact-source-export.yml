@@ -1,0 +1,21 @@
+name: Gate4 Exact Source Export
+
+on:
+  push:
+    branches:
+      - audit/gate4-exact-sdk-2026-10-01
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Package exact checkout including Git identity
+        run: tar -czf /tmp/bible-source.tgz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bible-gate4-exact-source
+          path: /tmp/bible-source.tgz
+          if-no-files-found: error
