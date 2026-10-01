@@ -133,4 +133,4 @@ A release record should make it possible to answer:
 
 ## Verification boundary
 
-The Bible currently records a macOS exact-SDK syntax/type baseline; Windows native compilation remains a separate pending verification gate. This chapter defines the build workflow and does not mark Windows examples host-verified.
+This chapter defines the Windows build workflow. Historical compiler evidence for Bible source snapshots is optional evidence, not a pending completion gate for the documentation.
