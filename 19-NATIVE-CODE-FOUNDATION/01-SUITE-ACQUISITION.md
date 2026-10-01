@@ -155,7 +155,7 @@ The foundation test verifies:
 - exactly one release;
 - acquisition failure leaves owner empty.
 
-Add product integration tests for:
+For a concrete product, useful runtime cases include:
 
 - provider missing;
 - wrong version;
@@ -164,6 +164,10 @@ Add product integration tests for:
 - repeated acquire/release;
 - any declared concurrency mode.
 
+Those tests support product runtime/support claims; they are not editorial prerequisites for Bible.
+
 ## Verification boundary
 
-Stub tests prove local ownership mechanics only. Real suite discovery/refcount/provider lifetime must still be tested inside the target AE host.
+Stub tests prove local ownership mechanics only.
+
+They do not prove real suite discovery, provider lifetime or thread legality. Bible records that boundary instead of treating missing host execution as unfinished documentation.
