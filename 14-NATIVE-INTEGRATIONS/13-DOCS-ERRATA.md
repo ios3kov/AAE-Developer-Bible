@@ -1,5 +1,7 @@
 # Public SDK docs errata / verification notes
 
+> Supporting errata/conflict record. Canonical editorial policy: [EDITORIAL-GUIDE.md](../EDITORIAL-GUIDE.md).
+
 Research baseline: **SDK 25.6 source review + dated public documentation review**.
 
 Purpose of this file: preserve places where public guide, bundled sample, historical code and exact SDK headers can disagree.
