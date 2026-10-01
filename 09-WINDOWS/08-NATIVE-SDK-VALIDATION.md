@@ -8,7 +8,7 @@ It is not Windows build or host evidence.
 
 ~~~powershell
 cd 18-SDK-HEADER-TOOLS
-.\run-windows.ps1 "C:\path\to\After Effects SDK\Examples\Headers"
+.\run-windows.ps1 "C:\path\to\After Effects SDK\Examples"
 ~~~
 
 Use the exact candidate SDK.
@@ -17,9 +17,11 @@ Use the exact candidate SDK.
 
 A successful run means only the tool's implemented checks passed, for example:
 
-- supported header declarations parsed;
-- inventory generated;
-- cookbook/reference suite symbols resolved against that inventory.
+- supported header declarations parsed without unresolved diagnostics;
+- inventory schema/version validation passed;
+- cookbook/reference suite symbols resolved against that inventory;
+- the current Bible native C++ translation units passed MSVC C++17 syntax/type checks;
+- a machine-readable report records SDK header-manifest identity, MSVC identity, exact commands and per-source results.
 
 The parser is deliberately conservative; unsupported declarations are not silently guessed.
 
@@ -27,7 +29,6 @@ The parser is deliberately conservative; unsupported declarations are not silent
 
 It does not prove:
 
-- MSVC compilation;
 - PiPL/resource generation;
 - link;
 - x64/ARM64 architecture correctness;
@@ -41,9 +42,8 @@ It does not prove:
 ## Required next gates
 
 ~~~text
-header preflight
-→ MSVC compile
-→ Windows resource/PiPL step
+header inventory + symbol check + MSVC syntax/type report
+→ Windows resource/PiPL project step
 → link
 → PE/import/architecture inspection
 → native tests
