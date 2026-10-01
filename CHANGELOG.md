@@ -10,6 +10,13 @@
 - Added a dated source-review record; no native build, signing, notarization, installer or host-test status was upgraded by this editorial pass.
 
 
+## Unreleased — 2026-10-01
+
+- Expanded CEP/ExtendScript and native/script-panel communication into versioned production bridge protocols with batching, undo, stale-response, failure, IPC and ownership guidance.
+- Added end-to-end macOS and Windows production build pipeline chapters.
+- Added release artifact identity, installer ownership, upgrade/rollback and staged update guidance.
+- Updated STATUS and VERIFICATION without claiming new host/build verification.
+
 ## v1.1 — 2026-09-30
 
 - Fixed Minimal Gain registration macro, About callback context, selector spelling and suite includes.
