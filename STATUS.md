@@ -110,6 +110,15 @@ Completed as a single cookbook/foundation block:
 
 The block now uses one consistent model for ownership, cleanup, invalidation, thread permission, persistence, partial failure and shutdown.
 
+### Effects / streams / keyframes
+
+Completed as one source/cookbook/reference block:
+
+- `EffectSuite5` current baseline reconciled across cookbook, canonical recipe, ownership helper and Effect↔AEGP bridge docs;
+- `StreamSuite6` / `DynamicStreamSuite4` retained as SDK 25.6 stream baseline;
+- `KeyframeSuite5` retained as SDK 25.6 keyframe baseline;
+- source examples, Keyframer references and product-validation language aligned with `EDITORIAL-GUIDE.md`.
+
 ## Current editorial TODO
 
 1. Sweep every main chapter for completeness against the editorial checklist.
