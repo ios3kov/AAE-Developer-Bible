@@ -1,3 +1,13 @@
+# Verification purpose
+
+This file is an **evidence ledger**, not the completion checklist for AE Developer Bible.
+
+It records what was actually reviewed, compiled, observed or not run so the text never overstates evidence. A missing host/compiler result means only that Bible must not claim that result. It does **not** create an obligation to build or run every example before the documentation can be complete.
+
+The authoritative editorial readiness criteria are in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md).
+
+---
+
 ## Gate 3 post-close consistency correction — 3D Channel Extract (2026-10-01)
 
 A follow-up consistency scan after the recorded Gate 3 closure found two stale planning statements, not new runtime evidence. The master effect list still defaulted every entry to TO VERIFY, and the execution plan still placed 3D Channel Extract under the original HOST-BUILTIN-first pilot wording.
@@ -25,7 +35,7 @@ Expanded the ExtendScript object model and ScriptUI chapters, CEP/UXP panel guid
 
 The review records the CEP two-engine boundary and host-main-thread evalScript/event scheduling; treats the November 2026 AE UXP beta as a future dated milestone rather than an available API; distinguishes development plug-in paths from installer policy; preserves Windows PiPL resource-generation and architecture declarations; separates macOS ad-hoc development signing from Developer ID/notarized release distribution; and expands Authenticode, installer ownership, upgrade, provenance, symbol and release-evidence rules.
 
-**Verification level: public-source review and documentation.** No new exact-SDK compilation, native link, CEP host run, UXP host run, Developer ID signature, notarization submission, Authenticode signature, installer run, clean-machine load or Windows x64/ARM64 host test was performed. Existing completion gates are unchanged by this editorial work.
+**Verification level: public-source review and documentation.** No new exact-SDK compilation, native link, CEP host run, UXP host run, Developer ID signature, notarization submission, Authenticode signature, installer run, clean-machine load or Windows x64/ARM64 host test was performed. This editorial work records source accuracy; runtime execution remains a separate evidence class.
 
 
 ## GPU, audio and Custom UI / Drawbot chapter review (2026-10-01)
@@ -38,7 +48,7 @@ Audio review records AUDIO_SETUP/RENDER/SETDOWN, audio capability flags, PF_Soun
 
 Custom UI review records PF_Cmd_EVENT, event contexts, PF_CustomUIInfo, PF_EffectCustomUISuite, Drawbot supplier/surface borrowed ownership versus created-object ReleaseObject, Custom_ECW_UI/CCU patterns and the documented async-manager requirement for rendered UI frames after the UI/render-thread split.
 
-**Verification level: SDK source review and documentation.** No new GPU binary, device setup/render, CPU↔GPU comparison, audio processing host run, custom UI interaction, async-manager lifecycle, Drawbot leak test, HiDPI/theme test or Windows host run was performed. Gate 4/6/7 remain open.
+**Verification level: SDK source review and documentation.** No new GPU binary, device setup/render, CPU↔GPU comparison, audio processing host run, custom UI interaction, async-manager lifecycle, Drawbot leak test, HiDPI/theme test or Windows host run was performed. No broader runtime result is claimed by this source-review entry.
 
 ## PICA providers, Effect↔AEGP and legacy-boundary chapter review (2026-10-01)
 
@@ -48,7 +58,7 @@ Reviewed contracts include SPBasic public-version acquire/release reference coun
 
 Source limits are explicit: Sweetie does not demonstrate generic suite unpublish/hot replacement; suite refcount does not prove thread safety; the current Bible SharedSuite header is C++-oriented despite its C-shaped ABI; old bundled sample suite generations remain pattern evidence rather than current signatures.
 
-**Verification level: SDK source review and documentation.** The SDK TAR SHA-256 was recalculated and matched the accepted archive. No new provider/consumer host load, wrong-version acquisition run, suite unload/reload test, generic call, layer-time host test, concurrency stress, exact-SDK compile of the Bible bridge templates or Windows host run was performed. Gate 4/6/7 remain open.
+**Verification level: SDK source review and documentation.** The SDK TAR SHA-256 was recalculated and matched the accepted archive. No new provider/consumer host load, wrong-version acquisition run, suite unload/reload test, generic call, layer-time host test, concurrency stress, exact-SDK compile of the Bible bridge templates or Windows host run was performed. No broader runtime result is claimed by this source-review entry.
 
 ## Native panels and BlitHook chapter review (2026-10-01)
 
@@ -58,7 +68,7 @@ Panel review establishes `AEGP_PanelSuite1`, non-localized UTF-8 match-name iden
 
 BlitHook review separates the `AEGeneral` PiPL/plugin entry contract from AEGP. `AE_Hook.h` protocol 3.0 describes 32/64/128-bit AE_PixBuffer metadata, ARGB/BGRA format, non-tight row bytes, view origin/visible rectangle, nullable blank frame and receipt/completion/async fields. Bundled EMP does not process pixels or exercise asynchronous completion, so the Bible does not invent pixel-pointer lifetime or async timing beyond the header.
 
-**Verification level: SDK source review and documentation.** No new native panel binary, dock/reopen/workspace/shutdown run, BlitHook display callback, async completion test, preview-latency benchmark or macOS/Windows host matrix was performed. Gate 6/7 remain open.
+**Verification level: SDK source review and documentation.** No new native panel binary, dock/reopen/workspace/shutdown run, BlitHook display callback, async completion test, preview-latency benchmark or macOS/Windows host matrix was performed. No broader runtime result is claimed by this source-review entry.
 ## AEIO and Artisan chapter review (2026-10-01)
 
 Rewrote [AEIO](04-AEIO/README.md), [AEIO native integration](14-NATIVE-INTEGRATIONS/08-AEIO.md), [Artisan](05-ARTISAN/README.md) and [Artisan native integration](14-NATIVE-INTEGRATIONS/09-ARTISAN.md) from the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md) records nine source hashes and exact header/sample ranges.
@@ -69,7 +79,7 @@ Artisan review records PR API 1.0, `PR_ArtisanEntryPoints` global/instance/frame
 
 Source caveats are preserved rather than silently fixed: IO's legacy comment about not freeing a replaced old InSpec options handle during sync; Artie's mostly-empty global/instance/frame/query lifecycle callbacks; Artie's old suite generations and helper that does not handle text-layer source dimensions; Artie registration sets both artisan version major/minor from `Artie_MAJOR_VERSION`. None is promoted to a measured AE defect without host reproduction.
 
-**Verification level: SDK source review and documentation.** No new exact-SDK compile, AEIO registration/import/export run, decoder/encoder output comparison, aux-channel import test, Artisan registration/selectability/render, interactive viewport test, persistence test, leak/cancel/error injection run or Windows host test was performed. Gate 6/7 remain open.
+**Verification level: SDK source review and documentation.** No new exact-SDK compile, AEIO registration/import/export run, decoder/encoder output comparison, aux-channel import test, Artisan registration/selectability/render, interactive viewport test, persistence test, leak/cancel/error injection run or Windows host test was performed. No broader runtime result is claimed by this source-review entry.
 ## Masks, text/markers and footage/import chapter review (2026-10-01)
 
 Rewrote [Masks](17-NATIVE-SUITE-COOKBOOK/07-MASKS.md), [Text + markers](17-NATIVE-SUITE-COOKBOOK/08-TEXT-MARKERS.md) and [Footage / import](17-NATIVE-SUITE-COOKBOOK/09-FOOTAGE-IMPORT.md) against the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/11-MASK-TEXT-FOOTAGE-SDK25.6.md) records six SDK/source hashes, current suite generations, sample ranges and ownership findings.
@@ -185,7 +195,7 @@ python3 scripts/check_native.py "/path/to/Adobe-SDK/Examples"
 
 This is a **syntax/type** check. It deliberately does not call it a plugin build. Keep Adobe sample utilities, PiPL resources, exported entry points and platform settings when integrating. Compile canonical sources or section-20 forwarding files, never both into the same binary. Copy the foundation headers alongside MenuTool or adjust its relative include.
 
-## Required next host checks
+## Optional implementation/runtime checks for readers who turn references into products
 
 1. Minimal Gain: load, parameter UI, gain 0/1/4, 8/16-bpc and transparent pixels.
 2. SmartFX Copy: compare input/output at 8/16/32-bpc, partial/empty ROI, odd sizes, nonzero origins and cancellation. Keep MFR off in the delivery build until concurrent-frame tests pass; use a separately identified enabled test build for those tests.
@@ -202,7 +212,7 @@ Added end-to-end release-flow chapters for [macOS](08-MACOS/09-PRODUCTION-BUILD-
 
 Added [release artifacts, installers and update strategy](11-DISTRIBUTION/05-RELEASE-ARTIFACTS-UPDATES.md), covering release-set identity, installer ownership, upgrade/rollback, staged auto-update, download integrity and compatibility/support metadata.
 
-**Verification level: documentation/architecture review only.** No new CEP panel was executed in AE, no ExtendScript dispatcher was host-tested, no macOS release binary was signed/notarized in this update, no Windows binary was Authenticode-signed, no installer was built, and no clean-machine AE load cycle was performed. These chapters define the required production process; they do not close completion-plan host/build gates.
+**Verification level: documentation/architecture review only.** No new CEP panel was executed in AE, no ExtendScript dispatcher was host-tested, no macOS release binary was signed/notarized in this update, no Windows binary was Authenticode-signed, no installer was built, and no clean-machine AE load cycle was performed. These chapters define the production process for reader products; no Bible-owned build/host run is required for editorial completion.
 
 
 ## Host-verification and release-evidence guidance (2026-10-01)
