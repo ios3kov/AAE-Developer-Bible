@@ -331,3 +331,27 @@ A Linux-container compiler experiment against the exact headers was also run onl
 **Editorial consequence:** required-contract parsing is PASS for the current SDK baseline. macOS/Xcode or Windows/MSVC compilation may be performed as optional evidence for specific source examples, but is not required for Bible completion.
 
 Full record: [18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md](18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md).
+
+
+## Effects / streams / keyframes consistency block (2026-10-01)
+
+The canonical AEGP operation chain was reconciled as one block:
+
+```text
+Layer
+→ EffectSuite5
+→ StreamSuite6 / DynamicStreamSuite4
+→ KeyframeSuite5
+```
+
+Current-source corrections:
+
+- `17-NATIVE-SUITE-COOKBOOK/code/EffectStreamRecipes.cpp` now uses current SDK 25.6 `EffectSuite5` instead of the older compatibility `EffectSuite4`;
+- `AegpEffectRefOwner` and its foundation stub/test now use `AEGP_EffectSuite5`;
+- the Effect↔AEGP working/reference docs were corrected from stale “current EffectSuite4” wording to `EffectSuite5`;
+- stream/keyframe chapters retain `StreamSuite6`, `DynamicStreamSuite4`, and `KeyframeSuite5`;
+- “required host tests / host acceptance matrix” wording was replaced with product-validation guidance consistent with `EDITORIAL-GUIDE.md`.
+
+The earlier source-review blob hashes remain historical provenance for the earlier snapshots. They are not retroactively relabeled.
+
+**Verification level:** source/editorial consistency plus existing portable source tests. No new AE runtime result is claimed.
