@@ -69,7 +69,7 @@ Do not let the behavior emerge accidentally from host duplicate-time semantics.
 
 ## Interpolation/ease
 
-If the product promises interpolation/easing, add explicit host tests for:
+If a concrete product promises interpolation/easing behavior, useful runtime checks include:
 
 - linear;
 - hold;
@@ -86,7 +86,7 @@ The complete user operation should generally be one undo group.
 
 Test Undo and Redo in AE, not only function return codes.
 
-## Stress fixture
+## Product stress fixture
 
 Generate a known number of keys, for example hundreds or thousands, then verify:
 
@@ -100,4 +100,4 @@ Generate a known number of keys, for example hundreds or thousands, then verify:
 
 ## Verification boundary
 
-This template documents the transaction shape. Exact KeyframeSuite signatures, value ownership and stream generations must come from the SDK compiled by the product, and host behavior remains pending until tested.
+This template documents the transaction/source shape. Exact KeyframeSuite signatures, value ownership and stream generations come from the target SDK contract. Bible does not claim runtime behavior for this template; a concrete product adds runtime evidence only for the support claims it makes.
