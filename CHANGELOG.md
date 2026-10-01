@@ -2,6 +2,12 @@
 
 ## Editorial progress — 2026-10-01
 
+- Expanded the full testing section with explicit build/host/release evidence layers, richer matrices, render/ROI correctness, MFR stress, performance and crash diagnostics.
+- Added an evidence/acceptance chapter with PASS/FAIL/BLOCKED/NOT_RUN vocabulary tied to exact artifact and environment identity.
+- Expanded practical recipes and bug/compatibility/performance/spec/release templates.
+- Reconciled the CEP working template with the communication protocol field and corrected ScriptUI/JSX verification wording.
+- Serialized/retried generated-doc updates to prevent non-fast-forward failures during rapid documentation pushes.
+
 - Expanded ExtendScript object-model and ScriptUI chapters with reference invalidation, stable targeting, command boundaries and long-operation rules.
 - Expanded CEP communication into a versioned request/response protocol with main-thread scheduling, stale-response, path, large-data and security boundaries.
 - Added a dated After Effects UXP migration plan based on Adobe's 2026-09-24 transition announcement without treating the future beta as a verified API.
