@@ -50,7 +50,7 @@ The sample demonstrates publication, not general hot replacement. It does not sh
 
 ### Current generic Effect call
 
-`Headers/AE_GeneralPlug.h:2162–2168` declares the current `AEGP_EffectSuite4::AEGP_EffectCallGeneric` with plugin id, effect ref, layer-time value, explicit `PF_Cmd` and `void* extra`.
+`Headers/AE_GeneralPlug.h:2162–2168` declares `AEGP_EffectCallGeneric` inside the current `AEGP_EffectSuite5` table with plugin id, effect ref, layer-time value, explicit `PF_Cmd` and `void* extra`.
 
 The header explicitly says old behavior is obtained by passing `PF_Cmd_COMPLETELY_GENERAL`.
 
@@ -95,7 +95,7 @@ The README was corrected; the header was not changed in this editorial pass.
 
 ### Generic-bridge template lacked the explicit current command/time emphasis
 
-The template documentation was updated to require current `EffectSuite4` call semantics: explicit `PF_Cmd_COMPLETELY_GENERAL` for the historical path, and time in the target layer timebase.
+The template documentation was updated to require current `EffectSuite5` call semantics: explicit `PF_Cmd_COMPLETELY_GENERAL` for the historical path, and time in the target layer timebase.
 
 No new host call was made.
 
