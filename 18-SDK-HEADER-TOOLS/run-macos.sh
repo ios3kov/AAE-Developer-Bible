@@ -34,7 +34,8 @@ python3 "$HERE/tools/verify_recipe_symbols.py" \
 python3 "$ROOT/scripts/check_native.py" "$SDK_EXAMPLES" \
   --compiler "${CXX:-clang++}" \
   --compiler-style clang \
-  --report "$OUT/native-compile-report.json"
+  --report "$OUT/native-compile-report.json" \
+  --require-clean
 
 echo "Gate-4 local SDK lane: inventory + symbol-name + compiler syntax/type checks PASS"
 echo "No link, PiPL load, AE host execution or runtime semantics were tested."
