@@ -1,23 +1,43 @@
 (function () {
   var cs = new CSInterface();
   var status = document.getElementById('status');
+  var sequence = 0;
+  var latestRequestId = null;
 
-  function callHost(method, params) {
+  function callHost(command, payload) {
+    sequence += 1;
+
+    var requestId = String(Date.now()) + "-" + String(sequence);
+    latestRequestId = requestId;
+
     var req = {
       version: 1,
-      requestId: String(Date.now()),
-      method: method,
-      params: params || {}
+      requestId: requestId,
+      command: command,
+      payload: payload || {}
     };
+
     var json = JSON.stringify(req);
     var arg = JSON.stringify(json); // safely quoted JS string literal
+
     cs.evalScript('$._aeBible.dispatch(' + arg + ')', function (raw) {
+      var res;
+
       try {
-        var res = JSON.parse(raw);
-        status.textContent = JSON.stringify(res, null, 2);
+        res = JSON.parse(raw);
       } catch (e) {
-        status.textContent = 'Bad host response: ' + raw;
+        if (requestId === latestRequestId) {
+          status.textContent = 'Bad host response: ' + raw;
+        }
+        return;
       }
+
+      // A newer UI request superseded this reply.
+      if (res.requestId !== latestRequestId) {
+        return;
+      }
+
+      status.textContent = JSON.stringify(res, null, 2);
     });
   }
 
