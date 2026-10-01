@@ -20831,18 +20831,23 @@ iterate current project items
 
 # Composition recipes
 
-**Suite:** `AEGP_CompSuite13` for AE 26.5-specific features; older functions remain available through the current suite.  
-**Confidence:** SDK-verified.
+**Primary Bible baseline:** Adobe After Effects SDK **25.6 build 61**.
 
-## Создать comp
+**Baseline suite:** `AEGP_CompSuite12`.
+
+`AEGP_CompSuite13` belongs to later-version research and must be feature/version-gated rather than silently replacing the 25.6 baseline.
+
+## Create a composition
+
+Conceptual call shape:
 
 ```cpp
-A_Time duration{10, 1}; // 10 seconds
+A_Time duration{10, 1};
 A_Ratio par{1, 1};
 A_Ratio fps{25, 1};
 
 AEGP_CompH compH = nullptr;
-ERR(suites.CompSuite13()->AEGP_CreateComp(
+ERR(suites.CompSuite12()->AEGP_CreateComp(
     parent_folderH,
     utf16_name,
     1920,
@@ -20853,100 +20858,194 @@ ERR(suites.CompSuite13()->AEGP_CreateComp(
     &compH));
 ```
 
-Порядок: parent folder → name → dimensions → PAR → duration → frame rate → output handle.
+Keep explicit:
 
----
+- parent folder;
+- UTF-16 name;
+- dimensions;
+- pixel aspect ratio;
+- duration;
+- frame rate;
+- returned comp handle.
 
-## Получить comp из project item
+Do not replace rational time/frame-rate types with floating-point guesses.
 
-```cpp
-AEGP_CompH compH = nullptr;
-ERR(suites.CompSuite13()->AEGP_GetCompFromItem(itemH, &compH));
-```
-
-И обратно:
-
-```cpp
-AEGP_ItemH comp_itemH = nullptr;
-ERR(suites.CompSuite13()->AEGP_GetItemFromComp(compH, &comp_itemH));
-```
-
----
-
-## Создать solid
-
-```cpp
-AEGP_LayerH solid_layerH = nullptr;
-PF_Pixel color{};
-color.alpha = 255;
-color.red   = 255;
-color.green = 0;
-color.blue  = 0;
-
-ERR(suites.CompSuite13()->AEGP_CreateSolidInComp(
-    utf16_name,
-    500,
-    500,
-    &color,
-    compH,
-    nullptr,          // duration: use host/default contract as appropriate
-    &solid_layerH));
-```
-
-Точную optional-duration семантику сверять с headers версии SDK.
-
----
-
-## Создать camera / light / text layer
-
-```cpp
-AEGP_LayerH cameraH = nullptr;
-AEGP_LayerH lightH  = nullptr;
-AEGP_LayerH textH   = nullptr;
-
-ERR(suites.CompSuite13()->AEGP_CreateCameraInComp(
-    utf16_camera_name, center_point, compH, &cameraH));
-
-ERR(suites.CompSuite13()->AEGP_CreateLightInComp(
-    utf16_light_name, center_point, compH, &lightH));
-
-ERR(suites.CompSuite13()->AEGP_CreateTextLayerInComp(
-    compH, TRUE, &textH));
-```
-
-`center_point` type/coordinates брать из installed SDK declaration; не подменять screen-space и comp-space координаты.
-
----
-
-## 26.5: parametric mesh layer
-
-`AEGP_CompSuite13` добавляет `AEGP_CreateParametricMeshLayerInComp`. Это **feature-gated** recipe:
+## Item ↔ Comp
 
 ```text
-Acquire/compile against CompSuite13
-→ call CreateParametricMeshLayerInComp
-→ older host? disable this command
+ItemH
+→ GetCompFromItem
+→ CompH
+
+CompH
+→ GetItemFromComp
+→ ItemH
 ```
 
-Не делайте весь plug-in AE 26.5-only, если mesh — необязательная функция.
+Project item identity and composition handle are related but not interchangeable.
 
----
+## Handle lifetime
 
-## Получить marker stream composition
+`AEGP_CompH` is a host reference, not product-owned memory.
 
-В актуальном CompSuite доступен comp marker stream. Дальше он обрабатывается обычными Stream/Keyframe/Marker suites.
+Do not:
 
-Архитектура:
+- `delete` it;
+- persist its raw pointer value;
+- use it as cross-project database identity.
+
+For long-lived product state, retain documented IDs/your own identifiers and re-resolve host refs when needed.
+
+## Create a solid
+
+Use the current `CompSuite12` declaration for exact signature/optional duration semantics.
+
+Example shape:
+
+```cpp
+PF_Pixel color{};
+color.alpha = 255;
+color.red = 255;
+
+AEGP_LayerH layerH = nullptr;
+ERR(suites.CompSuite12()->AEGP_CreateSolidInComp(
+    utf16_name,
+    width,
+    height,
+    &color,
+    compH,
+    durationP0,
+    &layerH));
+```
+
+Returned LayerH belongs to host model. Structural edits can invalidate assumptions about indices/order.
+
+## Create camera / light / text
+
+Current suite provides composition-level creation paths for camera/light/text-related layers.
+
+Keep coordinate/time assumptions explicit:
+
+- comp-space vs layer-space;
+- 2D point vs 3D transform;
+- current UI time vs explicit render/project time.
+
+Do not infer coordinates from panel pixels.
+
+## Composition marker stream
+
+Composition marker data is exposed as a stream.
+
+Pattern:
 
 ```text
 CompH
 → GetNewCompMarkerStream
-→ StreamRefH
-→ KeyframeSuite (times)
-→ StreamSuite (values)
-→ MarkerSuite (marker contents)
+→ owned StreamRefH
+→ Keyframe Suite for times
+→ Stream Suite for values
+→ Marker Suite for marker payload
 → DisposeStream
 ```
+
+Stream ref/value/marker/memory handles have different cleanup families.
+
+## Dimensions and duration
+
+Validate product limits before mutation.
+
+Do not let UI text fields directly become:
+
+- width/height;
+- time scale;
+- frame rate numerator/denominator.
+
+Normalize/validate first, then call host.
+
+## Frame rate
+
+Use rational representation from the API.
+
+Examples like 23.976 are commonly represented as ratios rather than exact decimal float values.
+
+Do not store product timing internally only as `double fps` if exact frame mapping matters.
+
+## Active comp vs explicit comp
+
+Do not build deep logic around “active comp” unless the feature explicitly targets the current UI context.
+
+Better command model:
+
+```text
+resolve active comp at user action
+→ normalize identity
+→ pass explicit target into core operation
+```
+
+This improves stale-state handling and testability.
+
+## Undo
+
+User-visible comp creation/mutation should participate in deliberate undo grouping.
+
+Validate all arguments first. Undo is not guaranteed transactional rollback for every partial failure.
+
+## Feature gating: later CompSuite13
+
+Later SDK research includes `AEGP_CompSuite13` and additional features such as parametric mesh creation.
+
+Do not write baseline 25.6 code as:
+
+```cpp
+suites.CompSuite13()->...
+```
+
+unless the feature is explicitly version-gated.
+
+Architecture:
+
+```text
+baseline feature → CompSuite12
+optional later feature → acquire/use later suite only when supported
+```
+
+## Failure modes
+
+Plan for:
+
+- invalid parent folder;
+- invalid dimensions/PAR/fps;
+- unsupported later-suite feature;
+- target project closed/changed;
+- comp/item deleted between UI snapshot and command;
+- partial operation followed by later failure.
+
+## Product workflow
+
+1. Resolve target project/folder.
+2. Validate dimensions/timing/name.
+3. Open undo group if user-facing.
+4. Create comp/layers.
+5. Store stable product identity, not raw refs.
+6. Drop temporary refs after command.
+7. Return fresh project/comp summary to UI.
+
+## Version discipline
+
+The supplied SDK 25.6 source review identifies `AEGP_CompSuite12` as the current baseline. Later suite notes must remain labeled as later-version research.
+
+See [masks/text/footage SDK 25.6 review](17-NATIVE-SUITE-COOKBOOK/../18-SDK-HEADER-TOOLS/11-MASK-TEXT-FOOTAGE-SDK25.6.md).
+
+## Related chapters
+
+- [Project/items](17-NATIVE-SUITE-COOKBOOK/01-PROJECT-ITEMS.md)
+- [Layers](17-NATIVE-SUITE-COOKBOOK/03-LAYERS.md)
+- [Streams/properties](17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md)
+- [Lifetime/threading](17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md)
+
+## Evidence boundary
+
+Suite baseline and ownership statements are SDK-contract-reviewed. Bible does not claim runtime behavior of one specific composition-creation binary.
 
 
 ---
@@ -20955,10 +21054,13 @@ CompH
 
 # Layer recipes
 
-**Suites:** `AEGP_LayerSuite9`, `AEGP_CompSuite13`  
-**Confidence:** SDK-verified. `AEGP_AddLayer` signature additionally checked against header-derived bindings.
+**Primary Bible baseline:** Adobe After Effects SDK **25.6 build 61**.
 
-## Количество слоёв и layer по index
+**Suites:** `AEGP_LayerSuite9`, with composition context from `AEGP_CompSuite12` where needed.
+
+Later `CompSuite13` notes must stay version-gated.
+
+## Enumerate layers
 
 ```cpp
 A_long count = 0;
@@ -20967,99 +21069,220 @@ ERR(suites.LayerSuite9()->AEGP_GetCompNumLayers(compH, &count));
 for (A_long i = 0; i < count && !err; ++i) {
     AEGP_LayerH layerH = nullptr;
     ERR(suites.LayerSuite9()->AEGP_GetCompLayerByIndex(compH, i, &layerH));
-    // use layerH now
+    // use layerH within the current operation
 }
 ```
 
-Не полагаться на index как на persistent identity.
+Layer index is ordering, not persistent identity.
 
----
+## Stable layer ID
 
-## Добавить footage/project item как layer
+Use Layer Suite ID APIs where appropriate:
 
-Сначала проверить legality:
+```text
+LayerH
+→ GetLayerID
+→ LayerID
+
+later in same relevant project/comp context
+→ GetLayerFromLayerID
+→ fresh LayerH
+```
+
+Do not over-promise ID lifetime beyond documented project/import/merge boundaries.
+
+## Add project item as layer
+
+Validate first:
 
 ```cpp
 A_Boolean validB = FALSE;
 ERR(suites.LayerSuite9()->AEGP_IsAddLayerValid(itemH, compH, &validB));
-
-if (validB) {
-    AEGP_LayerH new_layerH = nullptr;
-    ERR(suites.LayerSuite9()->AEGP_AddLayer(
-        itemH,
-        compH,
-        &new_layerH));
-}
 ```
 
-### Docs erratum
+Then add only if legal.
 
-В некоторых версиях публичной HTML-страницы третий аргумент `AEGP_AddLayer` отображался как `A_Boolean*`. Header-derived contract — `AEGP_LayerH*`.
+Current header-derived `AEGP_AddLayer` returns `AEGP_LayerH*`; some historical HTML showed an incorrect third-argument type.
 
----
+See [docs errata](17-NATIVE-SUITE-COOKBOOK/../14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md).
 
-## Stable identity: Layer ID
-
-```cpp
-AEGP_LayerIDVal id = 0;
-ERR(suites.LayerSuite9()->AEGP_GetLayerID(layerH, &id));
-```
-
-Позже:
-
-```cpp
-AEGP_LayerH freshH = nullptr;
-ERR(suites.LayerSuite9()->AEGP_GetLayerFromLayerID(compH, id, &freshH));
-```
-
-Это предпочтительнее хранения `LayerH` через длинную цепочку UI операций.
-
----
-
-## Переименовать layer
+## Rename layer
 
 ```cpp
 ERR(suites.LayerSuite9()->AEGP_SetLayerName(layerH, utf16_name));
 ```
 
----
+Validate UTF-16 string lifetime and user input before mutation.
 
-## Duplicate
+## Duplicate layer
 
 ```cpp
 AEGP_LayerH duplicateH = nullptr;
-ERR(suites.LayerSuite9()->AEGP_DuplicateLayer(
-    layerH,
-    &duplicateH));
+ERR(suites.LayerSuite9()->AEGP_DuplicateLayer(layerH, &duplicateH));
 ```
 
-После duplicate пересчитать layer indices.
+After duplicate:
 
----
+- layer indices may change;
+- selection may change depending on host behavior;
+- cached index→identity maps should be rebuilt.
 
-## Parent layer
-
-```cpp
-AEGP_LayerH parentH = nullptr;
-ERR(suites.LayerSuite9()->AEGP_GetLayerParent(layerH, &parentH));
-
-ERR(suites.LayerSuite9()->AEGP_SetLayerParent(
-    layerH,
-    new_parentH));
-```
-
-Перед parent operation проверять cycle/host legality, если API предоставляет соответствующую проверку.
-
----
-
-## Delete
+## Delete layer
 
 ```cpp
 ERR(suites.LayerSuite9()->AEGP_DeleteLayer(layerH));
 layerH = nullptr;
 ```
 
-Никаких вызовов по удалённому handle.
+After delete, do not call anything through the deleted handle.
+
+Any dependent cached refs/indices should be considered suspect and re-resolved.
+
+## Parent layer
+
+Pattern:
+
+```text
+GetLayerParent
+→ validate desired new parent
+→ SetLayerParent
+```
+
+Do not build cycles or assume arbitrary layer types can parent every target. Use documented legality/host behavior.
+
+## Source item
+
+LayerH and source ItemH are different model objects.
+
+A layer may represent:
+
+- footage;
+- comp;
+- text/shape/null/camera/light-like host objects;
+- other layer types without an ordinary source item.
+
+Do not assume every layer has a normal footage source.
+
+## Comp ownership
+
+Layer belongs to a composition context.
+
+Store product identity as:
+
+```text
+composition identity
++ layer ID
+```
+
+rather than LayerID alone if your product can operate across multiple comps.
+
+## Timing
+
+Layer time-related operations must distinguish:
+
+- comp time;
+- layer time;
+- in/out;
+- start time;
+- stretch/time remapping where relevant.
+
+Do not silently convert with project current UI time.
+
+## Selection
+
+Selection is UI state, not stable layer identity.
+
+Safe UI command:
+
+```text
+query selected layers
+→ normalize comp + LayerIDs
+→ validate
+→ mutate
+```
+
+Do not retain selection collection/LayerH refs through long asynchronous work.
+
+## Effects/properties
+
+To modify a layer's effects/properties, resolve through Effect/Stream/DynamicStream APIs rather than assuming UI index/name is stable.
+
+Use match names where appropriate for effects/properties.
+
+## Undo
+
+For batch layer mutation:
+
+1. resolve target IDs;
+2. validate all targets;
+3. open undo group;
+4. mutate;
+5. cleanup/drop refs;
+6. return updated summary.
+
+Undo does not guarantee automatic rollback of every partial mutation.
+
+## Invalidation
+
+Operations that structurally change the comp can make previously observed indices stale.
+
+Examples:
+
+- add;
+- duplicate;
+- delete;
+- reorder.
+
+After structural mutation, re-query ordering.
+
+## Long-running commands
+
+If heavy planning happens on worker thread, pass only pure data/stable IDs to worker.
+
+Before host mutation:
+
+- re-resolve comp;
+- re-resolve layer;
+- validate revision/context;
+- then mutate on supported host path.
+
+## Failure modes
+
+Handle:
+
+- comp disappeared;
+- layer ID not found;
+- wrong layer type;
+- add invalid;
+- parent invalid;
+- user changed project during async work;
+- partial batch failure.
+
+## Product pattern
+
+```text
+UI intent
+→ comp ID + LayerIDs
+→ pure operation plan
+→ host callback
+→ resolve current LayerH refs
+→ validate
+→ undo
+→ mutate
+→ fresh state
+```
+
+## Related chapters
+
+- [Compositions](17-NATIVE-SUITE-COOKBOOK/02-COMPOSITIONS.md)
+- [Effects](17-NATIVE-SUITE-COOKBOOK/04-EFFECTS.md)
+- [Streams/properties](17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md)
+- [Guides/views/selection](17-NATIVE-SUITE-COOKBOOK/13-GUIDES-VIEWS-SELECTION.md)
+- [Lifetime/threading](17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md)
+
+## Evidence boundary
+
+`LayerSuite9`/`CompSuite12` baseline is source-reviewed against SDK 25.6. Runtime semantics of a concrete batch tool belong to that product's evidence.
 
 
 ---
@@ -22399,104 +22622,258 @@ ERR(suites.RenderSuite4()->AEGP_GetRenderedRegion(
 
 # Render Queue recipes
 
-**Suites:** `AEGP_RenderQueueSuite1`, `AEGP_RQItemSuite4`, `AEGP_OutputModuleSuite4`  
-**Confidence:** SDK-verified + `QueueBert` sample-derived.
+**Primary Bible baseline:** Adobe After Effects SDK **25.6 build 61**.
 
-## Добавить comp в queue
+**Current SDK families:** `AEGP_RenderQueueSuite1`, `AEGP_RQItemSuite4`, `AEGP_OutputModuleSuite4`.
+
+The existing Bible C++ recipe intentionally uses the older-compatible `RQItemSuite3` subset; both Suite3 and current Suite4 use **`AEGP_RenderItemStatusType`**, not `A_Boolean`, for render-item state.
+
+## Queue state vs item state
+
+These are different state machines.
+
+Queue state:
+
+- STOPPED;
+- PAUSED;
+- RENDERING.
+
+Item state includes values such as:
+
+- NEEDS_OUTPUT;
+- UNQUEUED;
+- QUEUED;
+- USER_STOPPED;
+- ERR_STOPPED;
+- DONE.
+
+Do not pass queue-state constants to item APIs or vice versa.
+
+## Add composition
 
 ```cpp
 ERR(suites.RenderQueueSuite1()->AEGP_AddCompToRenderQueue(
     compH,
-    output_path_utf8_or_host_expected_path));
+    initial_path_utf8));
 ```
 
-После add **старые Render Queue references могут стать invalid**. Re-query queue.
+Important: changing queue composition/order invalidates existing `AEGP_RQItemRefH` references.
 
----
-
-## Получить queue items
+After add/remove/reorder:
 
 ```text
-GetNumRQItems
-→ GetRQItemByIndex / GetNextRQItem
-→ GetCompFromRQItem
-→ GetRenderState / SetRenderState
-```
-
-Используйте именно indexing semantics вашей версии/sample; не переносите undocumented community assumptions между версиями.
-
----
-
-## Output modules
-
-```text
-RQItem
-→ GetNumOutputModulesForRQItem
-→ GetOutputModuleByIndex
-→ SetOutputFilePath
-→ configure enabled outputs / channels / crop / stretch / sound
-```
-
-После add/remove output module re-query references/indices.
-
----
-
-## Установить output path
-
-```cpp
-ERR(suites.OutputModuleSuite4()->AEGP_SetOutputFilePath(
-    rq_item_refH,
-    output_module_refH,
-    utf16_pathZ));
-```
-
-`AEGP_SetOutputFilePath` принимает NULL-terminated UTF-16 path (`A_UTF16Char*`). `AEGP_GetOutputFilePath` возвращает `AEGP_MemHandle`, который надо освободить через Memory Suite.
-
----
-
-## Запустить queue
-
-Сначала item должен иметь допустимый output path и быть включён для рендера:
-
-```cpp
-ERR(suites.RQItemSuite4()->AEGP_SetRenderState(
-    rq_itemH,
-    TRUE));
-
-ERR(suites.RenderQueueSuite1()->AEGP_SetRenderQueueState(
-    AEGP_RenderQueueState_RENDERING));
-```
-
-`AEGP_SetRenderState` принимает `A_Boolean`, а не enum статуса render item.
-
-Host может передать управление render pipeline и UI; команда не должна ожидать «обычный синхронный цикл» после старта.
-
----
-
-## Invalidation rule
-
-Официальный SDK guide отдельно предупреждает:
-
-- `AddCompToRenderQueue` или пользовательский add/remove инвалидирует RQ item references;
-- add/remove output module инвалидирует output-module references для item.
-
-Production code:
-
-```text
-mutation
-→ drop old refs
+drop old RQ refs
 → query count again
 → fetch fresh refs
 ```
 
----
+## Find queue items
 
-## Для сложных preset/template операций
+Current RQItemSuite4 supports item enumeration/state access. A compatibility source recipe may use Suite3 when it needs only older members.
 
-Некоторые render settings/output module template actions проще/надёжнее делаются через scripting (`applyTemplate`) поверх native controller. Hybrid допустим, если:
-- boundary документирован;
-- script failure возвращается как structured error;
-- native core не зависит от UI language strings.
+Do not cast Suite3 ↔ Suite4.
+
+## Output modules
+
+Pattern:
+
+```text
+RQ item
+→ GetNumOutputModulesForRQItem
+→ GetOutputModuleByIndex
+→ configure path/channels/crop/stretch/etc.
+```
+
+Adding/removing/reordering output modules invalidates output-module refs according to the relevant contract.
+
+Re-query after structural changes.
+
+## Output path
+
+`AEGP_SetOutputFilePath` uses UTF-16 path in the current reviewed output-module contract.
+
+`AEGP_GetOutputFilePath` returns Memory Suite handle requiring the matching free path.
+
+Do not retain pointer after unlock/free.
+
+## Queue must be stopped for item state edit
+
+Current RQItemSuite4 header says `AEGP_SetRenderState` errors if Render Queue state is not STOPPED.
+
+Do not silently stop user's render merely because your tool wants to edit an item.
+
+Better:
+
+```text
+queue not STOPPED
+→ report command unavailable/busy
+```
+
+unless product explicitly owns queue operation and user asked for stop/reconfigure.
+
+## Set item to QUEUED correctly
+
+Correct semantic call:
+
+```cpp
+ERR(rq_items->AEGP_SetRenderState(
+    rq_itemH,
+    AEGP_RenderItemStatus_QUEUED));
+```
+
+Then read back state when command semantics depend on it.
+
+## Historical TRUE bug
+
+An earlier Bible recipe and Adobe QueueBert sample used:
+
+```cpp
+AEGP_SetRenderState(rq_itemH, TRUE)
+```
+
+This is wrong for the reviewed enum contract.
+
+In the SDK baseline:
+
+```text
+TRUE == 1
+AEGP_RenderItemStatus_UNQUEUED == 1
+AEGP_RenderItemStatus_QUEUED == 2
+```
+
+So `TRUE` requests UNQUEUED, not QUEUED.
+
+The Bible C++ recipe was corrected to named `AEGP_RenderItemStatus_QUEUED` + readback.
+
+## Current Suite4 vs recipe Suite3
+
+Why chapter says Suite4 while code uses Suite3:
+
+- SDK 25.6 current header exposes `AEGP_RQItemSuite4`;
+- existing source recipe uses members already present in Suite3;
+- Suite3 also has enum-typed SetRenderState;
+- recipe remains a compatibility-shaped source example, not current-suite authority.
+
+New product code should choose suite generation deliberately from target host/support policy.
+
+## Output module is more than filename
+
+Output config may include:
+
+- video/audio enabled;
+- RGB/RGBA/alpha;
+- crop;
+- stretch;
+- post-render action;
+- format/template-specific settings.
+
+File extension alone does not define output module format.
+
+## Post-render actions
+
+Output module may perform project-side actions such as import/replace/proxy workflows.
+
+Treat these as project mutations, not harmless file settings.
+
+## Prepare vs start queue
+
+Separate two commands:
+
+### Prepare our item
+
+```text
+validate comp/path
+→ add item
+→ reacquire refs
+→ configure output
+→ set QUEUED
+→ read back
+```
+
+### Start global queue
+
+```text
+inspect queue/user intent
+→ ensure other queued items are acceptable
+→ set queue state RENDERING
+```
+
+Starting queue is global. It can render items your tool did not create.
+
+Do not make it an implicit side effect of preview/export preparation.
+
+## Invalidation
+
+Two separate invalidation layers:
+
+| Mutation | Invalidated |
+|---|---|
+| queue item add/remove/reorder | RQ item refs |
+| output module add/remove/reorder | output-module refs for item |
+
+Stored numeric index is also not durable identity after reorder.
+
+## Partial failure
+
+Example:
+
+```text
+AddCompToRenderQueue succeeds
+→ output path configuration fails
+```
+
+The queue may already contain a new item.
+
+Returning error does not mean “nothing changed”.
+
+Define product policy:
+
+- leave item and report;
+- rollback only the item you created;
+- mark unqueued/needs output;
+- ask user.
+
+Do not delete unrelated queue items during cleanup.
+
+## Unicode/path conversion
+
+`AddCompToRenderQueue` and output-path APIs do not necessarily use identical string types.
+
+Use deliberate UTF conversion. Do not pointer-cast UTF-8/UTF-16.
+
+## Hybrid scripting
+
+Some template/preset operations may be more practical through scripting (`applyTemplate`) controlled by native/panel orchestration.
+
+Hybrid is acceptable when:
+
+- command boundary documented;
+- script errors structured;
+- native logic does not depend on localized UI strings.
+
+## Product workflow
+
+1. Verify queue is editable.
+2. Validate comp/path.
+3. Add own item.
+4. Drop stale refs.
+5. Re-query item/output module.
+6. Configure complete output contract.
+7. Set named QUEUED enum.
+8. Read back state/config if required.
+9. Start global queue only on explicit user intent.
+
+## Related chapters
+
+- [Project/render automation](17-NATIVE-SUITE-COOKBOOK/../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md)
+- [Rendered frames](17-NATIVE-SUITE-COOKBOOK/10-RENDER-FRAMES.md)
+- [Memory/undo](17-NATIVE-SUITE-COOKBOOK/12-MEMORY-UNDO-PERSISTENCE.md)
+- [SDK 25.6 project/render review](17-NATIVE-SUITE-COOKBOOK/../18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md)
+- [Corrected C++ recipe](17-NATIVE-SUITE-COOKBOOK/code/RenderQueueRecipes.cpp)
+
+## Evidence boundary
+
+Suite4 baseline and enum/invalidation rules are source-reviewed against SDK 25.6. The corrected source example does not claim a particular queue runtime run.
 
 
 ---
