@@ -1,5 +1,17 @@
 # Verification — v1.1
 
+## AEGP project and render automation chapter review (2026-10-01)
+
+Expanded [AEGP project and render automation](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md) from the supplied SDK 25.6 build 61. The [fifth source-review record](18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md) records six SDK file hashes, reviewed ranges and three existing cookbook Git blobs. The source TAR SHA-256 was recalculated and matched the previously accepted archive.
+
+The chapter distinguishes project/item/comp/layer handles, temporal spaces, owned strings, dangerous New/Open operations, Undo grouping versus rollback, queue versus item status, ref invalidation, output configuration, render options, borrowed receipt worlds, sync/async lifetime and cache submission. QueueBert and Projector excerpts are treated as historical sample code, not automatically safe or executed workflows. The frame/cache explanations do not claim a new independent AE renderer.
+
+A concrete source finding remains OPEN: `RenderQueueRecipes.cpp` passes TRUE to `AEGP_SetRenderState`, whose RQItemSuite3 argument is an enum. With TRUE=1 this requests UNQUEUED rather than QUEUED=2. Exact declarations and the matching sample occurrence are recorded. The recipe README now withdraws its earlier “enable render” description; the native source is unchanged. Fixing and testing that behavior is still required even when documentation CI passes.
+
+The previously prepared registration STATUS/VERIFICATION patch was actually written to main through `a5080a132d299b8ef20888e814f3c0513365710c` and `4cd4515e605783f9255edb59cf734d0cabe0f1fd`. No SDK files or raw user project evidence were published with these documentation updates.
+
+**Verification level: source review and documentation.** No new exact-SDK compile, linked native binary, project mutation, undo/rollback test, queue execution, image export, cancellation, async shutdown or MFR test was performed. GitHub Validate and documentation-regeneration results belong to their actual committed revisions. Source hash checks and successful Markdown generation are not native-effect acceptance. The next editorial topic is streams/keyframes; general plan gates are not closed by this writing milestone.
+
 ## Registration/PiPL and AEGP lifecycle chapter review (2026-10-01)
 
 Expanded [registration, PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md) and [AEGP hooks and suites](03-AEGP/01-HOOKS-SUITES.md). The [fourth source-review record](18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md) identifies 19 files from SDK 25.6 build 61, exact ranges and the unchanged Bible MenuTool source. The chapters, review record and AEGP reading route are present by commit `859b9c6c816a7cb5a360f61869d1bcf1531aede3`; this status reconciliation does not create a new native implementation.
@@ -84,5 +96,5 @@ This is a **syntax/type** check. It deliberately does not call it a plugin build
 1. Minimal Gain: load, parameter UI, gain 0/1/4, 8/16-bpc and transparent pixels.
 2. SmartFX Copy: compare input/output at 8/16/32-bpc, partial/empty ROI, odd sizes, nonzero origins and cancellation. Keep MFR off in the delivery build until concurrent-frame tests pass; use a separately identified enabled test build for those tests.
 3. MenuTool: successful command execution, menu updates, failed initialization and shutdown.
-4. Recipes: disposable project operations, undo, stream/keyframe ownership and render receipt cleanup.
+4. Recipes: disposable project operations, undo, stream/keyframe ownership and render receipt cleanup. Correct and test the queue-status argument noted above; a syntax-only check is insufficient.
 5. Record AE build, SDK, OS/architecture, sample base and actual observed result before upgrading a status to host-verified.
