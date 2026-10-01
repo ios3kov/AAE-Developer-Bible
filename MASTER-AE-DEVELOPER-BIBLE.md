@@ -20450,7 +20450,7 @@ Worker после teardown не должен обращаться к unloaded co
 
 В debug log полезны thread ID, selector/callback, requestId, generation, lock wait duration, shutdown state.
 
-## 14. Acceptance tests
+## 14. Product validation cases
 
 - MFR on/off;
 - repeated multi-frame stress;
@@ -20464,7 +20464,9 @@ Worker после teardown не должен обращаться к unloaded co
 
 ## Verification boundary
 
-Глава объединяет source-reviewed MFR/AEGP/CEP contracts. Явно thread-safe функция не расширяет thread safety на соседние calls. Нового host stress run в этом editorial pass не выполнялось.
+Глава объединяет source-reviewed MFR/AEGP/CEP contracts и conservative architecture guidance. Явно thread-safe функция не расширяет thread safety на соседние calls.
+
+Перечисленные runtime cases относятся к concrete product support claims. Bible не требует собственного host stress run, если не заявляет такой observed result.
 
 
 ---
@@ -20660,7 +20662,7 @@ stop new requests
 
 Owner переживает borrower.
 
-## 16. Acceptance checklist
+## 16. Product validation cases
 
 - acquire failure;
 - partial acquire then failure;
@@ -20678,7 +20680,9 @@ Owner переживает borrower.
 
 ## Verification boundary
 
-Это ownership model поверх public SDK contracts и product protocols. Конкретный lifetime определяется соответствующим API/header. Editorial pass не заменяет ASan/leak/stress/host validation.
+Это ownership model поверх public SDK contracts и product protocols. Конкретный lifetime определяется соответствующим API/header.
+
+ASan/leak/stress/host validation относится к concrete product evidence where relevant; отсутствие такого run не делает source-level Bible guidance незавершённой.
 
 
 ---
@@ -34935,6 +34939,25 @@ Checked and reconciled as one logical block:
 - Artisan template/reference evidence wording aligned with `EDITORIAL-GUIDE.md`;
 - SDK source-review provenance preserved with a later consistency note.
 
+### Native Panels / BlitHook block — completed 2026-10-01
+
+Checked and reconciled as one logical block:
+
+- Native Panel baseline: `AEGP_PanelSuite1`, `AEGP_PanelFunctions1`, Panelator;
+- stable match-name identity separated from localized title and transient platform view handles;
+- host-owned panel/container objects separated from product-owned child UI/controller state;
+- create-hook partial-failure rollback, panel recreation and conservative destroy/unregister/shutdown order documented;
+- worker → UI/host-safe handoff and stale-generation rejection documented;
+- dock/resize/workspace/HiDPI state treated as transient view state;
+- Native Panel template/reference now use product-validation / RUNTIME-NOT-CLAIMED evidence wording;
+- BlitHook baseline: `AE_Hook` protocol 3.0 + EMP sample;
+- borrowed pixel buffer, rowbytes/depth/format/view metadata, blank-frame behavior and display-color boundary documented;
+- product-owned staging, bounded backpressure/drop policy and worker/IPC ownership documented without inventing Adobe async lifetime guarantees;
+- death-hook shutdown and pending-frame cleanup documented;
+- async receipt/completion remains explicitly under-qualified because the bundled sample does not exercise it;
+- related threading/data-ownership validation wording aligned with `EDITORIAL-GUIDE.md`;
+- SDK source-review provenance preserved with a later consistency note.
+
 ## E. Recipes and reference source
 
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
@@ -36227,6 +36250,16 @@ Completed as one renderer-architecture/source-reference block:
 - Artie historical suite generations retained only as sample pattern evidence;
 - template/reference wording aligned with `EDITORIAL-GUIDE.md`.
 
+### Native Panels / BlitHook
+
+Completed as one workspace/display-lifecycle block:
+
+- Native Panel registration, stable identity, host-container vs product-child ownership, recreation and shutdown clarified;
+- panel model/project model and worker handoff boundaries documented;
+- BlitHook borrowed-buffer lifetime, row-aware staging, blank frames, view metadata, backpressure and display-color semantics expanded;
+- asynchronous BlitHook behavior remains deliberately unclaimed beyond verified source contract;
+- template/reference/source-review and communication evidence language aligned with `EDITORIAL-GUIDE.md`.
+
 ## Current editorial TODO
 
 1. Sweep every main chapter for completeness against the editorial checklist.
@@ -36701,3 +36734,57 @@ Editorial/source conclusions:
 - registration/reference docs use RUNTIME-NOT-CLAIMED and product-validation guidance rather than mandatory Bible host testing.
 
 **Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new Artisan registration/render/interactive host run is claimed.
+
+
+## Native Panels / BlitHook block (2026-10-01)
+
+The native workspace-panel and display-hook documentation was reconciled as one lifecycle/ownership block.
+
+### Native Panels
+
+Current source baseline:
+
+```text
+AEGP_PanelSuite1
+→ RegisterCreatePanelHook
+→ host-owned AEGP_PanelH / AEGP_PlatformViewRef
+→ product-owned per-panel controller / child UI
+→ PanelFunctions1 callbacks
+```
+
+Editorial/source conclusions:
+
+- stable match name is product/workspace identity; localized title and NSView/HWND are not;
+- host workspace container is borrowed, while product child views/controllers follow product/platform ownership;
+- CreatePanelHook partial initialization needs rollback that destroys only product-owned state;
+- panel recreation must rebuild view/controller state from persistent project/product state rather than stale widget pointers;
+- unregister is not treated as proof that existing child views are destroyed for the product;
+- worker results use generation/state handoff back to supported UI/host paths;
+- Panelator's missing explicit teardown sequence remains a source limitation, not a measured runtime defect.
+
+### BlitHook
+
+Current source baseline:
+
+```text
+AE_Hook protocol 3.0
+→ AE_BlitHook
+→ borrowed AE_PixBuffer + view coordinates
+→ synchronous consume/copy by default
+→ optional product-owned staging / worker / IPC
+```
+
+Editorial/source conclusions:
+
+- `pixelsPV` is not retained beyond callback without a verified stronger lifetime contract;
+- staged post-callback processing uses product-owned copies/metadata;
+- rowbytes/pixel format/depth/view coordinates remain explicit;
+- null pixel buffer is an explicit blank-frame event;
+- bounded queues/backpressure/drop policy are product architecture, not Adobe protocol guarantees;
+- BlitHook sees display-pipeline pixels, not a guaranteed scene-linear/effect/render-queue oracle;
+- asynchronous receipt/completion support is preserved as an under-qualified contract path because EMP does not demonstrate it;
+- death-hook shutdown prevents late workers/IPC from using host/product state after teardown.
+
+The related threading/data-ownership chapters now label runtime scenarios as product-validation cases rather than Bible completion tests.
+
+**Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new panel or BlitHook host result is asserted.
