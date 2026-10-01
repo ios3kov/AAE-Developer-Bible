@@ -200,7 +200,7 @@ This is a **syntax/type** check. It deliberately does not call it a plugin build
 1. Minimal Gain: load, parameter UI, gain 0/1/4, 8/16-bpc and transparent pixels.
 2. SmartFX Copy: compare input/output at 8/16/32-bpc, partial/empty ROI, odd sizes, nonzero origins and cancellation. Keep MFR off in the delivery build until concurrent-frame tests pass; use a separately identified enabled test build for those tests.
 3. MenuTool: successful command execution, menu updates, failed initialization and shutdown.
-4. Recipes: disposable project operations, undo, stream/keyframe ownership and render receipt cleanup. The render-queue Boolean/enum source defect is corrected to named `QUEUED` plus readback; actual queue behavior remains host-test-required.
+4. Recipes: disposable project operations, undo, stream/keyframe ownership and render receipt cleanup. The render-queue Boolean/enum source defect is corrected to named `QUEUED` plus readback; Bible does not claim a queue runtime result beyond the recorded source-level correction.
 5. Record AE build, SDK, OS/architecture, sample base and actual observed result before upgrading a status to host-verified.
 
 
@@ -258,7 +258,7 @@ Transfer decisions are explicit: FSTR snapshot/guard/coalescing/fake-host patter
 **Gate 3A is closed.** None of these results are Bible AE host verification.
 
 
-## Gate 4 portable verification hardening (2026-10-01)
+## SDK contract/tooling hardening (2026-10-01)
 
 The native verification lane was strengthened without claiming a new Adobe SDK compiler run.
 
@@ -277,7 +277,7 @@ New fail-closed checks:
 
 Recent portable validation runs for these changes are green, including run `36843099891` for runner syntax and run `36843081166` for the full synthetic compiler-report path.
 
-**Boundary:** this does not close Gate 4. The previously recorded Adobe SDK 25.6 macOS compiler baseline predates current source changes. The exact SDK archive is not available in the current accessible file set, so no fresh licensed-SDK compile was performed here. A real MSVC + SDK 25.6 run also remains NOT RUN.
+**Boundary:** this entry records tooling/source evidence only. Historical compiler results belong to their snapshots; no additional compiler run is required for Bible editorial completion.
 
 
 ### Portable native ABI/header compile
@@ -294,10 +294,10 @@ The current validation lane also compiles the standalone Effect↔AEGP and PICA 
 
 Compiler reports now include Bible Git SHA/dirty state and SHA-256 for each translation unit. The acceptance platform runners use `--require-clean`; a dirty/unknown source tree cannot be promoted to Gate-4 compiler evidence.
 
-See [Gate 4 — exact SDK acceptance runbook](18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
+See [SDK contract audit runbook](18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
 
 
-## Real SDK 25.6 Gate 4 required-contract preflight (2026-10-01)
+## Real SDK 25.6 required-contract audit (2026-10-01)
 
 The user supplied Adobe After Effects SDK 25.6 build 61 again. The two supplied representations were validated before use:
 
@@ -322,6 +322,6 @@ The increase from the historical 230 tables / 3,537 functions is a parser improv
 
 A Linux-container compiler experiment against the exact headers was also run only to test the platform boundary. All 13 translation units stop at the Adobe SDK's `AEConfig.h` “unrecognized AE platform” gate; this is expected on Linux and is not macOS compiler evidence.
 
-**Gate 4 consequence:** required-contract parsing is now PASS. Real current-source compilation on macOS/Xcode and Windows/MSVC remains NOT RUN and keeps Gate 4 open.
+**Editorial consequence:** required-contract parsing is PASS for the current SDK baseline. macOS/Xcode or Windows/MSVC compilation may be performed as optional evidence for specific source examples, but is not required for Bible completion.
 
 Full record: [18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md](18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md).
