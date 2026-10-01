@@ -5791,7 +5791,7 @@ Header-derived validation is the first native preflight, not the final Mac valid
 
 ~~~bash
 cd 18-SDK-HEADER-TOOLS
-./run-macos.sh "/path/to/After Effects SDK/Examples/Headers"
+./run-macos.sh "/path/to/After Effects SDK/Examples"
 ~~~
 
 Use the exact SDK intended for the candidate build.
@@ -5800,9 +5800,11 @@ Use the exact SDK intended for the candidate build.
 
 A successful header-tool run means only the checks implemented by the tool passed, such as:
 
-- supported headers were parsed;
-- inventory was generated;
-- cookbook/reference suite symbols were found according to parser rules.
+- supported headers were parsed with no unresolved parser diagnostics;
+- inventory schema/version validation passed;
+- cookbook/reference suite symbols were found according to parser rules;
+- the current Bible native C++ translation units passed Clang C++17 syntax/type checks;
+- a machine-readable compiler report records SDK header-manifest identity, compiler identity, exact commands and per-source results.
 
 It does not prove complete header coverage.
 
@@ -5812,7 +5814,6 @@ The indexer fails closed on unsupported declaration shapes, and full exact-SDK i
 
 It does not prove:
 
-- C++ source compiles;
 - resources/PiPL compile;
 - link succeeds;
 - arm64/x86_64 slices exist;
@@ -5828,8 +5829,8 @@ Do not promote this preflight into host verification.
 ## Required next gates
 
 ~~~text
-header preflight
-→ Xcode compile
+header inventory + symbol check + Clang syntax/type report
+→ Xcode project/resource compile
 → resource/PiPL build
 → link
 → architecture/dependency inspection
@@ -6957,7 +6958,7 @@ It is not Windows build or host evidence.
 
 ~~~powershell
 cd 18-SDK-HEADER-TOOLS
-.\run-windows.ps1 "C:\path\to\After Effects SDK\Examples\Headers"
+.\run-windows.ps1 "C:\path\to\After Effects SDK\Examples"
 ~~~
 
 Use the exact candidate SDK.
@@ -6966,9 +6967,11 @@ Use the exact candidate SDK.
 
 A successful run means only the tool's implemented checks passed, for example:
 
-- supported header declarations parsed;
-- inventory generated;
-- cookbook/reference suite symbols resolved against that inventory.
+- supported header declarations parsed without unresolved diagnostics;
+- inventory schema/version validation passed;
+- cookbook/reference suite symbols resolved against that inventory;
+- the current Bible native C++ translation units passed MSVC C++17 syntax/type checks;
+- a machine-readable report records SDK header-manifest identity, MSVC identity, exact commands and per-source results.
 
 The parser is deliberately conservative; unsupported declarations are not silently guessed.
 
@@ -6976,7 +6979,6 @@ The parser is deliberately conservative; unsupported declarations are not silent
 
 It does not prove:
 
-- MSVC compilation;
 - PiPL/resource generation;
 - link;
 - x64/ARM64 architecture correctness;
@@ -6990,9 +6992,8 @@ It does not prove:
 ## Required next gates
 
 ~~~text
-header preflight
-→ MSVC compile
-→ Windows resource/PiPL step
+header inventory + symbol check + MSVC syntax/type report
+→ Windows resource/PiPL project step
 → link
 → PE/import/architecture inspection
 → native tests
@@ -19818,10 +19819,20 @@ If a bundled sample is historical and differs from the current header, record th
 
 ## 6. Compile
 
-After symbol preflight:
+The platform runners now add a compiler/type lane after symbol preflight:
 
-- compile Debug;
-- compile release configuration;
+~~~text
+inventory
+→ schema/diagnostic gate
+→ recipe symbol names
+→ C++17 syntax/type compile report
+~~~
+
+`scripts/check_native.py` records an aggregate hash of the SDK header set, compiler identity, exact per-source command and result. SDK include roots are treated as external/system headers; Bible project headers remain normal warning-bearing includes.
+
+After this source-level lane, the real sample/project build must still:
+
+- compile the chosen Debug/Release project configuration;
 - build resources/PiPL;
 - link final native artifact.
 
@@ -19888,7 +19899,7 @@ header inventory
 → release signing/package gates
 ~~~
 
-The current repository does not claim that every stage is automated on every platform.
+The repository has portable tests for the compiler-driver command construction and report identity, but a real Windows/macOS licensed-SDK run is separate evidence. The current repository does not claim that every stage is automated on every platform.
 
 ## Stop rule
 
@@ -21569,7 +21580,7 @@ These remain Gate 4/6/7 work.
 
 # SDK Header Tools — declaration index and symbol-name checks
 
-Это вспомогательный индексатор локальных SDK headers. Он не является C/C++ compiler, signature checker или полным ABI diff. Проверка типов выполняется отдельно через `scripts/check_native.py`.
+Это fail-closed preflight для локального SDK: declaration inventory + symbol-name checks + отдельный real-compiler syntax/type driver. Regex inventory сам по себе не является signature/ABI proof; типы проверяет `scripts/check_native.py`.
 
 Главное правило: точный контракт сборки задают headers целевого SDK. Regex parser поддерживает ограниченные формы объявлений. Неполный разбор таблицы теперь сохраняет диагностику и возвращает ошибку; `--allow-incomplete` разрешает только исследовательский индекс. Реальный SDK 25.6 содержит неподдерживаемые объявления, поэтому полного inventory пока нет.
 
@@ -21652,6 +21663,42 @@ python3 tests/test_inventory.py
 3. код компилируется внутри ближайшего официального Adobe sample;
 4. binary загружается в целевой AE;
 5. smoke tests проходят на заявленных macOS/Windows + architecture + AE versions.
+
+
+## Полный локальный Gate-4 runner
+
+Передавайте **SDK Examples root**, не только Headers:
+
+macOS:
+
+```bash
+cd 18-SDK-HEADER-TOOLS
+./run-macos.sh "/path/to/After Effects SDK/Examples"
+```
+
+Windows, из Visual Studio Developer Command Prompt / VsDevCmd:
+
+```powershell
+cd 18-SDK-HEADER-TOOLS
+.\run-windows.ps1 "C:\path\to\After Effects SDK\Examples"
+```
+
+Оба runner'а выполняют:
+
+1. inventory exact headers;
+2. отказ при parser diagnostics;
+3. schema/version validation;
+4. cookbook symbol-name preflight;
+5. C++17 compiler syntax/type checks;
+6. запись `generated/local-sdk/native-compile-report.json`.
+
+Compile report сохраняет aggregate SDK-header manifest SHA-256, compiler identity, exact commands и status каждой translation unit.
+
+Это **не** resource/PiPL build, link или AE host test.
+
+## Inventory compatibility guard
+
+`verify_recipe_symbols.py` и `diff_sdk_inventory.py` принимают только поддерживаемую `schema_version=1` и отклоняют malformed/empty function declarations. Signature/order drift покрыт portable regression tests. Старый/неполный JSON нельзя использовать как скрытый источник зелёной проверки.
 
 
 ---
