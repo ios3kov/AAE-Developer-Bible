@@ -13,7 +13,7 @@
 - `BibleAegpCommon.h` — no-throw undo guard.
 - `ProjectItemRecipes.cpp` — project/root/item traversal.
 - `CompLayerRecipes.cpp` — create comp, enumerate layers, LayerID lookup; lifetime must follow the applicable SDK contract.
-- `EffectStreamRecipes.cpp` — find/apply effect, read/write scalar stream.
+- `EffectStreamRecipes.cpp` — find/apply effect through current SDK 25.6 `EffectSuite5`, read/write scalar stream through `StreamSuite6`.
 - `KeyframeRecipes.cpp` — batch keyframe transaction pattern.
 - `RenderRecipes.cpp` — checkout/get-world/checkin pattern.
 - `RenderQueueRecipes.cpp` — add comp, re-query queue, set output path, queue the item with the named enum and verify state by readback.
@@ -34,6 +34,6 @@ This closes the **source-level argument-selection defect**. It does **not** prov
 
 ## Verification label
 
-**Historical SDK 25.6 macOS syntax/type baseline; linking and host tests pending.** The enum-selection source defect has been corrected, but this revised source has not yet been promoted to host-verified queue behavior.
+**Evidence boundary:** historical SDK 25.6 syntax/type evidence exists for an earlier source snapshot. Current recipes are SOURCE EXAMPLES / SDK-CONTRACT-REVIEWED where noted; Bible does not claim runtime results unless a separate runtime record exists. The render-queue enum defect is corrected at source level.
 
 Команда и результаты: [VERIFICATION.md](../../VERIFICATION.md). Сохраните relative includes к `19-NATIVE-CODE-FOUNDATION` или перенесите helpers вместе с recipes. Host callbacks, вызывающие recipes, должны иметь exception boundary.
