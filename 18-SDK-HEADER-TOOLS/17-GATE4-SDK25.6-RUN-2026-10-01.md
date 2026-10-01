@@ -2,7 +2,7 @@
 
 ## Scope
 
-This record is a **real-header Gate 4 preflight** against the user-supplied Adobe After Effects SDK 25.6 build 61.
+This record is a **real-header SDK contract audit** against the user-supplied Adobe After Effects SDK 25.6 build 61.
 
 It establishes required contract-table/function coverage and cookbook suite-generation symbol coverage. It does **not** establish macOS/Windows compilation, linking, PiPL/resource build, After Effects host execution or runtime semantics.
 
@@ -61,7 +61,7 @@ The four retained partial diagnostics are:
 - `AE_FIM_ImportCallbacks`;
 - `SPPluginsSuite`.
 
-They contain non-function/data or parser-boundary material and are **not in the Gate 4 required-contract manifest**.
+They contain non-function/data or parser-boundary material and are **not in the required-contract manifest used by the Bible**.
 
 The runner intentionally preserves these diagnostics instead of hiding them. `--allow-incomplete` only allows the inventory file to be emitted so the required-contract gate can classify the diagnostics; inventory alone is not acceptance.
 
