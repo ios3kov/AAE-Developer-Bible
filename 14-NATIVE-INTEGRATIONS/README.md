@@ -76,6 +76,6 @@ Primary acceptance/source-review baseline: **After Effects SDK 25.6 build 61**. 
 - [`11-LEGACY-NATIVE.md`](11-LEGACY-NATIVE.md) — deprecated/legacy.
 - [`12-AEGP-SUITES-CATALOG.md`](12-AEGP-SUITES-CATALOG.md) — полный AEGP suite map 26.5.
 
-Sources: supplied Adobe After Effects SDK 25.6 build 61 headers/samples plus the maintained C++ SDK Guide for context. Exact 25.6 AEIO/Artisan source review: [`12-AEIO-ARTISAN-SDK25.6.md`](../18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md). Later SDK history remains a separate compatibility source.
+Sources: supplied Adobe After Effects SDK 25.6 build 61 headers/samples plus the maintained C++ SDK Guide for context. Exact source reviews include [`12-AEIO-ARTISAN-SDK25.6.md`](../18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md), [`13-PANELS-BLITHOOK-SDK25.6.md`](../18-SDK-HEADER-TOOLS/13-PANELS-BLITHOOK-SDK25.6.md) and [`14-PICA-BRIDGES-LEGACY-SDK25.6.md`](../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md). Later SDK history remains a separate compatibility source.
 
 - [`13-DOCS-ERRATA.md`](13-DOCS-ERRATA.md) — known public-doc mismatches and verification policy.
