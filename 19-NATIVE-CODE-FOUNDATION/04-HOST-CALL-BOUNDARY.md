@@ -135,13 +135,15 @@ tests/test_foundation.cpp verifies:
 - thrown nonzero A_Err is preserved;
 - thrown zero A_Err maps to fallback.
 
-Add product tests for:
+For a concrete product, useful tests include:
 
 - allocation failure policy where feasible;
 - third-party exception;
 - callback cleanup after exception;
-- host behavior for chosen fallback.
+- host behavior for the chosen fallback error.
 
-## Acceptance rule
+## Product rule
 
-Every exported/native host callback used by product C++ must have a documented exception boundary, and no test should observe a C++ exception escaping into After Effects.
+Every exported/native host callback in product C++ should have a documented exception boundary.
+
+Bible's local guard tests demonstrate the containment pattern; they do not claim that every possible product callback/third-party failure has been executed inside After Effects.
