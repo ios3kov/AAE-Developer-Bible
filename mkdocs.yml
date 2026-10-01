@@ -8,6 +8,7 @@ theme:
   name: material
 nav:
   - Home: README.md
+  - Editorial guide: EDITORIAL-GUIDE.md
   - Status: STATUS.md
   - Changelog: CHANGELOG.md
   - Sources: SOURCES.md
