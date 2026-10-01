@@ -16,7 +16,7 @@ The reusable piece is a single versioned dispatcher protocol:
 
 ```json
 {
-  "version": 1,
+  "protocol": 1,
   "requestId": "123-1",
   "command": "renameSelected",
   "payload": {
