@@ -14881,7 +14881,7 @@ Adobe сама рекомендует стартовать от ближайше
 | Template | Base | Что доказывает |
 |---|---|---|
 | `effect-basic/` | SDK Skeleton | Effect registration, param, render, 8/16 bpc |
-| `aegp-menu-command/` | SDK Persisto/Projector-style AEGP | menu + command hook + undo-safe mutation |
+| `aegp-menu-command/` | SDK Persisto/Projector-style AEGP | menu/update/death-hook lifecycle + harmless command callback |
 | `effect-aegp-generic-bridge/` | paired Effect + AEGP | `AEGP_EffectCallGeneric` ↔ `PF_Cmd_COMPLETELY_GENERAL` protocol |
 | `pica-shared-suite/` | SDK Sweetie-style provider | stable native service ABI |
 | `native-panel-registration/` | SDK Panelator | native Window-menu + dockable panel registration |
@@ -15163,13 +15163,26 @@ Windows PiPL resource generation and platform SDK settings are easy to get subtl
 
 # Standalone JSX tool
 
-`rename-selected-layers.jsx` is a complete Script menu script:
+Status: **source supplied / After Effects host test pending**.
 
-1. Put it in the appropriate After Effects Scripts folder for your installation/user setup.
-2. Restart AE if required by the script location.
-3. Open a comp, select layers, run the script.
+rename-selected-layers.jsx is a complete Script-menu source example.
 
-Pattern demonstrated: validation + one undo group + no persistent globals.
+Integration:
+
+1. place it in the appropriate After Effects Scripts folder for the target installation/user setup;
+2. restart AE if required by that script location;
+3. open a composition;
+4. select one or more layers;
+5. run the script.
+
+Pattern demonstrated:
+
+- validate project/composition/selection before mutation;
+- open one undo group only around the mutation;
+- keep the command logic independent of persistent global state;
+- contain errors at the script entry boundary.
+
+The source is intended to be directly runnable, but the repository does not call it host-verified until an actual AE/OS execution is recorded.
 
 
 ---
@@ -22924,6 +22937,12 @@ The master list includes bundled entries that Adobe itself lists (for example Mo
 
 ## Editorial progress — 2026-10-01
 
+- Expanded the full testing section with explicit build/host/release evidence layers, richer matrices, render/ROI correctness, MFR stress, performance and crash diagnostics.
+- Added an evidence/acceptance chapter with PASS/FAIL/BLOCKED/NOT_RUN vocabulary tied to exact artifact and environment identity.
+- Expanded practical recipes and bug/compatibility/performance/spec/release templates.
+- Reconciled the CEP working template with the communication protocol field and corrected ScriptUI/JSX verification wording.
+- Serialized/retried generated-doc updates to prevent non-fast-forward failures during rapid documentation pushes.
+
 - Expanded ExtendScript object-model and ScriptUI chapters with reference invalidation, stable targeting, command boundaries and long-operation rules.
 - Expanded CEP communication into a versioned request/response protocol with main-thread scheduling, stale-response, path, large-data and security boundaries.
 - Added a dated After Effects UXP migration plan based on Adobe's 2026-09-24 transition announcement without treating the future beta as a verified API.
@@ -23898,6 +23917,7 @@ Completed editorial changes:
 - **PICA providers and native bridges:** `SPBasicSuite` acquire/release, `SPSuitesSuite::AddSuite`, Sweetie/Checkout provider-consumer patterns, current `AEGP_EffectCallGeneric` command/time contract and historical sample/version boundaries are documented. Legacy samples are no longer treated as current ABI signatures by default.
 - **GPU, audio and Custom UI/Drawbot:** GPU capability/setup/pre-render/render/setdown and GPU-world ownership are sourced from `AE_Effect.h`, `AE_EffectGPUSuites.h` and SDK_Invert_ProcAmp; audio selectors/flags/SoundWorld/checkout are documented with the explicit limitation that the supplied archive has no bundled AUDIO_RENDER implementation; custom UI now has a dedicated event/Drawbot/async-manager chapter using Custom_ECW_UI and CCU.
 - **Scripting, panels and platform distribution:** object-model/ScriptUI chapters, CEP/UXP bridge architecture, hybrid native communication, macOS/Windows build-sign-package workflows and release/distribution gates were expanded from the public Adobe CEP/SDK guidance plus current Apple and Microsoft platform documentation. See [the dated platform source-review record](11-DISTRIBUTION/05-PLATFORM-SOURCE-REVIEW-2026-10-01.md).
+- **Testing, recipes and templates:** test evidence is now separated into unit/build/host/release layers; matrix, render correctness, MFR stress, performance and crash chapters were expanded; a new evidence/acceptance chapter defines PASS/FAIL/BLOCKED/NOT_RUN; practical recipes and reusable report/spec/release templates were aligned to the same evidence model. The CEP working template protocol field was also reconciled with the communication chapter.
 - [Registration, PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md): separate registration/dispatcher/initializer contracts, resource Kind, symbols, architectures, version domains, outflags and platform resource pipelines.
 - [AEGP lifecycle, hooks and suites](03-AEGP/01-HOOKS-SUITES.md): IDs/refcons, suite macros, callbacks and partial initialization; the existing MenuTool is reviewed, not changed or host-verified.
 - [AEGP project and render automation](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md): project graph and time, Undo versus rollback, queue states and invalidation, output settings, frame receipts, borrowed worlds, sync/async cancellation and cache boundaries.
@@ -23944,6 +23964,17 @@ See [verification commands and results](VERIFICATION.md) and [coverage matrix](F
 <!-- SOURCE: VERIFICATION.md -->
 
 # Verification — v1.1
+
+## Testing, recipes and templates editorial review (2026-10-01)
+
+Expanded the complete 10-TESTING section and added [Evidence and acceptance](10-TESTING/06-EVIDENCE-AND-ACCEPTANCE.md). The matrix now distinguishes PR/nightly/pre-release lanes; render correctness covers exact/tolerance comparisons, alpha, ROI/origins and golden-update policy; MFR stress now has state-bleed, repeatability, hang and memory evidence; performance requires fixed baselines; crash diagnostics now ties exact symbols to artifact identity.
+
+The practical recipes and templates were aligned to the same evidence vocabulary. During that cross-check one concrete documentation/template mismatch was found and corrected: the CEP bridge chapter standardized the request field as `protocol`, while the working template still used `version`. The CEP README, panel JavaScript and host dispatcher now use the same `protocol` field. ScriptUI/JSX example status wording was also corrected so source that is intended to run is not mislabeled as host-verified.
+
+The regeneration workflow was hardened after several simultaneous documentation pushes produced non-fast-forward failures in the generated-doc commit step. The workflow now serializes main-branch regeneration and retries from the latest main before generating/pushing MASTER and MANIFEST.
+
+**Verification level: documentation/template review.** No new AE host execution, native SDK compile, render, installer, signing or performance run was performed by this pass. The CEP/JSX/ScriptUI changes are source-level alignment until an actual host result is recorded.
+
 
 ## Scripting, panels and platform distribution chapter review (2026-10-01)
 
