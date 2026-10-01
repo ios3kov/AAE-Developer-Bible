@@ -1,6 +1,6 @@
 # AEGP menu command reference
 
-Status: **drop-in pattern / host verification remains separate**.
+Status: **drop-in/source reference; runtime result not claimed by Bible**.
 
 MenuTool.cpp forwards to the canonical implementation in 16-WORKING-TEMPLATES/aegp-menu-command. Compile this forwarding file or the canonical source, not both.
 
