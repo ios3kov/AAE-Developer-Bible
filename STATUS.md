@@ -80,11 +80,10 @@ Historical compiler/runtime results remain useful evidence about their snapshots
 
 1. Sweep every main chapter for completeness against the editorial checklist.
 2. Find underdeveloped/too-short sections and expand them.
-3. Remove stale gate/QA language left from the superseded completion model.
-4. Reconcile recipes/source examples with the latest explanatory chapters.
-5. Review dated public facts before edition freeze.
-6. Complete navigation/cross-link/provenance audit.
-7. Freeze and publish the next coherent documentation edition.
+3. Reconcile recipes/source examples with the latest explanatory chapters.
+4. Review dated public facts before edition freeze.
+5. Complete cross-link/provenance audit.
+6. Freeze and publish the next coherent documentation edition.
 
 ## Research tracks
 
