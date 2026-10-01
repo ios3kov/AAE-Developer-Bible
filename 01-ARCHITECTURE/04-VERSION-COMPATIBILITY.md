@@ -316,7 +316,7 @@ Avoid:
 - [PiPL and loading](03-PIPL-AND-LOADING.md)
 - [SDK diff policy](../18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md)
 - [Compatibility matrix template](../13-TEMPLATES/COMPATIBILITY-MATRIX.md)
-- [Distribution](../11-DISTRIBUTION/README.md)
+- [Distribution](../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
 
 ## Evidence boundary
 
