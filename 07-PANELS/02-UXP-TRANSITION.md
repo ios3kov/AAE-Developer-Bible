@@ -1,40 +1,123 @@
 # UXP transition for After Effects
 
-## Published Adobe timeline snapshot
+This is a dated migration plan, not an assumption that After Effects already exposes the same UXP API surface as Photoshop, Premiere or Media Encoder.
 
-As announced 2026-09-24:
-- After Effects UXP public beta: planned by **November 2026**;
-- AE/Illustrator/Media Encoder: stop accepting new CEP marketplace submissions and move CEP disabled-by-default together in **December 2028**;
-- overall CEP retirement: **end of 2029**.
+## Adobe timeline snapshot — 2026-10-01
 
-Timelines can change; re-check Adobe announcement/release docs before product planning.
+Adobe's 2026-09-24 developer announcement states:
 
-## What to do before AE UXP beta
+- After Effects UXP public beta: planned by November 2026;
+- AE, Illustrator and Media Encoder stop accepting new CEP Marketplace submissions and move CEP disabled-by-default in December 2028;
+- Adobe plans at least two years from a host's UXP public beta before removing CEP from new versions;
+- CEP retirement across flagship Creative Cloud desktop apps begins at the end of 2029;
+- ExtendScript is not affected by that CEP retirement announcement.
 
-1. Separate domain/business logic from CEP APIs.
-2. Wrap filesystem/network/storage behind interfaces.
-3. Put all `evalScript` calls in one bridge module.
-4. Use typed/versioned command payloads.
-5. Remove implicit Node globals from core logic.
-6. Add contract tests for bridge commands.
-7. Maintain UI components with minimal CEP-specific code.
+These dates are planning inputs, not immutable API contracts. Re-check Adobe's host-specific UXP documentation before release decisions.
 
-## Migration readiness scorecard
+## Do not assume cross-host parity
 
-Good:
+A UXP feature existing in Photoshop, Premiere or Media Encoder does not prove that the same API exists in After Effects.
 
-```text
-React/UI → CommandBus → AeBridge interface
-                         ├─ CepAeBridge
-                         └─ FutureUxpAeBridge
-```
+Before migrating a feature, verify AE-specific support for:
 
-Bad:
+- project/items/compositions/layers/properties;
+- render queue;
+- filesystem;
+- networking;
+- persistent storage;
+- dialogs and panels;
+- events and notifications;
+- native/hybrid bridge;
+- packaging and Marketplace rules.
 
-```text
-button onclick → window.cep + fs + evalScript + business rule + DOM mutation
-```
+The beta is evidence only for the APIs the beta actually exposes.
 
-## Rule after beta launches
+## Architecture before migration
 
-Не мигрировать по announcement alone. Сначала проверить, что AE UXP beta/GA покрывает конкретно ваши requirements: host DOM/API, filesystem, networking, native bridge, packaging, marketplace/distribution.
+Make the shell replaceable now:
+
+~~~text
+UI components
+      ↓
+Command / domain layer
+      ↓
+AeBridge interface
+   ┌───────────────┐
+   │               │
+CepAeBridge   FutureUxpAeBridge
+   │               │
+ExtendScript   AE UXP APIs / supported bridge
+~~~
+
+The domain layer should not import window.cep, CSInterface, Node filesystem modules or UXP APIs directly.
+
+## Work to do before AE UXP beta
+
+1. Put every evalScript call behind one bridge.
+2. Use versioned command/response payloads.
+3. Separate filesystem/network/storage adapters.
+4. Remove business logic from DOM event handlers.
+5. Keep pure transforms as plain JavaScript data logic where possible.
+6. Add contract tests for bridge commands and error envelopes.
+7. Inventory every CEP-only capability used by the product.
+8. Record performance-sensitive flows that cannot tolerate extra serialization.
+
+This work is useful even if Adobe changes the rollout dates.
+
+## Migration inventory
+
+Maintain a product table:
+
+| Capability | CEP implementation | Required in AE UXP | Blocking? | Verified |
+|---|---|---|---|---|
+| project edits | ExtendScript dispatcher | project API or supported script bridge | yes | pending |
+| filesystem | Node/CEP adapter | AE UXP filesystem path | yes | pending |
+| web auth | browser/network adapter | AE UXP network/webview pattern | maybe | pending |
+| native compute | helper/native bridge | supported hybrid/native path | yes for heavy tools | pending |
+
+Do not mark a row supported based on generic UXP documentation. Record the exact AE host/version that was tested.
+
+## Hybrid/native products
+
+For products with C++ effects, AEGPs or helpers, the migration is larger than swapping UI widgets.
+
+Keep the contract between UI and native code:
+
+- explicit;
+- versioned;
+- small;
+- independent of CEP DOM types;
+- independent of UXP object instances.
+
+A good command protocol can survive multiple panel runtimes.
+
+## After the beta becomes available
+
+Migration sequence:
+
+~~~text
+AE UXP beta available
+→ inventory required APIs
+→ build a thin proof for each blocker
+→ compare behavior and performance
+→ decide dual-runtime support window
+→ package/test clean installs
+→ only then migrate production users
+~~~
+
+Do not migrate because of the announcement alone. Also do not wait until CEP becomes disabled-by-default before starting proofs.
+
+## Distribution transition
+
+Plan for a period where the product may ship:
+
+- a CEP package for older supported AE versions;
+- a UXP package for newer versions;
+- the same native plug-in binaries where compatible;
+- one product/versioning policy across both shells.
+
+Logs and support reports should identify which shell and protocol version produced the failure.
+
+## Verification boundary
+
+The dates in this chapter are based on Adobe's 2026-09-24 announcement. As of this snapshot the After Effects UXP public beta is still future work. No AE UXP capability is marked verified until it is actually available and tested.
