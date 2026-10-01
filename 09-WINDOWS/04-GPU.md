@@ -136,7 +136,7 @@ Bible документирует метод и не обязана строит�
 
 - [GPU effects](../02-EFFECT-PLUGINS/05-GPU.md)
 - [Windows debugging](03-DEBUGGING.md)
-- [Windows ARM64](02-ARM64.md)
+- [Windows ARM64](02-X64-ARM64.md)
 - [CPU/GPU equivalence recipe](../12-RECIPES/04-CPU-GPU-EQUIVALENCE.md)
 - [Distribution](../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
 
