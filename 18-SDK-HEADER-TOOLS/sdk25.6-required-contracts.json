@@ -130,8 +130,8 @@
       ]
     },
     {
-      "name": "AEGP_RQItemSuite3",
-      "area": "render queue items",
+      "name": "AEGP_RQItemSuite4",
+      "area": "render queue items (SDK 25.6 current)",
       "required_functions": [
         "AEGP_GetNumRQItems",
         "AEGP_GetRQItemByIndex",
@@ -149,8 +149,8 @@
       ]
     },
     {
-      "name": "AEGP_RenderSuite4",
-      "area": "frame rendering",
+      "name": "AEGP_RenderSuite5",
+      "area": "frame rendering (SDK 25.6 current)",
       "required_functions": [
         "AEGP_RenderAndCheckoutFrame",
         "AEGP_GetReceiptWorld",
