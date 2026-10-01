@@ -59,6 +59,6 @@ AEGP_AddLayer(
 
 Каждый executable-looking snippet:
 - либо проверяется по официальному published signature;
-- либо помечается `host-test-required`;
+- либо помечается как source-level / runtime-not-claimed;
 - не выдумывает undocumented struct layout;
 - не заявляется binary-tested без AE host.
