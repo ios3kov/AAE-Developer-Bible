@@ -443,3 +443,57 @@ Editorial/source conclusions:
 - registration/reference docs use RUNTIME-NOT-CLAIMED and product-validation guidance rather than mandatory Bible host testing.
 
 **Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new Artisan registration/render/interactive host run is claimed.
+
+
+## Native Panels / BlitHook block (2026-10-01)
+
+The native workspace-panel and display-hook documentation was reconciled as one lifecycle/ownership block.
+
+### Native Panels
+
+Current source baseline:
+
+```text
+AEGP_PanelSuite1
+→ RegisterCreatePanelHook
+→ host-owned AEGP_PanelH / AEGP_PlatformViewRef
+→ product-owned per-panel controller / child UI
+→ PanelFunctions1 callbacks
+```
+
+Editorial/source conclusions:
+
+- stable match name is product/workspace identity; localized title and NSView/HWND are not;
+- host workspace container is borrowed, while product child views/controllers follow product/platform ownership;
+- CreatePanelHook partial initialization needs rollback that destroys only product-owned state;
+- panel recreation must rebuild view/controller state from persistent project/product state rather than stale widget pointers;
+- unregister is not treated as proof that existing child views are destroyed for the product;
+- worker results use generation/state handoff back to supported UI/host paths;
+- Panelator's missing explicit teardown sequence remains a source limitation, not a measured runtime defect.
+
+### BlitHook
+
+Current source baseline:
+
+```text
+AE_Hook protocol 3.0
+→ AE_BlitHook
+→ borrowed AE_PixBuffer + view coordinates
+→ synchronous consume/copy by default
+→ optional product-owned staging / worker / IPC
+```
+
+Editorial/source conclusions:
+
+- `pixelsPV` is not retained beyond callback without a verified stronger lifetime contract;
+- staged post-callback processing uses product-owned copies/metadata;
+- rowbytes/pixel format/depth/view coordinates remain explicit;
+- null pixel buffer is an explicit blank-frame event;
+- bounded queues/backpressure/drop policy are product architecture, not Adobe protocol guarantees;
+- BlitHook sees display-pipeline pixels, not a guaranteed scene-linear/effect/render-queue oracle;
+- asynchronous receipt/completion support is preserved as an under-qualified contract path because EMP does not demonstrate it;
+- death-hook shutdown prevents late workers/IPC from using host/product state after teardown.
+
+The related threading/data-ownership chapters now label runtime scenarios as product-validation cases rather than Bible completion tests.
+
+**Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new panel or BlitHook host result is asserted.
