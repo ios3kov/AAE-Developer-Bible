@@ -6,7 +6,7 @@ Updated: **2026-10-01**. Previously recorded native compilation baseline: **Adob
 
 ## Current work — writing the Bible from the supplied SDK
 
-The supplied `ae25.6_61.64bit.AfterEffectsSDK` is the basis of ten source-review records:
+The supplied `ae25.6_61.64bit.AfterEffectsSDK` is the basis of eleven source-review records:
 
 1. [Effect anatomy, SmartFX and auxiliary channels](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md).
 2. [Parameters and pixels](18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md).
@@ -36,12 +36,16 @@ Completed editorial changes:
 - **Native panels and BlitHook:** workspace-panel identity/create/flyout/visibility contracts are now sourced from `AEGP_PanelSuite1`/Panelator; BlitHook is separated as `AEGeneral` hook protocol 3.0 with 32/64/128 pixel-buffer metadata, view coordinates and explicitly unqualified async lifetime.
 - **PICA providers and native bridges:** `SPBasicSuite` acquire/release, `SPSuitesSuite::AddSuite`, Sweetie/Checkout provider-consumer patterns, current `AEGP_EffectCallGeneric` command/time contract and historical sample/version boundaries are documented. Legacy samples are no longer treated as current ABI signatures by default.
 - **GPU, audio and Custom UI/Drawbot:** GPU capability/setup/pre-render/render/setdown and GPU-world ownership are sourced from `AE_Effect.h`, `AE_EffectGPUSuites.h` and SDK_Invert_ProcAmp; audio selectors/flags/SoundWorld/checkout are documented with the explicit limitation that the supplied archive has no bundled AUDIO_RENDER implementation; custom UI now has a dedicated event/Drawbot/async-manager chapter using Custom_ECW_UI and CCU.
+- **Scripting, panels and platform distribution:** object-model/ScriptUI chapters, CEP/UXP bridge architecture, hybrid native communication, macOS/Windows build-sign-package workflows and release/distribution gates were expanded from the public Adobe CEP/SDK guidance plus current Apple and Microsoft platform documentation. See [the dated platform source-review record](11-DISTRIBUTION/05-PLATFORM-SOURCE-REVIEW-2026-10-01.md).
 - [Registration, PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md): separate registration/dispatcher/initializer contracts, resource Kind, symbols, architectures, version domains, outflags and platform resource pipelines.
 - [AEGP lifecycle, hooks and suites](03-AEGP/01-HOOKS-SUITES.md): IDs/refcons, suite macros, callbacks and partial initialization; the existing MenuTool is reviewed, not changed or host-verified.
 - [AEGP project and render automation](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md): project graph and time, Undo versus rollback, queue states and invalidation, output settings, frame receipts, borrowed worlds, sync/async cancellation and cache boundaries.
 - AEGP navigation, recipe warnings and VERIFICATION distinguish source review from compiler/host evidence.
 
 ## Latest synchronization and findings
+
+The platform/distribution source review records the public CEP main-thread bridge contract, Adobe's dated UXP/CEP transition milestones, sample-first native build guidance, installer paths, Apple Developer ID/notarization requirements and Microsoft Authenticode tooling. It expands documentation only; no signing/notarization/installer/host result is promoted to PASS.
+
 
 The previously pending STATUS/VERIFICATION registration update was written to main in commits `a5080a132d299b8ef20888e814f3c0513365710c` and `4cd4515e605783f9255edb59cf734d0cabe0f1fd`. It reconciles chapters already present by `859b9c6c816a7cb5a360f61869d1bcf1531aede3`; it is no longer only an unapplied ZIP patch.
 
@@ -55,7 +59,7 @@ Earlier source findings remain in the linked records: ten-file memory/MFR review
 
 This is documentation and SDK source-review work within the agreed subject matter of [the completion plan](COMPLETION-PLAN.md). It does not complete stages 3–4 or bypass outstanding safety, reuse-audit, compiler and host gates. **Native readout-adapter development remains paused; the deliverable is the Bible, not a separate testing product.** No new user AE run is requested.
 
-**Next editorial block: scripting/panels communication and platform build/distribution chapters**, while preserving the exact-SDK baseline. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
+**The scripting/panels communication → macOS/Windows build → distribution editorial block is now written. Next editorial block: testing/release-evidence chapters and cross-checking recipes/templates against the expanded contracts**, while preserving the exact-SDK baseline. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
 
 ## Earlier baseline evidence
 
