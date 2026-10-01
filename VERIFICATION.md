@@ -233,3 +233,16 @@ Portable regression coverage lives in `scripts/test_safe_tools.py`. It covers su
 **Evidence:** GitHub Actions Validate run `36839553520` on commit `22095cd86a7460f241215f5252de65327824a892` completed successfully. The safe-tool step, SDK-header parser tests, C++ foundation test, generated-documentation check and `mkdocs build --strict` all passed.
 
 This closes Completion Gate 2 only. It does not establish AE host loading, render correctness, signing, installer acceptance or Windows native compilation.
+
+
+## Gate 3A reuse-audit verification (2026-10-01)
+
+The code-level audit is recorded in [22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md](22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md).
+
+FSTR Line was independently rerun from the pinned snapshot `c69e3663de59dc44cbdef18042891f6dd1ce5ee6` using audit branch `audit/bible-reuse-2026-10-01`. Audit commit `165bfac15ef9401ba8f2aaec747d2a6bc487a0b1` differs from the pinned snapshot by exactly one added workflow file. GitHub Actions run `36841872858` passed locked dependency installation, `npm run check`, `npm run check:cep` and `git diff --check`.
+
+AE Hot Loader retained CI evidence was reviewed, including successful macOS PoC runs `36309949069` and `36337979733`, plus earlier failed run `36308472947` whose Static checks failed and whose later steps were skipped. The audit preserves that failure.
+
+Transfer decisions are explicit: FSTR snapshot/guard/coalescing/fake-host patterns are adapted conceptually; the FSTR command-hook probe remains evidence-only; AE Hot Loader request-correlation ideas may inform bridge design; its private `ML::LoadPlugins` path remains research-only and its destructive installer pattern is explicitly rejected.
+
+**Gate 3A is closed.** None of these results are Bible AE host verification.
