@@ -95,6 +95,20 @@ Checked and reconciled as one logical block:
 
 No compiler/host run is required for this editorial block; runtime results are not claimed.
 
+### Memory / lifetime / threading block — completed 2026-10-01
+
+Checked and reconciled as one logical block:
+
+- Memory / Undo / Persistent Data now separates host memory, product memory, preferences, project state, secrets and request/runtime state;
+- Undo is explicitly separated from rollback and partial-failure semantics;
+- ownership transfer/adoption is modeled as a state transition;
+- cleanup policy distinguishes no-throw destructor fallback from observable close/checkin;
+- lifetime/threading chapter now separates ownership, validity, invalidation, thread permission and persistence;
+- structural invalidation rules cover streams, layers, render queue/output modules, project graph and async generations;
+- suite lifetime is required to outlive resource-owner cleanup;
+- worker/main-thread split, MFR shared-state rules, mutex/host-call deadlock risk and shutdown order are documented;
+- Native C++ foundation docs now state exactly what stub tests prove and no longer imply Bible needs host QA to be editorially complete.
+
 ## E. Recipes and reference source
 
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
