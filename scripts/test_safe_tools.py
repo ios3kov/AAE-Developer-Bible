@@ -2,6 +2,7 @@
 
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from scripts import host_cycle
@@ -57,6 +58,31 @@ class HostCycleSafetyTests(unittest.TestCase):
             self.assertEqual(
                 (install_root / "Test.plugin" / "Contents" / "marker.txt").read_text(),
                 "new",
+            )
+            self.assertEqual((plugin / "Contents" / "marker.txt").read_text(), "new")
+
+    def test_install_copy_failure_restores_previous_plugin(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            src_root = root / "src"
+            install_root = root / "install"
+            src_root.mkdir()
+            install_root.mkdir()
+
+            plugin = self.make_plugin(src_root, "Test.plugin", "new")
+            self.make_plugin(install_root, "Test.plugin", "old")
+            output = root / "render.png"
+
+            with mock.patch.object(
+                host_cycle.shutil, "copytree", side_effect=OSError("copy failed")
+            ):
+                with self.assertRaises(host_cycle.HostCycleError) as cm:
+                    host_cycle.run_cycle(plugin, install_root, output)
+
+            self.assertEqual(cm.exception.report["install"]["status"], "failed")
+            self.assertEqual(
+                (install_root / "Test.plugin" / "Contents" / "marker.txt").read_text(),
+                "old",
             )
             self.assertEqual((plugin / "Contents" / "marker.txt").read_text(), "new")
 
