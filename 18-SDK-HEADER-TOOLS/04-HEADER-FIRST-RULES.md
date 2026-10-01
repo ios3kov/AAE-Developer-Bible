@@ -1,9 +1,177 @@
 # Header-first rules
 
-1. Exact function name/signature → **build SDK header**.
-2. Ownership/lifecycle → header comments + official sample + guide.
-3. Host availability → suite/version macro + release notes + runtime acquisition test.
-4. Public HTML guide полезен для контекста, но найденные расхождения фиксируются в `14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md`.
-5. Никогда не «исправлять» вызов так, чтобы он совпал с HTML, если compiler/header говорит обратное.
-6. Никогда не кастовать неподходящую suite generation только ради компиляции.
-7. Если `AcquireSuite` не дал нужную version — graceful fallback или понятная ошибка, но не dereference `nullptr`.
+When documentation, sample history and memory disagree, use a strict evidence order.
+
+## Rule 1 — exact declaration comes from the build SDK
+
+For:
+
+- function signature;
+- struct layout;
+- suite generation;
+- typedef;
+- macro/constant used by the compiler;
+
+the exact target SDK header is the compile-time source of truth.
+
+Do not rewrite a call to match a web page when the exact supported SDK header says otherwise.
+
+## Rule 2 — ownership needs more than a prototype
+
+A prototype rarely describes the whole lifetime.
+
+Determine ownership from:
+
+~~~text
+header comments
++ paired acquire/dispose/checkin APIs
++ official sample usage
++ public guide
++ host test
+~~~
+
+Write down whether a returned object is:
+
+- borrowed;
+- owned;
+- locked view;
+- checkout requiring checkin;
+- host reference requiring dispose;
+- valid only inside callback.
+
+## Rule 3 — runtime availability is separate from compile availability
+
+A suite can exist in headers while an older target host does not provide it.
+
+Runtime code must:
+
+- request the exact public suite version;
+- handle acquisition failure;
+- use fallback when intentionally supported;
+- report a clear compatibility error otherwise.
+
+Never dereference a null table.
+
+## Rule 4 — current header outranks historical sample for ABI
+
+Samples are essential for workflow/lifecycle, but a bundled sample may preserve old syntax or compatibility.
+
+If sample and current header differ:
+
+1. record both;
+2. identify likely version boundary;
+3. compile against current header;
+4. do not silently publish old signature as current.
+
+The Bible already records examples of legacy/current AEGP differences.
+
+## Rule 5 — public guide provides context, not a cast license
+
+HTML documentation is useful for:
+
+- design explanation;
+- lifecycle;
+- feature introduction;
+- platform guidance.
+
+If it conflicts with exact build headers, record an erratum/version note.
+
+Do not cast a function pointer or suite table solely to reproduce guide syntax.
+
+## Rule 6 — suite generations are types, not labels
+
+Suite version changes can change:
+
+- table layout;
+- function signatures;
+- semantics;
+- ownership;
+- availability.
+
+Never reinterpret SuiteN as SuiteN+1 because the first members look similar.
+
+## Rule 7 — size/version before tail fields
+
+For versioned product messages and host structs that expose size/version:
+
+~~~text
+validate base size
+→ validate supported version
+→ validate total length
+→ only then access optional tail
+~~~
+
+This rule prevents old/new ABI reads from running past a smaller object.
+
+## Rule 8 — integer/enum width matters
+
+Do not replace enum parameters with bool/int just because constants compile.
+
+Check the exact typedef and semantic values.
+
+The existing render-queue source review contains a concrete warning where TRUE numerically maps to a different enum state than the intended QUEUED value.
+
+## Rule 9 — constness is a contract clue
+
+A new const qualifier can indicate changed mutation expectations.
+
+Do not cast const away before understanding why the API changed.
+
+MFR-era sequence-data changes are an example of lifetime/thread semantics becoming stricter.
+
+## Rule 10 — compiler success is not host proof
+
+Headers/compiler establish type compatibility.
+
+They do not prove:
+
+- suite is available in target AE;
+- PiPL loads;
+- output pixels are correct;
+- callback order assumption is valid;
+- ownership is correct;
+- thread safety;
+- installer/signing.
+
+Every public capability still needs host evidence.
+
+## Rule 11 — missing evidence stays unknown
+
+If:
+
+- parser cannot understand declaration;
+- sample is absent;
+- documentation is ambiguous;
+- host run is not available;
+
+label the fact unresolved/NOT RUN.
+
+Do not fill the gap from memory and present it as verified.
+
+## Rule 12 — preserve provenance
+
+When a Bible chapter states an exact SDK fact, preserve enough provenance to recover:
+
+- SDK version/build;
+- header path;
+- sample path if used;
+- source hash in formal review records where appropriate;
+- date of public-doc review.
+
+This is what makes future SDK diffs possible.
+
+## Practical decision table
+
+| Question | Primary source |
+|---|---|
+| exact function signature | target SDK header |
+| function-table generation | target SDK header |
+| ownership/lifetime | header comments + sample + guide |
+| introduction/deprecation | release notes/guide + runtime check |
+| how Adobe wires a project | exact SDK sample |
+| whether product supports it | product compile + host evidence |
+| current platform signing/install policy | current platform documentation |
+
+## Stop rule
+
+Never make code compile by weakening a native contract you have not understood.

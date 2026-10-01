@@ -1,16 +1,87 @@
 # macOS — native SDK validation
 
-Перед Xcode build прогонять header-derived validation из `18-SDK-HEADER-TOOLS/`.
+Header-derived validation is the first native preflight, not the final Mac validation.
 
-```bash
+## Run
+
+~~~bash
 cd 18-SDK-HEADER-TOOLS
 ./run-macos.sh "/path/to/After Effects SDK/Examples/Headers"
-```
+~~~
 
-PASS означает только:
+Use the exact SDK intended for the candidate build.
 
-- headers распарсились;
-- inventory создан;
-- suite symbols в наших cookbook C++ recipes существуют в указанном SDK.
+## What PASS means
 
-После этого обязательны Xcode compile/link и запуск plug-in внутри целевого After Effects. Signing/notarization проверяются отдельным release pipeline.
+A successful header-tool run means only the checks implemented by the tool passed, such as:
+
+- supported headers were parsed;
+- inventory was generated;
+- cookbook/reference suite symbols were found according to parser rules.
+
+It does not prove complete header coverage.
+
+The indexer fails closed on unsupported declaration shapes, and full exact-SDK indexing remains a separate coverage concern.
+
+## What PASS does not mean
+
+It does not prove:
+
+- C++ source compiles;
+- resources/PiPL compile;
+- link succeeds;
+- arm64/x86_64 slices exist;
+- nested dependencies are correct;
+- bundle loads in AE;
+- pixels are correct;
+- MFR/GPU are safe;
+- code signing is valid;
+- notarization passes.
+
+Do not promote this preflight into host verification.
+
+## Required next gates
+
+~~~text
+header preflight
+→ Xcode compile
+→ resource/PiPL build
+→ link
+→ architecture/dependency inspection
+→ development sign
+→ AE load/operation tests
+→ release sign/package/notarize
+→ quarantined clean-install test
+~~~
+
+Only run gates relevant to the current development/release stage, but keep their evidence classes separate.
+
+## Artifact identity
+
+Record with validation:
+
+- SDK version/build;
+- tool Git SHA;
+- inventory hash/path;
+- plug-in source Git SHA;
+- Xcode/Clang version;
+- target architecture.
+
+## SDK upgrade
+
+When changing SDK, generate/diff inventory before accepting compiler fixes.
+
+See 18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md.
+
+## Failure handling
+
+If header tool fails:
+
+1. determine whether it found a real product/reference mismatch or an unsupported parser declaration;
+2. inspect the exact header;
+3. improve tool coverage only when the parser can do so deterministically;
+4. never add a permissive guess just to turn CI green.
+
+## Verification boundary
+
+The Bible has historical macOS arm64 syntax/type evidence for parts of the repository. This file does not upgrade any reference implementation to linked/signed/host-verified status.
