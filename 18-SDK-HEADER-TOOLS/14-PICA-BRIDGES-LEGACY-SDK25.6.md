@@ -155,4 +155,4 @@ NOT RUN in this iteration:
 - exact-SDK compilation of the two Bible bridge templates;
 - Windows host behavior.
 
-These remain Gate 4/6/7 work.
+These are optional future implementation/runtime evidence areas, not Bible completion requirements.
