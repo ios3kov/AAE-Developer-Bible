@@ -153,6 +153,16 @@ Completed as one renderer-architecture/source-reference block:
 - Artie historical suite generations retained only as sample pattern evidence;
 - template/reference wording aligned with `EDITORIAL-GUIDE.md`.
 
+### Native Panels / BlitHook
+
+Completed as one workspace/display-lifecycle block:
+
+- Native Panel registration, stable identity, host-container vs product-child ownership, recreation and shutdown clarified;
+- panel model/project model and worker handoff boundaries documented;
+- BlitHook borrowed-buffer lifetime, row-aware staging, blank frames, view metadata, backpressure and display-color semantics expanded;
+- asynchronous BlitHook behavior remains deliberately unclaimed beyond verified source contract;
+- template/reference/source-review and communication evidence language aligned with `EDITORIAL-GUIDE.md`.
+
 ## Current editorial TODO
 
 1. Sweep every main chapter for completeness against the editorial checklist.
