@@ -1,6 +1,6 @@
 # Published PICA suite contract
 
-Status: **ABI design template, not a complete provider implementation and not host-verified**.
+Status: **ABI/source design template; no runtime result is claimed by Bible**.
 
 Source review baseline: Adobe After Effects SDK **25.6 build 61**, especially Sweetie + Checkout. See [PICA chapter](../../14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md) and [source review](../../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md).
 
