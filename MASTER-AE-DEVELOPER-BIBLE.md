@@ -25317,24 +25317,26 @@ A checked item requires recorded evidence. Documentation presence alone is not c
 
 ## Gate 2 — Safe tooling
 
+**Status: CLOSED — 2026-10-01.** Validation run for commit `22095cd86a7460f241215f5252de65327824a892` passed the destructive/false-success suite plus the existing parser, C++ foundation and strict documentation checks.
+
 ### host_cycle.py
-- [ ] Reject source plugin == destination plugin.
-- [ ] Never destroy the only input copy.
-- [ ] Back up an existing installed plugin before replacement.
-- [ ] Restore the previous plugin after failed install.
-- [ ] Non-zero aerender exit fails the command.
-- [ ] Support/report timeout.
-- [ ] Missing expected render output is failure.
-- [ ] Machine-readable report separates install/load/render states.
-- [ ] Tests cover success, render failure, timeout, missing output and path collision.
+- [x] Reject source plugin == destination plugin.
+- [x] Never destroy the only input copy.
+- [x] Back up an existing installed plugin before replacement.
+- [x] Restore the previous plugin after failed install.
+- [x] Non-zero aerender exit fails the command.
+- [x] Support/report timeout.
+- [x] Missing expected render output is failure.
+- [x] Machine-readable report separates install/load/render states.
+- [x] Tests cover success, install-copy failure, render failure, timeout, missing output and path collision.
 
 ### SDK sample materialization
-- [ ] Reject source/destination collision.
-- [ ] Replacement cannot destroy source.
-- [ ] Missing/partial SDK sample fails closed.
-- [ ] Destructive-path tests exist.
+- [x] Reject source/destination collision/overlap.
+- [x] Replacement cannot destroy source.
+- [x] Missing/partial SDK sample fails closed.
+- [x] Destructive-path tests exist.
 
-**Acceptance:** destructive-path tests pass and false-success render tests are impossible.
+**Acceptance:** met by `scripts/test_safe_tools.py` in GitHub Actions Validate run `36839553520`. The installer path now stages the replacement, temporarily backs up an existing installation and rolls back on failure; render exit/timeout/output failures return failure instead of a false success.
 
 ## Gate 3 — Documentation consistency
 
