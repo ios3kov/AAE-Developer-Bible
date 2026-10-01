@@ -88,4 +88,4 @@ If header tool fails:
 The Bible has historical macOS arm64 syntax/type evidence for parts of the repository. This file does not upgrade any reference implementation to linked/signed/host-verified status.
 
 
-For the SDK contract-audit method, see [SDK contract audit runbook](../18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
+For the SDK contract-audit method, see [SDK contract audit runbook](../18-SDK-HEADER-TOOLS/16-SDK-CONTRACT-AUDIT-RUNBOOK.md).
