@@ -23336,6 +23336,23 @@ These three topics look unrelated, but they meet at one architectural rule:
 
 > **state must have explicit owner, lifetime and failure semantics.**
 
+## State classification table
+
+Перед хранением любого state определите его класс:
+
+| State | Typical owner | Lifetime | Persistence |
+|---|---|---|---|
+| project/render truth | After Effects project/effect model | project/instance | project-visible |
+| user preference | product/user | across sessions | PersistentData/config |
+| runtime cache | product | process/instance | rebuildable |
+| host ref/handle | host/product per API | API-defined | usually not serializable |
+| request state | product | request/generation | ephemeral |
+| secret credential | product/platform secure store | product policy | security-specific |
+
+Главное правило: **не переносите state в PersistentData только потому, что его удобно хранить там**.
+
+Render-affecting state, который должен путешествовать с project, требует project/effect persistence strategy, а не hidden user preference.
+
 ## Undo
 
 **Suite:** `AEGP_UtilitySuite6`.
@@ -23441,6 +23458,25 @@ Examples of different cleanup families:
 
 Type determines cleanup contract.
 
+## Ownership transfer and adoption
+
+Некоторые host APIs меняют владельца после successful call.
+
+Model:
+
+~~~text
+caller owns resource
+→ adoption/attach call
+→ success: host owns
+→ failure: caller may still own
+~~~
+
+RAII wrapper в таком месте должен уметь **явно release ownership** только после успешной передачи.
+
+Не вызывайте cleanup дважды после adoption и не теряйте cleanup на failure branch.
+
+Примеры такого reasoning встречаются в footage/import и других create→adopt workflows.
+
 ## Product-native allocations
 
 `new/delete`, `std::vector`, smart pointers etc. are fine inside your module.
@@ -23504,6 +23540,31 @@ schema version
 
 Do not reinterpret old bytes/string format as new struct without migration.
 
+## Persistent migration failure
+
+Migration — это тоже failure boundary.
+
+Планируйте:
+
+- unknown future schema;
+- malformed value;
+- partially written value;
+- old key missing;
+- migration step failed;
+- downgrade to older product version.
+
+Safe policy:
+
+~~~text
+read version
+→ validate representation
+→ migrate known versions
+→ on unknown/corrupt: use explicit recovery/default policy
+→ write new version only after successful migration
+~~~
+
+Не затирайте старые данные новым schema marker до успешного преобразования.
+
 ## Project state vs preferences
 
 Do not store project-essential render state only in global preferences.
@@ -23547,6 +23608,33 @@ cause
 
 At AE boundary convert to `A_Err` and optionally report user-facing context through supported host/UI layer.
 
+## Cleanup error policy
+
+Разделяйте два класса cleanup:
+
+### Best-effort destructor cleanup
+
+Подходит, когда:
+
+- ошибка cleanup уже не может быть полезно обработана;
+- destructor обязан быть noexcept;
+- ресурс всё равно должен быть освобождён насколько возможно.
+
+### Observable close/checkin
+
+Нужен, когда cleanup result влияет на correctness/diagnostics.
+
+Pattern:
+
+~~~text
+owner.Close()
+→ returns host error
+→ caller records/propagates result
+→ destructor becomes fallback only
+~~~
+
+Это особенно важно для frame checkin, transaction end и других cleanup calls, где silent failure может скрыть проблему.
+
 ## First-error preservation
 
 Pattern:
@@ -23574,6 +23662,18 @@ catch ...
 → A_Err
 ```
 
+## Persistent data is not a synchronization primitive
+
+То, что state записан через PersistentData, не делает concurrent access автоматически безопасным.
+
+Если несколько callbacks/threads читают и меняют product state:
+
+- определите собственную synchronization policy;
+- не используйте preference store как lock;
+- не делайте high-frequency render coordination через persistent settings.
+
+PersistentData решает хранение, не concurrency.
+
 ## Threading
 
 Memory ownership does not imply thread permission.
@@ -23585,6 +23685,23 @@ Separate:
 - lifetime;
 - ownership;
 - thread-affinity.
+
+## Shutdown ordering
+
+Memory/undo/persistence helpers должны завершаться **до** того, как исчезнут suites/host services, которые нужны их cleanup.
+
+Типичный порядок:
+
+~~~text
+stop new work
+→ close active requests/transactions
+→ destroy resource owners
+→ flush product settings if policy requires
+→ release suites/services
+→ module teardown
+~~~
+
+Не оставляйте host-cleanup RAII objects process-global до C++ static destruction.
 
 ## Shutdown
 
