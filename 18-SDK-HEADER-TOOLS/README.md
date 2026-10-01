@@ -53,14 +53,14 @@ They are useful to a developer who wants extra confidence in a source example, b
 
 Historical compiler results remain in [VERIFICATION.md](../VERIFICATION.md) because they are real evidence about those snapshots.
 
-## Historical “Gate 4” filenames
+## Canonical audit documents and compatibility aliases
 
-Files such as `16-SDK-CONTRACT-AUDIT-RUNBOOK.md` and `17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md` retain filenames for stable links/history. The former build-gate completion model is superseded.
+Canonical documents:
 
-Read them as:
+- [SDK contract audit runbook](16-SDK-CONTRACT-AUDIT-RUNBOOK.md)
+- [SDK 25.6 contract audit record](17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md)
 
-- SDK contract audit methodology;
-- exact SDK 25.6 evidence record.
+The old `16-GATE4-...` / `17-GATE4-...` paths remain only as short compatibility aliases so historical links do not break. They are not the active completion model.
 
 ## Current real SDK evidence
 
