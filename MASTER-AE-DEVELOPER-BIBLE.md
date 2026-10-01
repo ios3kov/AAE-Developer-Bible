@@ -15813,41 +15813,44 @@ Source review и documentation review не равны host verification.
 
 # Source templates and integration guides
 
-v1.1: implementation and verification levels are listed in [the coverage matrix](16-WORKING-TEMPLATES/../FINAL-COVERAGE-AUDIT.md). Historical directory names are retained for link compatibility.
+Цель раздела — дать **production-shaped source patterns**, которые связывают объяснение Bible с реальным SDK/sample architecture.
 
-Цель этого раздела — не псевдокод, а **минимальные production-shaped куски**, которые можно graft/вставлять в официальный SDK sample соответствующего типа.
+Это reference material, а не набор binaries, которые репозиторий обязан собрать.
 
-## Почему это не один «универсальный CMake проект»
+## Почему не один универсальный проект
 
-Adobe сама рекомендует стартовать от ближайшего SDK sample, потому что PiPL/resource build steps и platform project settings уже настроены. Поэтому шаблоны здесь делятся на:
+Adobe native samples already contain version/platform-specific project, PiPL and resource plumbing. Поэтому Bible хранит в основном:
 
-- **drop-in C++ source** — вставляется в конкретный official sample;
-- **protocol headers** — полностью наши, platform-neutral;
-- **JSX/CEP mini projects** — самостоятельные файлы;
-- **integration recipe** — какой Adobe sample копировать и какой файл заменить.
+- **drop-in/source-shaped C++ fragments**;
+- **protocol headers**;
+- **JSX/CEP mini projects**;
+- **integration recipes** — какой sample family использовать и что заменить.
 
 ## Templates
 
-| Template | Base | Что доказывает |
+| Template | Base | Что иллюстрирует |
 |---|---|---|
-| `effect-basic/` | SDK Skeleton | Effect registration, param, render, 8/16 bpc |
-| `aegp-menu-command/` | SDK Persisto/Projector-style AEGP | menu/update/death-hook lifecycle + harmless command callback |
-| `effect-aegp-generic-bridge/` | paired Effect + AEGP | `AEGP_EffectCallGeneric` ↔ `PF_Cmd_COMPLETELY_GENERAL` protocol |
-| `pica-shared-suite/` | SDK Sweetie-style provider | stable native service ABI |
-| `native-panel-registration/` | SDK Panelator | native Window-menu + dockable panel registration |
-| `keyframer-batch/` | SDK Easy Cheese | correct batch keyframe transaction |
-| `aeio-registration/` | SDK IO/FBIO | AEIO registration contract |
-| `artisan-registration/` | SDK Artie | Artisan registration contract |
-| `jsx-tool/` | Scripts folder | undo-safe ExtendScript tool |
+| `effect-basic/` | SDK Skeleton | registration, parameter, 8/16-bpc render shape |
+| `aegp-menu-command/` | Persisto/Projector-style AEGP | menu/update/death-hook lifecycle |
+| `effect-aegp-generic-bridge/` | paired Effect + AEGP | generic-call protocol |
+| `pica-shared-suite/` | Sweetie-style provider | native service ABI shape |
+| `native-panel-registration/` | Panelator | Window menu + dockable-panel registration |
+| `keyframer-batch/` | Easy Cheese | batch-keyframe transaction |
+| `aeio-registration/` | IO/FBIO | AEIO registration contract |
+| `artisan-registration/` | Artie | Artisan registration contract |
+| `jsx-tool/` | Scripts folder | undo-safe ExtendScript pattern |
 | `cep-panel-bridge/` | CEP extension | panel JS ↔ JSX JSON dispatcher |
 
-## Validation status labels
+## Evidence labels
 
-- **SDK syntax-checked** — compiler-checked against SDK 25.6 on macOS; not linked or host-tested.
-- **drop-in** — intended to replace logic inside named Adobe sample, retaining its PiPL/project files.
-- **standalone** — no Adobe SDK compile needed (JSX/HTML).
+- **SDK-CONTRACT-REVIEWED** — relevant names/generations/signatures were checked against selected SDK material.
+- **SOURCE EXAMPLE** — source illustrates the pattern; runtime behavior is not being claimed.
+- **STANDALONE SOURCE** — no Adobe SDK project is required to read/use the JS/HTML source shape.
+- **HISTORICAL COMPILE/RUNTIME EVIDENCE** — retained only when such evidence actually exists.
 
-Результаты проверок фиксируются в [VERIFICATION.md](16-WORKING-TEMPLATES/../VERIFICATION.md). `drop-in` обозначает способ интеграции, а не доказанную готовность бинарного плагина.
+Older `host-test-required` / `host-test pending` labels mean “runtime not claimed”, not “Bible must now run this example”.
+
+If a reader turns a template into a product, use the platform/build/testing chapters for that product's own validation.
 
 
 ---
@@ -21990,157 +21993,75 @@ The four non-required parser diagnostics remain visible and may be improved late
 
 <!-- SOURCE: 18-SDK-HEADER-TOOLS/README.md -->
 
-# SDK Header Tools — declaration index and symbol-name checks
+# SDK Header Tools — exact contract audit helpers
 
-Это fail-closed preflight для локального SDK: declaration inventory + symbol-name checks + отдельный real-compiler syntax/type driver. Regex inventory сам по себе не является signature/ABI proof; типы проверяет `scripts/check_native.py`.
+These tools keep **version-sensitive Bible claims aligned with a real Adobe SDK**.
 
-Главное правило: точный контракт сборки задают headers целевого SDK. Regex parser поддерживает ограниченные формы объявлений. Он сохраняет все diagnostics; `--allow-incomplete` позволяет только записать полный inventory для следующего required-contract gate и сам по себе никогда не означает PASS. Реальный SDK 25.6 сейчас даёт четыре видимых non-required partial diagnostics, а обязательный Gate-4 baseline проходит полностью.
+They are not a requirement to compile the whole Bible.
 
-## Что генерируется
+## Editorial purpose
 
-`tools/ae_sdk_inventory.py` находит C ABI function tables:
+The useful editorial question is:
 
-- `AEGP_*SuiteN` — AEGP host-control API;
-- `PF_*SuiteN` — Effect plug-in suites;
-- `DRAWBOT_*SuiteN` — native custom UI/Drawbot;
-- `AEIO_*FunctionBlockN` — callbacks import/export plug-ins;
-- `PR_*EntryPoints` — Artisan/native renderer callbacks;
-- другие SDK function tables с типичными именами `Suite`, `FunctionBlock`, `EntryPoints`, `Callbacks`.
+> Does the SDK version we cite actually contain the suite generation/function/table the text and recipes say it contains?
 
-Для каждой таблицы сохраняются:
+For Adobe After Effects SDK **25.6 build 61**, the real-header audit records:
 
-- имя/семейство;
-- header-источник и SHA-256;
-- все function-pointer names;
-- normalized header signatures;
-- найденные рядом suite/version macros;
-- parser diagnostics для подозрительных таблиц, которые не удалось разобрать.
+- 35/35 required contract tables/functions present;
+- 39/39 cookbook call-sites resolving to expected SuiteHandler generations;
+- 0 required parser diagnostics;
+- four unrelated partial parser diagnostics retained explicitly.
 
-## Запуск
+That is the current contract-accuracy baseline for the Bible.
 
-macOS:
+## Inventory
 
-```bash
-python3 tools/ae_sdk_inventory.py \
-  "/path/to/After Effects SDK/Examples/Headers" \
-  --json generated/ae-sdk-inventory.json \
-  --markdown generated/ae-sdk-inventory.md
-```
+`tools/ae_sdk_inventory.py` indexes C ABI-style tables such as AEGP, PF, DRAWBOT, AEIO, PR and PICA/SP tables.
 
-Windows PowerShell:
+It records source file/hash, normalized declarations and parser diagnostics.
 
-```powershell
-py tools\ae_sdk_inventory.py `
-  "C:\path\to\After Effects SDK\Examples\Headers" `
-  --json generated\ae-sdk-inventory.json `
-  --markdown generated\ae-sdk-inventory.md
-```
+`--allow-incomplete` means only “emit the inventory including diagnostics”. It never means “everything is verified”.
 
-## Проверка наших recipes против SDK
+## Required-contract audit
 
-После генерации inventory:
+`sdk25.6-required-contracts.json` defines the minimum contract surface referenced by the current core native chapters/recipes.
 
-```bash
-python3 tools/verify_recipe_symbols.py \
-  generated/ae-sdk-inventory.json \
-  ../17-NATIVE-SUITE-COOKBOOK/code
-```
+`verify_required_contracts.py` fails when a required table/function is absent, a required table has a parser diagnostic, or the inventory schema is unsupported.
 
-Скрипт проверяет имена в call-sites вида `suite->AEGP_Foo(...)` / `suite->PF_Foo(...)`; suite generation, аргументы и типы не проверяются. Пустые/несуществующие входы, отсутствие вызовов и неполный inventory завершаются ошибкой. Комментарии и строки не считаются вызовами.
+Unrelated diagnostics remain visible without turning the Bible into a project to implement a complete C/C++ parser for every Adobe structure.
 
-## Сравнение двух SDK
+## Recipe audit
 
-Сгенерировать JSON для старого и нового SDK, затем:
+`verify_recipe_symbols.py` checks cookbook call-site names and, for SuiteHandler calls, the expected suite generation.
 
-```bash
-python3 tools/diff_sdk_inventory.py old.json new.json --markdown sdk-diff.md
-```
+This is a **documentation/source consistency check**. It does not need to prove a shipping binary.
 
-Получим added/removed tables/functions, textual signature changes и изменения порядка function fields. Typedef expansion, packing и platform ABI не проверяются. Конфликтующие или неполные inventory отклоняются.
+## SDK diff
 
-## Что уже протестировано здесь
+`diff_sdk_inventory.py` is useful when a future edition moves to another SDK baseline.
 
-В `tests/fixture_header.h` лежит маленький **синтетический** SDK header. Он не содержит Adobe SDK code, но повторяет ABI-форму function tables. Unit test проверяет named suite, anonymous suite и AEIO-style function block.
+## Optional compiler helper
 
-```bash
-python3 tests/test_inventory.py
-```
+`scripts/check_native.py` and the platform runners can produce additional syntax/type evidence for source snapshots.
 
-## Что нельзя честно заявить в песочнице
+They are useful to a developer who wants extra confidence in a source example, but **compiler evidence is not a completion criterion for AE Developer Bible**.
 
-В v1.1 выполнены syntax/type checks с локальным SDK 25.6; host validation не выполнялась. Критерий готовности на машине разработчика:
+Historical compiler results remain in [VERIFICATION.md](18-SDK-HEADER-TOOLS/../VERIFICATION.md) because they are real evidence about those snapshots.
 
-1. inventory успешно строится из фактических headers;
-2. `verify_recipe_symbols.py` не показывает неизвестных calls;
-3. код компилируется внутри ближайшего официального Adobe sample;
-4. binary загружается в целевой AE;
-5. smoke tests проходят на заявленных macOS/Windows + architecture + AE versions.
+## Historical “Gate 4” filenames
 
+Files such as `16-GATE4-ACCEPTANCE-RUNBOOK.md` and `17-GATE4-SDK25.6-RUN-2026-10-01.md` retain filenames for stable links/history. The former build-gate completion model is superseded.
 
-## Полный локальный Gate-4 runner
+Read them as:
 
-Передавайте **SDK Examples root**, не только Headers:
+- SDK contract audit methodology;
+- exact SDK 25.6 evidence record.
 
-macOS:
+## Current real SDK evidence
 
-```bash
-cd 18-SDK-HEADER-TOOLS
-./run-macos.sh "/path/to/After Effects SDK/Examples"
-```
+See [SDK 25.6 contract audit record](18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md).
 
-Windows, из Visual Studio Developer Command Prompt / VsDevCmd:
-
-```powershell
-cd 18-SDK-HEADER-TOOLS
-.\run-windows.ps1 "C:\path\to\After Effects SDK\Examples"
-```
-
-Оба runner'а выполняют:
-
-1. inventory exact headers с сохранением всех diagnostics;
-2. schema/version validation;
-3. required-contract gate: diagnostics в обязательных tables/functions блокируют run;
-4. cookbook symbol-name + exact SuiteHandler-generation preflight;
-5. C++17 compiler syntax/type checks;
-6. запись `generated/local-sdk/native-compile-report.json`.
-
-Compile report сохраняет aggregate SDK-header manifest SHA-256, compiler identity, exact commands и status каждой translation unit.
-
-Это **не** resource/PiPL build, link или AE host test.
-
-## Inventory compatibility guard
-
-`verify_recipe_symbols.py` и `diff_sdk_inventory.py` принимают только поддерживаемую `schema_version=1` и отклоняют malformed/empty function declarations. Signature/order drift покрыт portable regression tests. Старый/неполный JSON нельзя использовать как скрытый источник зелёной проверки.
-
-
-## Required SDK 25.6 contract manifest
-
-`sdk25.6-required-contracts.json` is a fail-closed minimum baseline for the current Bible edition.
-
-It pins contract-table generations used by the reviewed chapters and native examples, including AEGP project/item/comp/layer/effect/stream/keyframe/render families, AEIO, Artisan, panels, GPU, Custom UI/Drawbot and PICA. High-risk tables also list required functions.
-
-`verify_required_contracts.py` fails when:
-
-- a required table is absent;
-- a required function is absent from its pinned table;
-- the inventory schema is unsupported;
-- parser diagnostics affecting required contracts make the acceptance lane fail; unrelated diagnostics remain visible and non-silent.
-
-This prevents a parser run from becoming green merely because it returned *some* tables.
-
-The manifest is **necessary, not sufficient** evidence. Real compiler and host gates still follow.
-
-
-## Gate 4 acceptance
-
-The exact acceptance criteria and evidence-retention rules are in [Gate 4 — exact SDK acceptance runbook](18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
-
-
-## Real SDK 25.6 preflight evidence
-
-See [Gate 4 — exact SDK 25.6 required-contract preflight — 2026-10-01](18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md).
-
-Current exact-header result: **35/35 required contracts PASS, 39/39 cookbook call-sites resolved, 0 required parser diagnostics**. Four non-required partial diagnostics remain explicitly recorded.
+The result supports the Bible's current native contract claims. No additional macOS/Windows compilation is required to call the documentation editorially complete.
 
 
 ---
@@ -24164,52 +24085,63 @@ The reference remains host GPU-test pending. Materializing the SDK sample and co
 
 # Reference implementations
 
-v1.1 verification: [coverage matrix](20-REFERENCE-IMPLEMENTATIONS/../FINAL-COVERAGE-AUDIT.md), [commands and results](20-REFERENCE-IMPLEMENTATIONS/../VERIFICATION.md). AEIO/Artisan/native-panel entries are **guide only**; Drawbot is an acquisition skeleton. Script/CEP host execution is pending. The historical matrix below describes intended integration, not test evidence.
+This section maps Bible concepts to **reference source shapes and official SDK sample starting points**.
 
-## v1.2 implementation workspaces
+It is not a suite of binaries that must be built to complete the Bible.
 
-Materialize the exact licensed SDK samples locally:
+## Purpose
 
-```bash
-python3 scripts/materialize_sdk_examples.py "/path/to/SDK/Examples"
-```
+Use this section when a reader asks:
 
-This creates untracked graft workspaces for AEIO (`IO`), Artisan (`Artie`), native panel (`Panelator`), GPU (`SDK_Invert_ProcAmp`), PICA (`Sweetie`) and Effect↔AEGP (`Commando`). SDK project/PiPL/utility files remain owned by Adobe and are not redistributed here.
+- what source shape does this architecture turn into;
+- which Adobe sample should I start from;
+- where is the relevant Bible recipe/header;
+- what pieces are intentionally omitted.
 
-MenuTool, Keyframer and bridge files forward to canonical sources in sections 16/17. Compile either location, not both, and retain the relative directory layout or copy the canonical implementation.
+For native work, Adobe SDK project/PiPL/utility files remain licensed external material and are not redistributed here.
 
-This directory turns the architecture chapters into copyable starting points.
+## Reference vocabulary
 
-## Status vocabulary
+- **source example** — Bible-owned source illustrating a contract/pattern;
+- **sample-derived pattern** — explanation/source shape based on a named Adobe sample family;
+- **guide-only** — architecture and integration route, intentionally no implementation;
+- **skeleton** — intentionally partial source for one boundary;
+- **runtime observed** — used only where a concrete recorded execution result exists.
 
-- **drop-in** — intended to be copied into the closest official Adobe SDK sample shell.
-- **sample-derived** — follows the public SDK/sample contract, but still needs the exact SDK version's headers/project plumbing.
-- **host-test-required** — host execution is pending; this label alone does not establish that source is implemented or compiled.
-- **guide-only** — architecture/sample selection, no implementation supplied.
-- **skeleton** — partial code, missing behavior explicitly documented.
-
-**Important:** Adobe's SDK headers and sample project files are not redistributed here. For native projects, start from the closest official SDK sample, then replace the implementation with the files here. This is deliberate: PiPL/resource build plumbing and platform settings change across SDK releases.
+Older `host-test-required` wording is superseded. Lack of a Bible-owned runtime run is an evidence boundary, **not a TODO required to finish the documentation**.
 
 ## Native-first matrix
 
-| Family | Example | Status | Purpose |
+| Family | Reference | Editorial status | Purpose |
 |---|---|---|---|
-| Effect | `../16-WORKING-TEMPLATES/effect-basic` | drop-in | classic pixel effect |
-| Effect | `Effect/SmartFX-MFR` | SDK syntax-checked / host-test-required | SmartFX pass-through; MFR disabled |
-| Effect UI | `Effect/CustomUI-Drawbot` | skeleton / SDK syntax-checked | Drawbot acquisition only; no drawing |
-| AEGP | `AEGP/MenuTool` | drop-in | menu command + host callback lifecycle |
-| AEGP | `AEGP/Keyframer` | sample-derived / host-test-required | keyframe batching path |
-| AEGP UI | `AEGP/NativePanel` | guide-only | native panel registration path |
-| AEIO | `AEIO/MinimalRegistrar` | guide-only | importer/exporter registration boundary |
-| Artisan | `Artisan/MinimalRegistrar` | guide-only | custom renderer registration boundary |
-| Bridge | `Bridges/Effect-AEGP` | sample-derived / host-test-required | `AEGP_EffectCallGeneric` message ABI |
-| Bridge | `Bridges/PICA-Provider-Consumer` | sample-derived / host-test-required | plug-in ↔ plug-in PICA suite ABI |
-| Script | `Scripts/ScriptUI-Panel` | source supplied / host-test pending | dockable ExtendScript panel |
-| CEP | `../16-WORKING-TEMPLATES/cep-panel-bridge` | logic supplied / packaging and host-test pending | panel ↔ ExtendScript JSON bridge |
+| Effect | `../16-WORKING-TEMPLATES/effect-basic` | source example | classic pixel-effect shape |
+| Effect | `Effect/SmartFX-MFR` | source example | SmartFX/MFR architecture shape |
+| Effect UI | `Effect/CustomUI-Drawbot` | skeleton | Drawbot acquisition/UI boundary |
+| AEGP | `AEGP/MenuTool` | source example | menu command + callback lifecycle |
+| AEGP | `AEGP/Keyframer` | sample-derived pattern | keyframe batching route |
+| AEGP UI | `AEGP/NativePanel` | guide-only | Panelator path |
+| AEIO | `AEIO/MinimalRegistrar` | guide-only | IO/FBIO registration path |
+| Artisan | `Artisan/MinimalRegistrar` | guide-only | Artie registration path |
+| Bridge | `Bridges/Effect-AEGP` | source pattern | generic-call message ABI |
+| Bridge | `Bridges/PICA-Provider-Consumer` | source pattern | published suite ABI |
+| Script | `Scripts/ScriptUI-Panel` | source example | ScriptUI panel pattern |
+| CEP | `../16-WORKING-TEMPLATES/cep-panel-bridge` | source example | panel ↔ JSX dispatcher |
 
-## Build rule
+## Using native references
 
-Native examples intentionally do **not** invent replacement Xcode/Visual Studio projects. Copy the matching Adobe SDK sample project and graft in the implementation. See `08-MACOS`, `09-WINDOWS`, and `18-SDK-HEADER-TOOLS`.
+If a reader chooses to build one:
+
+1. obtain the target Adobe SDK legally;
+2. start from the closest official sample project;
+3. keep the sample's PiPL/resource/platform plumbing;
+4. graft the Bible source/pattern;
+5. apply the product's own compiler/host/release testing.
+
+Those product-validation steps are described elsewhere in the Bible, but **the Bible itself does not need to execute them for every reference**.
+
+`scripts/materialize_sdk_examples.py` can create local untracked sample workspaces as an optional developer utility.
+
+Historical compiler/runtime evidence, where present, remains documented in [VERIFICATION.md](20-REFERENCE-IMPLEMENTATIONS/../VERIFICATION.md).
 
 
 ---
@@ -27552,10 +27484,12 @@ No source-project host result is promoted into Bible host verification. FSTR SYN
 
 ## Editorial progress — 2026-10-01
 
-- Closed Gate 3A reuse audit: exact FSTR/AE Hot Loader file+commit mapping, transfer decisions, provenance review and independent FSTR portable rerun.
-- Hardened Gate 4 tooling with inventory schema guards, required SDK 25.6 tables/functions, exact SuiteHandler-generation checks and compiler-report provenance.
-- Added cross-platform Gate 4 runners for Clang/MSVC, clean-Git evidence requirements, strict portable native protocol-header compilation and an exact-SDK acceptance runbook.
-- Re-ran Gate 4 against the supplied Adobe SDK 25.6: 35/35 required contracts and 39/39 cookbook call-sites pass; corrected Drawbot Surface v2 and added callback-typedef parsing for Artisan/related entry tables.
+- **Editorial model correction:** AE Developer Bible is a knowledge base, not a plug-in QA program. The former mandatory build/host completion-gate model is superseded; compiler/host runs remain evidence for specific claims, not requirements for Bible completion.
+
+- Completed the cross-project reuse audit: exact FSTR/AE Hot Loader file+commit mapping, transfer decisions, provenance review and independent FSTR portable rerun.
+- Hardened SDK contract-audit tooling with inventory schema guards, required SDK 25.6 tables/functions, exact SuiteHandler-generation checks and compiler-report provenance.
+- Added optional cross-platform compiler helpers for Clang/MSVC, clean-Git evidence requirements, strict portable native protocol-header compilation and an exact-SDK acceptance runbook.
+- Re-ran the SDK contract audit against the supplied Adobe SDK 25.6: 35/35 required contracts and 39/39 cookbook call-sites pass; corrected Drawbot Surface v2 and added callback-typedef parsing for Artisan/related entry tables.
 - Preserved four non-required parser diagnostics explicitly instead of treating them as hidden success; current macOS/MSVC compiler acceptance remains open.
 
 - Expanded the full testing section with explicit build/host/release evidence layers, richer matrices, render/ROI correctness, MFR stress, performance and crash diagnostics.
@@ -28489,6 +28423,16 @@ No user AE action is required for the current editorial work.
 
 <!-- SOURCE: VERIFICATION.md -->
 
+# Verification purpose
+
+This file is an **evidence ledger**, not the completion checklist for AE Developer Bible.
+
+It records what was actually reviewed, compiled, observed or not run so the text never overstates evidence. A missing host/compiler result means only that Bible must not claim that result. It does **not** create an obligation to build or run every example before the documentation can be complete.
+
+The authoritative editorial readiness criteria are in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md).
+
+---
+
 ## Gate 3 post-close consistency correction — 3D Channel Extract (2026-10-01)
 
 A follow-up consistency scan after the recorded Gate 3 closure found two stale planning statements, not new runtime evidence. The master effect list still defaulted every entry to TO VERIFY, and the execution plan still placed 3D Channel Extract under the original HOST-BUILTIN-first pilot wording.
@@ -28516,7 +28460,7 @@ Expanded the ExtendScript object model and ScriptUI chapters, CEP/UXP panel guid
 
 The review records the CEP two-engine boundary and host-main-thread evalScript/event scheduling; treats the November 2026 AE UXP beta as a future dated milestone rather than an available API; distinguishes development plug-in paths from installer policy; preserves Windows PiPL resource-generation and architecture declarations; separates macOS ad-hoc development signing from Developer ID/notarized release distribution; and expands Authenticode, installer ownership, upgrade, provenance, symbol and release-evidence rules.
 
-**Verification level: public-source review and documentation.** No new exact-SDK compilation, native link, CEP host run, UXP host run, Developer ID signature, notarization submission, Authenticode signature, installer run, clean-machine load or Windows x64/ARM64 host test was performed. Existing completion gates are unchanged by this editorial work.
+**Verification level: public-source review and documentation.** No new exact-SDK compilation, native link, CEP host run, UXP host run, Developer ID signature, notarization submission, Authenticode signature, installer run, clean-machine load or Windows x64/ARM64 host test was performed. This editorial work records source accuracy; runtime execution remains a separate evidence class.
 
 
 ## GPU, audio and Custom UI / Drawbot chapter review (2026-10-01)
@@ -28529,7 +28473,7 @@ Audio review records AUDIO_SETUP/RENDER/SETDOWN, audio capability flags, PF_Soun
 
 Custom UI review records PF_Cmd_EVENT, event contexts, PF_CustomUIInfo, PF_EffectCustomUISuite, Drawbot supplier/surface borrowed ownership versus created-object ReleaseObject, Custom_ECW_UI/CCU patterns and the documented async-manager requirement for rendered UI frames after the UI/render-thread split.
 
-**Verification level: SDK source review and documentation.** No new GPU binary, device setup/render, CPU↔GPU comparison, audio processing host run, custom UI interaction, async-manager lifecycle, Drawbot leak test, HiDPI/theme test or Windows host run was performed. Gate 4/6/7 remain open.
+**Verification level: SDK source review and documentation.** No new GPU binary, device setup/render, CPU↔GPU comparison, audio processing host run, custom UI interaction, async-manager lifecycle, Drawbot leak test, HiDPI/theme test or Windows host run was performed. No broader runtime result is claimed by this source-review entry.
 
 ## PICA providers, Effect↔AEGP and legacy-boundary chapter review (2026-10-01)
 
@@ -28539,7 +28483,7 @@ Reviewed contracts include SPBasic public-version acquire/release reference coun
 
 Source limits are explicit: Sweetie does not demonstrate generic suite unpublish/hot replacement; suite refcount does not prove thread safety; the current Bible SharedSuite header is C++-oriented despite its C-shaped ABI; old bundled sample suite generations remain pattern evidence rather than current signatures.
 
-**Verification level: SDK source review and documentation.** The SDK TAR SHA-256 was recalculated and matched the accepted archive. No new provider/consumer host load, wrong-version acquisition run, suite unload/reload test, generic call, layer-time host test, concurrency stress, exact-SDK compile of the Bible bridge templates or Windows host run was performed. Gate 4/6/7 remain open.
+**Verification level: SDK source review and documentation.** The SDK TAR SHA-256 was recalculated and matched the accepted archive. No new provider/consumer host load, wrong-version acquisition run, suite unload/reload test, generic call, layer-time host test, concurrency stress, exact-SDK compile of the Bible bridge templates or Windows host run was performed. No broader runtime result is claimed by this source-review entry.
 
 ## Native panels and BlitHook chapter review (2026-10-01)
 
@@ -28549,7 +28493,7 @@ Panel review establishes `AEGP_PanelSuite1`, non-localized UTF-8 match-name iden
 
 BlitHook review separates the `AEGeneral` PiPL/plugin entry contract from AEGP. `AE_Hook.h` protocol 3.0 describes 32/64/128-bit AE_PixBuffer metadata, ARGB/BGRA format, non-tight row bytes, view origin/visible rectangle, nullable blank frame and receipt/completion/async fields. Bundled EMP does not process pixels or exercise asynchronous completion, so the Bible does not invent pixel-pointer lifetime or async timing beyond the header.
 
-**Verification level: SDK source review and documentation.** No new native panel binary, dock/reopen/workspace/shutdown run, BlitHook display callback, async completion test, preview-latency benchmark or macOS/Windows host matrix was performed. Gate 6/7 remain open.
+**Verification level: SDK source review and documentation.** No new native panel binary, dock/reopen/workspace/shutdown run, BlitHook display callback, async completion test, preview-latency benchmark or macOS/Windows host matrix was performed. No broader runtime result is claimed by this source-review entry.
 ## AEIO and Artisan chapter review (2026-10-01)
 
 Rewrote [AEIO](04-AEIO/README.md), [AEIO native integration](14-NATIVE-INTEGRATIONS/08-AEIO.md), [Artisan](05-ARTISAN/README.md) and [Artisan native integration](14-NATIVE-INTEGRATIONS/09-ARTISAN.md) from the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md) records nine source hashes and exact header/sample ranges.
@@ -28560,7 +28504,7 @@ Artisan review records PR API 1.0, `PR_ArtisanEntryPoints` global/instance/frame
 
 Source caveats are preserved rather than silently fixed: IO's legacy comment about not freeing a replaced old InSpec options handle during sync; Artie's mostly-empty global/instance/frame/query lifecycle callbacks; Artie's old suite generations and helper that does not handle text-layer source dimensions; Artie registration sets both artisan version major/minor from `Artie_MAJOR_VERSION`. None is promoted to a measured AE defect without host reproduction.
 
-**Verification level: SDK source review and documentation.** No new exact-SDK compile, AEIO registration/import/export run, decoder/encoder output comparison, aux-channel import test, Artisan registration/selectability/render, interactive viewport test, persistence test, leak/cancel/error injection run or Windows host test was performed. Gate 6/7 remain open.
+**Verification level: SDK source review and documentation.** No new exact-SDK compile, AEIO registration/import/export run, decoder/encoder output comparison, aux-channel import test, Artisan registration/selectability/render, interactive viewport test, persistence test, leak/cancel/error injection run or Windows host test was performed. No broader runtime result is claimed by this source-review entry.
 ## Masks, text/markers and footage/import chapter review (2026-10-01)
 
 Rewrote [Masks](17-NATIVE-SUITE-COOKBOOK/07-MASKS.md), [Text + markers](17-NATIVE-SUITE-COOKBOOK/08-TEXT-MARKERS.md) and [Footage / import](17-NATIVE-SUITE-COOKBOOK/09-FOOTAGE-IMPORT.md) against the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/11-MASK-TEXT-FOOTAGE-SDK25.6.md) records six SDK/source hashes, current suite generations, sample ranges and ownership findings.
@@ -28676,7 +28620,7 @@ python3 scripts/check_native.py "/path/to/Adobe-SDK/Examples"
 
 This is a **syntax/type** check. It deliberately does not call it a plugin build. Keep Adobe sample utilities, PiPL resources, exported entry points and platform settings when integrating. Compile canonical sources or section-20 forwarding files, never both into the same binary. Copy the foundation headers alongside MenuTool or adjust its relative include.
 
-## Required next host checks
+## Optional implementation/runtime checks for readers who turn references into products
 
 1. Minimal Gain: load, parameter UI, gain 0/1/4, 8/16-bpc and transparent pixels.
 2. SmartFX Copy: compare input/output at 8/16/32-bpc, partial/empty ROI, odd sizes, nonzero origins and cancellation. Keep MFR off in the delivery build until concurrent-frame tests pass; use a separately identified enabled test build for those tests.
@@ -28693,7 +28637,7 @@ Added end-to-end release-flow chapters for [macOS](08-MACOS/09-PRODUCTION-BUILD-
 
 Added [release artifacts, installers and update strategy](11-DISTRIBUTION/05-RELEASE-ARTIFACTS-UPDATES.md), covering release-set identity, installer ownership, upgrade/rollback, staged auto-update, download integrity and compatibility/support metadata.
 
-**Verification level: documentation/architecture review only.** No new CEP panel was executed in AE, no ExtendScript dispatcher was host-tested, no macOS release binary was signed/notarized in this update, no Windows binary was Authenticode-signed, no installer was built, and no clean-machine AE load cycle was performed. These chapters define the required production process; they do not close completion-plan host/build gates.
+**Verification level: documentation/architecture review only.** No new CEP panel was executed in AE, no ExtendScript dispatcher was host-tested, no macOS release binary was signed/notarized in this update, no Windows binary was Authenticode-signed, no installer was built, and no clean-machine AE load cycle was performed. These chapters define the production process for reader products; no Bible-owned build/host run is required for editorial completion.
 
 
 ## Host-verification and release-evidence guidance (2026-10-01)
