@@ -127,19 +127,29 @@ tests/test_foundation.cpp currently checks:
 
 These are pure foundation tests with stubs. They do not prove real AE host lifetime, suite generation compatibility or thread legality.
 
-## Production checklist
+## Product-use checklist
 
-Before using this layer in a product:
+Before using this layer in a concrete product:
 
-- [ ] exact SDK suite generations checked;
+- [ ] exact target SDK suite generations checked;
 - [ ] every wrapped resource confirmed owned, not borrowed;
-- [ ] suite owners destroyed before host teardown;
+- [ ] resource owners destroyed before their suite/host lifetime ends;
 - [ ] suite-name lifetime is stable;
-- [ ] release errors reviewed for whether silent cleanup is acceptable;
+- [ ] release errors reviewed for whether silent destructor cleanup is acceptable;
 - [ ] callback fallback errors chosen deliberately;
 - [ ] product logging wraps failures without throwing;
-- [ ] real host integration test exists for each used resource family.
+- [ ] product-specific runtime evidence is added for any runtime/support claims the product makes.
 
 ## Verification boundary
 
-The foundation tests prove local move/cleanup mechanics against stubs. Host correctness still requires compile/link plus After Effects execution on the declared platform matrix.
+The foundation stub tests prove local move/cleanup mechanics and exception containment only.
+
+They do not prove:
+
+- target-host suite availability;
+- semantic validity after project mutation;
+- thread legality;
+- real host cleanup success;
+- product support on a platform/AE version.
+
+For Bible this is a complete evidence boundary, not an open requirement to build a demo plug-in.
