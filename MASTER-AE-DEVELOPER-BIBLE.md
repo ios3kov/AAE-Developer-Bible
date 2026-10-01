@@ -23024,7 +23024,7 @@ The source shape follows the reviewed AEGP contracts, but documentation/source s
 
 # Native AEGP panel reference path
 
-Status: **SDK sample workspace: Panelator / host-test pending**.
+Status: **Panelator integration guide / runtime result not claimed**.
 
 Materialize the exact licensed SDK sample with scripts/materialize_sdk_examples.py and use it as the project/lifecycle shell.
 
@@ -23131,7 +23131,7 @@ This entry intentionally remains guide-only until the exact Panelator-derived wo
 
 # AEIO reference workspace
 
-Status: **SDK sample workspace: IO/FBIO / host-test pending**.
+Status: **SDK sample workspace: IO/FBIO / runtime result not claimed**.
 
 Materialize the licensed SDK sample with scripts/materialize_sdk_examples.py. The Bible does not publish a fake registration-only AEIO and call it working.
 
@@ -23261,7 +23261,7 @@ This reference remains a materialized SDK workspace plan until a complete callba
 
 # Artisan reference workspace
 
-Status: **SDK sample workspace: Artie / host-test pending**.
+Status: **SDK sample workspace: Artie / runtime result not claimed**.
 
 Artisan replaces/customizes parts of After Effects 3D rendering and carries a substantially larger host contract than a normal effect.
 
@@ -23365,7 +23365,7 @@ The Bible deliberately does not provide a registrar stub and label it a renderer
 
 # Effect ↔ AEGP bridge reference
 
-Status: **sample-derived / host-test-required**.
+Status: **sample-derived / runtime result not claimed**.
 
 Protocol.h forwards to the canonical protocol in 16-WORKING-TEMPLATES/effect-aegp-generic-bridge.
 
@@ -23462,7 +23462,7 @@ This makes diagnostics distinguish target missing from command rejected.
 
 ## Verification boundary
 
-The contract is source-reviewed against SDK 25.6 and sample history, but the Bible bridge remains host-test-required until the actual caller/effect pair is compiled and run.
+The contract is source-reviewed against SDK 25.6 and sample history, but the Bible bridge remains runtime result not claimed until the actual caller/effect pair is compiled and run.
 
 
 ---
@@ -23471,7 +23471,7 @@ The contract is source-reviewed against SDK 25.6 and sample history, but the Bib
 
 # PICA provider ↔ consumer reference
 
-Status: **sample-derived / host-test-required**.
+Status: **sample-derived / runtime result not claimed**.
 
 SharedSuite.h forwards to the canonical shared ABI in 16-WORKING-TEMPLATES/pica-shared-suite.
 
@@ -23584,7 +23584,7 @@ Consumer follows the most conservative contract if unspecified.
 
 ## Verification boundary
 
-Sweetie/Checkout prove a provider/consumer pattern in the SDK, not this product ABI in the host. The Bible shared suite remains host-test-required until provider and consumer are compiled and exercised together.
+Sweetie/Checkout prove a provider/consumer pattern in the SDK, not this product ABI in the host. The Bible shared suite remains runtime result not claimed until provider and consumer are compiled and exercised together.
 
 
 ---
@@ -23702,7 +23702,7 @@ Syntax checking only proves declarations/types. This remains a skeleton until it
 
 # SmartFX pass-through reference
 
-Status: **source implementation / SDK 25.6 macOS syntax-checked / host-test-required**.
+Status: **source implementation / SDK 25.6 macOS syntax-checked / runtime result not claimed**.
 
 SmartFxMfr.cpp is intentionally a small pass-through reference with SmartFX support. It does **not** currently declare MFR support.
 
