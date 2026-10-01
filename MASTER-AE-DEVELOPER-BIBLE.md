@@ -4372,51 +4372,141 @@ UXP migration тогда меняет shell/bridge, а не весь проду�
 
 # macOS — Xcode setup
 
-## Start from SDK sample
+## Start from an Adobe SDK sample
 
-Для effect plug-in клонировать Skeleton или ближайший sample из After Effects SDK. Это сохраняет:
-- include/library configuration;
-- resource/PiPL generation;
-- bundle settings;
-- host-compatible entry point/export setup;
-- architecture config.
+For a native effect, start from Skeleton or the closest supplied SDK example instead of reconstructing an Xcode target from scratch.
 
-## Development output
+This preserves host-specific pieces that are easy to miss:
 
-SDK Guide рекомендует удобный per-user MediaCore path для development:
+- Adobe include configuration;
+- PiPL/resource generation;
+- bundle type and extension;
+- exported entry point setup;
+- architecture settings;
+- sample utility sources;
+- build phases expected by the SDK project.
 
-```text
-~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
-```
+A safe bootstrap sequence is:
 
-Это позволяет не писать каждый build внутрь `/Applications` или system `/Library`.
+~~~text
+copy closest sample
+→ build untouched sample
+→ load untouched sample in AE
+→ rename product identifiers
+→ replace implementation incrementally
+→ keep the resource/build contract intact
+~~~
+
+Do not change code, project format, output path, architecture and signing all at once. When the first load fails, you want only one variable to investigate.
+
+## Development output path
+
+The SDK guide recommends the per-user MediaCore path for macOS development:
+
+    ~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
+
+The 7.0 directory is the historical CC convention.
+
+Do not point normal Xcode build output at the system /Library MediaCore path and then build with sudo. The current SDK guide explicitly warns that this can leave root-owned build artifacts and produce confusing dependency-graph or temporary-file failures.
+
+If you need a system-level copy for a specific test:
+
+1. build normally as the user;
+2. finish signing the built bundle;
+3. copy the finished artifact with the required privileges.
+
+## Separate build output from release staging
+
+For a commercial project, distinguish:
+
+~~~text
+Derived/build output
+→ development install copy
+→ release staging directory
+→ signed/notarized package
+~~~
+
+QA should test the exact staged artifact that release signs and packages, not a different binary rebuilt later from the same commit.
 
 ## Xcode scheme
 
-Для Run scheme executable выбрать установленный After Effects. Тогда Build & Run может:
-1. собрать plug-in;
-2. положить его в dev plug-in location;
-3. запустить AE под debugger.
+For the Run scheme executable, select the installed After Effects host.
 
-Но debugger attach behavior зависит от версии AE и signing; см. `03-DEBUGGING.md`.
+Then Build & Run can:
+
+1. build the plug-in;
+2. place/copy it into the development plug-in path;
+3. start AE under the debugger.
+
+Attach behavior depends on macOS and AE build. See 03-DEBUGGING.md.
 
 ## Build configurations
 
-Рекомендуется минимум:
+Recommended minimum:
 
-- `Debug` — symbols, assertions/logging, dev signing;
-- `RelWithDebInfo` или `Release-DebugSymbols` — production optimization + symbols archive;
-- `Release` — shipping binary.
+- Debug — assertions/logging, symbols, development signing;
+- ReleaseWithSymbols — production optimization plus symbol archive;
+- Release — shipping settings if kept separately.
 
-Хранить `.dSYM` для каждого shipped build по exact build id/version.
+Avoid a release configuration that silently changes semantic compiler options beyond optimization.
+
+Archive the dSYM for every shipped binary and tie it to:
+
+- product version;
+- build number;
+- git commit;
+- binary SHA-256;
+- architectures.
+
+## macOS 15+ development signing
+
+The current AE SDK guide notes that macOS 15+ prevents loading unsigned plug-ins. Add a development signing step after the binary has reached its final built state.
+
+Ad-hoc signing is acceptable for local development. It is not the release trust model.
+
+Do not mutate the bundle after signing and then debug a mysteriously rejected copy.
 
 ## Deployment target
 
-Не выбирать минимальный macOS на глаз. Он должен совпадать с product support policy и реально поддерживаемыми AE versions.
+Choose the minimum macOS deployment target from the actual product support matrix.
 
-## Warnings
+It must agree with:
 
-Включать строгие compiler warnings постепенно, но third-party/Adobe headers изолировать так, чтобы warning debt SDK не заставлял отключать warnings во всём собственном коде.
+- supported AE versions;
+- third-party library minimums;
+- APIs your code uses;
+- QA coverage.
+
+Do not set an older target merely because Xcode accepts it.
+
+## Warning policy
+
+Use strict warnings for your own code. If Adobe/third-party headers produce legacy warning noise, isolate that boundary instead of globally disabling useful warnings.
+
+Recommended release rule:
+
+- new warning in product code fails CI;
+- known external-header warnings are documented and scoped;
+- no warning suppression without a reason.
+
+## Reproducibility
+
+Record for every native build:
+
+- Xcode version;
+- Apple Clang version;
+- SDK path/hash identity;
+- macOS SDK version;
+- deployment target;
+- architectures;
+- build configuration;
+- git SHA.
+
+"Built on my Mac" is not a release record.
+
+## Verification boundary
+
+The Bible has an earlier macOS arm64 syntax/type baseline against the supplied AE SDK 25.6. That is not the same as building, linking, signing and loading every reference plug-in. Full host-cycle acceptance remains open.
 
 
 ---
@@ -4425,40 +4515,101 @@ SDK Guide рекомендует удобный per-user MediaCore path для d
 
 # macOS — Apple Silicon / Universal binary
 
-After Effects SDK Guide указывает, что Universal build требует arm64 + Intel slice и соответствующие PiPL entry declarations.
+A macOS Universal plug-in contains both arm64 and x86_64 machine-code slices in the native executable.
 
-## PiPL
+Ship both only if the product still claims both Apple Silicon and Intel support.
 
-Для одного entry point:
+## PiPL and binary must agree
 
-```text
+For an effect with one entry point, the resource commonly declares both architectures:
+
+~~~text
 #if defined(AE_OS_MAC)
   CodeMacARM64 {"EffectMain"},
   CodeMacIntel64 {"EffectMain"},
 #endif
-```
+~~~
 
-Использовать фактический entry point вашего sample/project.
+Use the actual entry point of the project.
+
+The resource declaration is not a substitute for the slice. These must agree:
+
+~~~text
+PiPL says arm64     <-> executable contains arm64
+PiPL says x86_64    <-> executable contains x86_64
+~~~
+
+A mismatch is a packaging defect even if compilation succeeded.
 
 ## Build
 
-Xcode target должен собирать `arm64` и `x86_64` для Universal artifact, если оба заявлены.
+Configure the Xcode target to build arm64 and x86_64 for the release configuration when both are claimed.
 
-Проверка:
+Check the finished executable, not only Xcode settings:
 
-```bash
-lipo -info /path/to/MyPlugin.plugin/Contents/MacOS/MyPlugin
-```
+~~~bash
+lipo -info "/path/to/MyPlugin.plugin/Contents/MacOS/MyPlugin"
+~~~
 
-Ожидается список обеих architectures для Universal release.
+For a Universal release, the expected result contains both arm64 and x86_64.
+
+## Verify the staged artifact
+
+Run architecture inspection on the exact bundle that will be signed and packaged.
+
+Do not validate one build directory and then release a separately rebuilt copy.
+
+A useful release manifest records:
+
+~~~json
+{
+  "platform": "macOS",
+  "architectures": ["arm64", "x86_64"],
+  "binary_sha256": "...",
+  "git_sha": "..."
+}
+~~~
+
+## Third-party libraries
+
+Every native dependency must support the architectures you claim.
+
+Inspect:
+
+~~~bash
+lipo -info path/to/dependency.dylib
+otool -L "/path/to/MyPlugin.plugin/Contents/MacOS/MyPlugin"
+~~~
+
+Questions to answer:
+
+- is each dependency present for arm64?
+- is each dependency present for x86_64 if Intel is claimed?
+- are runtime paths valid after packaging?
+- is the dependency embedded or expected from the system?
+- is every nested code object signed?
+
+A Universal outer bundle containing an x86_64-only dependency is not a working Universal product.
+
+## Avoid accidental architecture loss
+
+Common causes:
+
+- a package manager provides one architecture only;
+- a local prebuilt static library is Intel-only;
+- a custom build script overwrites a fat binary with one slice;
+- release CI builds only the runner's native architecture;
+- a post-build helper is missing one slice.
+
+The release gate should inspect the finished artifact recursively where needed.
 
 ## Apple Silicon exception boundary
 
-SDK Guide отдельно предупреждает: не позволять C++ exception пройти через C entry point. На Apple Silicon это может закончиться `terminate()`.
+Do not let a C++ exception escape through an exported C host callback.
 
-Правило:
+Conceptually:
 
-```cpp
+~~~cpp
 extern "C" PF_Err EffectMain(...) {
     try {
         return Dispatch(...);
@@ -4466,24 +4617,39 @@ extern "C" PF_Err EffectMain(...) {
         return ConvertToPfError();
     }
 }
-```
+~~~
 
-## Third-party libraries
+The SDK guidance specifically calls out the exception boundary on Apple Silicon. Independently of architecture, containing exceptions at host ABI boundaries is a safer design.
 
-Каждая linked static/dynamic dependency также должна иметь нужный architecture slice. Universal plug-in с x86_64-only dylib всё равно сломан на arm64.
+## CPU architecture is not GPU architecture
 
-Проверять:
-- `lipo -info`;
-- `otool -L`;
-- actual load on clean Apple Silicon machine.
+Universal CPU slices do not prove GPU parity.
+
+Test separately:
+
+- CPU render arm64;
+- GPU render arm64;
+- CPU render x86_64 if claimed;
+- GPU render x86_64 if claimed;
+- fallback when a backend is unavailable.
+
+Do not derive GPU support from lipo output.
 
 ## Intel deprecation policy
 
-Если в будущем Intel support убирается:
-- поднять major/minor support statement;
-- явно предупредить пользователей;
-- не оставлять `CodeMacIntel64` в PiPL, если binary больше не содержит slice;
-- сохранить последний Intel-compatible installer в archive policy, если бизнес этого требует.
+If Intel support is removed:
+
+1. update the support matrix;
+2. remove the x86_64 build lane;
+3. remove CodeMacIntel64 if the resource no longer has an Intel binary;
+4. communicate the last Intel-compatible release;
+5. preserve rollback/archive artifacts according to product policy.
+
+Never leave an Intel declaration in PiPL as a historical decoration.
+
+## Verification boundary
+
+The exact final architecture matrix must be proven on the finished signed artifact and loaded in the claimed AE/macOS combinations. Compiler acceptance of both slices alone is insufficient.
 
 
 ---
@@ -4606,66 +4772,166 @@ Current After Effects GPU build guide для SDK sample указывает Boost
 
 # macOS — signing and notarization
 
+macOS has two different concerns:
+
+1. code signing establishes identity/integrity;
+2. notarization submits the distributable software to Apple's notary service and produces a ticket recognized by Gatekeeper.
+
+For a commercial external release, treat both as release gates.
+
 ## Development signing
 
-Ad-hoc sign (`-`) подходит для local development/load testing. Это **не** release trust model.
+Ad-hoc signing is suitable for local development and load testing:
 
-## Release signing
+~~~bash
+codesign --force --deep --sign - "/path/to/MyPlugin.plugin"
+~~~
 
-Для внешней дистрибуции Apple рекомендует Developer ID signing. Plug-in bundle должен быть подписан после завершения всех изменений содержимого.
+The AE SDK guide currently notes that macOS 15+ prevents loading unsigned plug-ins, making a development signing step important.
 
-Typical verification:
+Ad-hoc signing is not the release trust model.
 
-```bash
-codesign -vvv --deep --strict "/path/to/MyPlugin.plugin"
-```
+## Release identity
 
-Дополнительно проверять identity/entitlements по вашему release script.
+Apple's distribution documentation uses Developer ID for software distributed outside the Mac App Store.
 
-## Hardened Runtime / nested code
+Depending on what you ship, release artifacts can include:
 
-Если package содержит helpers, dylibs, executables:
-- каждый nested code object должен быть корректно signed;
-- signing order: внутри → наружу;
-- release entitlements минимальны;
-- `get-task-allow` не должен случайно попасть в production artifact.
+- Developer ID Application-signed plug-in/helper binaries;
+- Developer ID Installer-signed installer packages;
+- a notarized ZIP, DMG or PKG delivery artifact.
+
+Choose the exact certificate type for the artifact being signed.
+
+## Sign only final contents
+
+Signing establishes integrity. Any later content mutation can invalidate the signature.
+
+Correct order:
+
+~~~text
+compile
+→ copy runtime resources
+→ embed final dependencies
+→ strip only if intended
+→ finalize Info.plist/resources
+→ sign nested code
+→ sign outer plug-in bundle
+→ verify
+~~~
+
+Do not sign and then patch the binary/version/resource.
+
+## Nested code
+
+If the product contains helpers, dylibs or executables:
+
+- sign inner code first;
+- sign the containing bundle afterward;
+- use the intended identity consistently;
+- keep entitlements minimal;
+- verify nested signatures.
+
+Avoid using --deep as a substitute for understanding nested code in a release script. It is useful for verification and some workflows, but explicit signing order is easier to audit.
+
+## Hardened Runtime and entitlements
+
+Apple's notarization guidance requires modern Developer ID distribution software to meet signing/notarization requirements including Hardened Runtime where applicable.
+
+Important release rules:
+
+- no accidental get-task-allow entitlement in production;
+- no broad entitlement copied from a debug build without review;
+- use secure timestamps for release signatures;
+- document every non-default entitlement.
+
+A successful local load does not prove correct release entitlements.
+
+## Verify code signature
+
+Example verification:
+
+~~~bash
+codesign -vvv --strict "/path/to/MyPlugin.plugin"
+codesign -d --entitlements :- "/path/to/MyPlugin.plugin"
+~~~
+
+Inspect the actual shipping copy.
 
 ## Notarization
 
-Apple больше не принимает старый `altool` workflow. Использовать `notarytool`/актуальный Apple workflow.
+Apple no longer accepts the old altool notarization workflow. Use notarytool or the Notary API.
 
-Conceptual pipeline:
+Typical command-line pipeline:
 
-```text
-build
-→ sign nested binaries
-→ sign plug-in bundle
-→ package (zip/pkg/dmg as chosen)
-→ submit with notarytool
-→ wait/check result
-→ staple ticket where applicable
-→ verify Gatekeeper/signature
-```
+~~~text
+signed plug-in
+→ create supported submission archive/container
+→ notarytool submit
+→ inspect result/log
+→ staple where applicable
+→ verify Gatekeeper/signatures
+~~~
 
-Example submit shape:
+Example shape:
 
-```bash
-xcrun notarytool submit MyPlugin.zip \
-  --keychain-profile "notary-profile" \
-  --wait
-```
+~~~bash
+xcrun notarytool submit "MyPlugin.zip"   --keychain-profile "notary-profile"   --wait
+~~~
 
-Credentials не хранить в repository или shell history.
+Credentials belong in Keychain/CI secret storage, not the repository or shell history.
+
+## Read the notarization log
+
+"Accepted" should not end the investigation automatically.
+
+For release automation:
+
+- capture the submission ID;
+- store the final status;
+- fetch the log on rejection;
+- fail on rejection;
+- archive enough metadata to reproduce the exact submitted artifact.
+
+Do not resubmit a silently modified build under the same internal build identity.
+
+## Stapling
+
+Apple can publish the ticket online, and supported distributable containers can be stapled where applicable.
+
+Whether the plug-in bundle itself, PKG or DMG is the stapled object depends on the delivery format. Test the exact offline/online installation path your users receive.
+
+## Gatekeeper testing
+
+A release should include a clean-machine test with an artifact that carries normal download quarantine behavior.
+
+Do not prove only:
+
+~~~text
+local build directory
+→ copied manually by developer
+→ AE loaded it
+~~~
+
+That bypasses important distribution conditions.
 
 ## Release gate
 
-Release job падает, если:
-- signature invalid;
-- wrong identity;
-- missing required architecture;
+The macOS release job fails if any required condition is false:
+
+- wrong signing identity;
+- missing architecture;
+- invalid nested code signature;
+- unexpected entitlement;
 - notarization rejected;
-- package differs after notarization/signing;
-- clean machine cannot load plug-in.
+- package changed after signing/notarization;
+- clean install fails;
+- AE cannot load the installed plug-in;
+- release symbols/manifest are missing.
+
+## Verification boundary
+
+This chapter follows current Apple Developer ID/notarization guidance and AE SDK development-signing guidance. The Bible has not yet performed the complete Developer ID + notarization + quarantined clean-machine host cycle for every reference artifact.
 
 
 ---
@@ -4674,50 +4940,147 @@ Release job падает, если:
 
 # macOS — installation and packaging
 
-## Common location
+Development install, product install and delivery packaging are separate concerns.
 
-Для plug-ins, которые должны быть доступны совместимым Adobe video hosts:
+## Development location
 
-```text
-/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
-```
+The AE SDK guide recommends the per-user MediaCore path during development:
 
-CC использует historical `7.0` directory convention.
+    ~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
 
-## AE-only location
+This avoids writing Xcode output directly into the root-owned system Library path.
 
-Если plug-in принципиально AE-specific:
+## Common release location
 
-```text
-/Applications/Adobe After Effects [version]/Plug-ins/
-```
+For plug-ins intended for compatible Adobe video hosts, the documented common location is:
 
-Но installer, привязанный к app bundle/version path, требует больше maintenance при нескольких AE versions.
+    /Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
 
-## User dev path
+The 7.0 directory is the historical CC convention.
 
-Для development удобно:
+A plug-in placed here may also be discovered by other compatible Adobe hosts. That is useful only if the plug-in is actually compatible with those hosts.
 
-```text
-~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
-```
+## AE-specific location
 
-Release installer обычно использует system-level policy продукта.
+If the product depends on After Effects-only suites or behavior, the app-specific path remains available:
 
-## Packaging choices
+    /Applications/Adobe After Effects [version]/Plug-ins/
 
-- `.pkg` — хороший системный installer path;
-- signed/notarized `.dmg` как delivery container;
-- zip — только если manual install действительно является product decision.
+This path is version-specific and creates more installer maintenance when multiple AE versions are supported.
 
-## Installer rules
+Do not install into every detected host blindly. Decide product host policy first.
 
-- no hidden destructive cleanup;
-- upgrade keeps user presets/license data unless explicitly intended;
-- uninstall removes only files owned by your product;
-- support side-by-side old/new only if designed;
-- log install result/path/version;
-- verify architecture and supported OS before install where appropriate.
+## Package choices
+
+Common delivery patterns:
+
+- signed/notarized PKG installer;
+- DMG containing installer or documented manual-install payload;
+- ZIP only when manual installation is an explicit supported product choice.
+
+The package format should support the required permissions, upgrade semantics and uninstall policy.
+
+## Installer ownership model
+
+Maintain an explicit manifest of files owned by the installer.
+
+Installer may own:
+
+- native plug-in bundle;
+- helper binary;
+- shared product resources;
+- receipt/version metadata.
+
+Installer must not delete:
+
+- user projects;
+- user presets unless explicitly product-owned and removable;
+- unrelated plug-ins;
+- entire shared Adobe directories;
+- license/user data unless uninstall policy explicitly asks and the user agrees.
+
+Never implement uninstall as "delete parent folder" when that folder can contain third-party/user files.
+
+## Upgrade
+
+Define upgrade from at least the previous supported release.
+
+Test:
+
+~~~text
+N-1 installed
+→ install N
+→ old binary removed/replaced correctly
+→ user data preserved
+→ AE loads only intended version
+→ rollback plan still exists
+~~~
+
+If filenames/bundle IDs change, explicitly remove only the old product-owned artifact.
+
+## Multiple AE versions
+
+If using common MediaCore, one installed binary may be loaded by several Adobe host versions.
+
+Therefore compatibility is a property of the installed binary, not just the installer UI.
+
+If the plug-in is AE-version-specific, prefer a design that cannot accidentally expose an incompatible build to another host/version.
+
+## Atomicity
+
+Install into a staging location first when possible, validate payload, then perform the final privileged copy.
+
+Avoid leaving half-copied bundles when install fails.
+
+A plug-in bundle must be treated as one versioned artifact.
+
+## Signing and notarization order
+
+For a PKG-based release:
+
+~~~text
+build final plug-in
+→ sign plug-in/nested code
+→ verify
+→ construct installer payload
+→ sign installer
+→ notarize distributable
+→ staple where applicable
+→ verify clean install
+~~~
+
+Do not modify signed nested plug-in contents during installer generation.
+
+## Installer logs
+
+Log:
+
+- product version/build;
+- target path;
+- previous version detected;
+- files installed/removed;
+- signature/notarization preflight result where useful;
+- success/failure code.
+
+Do not log secrets or license tokens.
+
+## Required tests
+
+- fresh install;
+- upgrade;
+- uninstall;
+- reinstall after uninstall;
+- multiple AE versions;
+- no AE installed;
+- insufficient permissions;
+- disk-full/error injection where practical;
+- Unicode user/product paths for user-side assets;
+- quarantine/Gatekeeper path;
+- AE launch and plug-in load after install.
+
+## Verification boundary
+
+The paths follow current AE SDK installer guidance. A correct path alone does not prove a safe installer. Full clean-machine install/upgrade/uninstall verification remains an open completion gate.
 
 
 ---
@@ -4728,55 +5091,174 @@ Release installer обычно использует system-level policy прод
 
 ## Goal
 
-CI должен воспроизводимо выдавать тот же artifact, который QA тестирует и release подписывает.
+CI should produce a reproducible artifact that QA tests and release signs. Rebuilding after QA creates a new artifact and invalidates the evidence chain.
 
-## Stages
+## Recommended lanes
 
-```text
-lint/static analysis
-→ build arm64+x86_64
-→ unit tests (pure core)
-→ verify Universal slices
-→ package plug-in
-→ ad-hoc load-test artifact (dev lane)
-→ Release: Developer ID sign
+### Pull request lane
+
+~~~text
+format/lint
+→ unit tests
+→ build supported development architectures
+→ static checks
+→ inspect binary architecture/dependencies
+→ package unsigned/ad-hoc QA artifact
+~~~
+
+No release credentials are exposed to untrusted pull requests.
+
+### Release candidate lane
+
+~~~text
+pinned commit/tag
+→ clean build
+→ tests
+→ verify architectures
+→ stage exact plug-in bundle
+→ archive dSYM
+→ generate manifest/checksums
+→ QA artifact
+~~~
+
+### Release signing lane
+
+~~~text
+approved staged artifact
+→ import Developer ID credential into ephemeral keychain
+→ sign nested code
+→ sign plug-in
+→ verify signature/entitlements
+→ build/sign delivery package
 → notarize
-→ package integrity checks
-→ publish to QA/release storage
-```
+→ staple where applicable
+→ final verification
+→ publish immutable release artifact
+~~~
+
+Do not compile different source again inside the signing lane unless your process deliberately treats that as a new release candidate.
 
 ## SDK handling
 
-After Effects SDK licensing/distribution rules должны соблюдаться. Не коммитить SDK автоматически в public repo, если license этого не разрешает.
+The After Effects SDK is not automatically suitable for redistribution in a public repository.
 
-Подходы:
-- private CI artifact;
-- secret-authenticated internal storage;
-- developer-provided SDK path for local build;
-- hash-pinned expected SDK bundle.
+Approved approaches include:
+
+- licensed SDK on a controlled self-hosted runner;
+- private artifact store;
+- developer-provided local SDK path;
+- hash-pinned internal SDK bundle.
+
+Record the expected SDK identity in the build manifest.
+
+Do not make CI green by silently falling back to synthetic stubs for a release build.
+
+## Toolchain pinning
+
+Record:
+
+- macOS runner image;
+- Xcode version;
+- Apple Clang version;
+- macOS SDK;
+- deployment target;
+- AE SDK version/build;
+- architecture list.
+
+A runner-image update can change native output even when source did not change.
 
 ## Secrets
 
-Apple signing certificate/private key/notary credentials:
+Release credentials:
+
 - CI secret store only;
+- protected environment;
+- explicit approval where appropriate;
 - ephemeral keychain;
-- delete keychain after job;
-- never print secrets;
-- restrict release environment approvals.
+- least privilege;
+- keychain removed after job;
+- logs scrubbed.
 
-## Artifact metadata
+Do not expose signing/notary credentials to forked or untrusted PR workflows.
 
-Каждый artifact содержит рядом machine-readable manifest:
+## Artifact manifest
 
-```json
+Store machine-readable metadata beside the artifact:
+
+~~~json
 {
-  "version": "1.2.3",
+  "product_version": "1.2.3",
+  "build": 1042,
   "git_sha": "...",
-  "ae_sdk": "...",
+  "ae_sdk": "25.6 build 61",
+  "platform": "macOS",
   "architectures": ["arm64", "x86_64"],
-  "build_type": "Release"
+  "configuration": "Release",
+  "binary_sha256": "...",
+  "symbols_sha256": "..."
 }
-```
+~~~
+
+After signing/notarization also record hashes of the final delivery artifact.
+
+## Integrity chain
+
+Useful model:
+
+~~~text
+source commit
+→ unsigned build hash
+→ signed bundle hash
+→ package hash
+→ notarization submission
+→ published artifact hash
+~~~
+
+Each step should be attributable.
+
+## Host tests
+
+CI compilation is not host verification.
+
+A macOS AE runner or controlled QA machine should separately record:
+
+- AE version/build;
+- installed path;
+- architecture mode;
+- plug-in discovered;
+- command/effect operation;
+- render result where applicable;
+- unload/restart behavior.
+
+If host automation cannot cover a UI scenario, keep that scenario as a named manual gate rather than pretending the build job tested it.
+
+## Cache policy
+
+Never let compiler/dependency caches hide missing release inputs.
+
+For release:
+
+- cache can accelerate;
+- clean rebuild must remain possible;
+- generated PiPL/resources must be recreated;
+- final artifact must not depend on an untracked developer directory.
+
+## Failure policy
+
+Release fails on:
+
+- test failure;
+- architecture mismatch;
+- unexpected dynamic dependency;
+- missing symbols;
+- invalid signature;
+- notarization rejection;
+- checksum/manifest mismatch;
+- failed clean install/load gate.
+
+## Verification boundary
+
+The current Bible CI validates documentation and existing portable tests. This chapter specifies the desired native macOS release pipeline; it does not claim that the complete signed/notarized host pipeline is already running in this repository.
 
 
 ---
