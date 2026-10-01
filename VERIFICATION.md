@@ -246,3 +246,25 @@ AE Hot Loader retained CI evidence was reviewed, including successful macOS PoC 
 Transfer decisions are explicit: FSTR snapshot/guard/coalescing/fake-host patterns are adapted conceptually; the FSTR command-hook probe remains evidence-only; AE Hot Loader request-correlation ideas may inform bridge design; its private `ML::LoadPlugins` path remains research-only and its destructive installer pattern is explicitly rejected.
 
 **Gate 3A is closed.** None of these results are Bible AE host verification.
+
+
+## Gate 4 portable verification hardening (2026-10-01)
+
+The native verification lane was strengthened without claiming a new Adobe SDK compiler run.
+
+New fail-closed checks:
+
+- inventory `schema_version` is enforced;
+- malformed/empty function tables are rejected;
+- incomplete parser diagnostics prevent symbol/required-contract validation;
+- SDK diffs reject unsupported schema and malformed signatures;
+- SuiteHandler calls are checked against the exact suite generation, not only a global function-name set;
+- `sdk25.6-required-contracts.json` pins required contract tables and critical functions;
+- `verify_required_contracts.py` fails on missing required tables/functions;
+- `scripts/check_native.py` supports Clang/MSVC command styles and records SDK-header manifest SHA-256, compiler identity, exact commands and per-translation-unit results;
+- macOS and Windows SDK runners now chain inventory → required contracts → suite-generation symbol checks → compiler syntax/type report;
+- portable CI parses both runner scripts and exercises the compiler-report path with a synthetic compiler.
+
+Recent portable validation runs for these changes are green, including run `36843099891` for runner syntax and run `36843081166` for the full synthetic compiler-report path.
+
+**Boundary:** this does not close Gate 4. The previously recorded Adobe SDK 25.6 macOS compiler baseline predates current source changes. The exact SDK archive is not available in the current accessible file set, so no fresh licensed-SDK compile was performed here. A real MSVC + SDK 25.6 run also remains NOT RUN.
