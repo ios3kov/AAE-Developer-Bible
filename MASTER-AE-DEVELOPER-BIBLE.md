@@ -34175,6 +34175,10 @@ The v0.4 tooling deliberately does **not** bundle Adobe SDK headers. Exact inven
 
 Updated: **2026-10-01**
 
+## Canonical editorial policy
+
+All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). The mandatory workflow is: finish one logical block → commit/validate → report status to the user → stop before the next block.
+
 ## Current mission
 
 AE Developer Bible — **research-backed practical documentation for After Effects developers**.
