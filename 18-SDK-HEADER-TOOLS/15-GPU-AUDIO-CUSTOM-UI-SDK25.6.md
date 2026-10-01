@@ -164,4 +164,4 @@ NOT RUN in this editorial iteration:
 - leak checks for Drawbot resources;
 - Windows host verification.
 
-These remain Gate 4/6/7 work.
+These are optional future implementation/runtime evidence areas, not Bible completion requirements.
