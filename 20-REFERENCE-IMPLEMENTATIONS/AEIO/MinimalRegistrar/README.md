@@ -1,6 +1,6 @@
 # AEIO reference workspace
 
-Status: **SDK sample workspace: IO/FBIO / host-test pending**.
+Status: **SDK sample workspace: IO/FBIO / runtime result not claimed**.
 
 Materialize the licensed SDK sample with scripts/materialize_sdk_examples.py. The Bible does not publish a fake registration-only AEIO and call it working.
 
