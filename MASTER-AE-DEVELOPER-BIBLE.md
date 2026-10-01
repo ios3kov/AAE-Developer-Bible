@@ -1921,16 +1921,17 @@ Effect plug-in — основной путь, если инструмент до
 
 ## Маршрут чтения по SDK 25.6
 
-**Обновлено 2026-09-30 по присланной поставке SDK.** Это сверка учебных глав с заголовками и образцами, не новый результат запуска плагинов в AE.
+**Обновлено 2026-10-01 по присланной поставке SDK.** Это сверка учебных глав с заголовками и образцами, не новый результат запуска плагинов в AE.
 
 1. [Устройство Effect-плагина](02-EFFECT-PLUGINS/01-ANATOMY.md): регистрация, команды, параметры и время жизни данных на примере Skeleton.
 2. [Параметры и UI](02-EFFECT-PLUGINS/02-PARAMETERS-UI.md): индексы/IDs, setup-макросы, запрет анимации, supervised-изменения, UI-only и ограничения UPDATE_PARAMS_UI; глава расширена по SDK.
 3. [SmartFX](02-EFFECT-PLUGINS/03-SMARTFX.md): зависимости, области, checkout IDs и различающиеся правила cleanup.
 4. [Цвет и пиксели](02-EFFECT-PLUGINS/06-COLOR-PIXELS.md): ARGB32/64/128, диапазон 16 bpc, typed access, stride/origin, alpha, working-space color и отделение экспорта; глава расширена по SDK.
 5. [Дополнительные каналы](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md): глубина, ID, нормали, descriptors, типы и сырые buffers.
-6. [MFR и потокобезопасность](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md): следующий редакционный блок вместе с владением памятью. Уже установлено по header: iterate callbacks могут вызываться в нескольких потоках независимо от заявления MFR.
+6. [Память, lifetime и ошибки](02-EFFECT-PLUGINS/../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md): owned/borrowed/transferred ресурсы, state handles, различия flattening, обязательный cleanup и ограничения существующих RAII helpers.
+7. [MFR и потокобезопасность](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md): действующие flags, пересечение selectors, read-only sequence state, mutable render copies и Compute Cache с точными режимами ожидания. Глава расширена по SDK; MFR-тесты не объявляются выполненными.
 
-[Первая сверка поставки](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md) и [сверка параметров/пикселей](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md) содержат SHA-256, точные диапазоны источников и границы проверки. Расхождения комментариев и образцов сохраняются явно. Учебные фрагменты не являются новыми эталонными плагинами; обновление текста не закрывает сборку, загрузку и рендер примеров.
+[Первая сверка поставки](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md), [сверка параметров/пикселей](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md) и [сверка памяти/MFR](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/07-MEMORY-MFR-SDK25.6.md) содержат SHA-256, точные диапазоны источников и границы проверки. Расхождения комментариев и образцов сохраняются явно. Учебные фрагменты не являются новыми эталонными плагинами; обновление текста не закрывает сборку, загрузку и рендер примеров.
 
 ## Порядок разработки
 
@@ -1941,7 +1942,7 @@ Effect plug-in — основной путь, если инструмент до
 5. Добавить 8/16/32-bpc correctness.
 6. Перевести на SmartFX там, где это оправдано/необходимо.
 7. Сделать thread-safe.
-8. Только после этого включать MFR flag.
+8. Только после соответствующей проверки включать MFR capability в поставляемой сборке; для самой проверки нужна отдельная тестовая сборка с флагом.
 9. Добавить GPU backend, если benchmark доказывает пользу.
 10. Custom UI — последним, после стабильной render core.
 
