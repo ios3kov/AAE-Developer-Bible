@@ -6,7 +6,13 @@ Updated: **2026-10-01**. Previously recorded native compilation baseline: **Adob
 
 ## Current work — writing the Bible from the supplied SDK
 
-The user supplied `ae25.6_61.64bit.AfterEffectsSDK`. Source identity and reviewed ranges are recorded in the [first supplied-SDK review](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md), [parameter/pixel review](18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md), [memory/MFR review](18-SDK-HEADER-TOOLS/07-MEMORY-MFR-SDK25.6.md), and [registration/PiPL and AEGP review](18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md).
+The supplied `ae25.6_61.64bit.AfterEffectsSDK` is the basis of five source-review records:
+
+1. [Effect anatomy, SmartFX and auxiliary channels](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md).
+2. [Parameters and pixels](18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md).
+3. [Memory, lifetime and MFR](18-SDK-HEADER-TOOLS/07-MEMORY-MFR-SDK25.6.md).
+4. [Registration, PiPL and AEGP lifecycle](18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md).
+5. [AEGP project and render automation](18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md).
 
 Completed editorial changes:
 
@@ -17,17 +23,22 @@ Completed editorial changes:
 - [Auxiliary channels](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md): semantic types, descriptors, requested/returned datatype, raw layout and mandatory checkin.
 - [Memory, lifetime and errors](01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md): resource ownership, paired release APIs, host-managed state locks, both flatten operations, pre-render deletion, error-preserving cleanup and limits of existing helpers.
 - [MFR and thread safety](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md): exact flags and selector constraints, read-only sequence access, mutable thread-local copies, Compute Cache keys/values/receipts and waiting modes.
-- [Registration, PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md): separate Effect registration, EffectMain and AEGP initializer contracts; resource Kind, exported symbols, architecture records, version domains, outflags and platform resource pipelines.
-- [AEGP lifecycle, hooks and suites](03-AEGP/01-HOOKS-SUITES.md): plugin/command IDs, global and hook refcons, suite-version macros, command/update/idle/death callbacks and partial-initialization ownership; the existing MenuTool is reviewed, not changed or host-verified.
-- The AEGP reading route and VERIFICATION distinguish all four editorial reviews from the earlier native compiler baseline.
+- [Registration, PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md): separate registration/dispatcher/initializer contracts, resource Kind, symbols, architectures, version domains, outflags and platform resource pipelines.
+- [AEGP lifecycle, hooks and suites](03-AEGP/01-HOOKS-SUITES.md): IDs/refcons, suite macros, callbacks and partial initialization; the existing MenuTool is reviewed, not changed or host-verified.
+- [AEGP project and render automation](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md): project graph and time, Undo versus rollback, queue states and invalidation, output settings, frame receipts, borrowed worlds, sync/async cancellation and cache boundaries.
+- AEGP navigation, recipe warnings and VERIFICATION distinguish source review from compiler/host evidence.
 
-The third review identifies ten SDK source files by SHA-256 and inspects three existing Bible helpers at snapshot `fcfb0e32c14916b55c2bcdbe414d3d1b3f524eeb`. It records the PF handle suite version-number nuance, conditional sequence-setup threading statements, a schematic bool/error-code mismatch in the Compute Cache comment, and PathMaster's cross-platform caveat. Existing helpers borrow suite dependencies and discard cleanup return codes; their limitations are documented, not silently repaired or called host-verified.
+## Latest synchronization and findings
+
+The previously pending STATUS/VERIFICATION registration update was written to main in commits `a5080a132d299b8ef20888e814f3c0513365710c` and `4cd4515e605783f9255edb59cf734d0cabe0f1fd`. It reconciles chapters already present by `859b9c6c816a7cb5a360f61869d1bcf1531aede3`; it is no longer only an unapplied ZIP patch.
+
+The fifth review records six SDK file hashes and reviews three existing cookbook recipes. It identifies a concrete open source finding: `RenderQueueRecipes.cpp` passes TRUE to an enum-status argument; with TRUE=1 that means UNQUEUED, not QUEUED=2. The chapter and [recipe README](17-NATIVE-SUITE-COOKBOOK/code/README.md) now warn about it. The C++ implementation is unchanged; a code correction and behavioral checks remain required. Documentation CI must not be used to close this finding.
+
+Earlier source findings remain in the linked records: ten-file memory/MFR review and three helper inspections; PF handle/register suite-version macro nuances; conditional threading statements; sample/comment discrepancies; 19-file registration/PiPL review and MenuTool partial-initialization limits. No original evidence has been rewritten into a host PASS.
 
 This is documentation and SDK source-review work within the agreed subject matter of [the completion plan](COMPLETION-PLAN.md). It does not complete stages 3–4 or bypass outstanding safety, reuse-audit, compiler and host gates. **Native readout-adapter development remains paused; the deliverable is the Bible, not a separate testing product.** No new user AE run is requested.
 
-The fourth source-review record covers 19 supplied-SDK files and the unchanged MenuTool at snapshot `2b0dddfbb329024fbd5e8925d57ce425511840b0`. The registration/PiPL and AEGP chapters plus the source record and reading route are present in Git by `859b9c6c816a7cb5a360f61869d1bcf1531aede3`. This is source-backed editorial work, not a new initializer, resource build, native binary or host test.
-
-**Next editorial block: AEGP project and render automation**, expanding the existing chapter against the supplied SDK and current Bible recipes. This reading/writing order is not a claim that earlier acceptance gates are closed. Their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
+**Next editorial block: AEGP streams and keyframes**, against the supplied declarations, relevant sample ranges and existing recipes. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
 
 ## Earlier baseline evidence
 
@@ -39,7 +50,7 @@ The fourth source-review record covers 19 supplied-SDK files and the unchanged M
 
 ## Verification boundaries
 
-Source review is not compilation. Authored Markdown fragments illustrate isolated operations or design patterns; target-platform compilation, linking and host execution of new snippets are NOT RUN. Syntax compilation does not establish PiPL correctness, host loading, pixels or MFR safety. No native reference binary in this edition is labelled host-verified. Windows compilation and reference-example AE host tests remain pending.
+Source review is not compilation. Authored Markdown fragments illustrate isolated operations or design patterns; target-platform compilation, linking and host execution of new snippets are NOT RUN. Syntax compilation does not establish PiPL correctness, host loading, pixels, operation semantics or MFR safety. No native reference binary in this edition is labelled host-verified. Windows compilation and reference-example AE host tests remain pending.
 
 Previously collected native-effect research remains separately scoped in the [evidence audit](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/EVIDENCE-AUDIT-2026-09-30.md); it is not full-effect acceptance.
 
