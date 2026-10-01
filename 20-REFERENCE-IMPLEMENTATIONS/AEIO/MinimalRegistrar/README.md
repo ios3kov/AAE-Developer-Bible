@@ -1,6 +1,6 @@
 # AEIO reference workspace
 
-Status: **SDK sample workspace: IO/FBIO / runtime result not claimed**.
+Status: **IO/FBIO sample-derived workspace plan / RUNTIME-NOT-CLAIMED**.
 
 Materialize the licensed SDK sample with scripts/materialize_sdk_examples.py. The Bible does not publish a fake registration-only AEIO and call it working.
 
@@ -95,7 +95,7 @@ Validate sizes, counts, offsets, allocation arithmetic and file bounds before re
 
 Do not let a corrupt file crash the host.
 
-## Tests
+## Product validation cases
 
 ### Import
 
@@ -119,6 +119,20 @@ Do not let a corrupt file crash the host.
 - overwrite policy;
 - close/finalize failure.
 
+## Spec/options state
+
+When adapting IO/FBIO, make the state machine explicit before replacing callbacks:
+
+```text
+host spec
+→ attached live options/private state
+→ parser/decoder or encoder state
+→ flat options for persistence
+→ disposal/finalization
+```
+
+Do not replace parser, options ownership and frame I/O simultaneously; preserve a known reference shell while changing one layer at a time.
+
 ## Verification boundary
 
-This reference remains a materialized SDK workspace plan until a complete callback subset is compiled and exercised inside After Effects. Registration alone is explicitly not counted as completion.
+This is a source/workspace plan based on the licensed SDK samples. Registration alone is not a complete product implementation, but Bible does not require compiling/running this workspace for editorial completion. Runtime support is claimed only when a product has separate evidence.
