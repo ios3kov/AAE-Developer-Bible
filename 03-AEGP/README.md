@@ -9,7 +9,7 @@ AEGP (After Effects General Plug-in) — интеграция с приложе�
 3. [Операции с проектом и рендером](02-PROJECT-RENDER-AUTOMATION.md): чтение project/item/comp/layer, время, Undo и частичные ошибки; очередь, enum статуса и invalidation; render options, borrowed worlds, sync/async receipts и кэш.
 4. [Владение памятью и ошибки](../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md): разные release API и пределы существующих ownership helpers.
 
-Регистрация/PiPL и lifecycle hooks расширены **2026-10-01 по SDK 25.6 build 61**. [Запись сверки](../18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md) содержит 19 source hashes, диапазоны строк, сохранённые расхождения и разбор [MenuTool](../16-WORKING-TEMPLATES/aegp-menu-command/MenuTool.cpp). Сам MenuTool не менялся и не запускался в этой итерации.
+Регистрация/PiPL и lifecycle hooks расширены **2026-10-01 по SDK 25.6 build 61**. [Запись сверки](../18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md) содержит 19 source hashes, диапазоны строк, сохранённые расхождения и разбор [MenuTool](../16-WORKING-TEMPLATES/aegp-menu-command/MenuTool.cpp). Проект/render automation разобран в [следующей сверке](../18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md), а streams/keyframes — в [SDK 25.6 review](../18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md). Старые Adobe samples используются как pattern evidence; актуальные signatures берутся из current headers.
 
 [Сверка проекта и рендера](../18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md) добавляет диапазоны шести SDK-файлов и разбор трёх существующих рецептов. У RenderQueueRecipes обнаружено использование TRUE вместо именованного статуса: это не QUEUED. Ошибка и необходимость исправления кода отмечены в главе и README рецептов; host-проверка не заявляется.
 
@@ -24,3 +24,8 @@ AEGP (After Effects General Plug-in) — интеграция с приложе�
 Текст сверяется с declarations и samples; архитектурные рекомендации помечены отдельно. Source review не равен native build, удачная компиляция не равна загрузке, а успешный initializer не равен готовности всех функций.
 
 [COMPLETION-CHECKLIST](../COMPLETION-CHECKLIST.md) сохраняет отдельную приёмку MenuTool: сборка/регистрация, отсутствие дублей меню, действие команды, update hook, ошибки и завершение. Редакционное обновление этих пунктов не закрывает. Следующая тема написания — streams и ключевые кадры; это порядок чтения/написания, не закрытие более ранних gates.
+
+
+## Текущий редакционный статус
+
+Streams/properties и keyframes теперь сверены с supplied SDK 25.6. Исправлено смешение более позднего `StreamSuite7` с baseline 25.6: текущие families здесь — `StreamSuite6`, `DynamicStreamSuite4`, `KeyframeSuite5`. Host execution этих cookbook операций всё ещё требует отдельной приёмки по `COMPLETION-CHECKLIST.md`.
