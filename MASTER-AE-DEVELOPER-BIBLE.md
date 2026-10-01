@@ -6513,38 +6513,112 @@ Measure preview FPS/latency with hook enabled and disabled. A display hook that 
 
 <!-- SOURCE: 14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md -->
 
-# Legacy / deprecated native integration
+# Legacy / historical native integration boundaries
 
-Эти пути надо знать при поддержке старого кода, но не выбирать как основу нового продукта без специальной причины.
+Обновлено **2026-10-01** по присланному **SDK 25.6 build 61**.
 
-## Photoshop format plug-ins / filters
+Цель этой главы — не составить музей старых API, а помочь разработчику понять, **что в bundled samples является историческим pattern, а что является текущей сигнатурой header 25.6**.
 
-After Effects исторически поддерживает часть Photoshop plug-in formats. Для нового AE-native media integration выбирать современные AEIO/MediaCore paths.
+Подробная сверка: [PICA, Effect↔AEGP и legacy boundaries](14-NATIVE-INTEGRATIONS/../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md).
 
-## Foreign Project Format (FPF)
+## 1. Bundled sample не равен current suite generation
 
-Исторический project import path, deprecated в пользу более современных APIs.
+В одной и той же поставке 25.6 находятся sample-файлы, написанные против более старых suite generations.
 
-## ADM UI
+Конкретные примеры:
 
-Старый Adobe Dialog Manager использовался некоторыми keyframer/palette samples. Новый продукт не должен начинаться с ADM.
+- `ProjDumper` использует `EffectSuite2` и `StreamSuite2`;
+- `Streamie` использует `DynamicStreamSuite2` и старые stream call shapes;
+- current header 25.6 содержит `StreamSuite6`, `DynamicStreamSuite4`, `KeyframeSuite5`, `EffectSuite4`.
 
-## Старые fixed assumptions
+Поэтому правило:
 
-Не переносить в новый код:
-- 32-bit-only assumptions;
-- Carbon/CFM era platform code;
-- устаревшие command IDs как стабильный API;
-- global mutable state, рассчитанный на single-frame rendering;
-- hard-coded Intel-only binary assumptions.
+```text
+sample = evidence of workflow/pattern
+current header = compile-time signature source of truth
+```
 
-## Правило библии
+Копировать старую строку вызова без сверки нельзя.
 
-Legacy API документируется только с тремя метками:
+## 2. Generic Effect call: наглядная версия-маркер
 
-- **support-only** — чтобы чинить существующий продукт;
-- **migration-source** — откуда мигрировать;
-- **do-not-start** — не использовать для нового проекта.
+`ProjDumper` вызывает старую форму `AEGP_EffectCallGeneric(plugin, effect, time, extra)`.
+
+Current `EffectSuite4` добавляет отдельный `PF_Cmd effect_cmd`; header говорит передать `PF_Cmd_COMPLETELY_GENERAL` для старого поведения.
+
+Это хороший пример эволюции API внутри поставки: sample полезен как сценарий, но новая реализация должна следовать текущему declaration.
+
+## 3. Commando initializer — не current prototype
+
+Bundled `Commando.cpp/.h` объявляет initializer с дополнительными `file_pathZ` и `res_pathZ` и завершает его `void* global_refconPV`.
+
+Current `AE_GeneralPlug.h` определяет `AEGP_PluginInitFuncPrototype` иначе: `SPBasicSuite*`, driver major/minor, `AEGP_PluginID`, `AEGP_GlobalRefcon*`.
+
+Следствие для Библии: Commando можно читать как исторический hook/menu pattern, **но нельзя использовать его initializer signature как современный шаблон 25.6**.
+
+Мы не утверждаем здесь, почему этот старый sample остаётся в архиве или как конкретный AE build обрабатывает его binary; host execution не проводился.
+
+## 4. Старые UI / keyframer / format пути
+
+Ранее краткая версия главы перечисляла ADM, FPF и Photoshop-format paths слишком обобщённо.
+
+В просмотренном архиве 25.6 нет отдельного top-level sample family с именами ADM/FPF/Keyframer. Наличие старой документации или вспомогательных Photoshop-named headers в SP tree само по себе **не доказывает текущую поддержку конкретного plug-in format в AE 25.6**.
+
+Поэтому такие темы должны иметь одну из меток:
+
+- **support-only** — разбор существующего legacy продукта;
+- **migration-source** — источник идей/данных при переносе;
+- **do-not-start** — не выбирать как базовую архитектуру нового продукта без отдельного подтверждения.
+
+Если понадобится реальная поддержка legacy продукта, нужно отдельно поднять его target SDK/headers/sample и проверить host.
+
+## 5. Что считать legacy smell в новом коде
+
+Не переносить без проверки:
+
+- suite suffix/version из старого sample;
+- старый initializer prototype;
+- 32-bit-only pointer assumptions;
+- Carbon/CFM-era platform code;
+- raw global mutable state, рассчитанный на single-frame execution;
+- hard-coded Intel-only архитектуру;
+- старый command/menu behavior как вечную гарантию;
+- buffer/string signatures, которые в current suite уже возвращают MemorySuite handle.
+
+## 6. Version-gating в самой Библии
+
+Каждая source-backed глава должна различать:
+
+```text
+SDK 25.6 current header
+bundled older sample generation
+later SDK note
+historical observation
+host-verified behavior
+```
+
+Нельзя переносить функцию из later SDK в baseline 25.6 только потому, что имя похоже.
+
+Нельзя также объявлять старый sample «сломанный» только из-за отличия от current header: без сборки/host execution это **source discrepancy / version boundary**, а не runtime defect.
+
+## 7. Практическая миграция
+
+Для старого native plug-in:
+
+1. зафиксировать исходный SDK и host, где он реально работал;
+2. выписать используемые suite names/versions;
+3. сравнить current declarations;
+4. заменить только подтверждённые changed contracts;
+5. сохранить project/parameter compatibility отдельно;
+6. собрать с warnings-as-errors;
+7. выполнить host lifecycle tests;
+8. только после этого удалять compatibility branches.
+
+См. также:
+
+- [PICA suites](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md)
+- [AEGP → Effect](14-NATIVE-INTEGRATIONS/../15-COMMUNICATION/03-AEGP-TO-EFFECT.md)
+- [SDK verification policy](14-NATIVE-INTEGRATIONS/../18-SDK-HEADER-TOOLS/README.md)
 
 
 ---
@@ -7564,13 +7638,31 @@ The important reusable piece is the **single dispatcher protocol**. It avoids ar
 
 <!-- SOURCE: 16-WORKING-TEMPLATES/effect-aegp-generic-bridge/README.md -->
 
-# Effect <-> AEGP generic bridge
+# Effect ↔ AEGP generic bridge
 
-Use this only for a pair of plug-ins you control.
+Status: **protocol template; source-reviewed against SDK 25.6, not host-verified**.
+
+Use this only for a pair of plug-ins you control. See [AEGP → Effect](16-WORKING-TEMPLATES/effect-aegp-generic-bridge/../../15-COMMUNICATION/03-AEGP-TO-EFFECT.md).
+
+## Current AEGP call shape
+
+In SDK 25.6 `AEGP_EffectSuite4::AEGP_EffectCallGeneric` takes:
+
+```text
+plugin id
+effect ref
+time in the target layer timebase
+PF_Cmd
+void* extra
+```
+
+For the historical generic behavior pass `PF_Cmd_COMPLETELY_GENERAL`.
+
+Do **not** copy the old ProjDumper EffectSuite2 call shape literally; that bundled sample predates the explicit command argument.
 
 ## Effect side
 
-Handle `PF_Cmd_COMPLETELY_GENERAL`. Validate payload size/version before reading it.
+Handle `PF_Cmd_COMPLETELY_GENERAL` and validate payload size/version before reading it.
 
 ```cpp
 case PF_Cmd_COMPLETELY_GENERAL: {
@@ -7583,7 +7675,6 @@ case PF_Cmd_COMPLETELY_GENERAL: {
             msg->result_code = 0;
             return PF_Err_NONE;
         case bible_bridge::Op::ReloadResources:
-            // Update NON-render-dependent resource/control state here.
             msg->result_code = 0;
             return PF_Err_NONE;
         default:
@@ -7593,16 +7684,36 @@ case PF_Cmd_COMPLETELY_GENERAL: {
 }
 ```
 
+This example assumes the effect command is already on the correct SDK callback path. It does not permit storing `extra` after return.
+
 ## AEGP side
 
-Resolve the target effect reference, then use `AEGP_EffectCallGeneric()` from the current Effect Suite version. Pass a `MessageV1` pointer as the generic payload according to the exact signature in the SDK header you compile against.
+1. resolve the target `AEGP_EffectRefH`;
+2. convert time to the target layer timebase when needed;
+3. build a versioned payload;
+4. call `AEGP_EffectCallGeneric(..., PF_Cmd_COMPLETELY_GENERAL, &payload)`;
+5. distinguish the returned `A_Err` from `payload.result_code`;
+6. dispose the effect ref according to its ownership contract.
 
 ## Do not
 
 - send STL types;
-- send pointer to temporary object that dies before call returns;
-- use this as hidden render dependency;
-- assume struct packing without static assertions/platform checks.
+- send a temporary pointer that the effect stores for later use;
+- assume struct packing without explicit checks;
+- use hidden mutable state as a render dependency;
+- treat old EffectSuite2 sample syntax as current EffectSuite4 syntax;
+- swallow host-call error because the protocol field looks successful.
+
+## Required acceptance
+
+- missing target;
+- short/wrong-version payload;
+- unknown opcode;
+- correct response;
+- correct layer time;
+- target removal/reorder;
+- repeated calls;
+- cache invalidation behavior for any render-affecting state.
 
 
 ---
@@ -7720,25 +7831,64 @@ The actual native view class is deliberately not faked here: Cocoa/AppKit and Wi
 
 # Published PICA suite contract
 
-Status: **ABI template**; wire provider/registration calls using the current SDK Sweetie sample / SP suite APIs.
+Status: **ABI design template, not a complete provider implementation and not host-verified**.
 
-`SharedSuite.h` is intentionally C-ABI-shaped: no STL, no exceptions, explicit buffer ownership.
+Source review baseline: Adobe After Effects SDK **25.6 build 61**, especially Sweetie + Checkout. See [PICA chapter](16-WORKING-TEMPLATES/pica-shared-suite/../../14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md) and [source review](16-WORKING-TEMPLATES/pica-shared-suite/../../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md).
+
+`SharedSuite.h` deliberately contains only the shared function-table shape. It does **not** register itself.
+
+## Important source-language caveat
+
+The current header uses `std::int32_t/std::uint64_t`, so it is a **C++ header with C-shaped ABI data**, not a header that can currently be included unchanged by a C translation unit.
+
+The ABI intent remains:
+
+- plain function-pointer table;
+- no STL objects crossing the boundary;
+- no exceptions crossing the boundary;
+- explicit pointer/size ownership.
+
+If true C-source compatibility is required, adapt the header to C-compatible integer declarations and test it with both C and C++ compilers.
 
 ## Provider requirements
 
-- register `BIBLE_CORE_SUITE_NAME`, version 1;
-- function table must stay valid for the advertised lifetime;
-- return integer error codes, never throw across call boundary;
-- validate every pointer/size.
+- acquire `SPSuitesSuite`;
+- publish a stable table with `AddSuite`;
+- use a unique stable suite name;
+- version incompatible public ABI changes;
+- keep the advertised function table alive for the required provider lifetime;
+- validate pointer/size inputs;
+- return integer error codes; never throw through function pointers;
+- document thread/lifetime rules;
+- do not claim hot replacement unless separately implemented and host-tested.
+
+Sweetie publishes a static table into `kSPRuntimeSuiteList`; it does not demonstrate generic unpublish/replacement.
 
 ## Consumer requirements
 
-- acquire by exact name+version through `SPBasicSuite`;
-- if missing, disable dependent feature cleanly;
-- release after use;
-- never cache a pointer beyond the provider/suite lifetime guarantee.
+- acquire exact name + public version through `SPBasicSuite`;
+- handle missing suite explicitly;
+- release matching acquisition on all paths;
+- do not cache the table after release;
+- do not assume provider load order;
+- obey documented thread restrictions.
 
-Reference sample: Adobe SDK **Sweetie**, which demonstrates publishing a PICA function suite for other plug-ins.
+Checkout demonstrates an optional dependency: missing DuckSuite does not make the whole effect fail.
+
+## Verification required before calling this working
+
+1. provider present/absent;
+2. wrong version;
+3. correct version;
+4. repeated acquire/release;
+5. two consumers;
+6. malformed buffer sizes;
+7. service error propagation;
+8. provider/consumer restart lifecycle;
+9. declared concurrency mode;
+10. target AE build evidence.
+
+Reference sources: SDK Sweetie, Checkout, `SPBasicSuite`, `SPSuitesSuite`.
 
 
 ---
