@@ -33995,6 +33995,21 @@ Checked and reconciled as one logical block:
 - old host-acceptance wording replaced with product-validation guidance / runtime-not-claimed evidence language;
 - source-review provenance preserved with a later consistency note rather than rewriting original findings.
 
+### AEIO import / export lifecycle block — completed 2026-10-01
+
+Checked and reconciled as one logical block:
+
+- current SDK 25.6 baseline: `AEIO_ModuleInfo`, frozen `AEIO_FunctionBlock4`, `AEGP_IOInSuite7`, `AEGP_IOOutSuite6`, `AEGP_RegisterIO`;
+- InSpec/OutSpec host identity separated from module-owned options/private state;
+- live options versus flat persisted options and schema migration made explicit;
+- sparse/random/repeated frame requests, scale/region/rowbytes and decoder-cache implications documented;
+- bounded verification of untrusted media, cancellation and partial-init cleanup documented;
+- audio input/output, metadata/markers, color and auxiliary-channel contracts expanded;
+- exporter state/finalization/error handling and optional atomic output strategy documented;
+- Footage Suite versus AEIO boundary reconciled with cookbook;
+- AEIO registration template/reference now use RUNTIME-NOT-CLAIMED/product-validation language;
+- SDK source-review provenance preserved with a later consistency note.
+
 ## E. Recipes and reference source
 
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
@@ -35263,6 +35278,17 @@ Completed as one ownership/import block:
 - Footage caller-owned → project-adopted transition and failure rollback made explicit;
 - Footage Suite versus AEIO responsibility boundary made explicit;
 - product validation wording aligned with `EDITORIAL-GUIDE.md`.
+
+### AEIO import / export lifecycle
+
+Completed as one SDK/source/reference block:
+
+- `AEIO_FunctionBlock4` lifecycle mapped to current `IOInSuite7` / `IOOutSuite6`;
+- spec/options ownership and flat/live persistence separated;
+- random/sparse frame, audio, metadata, auxiliary-channel and output-finalization guidance expanded;
+- cancellation, untrusted-media validation and partial-failure cleanup made explicit;
+- Footage Suite versus AEIO responsibility boundary reconciled;
+- reference/template evidence wording aligned with `EDITORIAL-GUIDE.md`.
 
 ## Current editorial TODO
 
