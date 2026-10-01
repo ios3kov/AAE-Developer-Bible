@@ -294,7 +294,7 @@ The current validation lane also compiles the standalone Effect↔AEGP and PICA 
 
 Compiler reports now include Bible Git SHA/dirty state and SHA-256 for each translation unit. The acceptance platform runners use `--require-clean`; a dirty/unknown source tree cannot be promoted to Gate-4 compiler evidence.
 
-See [SDK contract audit runbook](18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
+See [SDK contract audit runbook](18-SDK-HEADER-TOOLS/16-SDK-CONTRACT-AUDIT-RUNBOOK.md).
 
 
 ## Real SDK 25.6 required-contract audit (2026-10-01)
@@ -324,4 +324,4 @@ A Linux-container compiler experiment against the exact headers was also run onl
 
 **Editorial consequence:** required-contract parsing is PASS for the current SDK baseline. macOS/Xcode or Windows/MSVC compilation may be performed as optional evidence for specific source examples, but is not required for Bible completion.
 
-Full record: [18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md](18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md).
+Full record: [18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md](18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md).
