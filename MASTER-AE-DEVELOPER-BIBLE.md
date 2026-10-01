@@ -6243,7 +6243,7 @@ AEGP_AddLayer(
 
 # Native integrations — карта всего нативного SDK After Effects
 
-Research baseline: **After Effects 26.5 SDK (September 2026)**.
+Primary acceptance/source-review baseline: **After Effects SDK 25.6 build 61**. Later 26.5 research notes are version-gated and must not silently replace 25.6 contracts.
 
 Этот раздел отвечает на вопрос: **какие типы нативных расширений реально существуют в After Effects, кто вызывает кого и для каких задач нужен каждый тип**.
 
@@ -6319,7 +6319,7 @@ Research baseline: **After Effects 26.5 SDK (September 2026)**.
 - [`11-LEGACY-NATIVE.md`](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) — deprecated/legacy.
 - [`12-AEGP-SUITES-CATALOG.md`](14-NATIVE-INTEGRATIONS/12-AEGP-SUITES-CATALOG.md) — полный AEGP suite map 26.5.
 
-Sources: Adobe C++ SDK Guide — What Can I Do, AEGP Overview, Sample Projects, AEIO, Artisan; SDK 26.5 history.
+Sources: supplied Adobe After Effects SDK 25.6 build 61 headers/samples plus the maintained C++ SDK Guide for context. Exact 25.6 AEIO/Artisan source review: [`12-AEIO-ARTISAN-SDK25.6.md`](14-NATIVE-INTEGRATIONS/../18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md). Later SDK history remains a separate compatibility source.
 
 - [`13-DOCS-ERRATA.md`](14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md) — known public-doc mismatches and verification policy.
 
