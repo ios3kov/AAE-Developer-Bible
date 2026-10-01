@@ -31467,6 +31467,32 @@ Bible готова как редакция, когда читатель може
 
 Этот пункт закрывается **редакционным проходом по главам**, а не сборкой примеров.
 
+## Editorial sweep progress — 2026-10-01
+
+First completeness wave expanded and normalized:
+
+- `00-START-HERE/01-EXTENSION-TYPES.md`;
+- `00-START-HERE/02-ENVIRONMENT-MATRIX.md`;
+- `01-ARCHITECTURE/01-LIFECYCLE.md`;
+- `01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md`;
+- `01-ARCHITECTURE/07-COMMUNICATION-ARCHITECTURE.md`;
+- `06-SCRIPTING/README.md`;
+- `07-PANELS/README.md`;
+- `08-MACOS/README.md`;
+- `08-MACOS/04-GPU.md`;
+- `09-WINDOWS/README.md`;
+- `09-WINDOWS/03-DEBUGGING.md`;
+- `09-WINDOWS/04-GPU.md`;
+- `14-NATIVE-INTEGRATIONS/01-TAXONOMY.md`;
+- `14-NATIVE-INTEGRATIONS/02-HOST-CALL-FLOWS.md`;
+- `14-NATIVE-INTEGRATIONS/05-AEGP-TOOLS.md`;
+- `14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md`;
+- `14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md`;
+- `17-NATIVE-SUITE-COOKBOOK/13-GUIDES-VIEWS-SELECTION.md`;
+- SDK header-first/diff methodology was reconciled with the documentation mission.
+
+These chapters now explicitly separate product validation guidance from Bible editorial evidence.
+
 ## E. Recipes and reference source
 
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
@@ -32235,6 +32261,26 @@ The Bible uses runtime evidence when it exists, but **runtime evidence is not ma
 “Source-reviewed, runtime not claimed” is a complete and valid editorial state when the text makes no runtime assertion.
 
 Historical compiler/runtime results remain useful evidence about their snapshots, not release requirements for the documentation.
+
+## Editorial completeness sweep — wave 1
+
+Expanded entry/architecture/platform/native chapters now include consistent coverage of selection criteria, lifecycle, ownership, threading, failure modes, production workflow, related chapters and evidence boundaries.
+
+Wave 1 covered:
+
+- extension selection and environment matrix;
+- native lifecycle, version compatibility and communication architecture;
+- scripting and panel entry architecture;
+- macOS/Windows platform entry pages;
+- macOS/Windows GPU guidance;
+- Windows debugging;
+- native taxonomy, host-call flows and AEGP tools;
+- Keyframers;
+- guides/views/selection;
+- documentation errata;
+- header-first and SDK-diff methodology.
+
+Strict-link failures introduced during expansion were corrected; the documentation tree returned to green strict validation.
 
 ## Current editorial TODO
 
