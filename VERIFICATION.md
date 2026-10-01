@@ -268,3 +268,20 @@ New fail-closed checks:
 Recent portable validation runs for these changes are green, including run `36843099891` for runner syntax and run `36843081166` for the full synthetic compiler-report path.
 
 **Boundary:** this does not close Gate 4. The previously recorded Adobe SDK 25.6 macOS compiler baseline predates current source changes. The exact SDK archive is not available in the current accessible file set, so no fresh licensed-SDK compile was performed here. A real MSVC + SDK 25.6 run also remains NOT RUN.
+
+
+### Portable native ABI/header compile
+
+The current validation lane also compiles the standalone Effect↔AEGP and PICA protocol headers with strict C++17 warnings. Validate run `36843562458` passed:
+
+- native compiler-driver portable tests;
+- macOS/Windows runner syntax parsing;
+- strict compile/run of `scripts/test_protocol_headers.cpp`;
+- SDK tooling regression tests;
+- C++ foundation tests;
+- generated documentation;
+- MkDocs strict build.
+
+Compiler reports now include Bible Git SHA/dirty state and SHA-256 for each translation unit. The acceptance platform runners use `--require-clean`; a dirty/unknown source tree cannot be promoted to Gate-4 compiler evidence.
+
+See [Gate 4 — exact SDK acceptance runbook](18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
