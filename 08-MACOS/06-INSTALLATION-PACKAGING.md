@@ -1,46 +1,143 @@
 # macOS — installation and packaging
 
-## Common location
+Development install, product install and delivery packaging are separate concerns.
 
-Для plug-ins, которые должны быть доступны совместимым Adobe video hosts:
+## Development location
 
-```text
-/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
-```
+The AE SDK guide recommends the per-user MediaCore path during development:
 
-CC использует historical `7.0` directory convention.
+    ~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
 
-## AE-only location
+This avoids writing Xcode output directly into the root-owned system Library path.
 
-Если plug-in принципиально AE-specific:
+## Common release location
 
-```text
-/Applications/Adobe After Effects [version]/Plug-ins/
-```
+For plug-ins intended for compatible Adobe video hosts, the documented common location is:
 
-Но installer, привязанный к app bundle/version path, требует больше maintenance при нескольких AE versions.
+    /Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
 
-## User dev path
+The 7.0 directory is the historical CC convention.
 
-Для development удобно:
+A plug-in placed here may also be discovered by other compatible Adobe hosts. That is useful only if the plug-in is actually compatible with those hosts.
 
-```text
-~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
-```
+## AE-specific location
 
-Release installer обычно использует system-level policy продукта.
+If the product depends on After Effects-only suites or behavior, the app-specific path remains available:
 
-## Packaging choices
+    /Applications/Adobe After Effects [version]/Plug-ins/
 
-- `.pkg` — хороший системный installer path;
-- signed/notarized `.dmg` как delivery container;
-- zip — только если manual install действительно является product decision.
+This path is version-specific and creates more installer maintenance when multiple AE versions are supported.
 
-## Installer rules
+Do not install into every detected host blindly. Decide product host policy first.
 
-- no hidden destructive cleanup;
-- upgrade keeps user presets/license data unless explicitly intended;
-- uninstall removes only files owned by your product;
-- support side-by-side old/new only if designed;
-- log install result/path/version;
-- verify architecture and supported OS before install where appropriate.
+## Package choices
+
+Common delivery patterns:
+
+- signed/notarized PKG installer;
+- DMG containing installer or documented manual-install payload;
+- ZIP only when manual installation is an explicit supported product choice.
+
+The package format should support the required permissions, upgrade semantics and uninstall policy.
+
+## Installer ownership model
+
+Maintain an explicit manifest of files owned by the installer.
+
+Installer may own:
+
+- native plug-in bundle;
+- helper binary;
+- shared product resources;
+- receipt/version metadata.
+
+Installer must not delete:
+
+- user projects;
+- user presets unless explicitly product-owned and removable;
+- unrelated plug-ins;
+- entire shared Adobe directories;
+- license/user data unless uninstall policy explicitly asks and the user agrees.
+
+Never implement uninstall as "delete parent folder" when that folder can contain third-party/user files.
+
+## Upgrade
+
+Define upgrade from at least the previous supported release.
+
+Test:
+
+~~~text
+N-1 installed
+→ install N
+→ old binary removed/replaced correctly
+→ user data preserved
+→ AE loads only intended version
+→ rollback plan still exists
+~~~
+
+If filenames/bundle IDs change, explicitly remove only the old product-owned artifact.
+
+## Multiple AE versions
+
+If using common MediaCore, one installed binary may be loaded by several Adobe host versions.
+
+Therefore compatibility is a property of the installed binary, not just the installer UI.
+
+If the plug-in is AE-version-specific, prefer a design that cannot accidentally expose an incompatible build to another host/version.
+
+## Atomicity
+
+Install into a staging location first when possible, validate payload, then perform the final privileged copy.
+
+Avoid leaving half-copied bundles when install fails.
+
+A plug-in bundle must be treated as one versioned artifact.
+
+## Signing and notarization order
+
+For a PKG-based release:
+
+~~~text
+build final plug-in
+→ sign plug-in/nested code
+→ verify
+→ construct installer payload
+→ sign installer
+→ notarize distributable
+→ staple where applicable
+→ verify clean install
+~~~
+
+Do not modify signed nested plug-in contents during installer generation.
+
+## Installer logs
+
+Log:
+
+- product version/build;
+- target path;
+- previous version detected;
+- files installed/removed;
+- signature/notarization preflight result where useful;
+- success/failure code.
+
+Do not log secrets or license tokens.
+
+## Required tests
+
+- fresh install;
+- upgrade;
+- uninstall;
+- reinstall after uninstall;
+- multiple AE versions;
+- no AE installed;
+- insufficient permissions;
+- disk-full/error injection where practical;
+- Unicode user/product paths for user-side assets;
+- quarantine/Gatekeeper path;
+- AE launch and plug-in load after install.
+
+## Verification boundary
+
+The paths follow current AE SDK installer guidance. A correct path alone does not prove a safe installer. Full clean-machine install/upgrade/uninstall verification remains an open completion gate.
