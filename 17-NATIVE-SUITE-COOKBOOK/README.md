@@ -62,7 +62,7 @@ Return A_Err
 
 ## Version discipline
 
-Главы `02-COMPOSITIONS.md` / `03-LAYERS.md` и `05-STREAMS-PROPERTIES.md` / `06-KEYFRAMES.md` перепроверены по supplied SDK 25.6. Composition/layer baseline: `AEGP_CompSuite12` + `AEGP_LayerSuite9`. Streams/keyframes: `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`, `AEGP_KeyframeSuite5`. Главы `07-MASKS.md`, `08-TEXT-MARKERS.md`, `09-FOOTAGE-IMPORT.md` также приведены к baseline 25.6: `MaskSuite6`, `MaskOutlineSuite3`, `TextDocumentSuite1`, `MarkerSuite3`, `FootageSuite5`, `ItemSuite9`, `CompSuite12`, `LayerSuite9`. Более поздние API не должны молча становиться baseline 25.6. Источники: `18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md` и `11-MASK-TEXT-FOOTAGE-SDK25.6.md`.
+Главы `02-COMPOSITIONS.md` / `03-LAYERS.md` и `05-STREAMS-PROPERTIES.md` / `06-KEYFRAMES.md` перепроверены по supplied SDK 25.6. Composition/layer baseline: `AEGP_CompSuite12` + `AEGP_LayerSuite9`. Streams/keyframes: `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`, `AEGP_KeyframeSuite5`. Главы `07-MASKS.md`, `08-TEXT-MARKERS.md`, `09-FOOTAGE-IMPORT.md` также приведены к baseline 25.6: `MaskSuite6`, `MaskOutlineSuite3`, `TextDocumentSuite1`, `MarkerSuite3`, `FootageSuite5`, `ItemSuite9`, `CompSuite12`, `LayerSuite9`. Their later editorial pass also reconciles ownership transfer, structural invalidation, static-vs-keyframed writes, Footage-vs-AEIO boundaries and product-validation wording. Более поздние API не должны молча становиться baseline 25.6. Источники: `18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md` и `11-MASK-TEXT-FOOTAGE-SDK25.6.md`.
 
 
 ## Render Queue / frame-render baseline
