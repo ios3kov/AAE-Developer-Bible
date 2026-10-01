@@ -1,6 +1,6 @@
 # Keyframer batch working pattern
 
-Status: **API recipe / host-test-required**.
+Status: **API/source recipe; runtime result not claimed by Bible**.
 
 Use this inside an AEGP based on the exact SDK sample such as Easy Cheese, with suite generations checked against target headers.
 
