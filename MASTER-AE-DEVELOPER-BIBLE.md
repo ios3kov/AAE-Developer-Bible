@@ -23846,7 +23846,42 @@ See [SDK diff policy](18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md) and [header-fir
 
 An SDK upgrade is a compatibility change, not merely a compiler upgrade.
 
+This chapter serves two different decisions:
+
+1. **Bible editorial baseline adoption** — can the documentation safely describe the new SDK contract?
+2. **Product SDK/toolchain adoption** — can a concrete shipping product move to the new SDK while preserving its support claims?
+
+The first is a source/documentation decision. The second may require builds and host regressions.
+
 Before changing product calls, compare the native contracts.
+
+## Two different decisions
+
+### Bible editorial baseline
+
+For Bible, adopting a new SDK baseline requires enough source evidence to update version-sensitive claims:
+
+- exact SDK identity;
+- inventory/diff;
+- required-contract coverage;
+- source/sample review for changed high-risk families;
+- explicit version boundaries;
+- updated errata and chapters;
+- unresolved parser/source gaps recorded.
+
+Bible does not need to build every source example on every platform merely to document the new contract.
+
+### Product baseline
+
+A concrete product may additionally require:
+
+- compile matrix;
+- resource/link/package checks;
+- host regressions;
+- updated support matrix;
+- release evidence.
+
+Those are product acceptance tasks, not documentation-completion requirements.
 
 ## Inputs
 
@@ -23928,7 +23963,9 @@ Do not assume a version-macro bump is cosmetic.
 
 ### Header unchanged
 
-Still run host regression.
+For a shipping product, header stability does not remove the need for runtime regression appropriate to the release.
+
+For Bible, unchanged headers mean there may be no contract text to update, but platform/release-note behavior can still require a dated documentation review.
 
 AE behavior, loader policy, GPU drivers, OS security and implementation semantics can change without a public C header diff.
 
@@ -23968,7 +24005,7 @@ Choose explicitly.
 
 Do not accidentally raise the minimum host by linking documentation/source against a newer suite generation.
 
-## Compiler matrix
+## Product compiler matrix
 
 Compile at least:
 
@@ -23981,7 +24018,7 @@ Each dependency must exist for the same targets.
 
 A candidate SDK is not accepted from one-platform syntax success.
 
-## Host regression
+## Product host regression
 
 Run the capability matrix affected by the SDK change.
 
@@ -23994,9 +24031,9 @@ Examples:
 - panel/build change → load/open/restart;
 - installer path/signing guidance → clean install.
 
-## Acceptance package
+## Product acceptance package
 
-New SDK version is accepted only when the project has:
+A **shipping product** should accept a new SDK/toolchain only with evidence appropriate to its support policy, typically:
 
 - candidate inventory;
 - diff artifact;
@@ -24005,6 +24042,15 @@ New SDK version is accepted only when the project has:
 - affected host regressions;
 - updated support statement;
 - recorded unresolved differences.
+
+For **Bible**, the editorial acceptance package is instead:
+
+- exact SDK identity;
+- contract inventory/diff;
+- required-contract result;
+- high-risk source/sample review;
+- chapter/recipe updates;
+- explicit unresolved differences and version boundaries.
 
 ## Rollback
 
@@ -24146,34 +24192,39 @@ Do not cast const away before understanding why the API changed.
 
 MFR-era sequence-data changes are an example of lifetime/thread semantics becoming stricter.
 
-## Rule 10 — compiler success is not host proof
+## Rule 10 — compiler success is not runtime proof
 
-Headers/compiler establish type compatibility.
+Headers/compiler establish source/type compatibility for a particular toolchain/SDK snapshot.
 
 They do not prove:
 
-- suite is available in target AE;
+- suite is available in a particular target AE build;
 - PiPL loads;
 - output pixels are correct;
 - callback order assumption is valid;
-- ownership is correct;
+- ownership logic is correct at runtime;
 - thread safety;
-- installer/signing.
+- installer/signing behavior.
 
-Every public capability still needs host evidence.
+For **Bible**, this means: do not claim runtime behavior unless runtime evidence exists.
 
-## Rule 11 — missing evidence stays unknown
+For a **product**, this means: support/release claims may require compiler/host/product evidence appropriate to that claim.
+
+It does **not** mean every Bible source example must be compiled or host-tested before the documentation can be complete.
+
+## Rule 11 — missing evidence stays at the correct evidence level
 
 If:
 
-- parser cannot understand declaration;
+- parser cannot understand a required declaration;
 - sample is absent;
 - documentation is ambiguous;
-- host run is not available;
 
-label the fact unresolved/NOT RUN.
+label that contract fact unresolved and do not fill the gap from memory.
 
-Do not fill the gap from memory and present it as verified.
+If host run is not available, do not claim a host-observed result. The source/documented contract may still be described when its own evidence is sufficient.
+
+Use precise labels rather than turning every missing runtime result into an editorial TODO.
 
 ## Rule 12 — preserve provenance
 
@@ -24196,7 +24247,7 @@ This is what makes future SDK diffs possible.
 | ownership/lifetime | header comments + sample + guide |
 | introduction/deprecation | release notes/guide + runtime check |
 | how Adobe wires a project | exact SDK sample |
-| whether product supports it | product compile + host evidence |
+| whether a concrete product supports it | product-specific compile/host evidence appropriate to the claim |
 | current platform signing/install policy | current platform documentation |
 
 ## Stop rule
