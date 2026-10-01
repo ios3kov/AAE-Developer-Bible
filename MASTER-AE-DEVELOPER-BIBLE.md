@@ -24271,6 +24271,20 @@ Return A_Err
 Главы `05-STREAMS-PROPERTIES.md` и `06-KEYFRAMES.md` перепроверены по supplied SDK 25.6: `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`, `AEGP_KeyframeSuite5`. Главы `07-MASKS.md`, `08-TEXT-MARKERS.md`, `09-FOOTAGE-IMPORT.md` также приведены к baseline 25.6: `MaskSuite6`, `MaskOutlineSuite3`, `TextDocumentSuite1`, `MarkerSuite3`, `FootageSuite5`, `ItemSuite9`, `CompSuite12`, `LayerSuite9`. Более поздние API не должны молча становиться baseline 25.6. Источники: `18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md` и `11-MASK-TEXT-FOOTAGE-SDK25.6.md`.
 
 
+## Render Queue / frame-render baseline
+
+The SDK 25.6 current header baseline used by the explanatory chapters is:
+
+- `AEGP_RenderQueueSuite1`;
+- `AEGP_RQItemSuite4`;
+- `AEGP_OutputModuleSuite4`;
+- `AEGP_RenderOptionsSuite4`;
+- `AEGP_RenderSuite5`;
+- `AEGP_WorldSuite3`.
+
+Some existing C++ recipes deliberately use older compatible Suite3/Suite4 subsets. Those source dependencies are preserved explicitly; they must not be mistaken for the current SDK generation.
+
+
 ---
 
 <!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/VERIFICATION.md -->
@@ -25393,6 +25407,15 @@ SHA-256 приложенного TAR повторно рассчитан: `eee39
 | Кэш | H:5413–5443 | Render timestamp, video-change check, проверка полезности speculative render и adopted platform world. CheckinRenderedFrame не равен CheckinFrame. |
 | QueueBert | `Examples/AEGP/Queuebert/QueueBert.cpp:110–165` | Старые нулевые/числовые refs, демонстрационные изменения очереди, фиксированный путь и TRUE в SetRenderState. Это не безопасная готовая команда для рабочего проекта. |
 | Projector | `Examples/AEGP/Projector/Projector.cpp:670–703` | Добавление шести элементов; старт очереди находится в закомментированном блоке, не в исполняемой части рассматриваемого фрагмента. |
+
+## Current suite generations relevant to this chapter
+
+Current SDK 25.6 header exposes:
+
+- `AEGP_RQItemSuite4` for render-queue items;
+- `AEGP_RenderSuite5` for frame rendering.
+
+Existing Bible recipes use older compatible `RQItemSuite3` / `RenderSuite4` subsets. They are source-example dependencies, not the current-generation baseline, and suite tables must never be cast between generations.
 
 ## Важная находка в существующем рецепте Bible
 
