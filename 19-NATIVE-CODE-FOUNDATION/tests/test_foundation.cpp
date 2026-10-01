@@ -48,7 +48,7 @@ int main() {
     }
     assert(disposals == 2);
     {
-        AEGP_EffectSuite4 effects{Dispose};
+        AEGP_EffectSuite5 effects{Dispose};
         AEGP_RenderSuite4 render{Dispose};
         AEGP_MemorySuite1 memory{Dispose};
         AegpEffectRefOwner e(&effects, reinterpret_cast<void*>(3));
