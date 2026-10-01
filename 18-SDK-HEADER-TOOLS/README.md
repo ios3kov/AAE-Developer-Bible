@@ -55,7 +55,7 @@ Historical compiler results remain in [VERIFICATION.md](../VERIFICATION.md) beca
 
 ## Historical “Gate 4” filenames
 
-Files such as `16-GATE4-ACCEPTANCE-RUNBOOK.md` and `17-GATE4-SDK25.6-RUN-2026-10-01.md` retain filenames for stable links/history. The former build-gate completion model is superseded.
+Files such as `16-SDK-CONTRACT-AUDIT-RUNBOOK.md` and `17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md` retain filenames for stable links/history. The former build-gate completion model is superseded.
 
 Read them as:
 
@@ -64,6 +64,6 @@ Read them as:
 
 ## Current real SDK evidence
 
-See [SDK 25.6 contract audit record](17-GATE4-SDK25.6-RUN-2026-10-01.md).
+See [SDK 25.6 contract audit record](17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md).
 
 The result supports the Bible's current native contract claims. No additional macOS/Windows compilation is required to call the documentation editorially complete.
