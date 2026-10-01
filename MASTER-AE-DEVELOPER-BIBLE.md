@@ -19780,21 +19780,173 @@ Nearby SDK macros:
 
 # Suite acquisition
 
-PICA suite имеет reference-counted acquire/release contract.
+PICA suites use a reference-counted name/version acquire/release contract.
 
-Правильный шаблон:
+The foundation helper is code/PicaSuiteRef.h.
 
-```text
-SPBasicSuite alive
-  → AcquireSuite(name, version)
-  → validate err + pointer
-  → use suite
-  → ReleaseSuite(name, version)
-```
+## Contract
 
-Не хранить suite pointer после release. Не предполагать, что newest version есть в старом AE. Версия suite — часть compatibility contract.
+~~~text
+SPBasicSuite is valid
+→ AcquireSuite(name, public version)
+→ check error
+→ check returned pointer
+→ use suite
+→ ReleaseSuite(same name, same version)
+~~~
 
-`code/PicaSuiteRef.h` автоматизирует баланс пары acquire/release, но его lifetime всё равно обязан находиться внутри host lifetime.
+A successful acquire creates a lifetime obligation.
+
+Do not use the function-table pointer after release.
+
+## Why wrap it
+
+Manual code tends to leak on paths such as:
+
+~~~text
+AcquireSuite
+→ second operation fails
+→ early return
+→ ReleaseSuite skipped
+~~~
+
+PicaSuiteRef makes the successful acquisition move-only and releases it on reset/destruction.
+
+## Helper behavior
+
+acquire:
+
+1. resets any existing suite first;
+2. rejects null SPBasicSuite or null suite name;
+3. calls AcquireSuite;
+4. requires both success error code and non-null returned pointer;
+5. stores basic suite, name, version and typed function table.
+
+reset:
+
+1. calls ReleaseSuite only when a suite is currently owned;
+2. clears all stored state;
+3. is safe to call repeatedly.
+
+Move construction/assignment transfer the owned acquisition and leave the source empty.
+
+## Important suite-name lifetime
+
+The current helper stores the suite name as a borrowed const char pointer because ReleaseSuite later needs the same name/version.
+
+Therefore the name must outlive the PicaSuiteRef.
+
+Good:
+
+~~~cpp
+static const char kMySuiteName[] = "com.example.MySuite";
+ref.acquire(basic, kMySuiteName, 1);
+~~~
+
+Also normally safe: SDK/product suite-name constants with static lifetime.
+
+Risky:
+
+~~~text
+temporary/local dynamically built character buffer
+→ acquire succeeds
+→ buffer dies
+→ destructor later calls ReleaseSuite with dangling name pointer
+~~~
+
+The helper does not copy the name.
+
+## Version policy
+
+Public suite version is part of compatibility.
+
+Do not always request the newest version and assume old AE hosts provide it.
+
+A product policy may be:
+
+~~~text
+try required version
+→ if absent, fail feature with explicit diagnostic
+~~~
+
+or, where APIs genuinely support a compatibility fallback:
+
+~~~text
+try preferred version
+→ try documented older version
+→ adapt through an explicit wrapper
+~~~
+
+Do not reinterpret an older function table as a newer struct.
+
+## Optional dependency
+
+For an optional service:
+
+~~~text
+AcquireSuite fails
+→ feature unavailable
+→ product remains usable
+~~~
+
+For a required service:
+
+~~~text
+AcquireSuite fails
+→ initialization/command fails explicitly
+→ diagnostic names suite/version
+~~~
+
+Never dereference a null table.
+
+## Threading
+
+Suite availability does not imply suite functions are thread-safe.
+
+The acquisition helper also does not grant permission to acquire/release on arbitrary worker threads.
+
+Follow the threading contract of the host/API in which SPBasicSuite is being used.
+
+## Host lifetime
+
+PicaSuiteRef stores the SPBasicSuite pointer and calls ReleaseSuite from reset/destructor.
+
+Destroy/reset it before the host invalidates SPBasicSuite.
+
+Do not put it in a process-global object whose static destructor can run after After Effects teardown.
+
+## Cleanup error boundary
+
+reset currently discards ReleaseSuite return status.
+
+That is appropriate only where cleanup failure cannot be usefully recovered at destructor time.
+
+If release failure must be logged/gated, use an explicit release path that returns the SPErr before the fallback destructor path.
+
+## Test cases
+
+The foundation test verifies:
+
+- successful acquire;
+- typed suite access;
+- move construction;
+- move assignment;
+- repeated reset;
+- exactly one release;
+- acquisition failure leaves owner empty.
+
+Add product integration tests for:
+
+- provider missing;
+- wrong version;
+- shutdown order;
+- multiple consumers;
+- repeated acquire/release;
+- any declared concurrency mode.
+
+## Verification boundary
+
+Stub tests prove local ownership mechanics only. Real suite discovery/refcount/provider lifetime must still be tested inside the target AE host.
 
 
 ---
@@ -19803,36 +19955,321 @@ SPBasicSuite alive
 
 # AEGP ownership / RAII
 
-Главная причина утечек в AEGP — не C++ heap, а host-owned handles/refs с отдельными dispose/checkin вызовами.
+The main native leak class is often not ordinary C++ heap memory. It is a host resource that requires a specific dispose, free or checkin call.
 
-## Типичные пары
+code/AegpOwners.h contains narrow move-only owners for four contracts from the current Bible baseline.
 
-- `GetNew...Stream` → `AEGP_DisposeStream`;
-- effect ref, который API требует dispose → `AEGP_DisposeEffect`;
-- `RenderAndCheckoutFrame` receipt → `AEGP_CheckinFrame`;
-- `AEGP_MemHandle` → `AEGP_FreeMemHandle`.
+## Included owners
 
-`code/AegpOwners.h` содержит move-only owners для этих четырёх случаев. Это уменьшает количество early-return leaks.
+| Owner | Stored resource | Cleanup |
+|---|---|---|
+| AegpStreamRefOwner | AEGP_StreamRefH | AEGP_DisposeStream |
+| AegpEffectRefOwner | AEGP_EffectRefH | AEGP_DisposeEffect |
+| AegpFrameReceiptOwner | AEGP_FrameReceiptH | AEGP_CheckinFrame |
+| AegpMemHandleOwner | AEGP_MemHandle | AEGP_FreeMemHandle |
 
-Не оборачивать borrowed handle в owner. Перед созданием owner всегда проверить ownership contract конкретной функции.
+Each owner also stores the suite function table required for cleanup.
+
+## Why separate classes
+
+A generic void-pointer owner hides the most important information: which host contract releases the resource.
+
+Explicit owners make the pair visible in code review.
+
+~~~text
+resource type
+↔ exact cleanup function
+~~~
+
+## Construction rule
+
+Construct an owner only after an API has successfully returned an owned resource.
+
+Conceptual:
+
+~~~cpp
+AEGP_StreamRefH raw = nullptr;
+A_Err err = /* host call creating owned stream ref */;
+
+if (!err && raw) {
+    AegpStreamRefOwner owner(stream_suite, raw);
+    // use owner.get()
+}
+~~~
+
+Do not create an owner for a borrowed handle simply because its type matches.
+
+## Move-only semantics
+
+Copy is disabled.
+
+Move transfers the raw host handle so there remains exactly one cleanup owner.
+
+~~~text
+owner A owns H
+→ move to B
+→ A empty
+→ B owns H
+→ B destructor disposes H
+~~~
+
+This is the intended protection against double release.
+
+## release
+
+release returns the raw handle and makes the owner empty.
+
+After release, responsibility moves back to the caller.
+
+Use it only for a deliberate ownership transfer.
+
+~~~text
+owner.release()
+→ caller now owns host cleanup obligation
+~~~
+
+The test explicitly releases one stream ref and manually disposes the returned raw handle to prove this transfer.
+
+## reset
+
+reset disposes/checks in the current handle and can optionally replace it with another raw handle while keeping the same suite pointer.
+
+Important: a default-constructed owner has no suite pointer. Do not call reset(newHandle) on such an object and assume it can later clean that handle.
+
+Prefer constructing with both the correct suite and owned handle.
+
+## Suite lifetime
+
+The stored suite pointer must remain valid until the owner has been reset/destroyed.
+
+This creates a strict order:
+
+~~~text
+resource owners destroyed
+→ acquired suites released
+→ host/module teardown
+~~~
+
+Not the reverse.
+
+## Error handling
+
+Current reset/destructors intentionally cast cleanup return values to void.
+
+That prevents cleanup from throwing, but it also means a failed checkin/dispose is not surfaced.
+
+For resources whose cleanup status affects correctness, add an explicit close/checkin operation that:
+
+1. performs cleanup;
+2. returns A_Err;
+3. clears ownership only according to the chosen failure policy;
+4. runs before destructor fallback.
+
+## Memory-handle locking is separate
+
+AegpMemHandleOwner owns the handle allocation. It does not model lock/unlock of the memory contents.
+
+Those are separate lifetimes:
+
+~~~text
+MemHandle owner
+  └─ lock
+      └─ temporary raw pointer
+      └─ unlock
+  └─ free handle
+~~~
+
+Never preserve the locked raw pointer after unlock or free.
+
+## Frame receipt semantics
+
+Frame receipt cleanup uses CheckinFrame. Do not treat the checked-out world/receipt as an ordinary heap object.
+
+A borrowed frame/world pointer obtained through the receipt cannot outlive the receipt contract.
+
+## Structural invalidation
+
+RAII prevents forgotten cleanup. It does not guarantee a host reference remains semantically valid after project structural mutation.
+
+Reacquire references when the relevant AEGP contract requires it.
+
+## Tests
+
+Current stub tests cover:
+
+- stream owner move assignment disposes the previous destination handle;
+- moved-from owner is empty;
+- release transfers cleanup;
+- effect ref cleanup;
+- frame receipt checkin;
+- memory handle free.
+
+Still required in product integration:
+
+- host error paths;
+- actual suite lifetime;
+- invalidation after project mutation;
+- async cancellation;
+- shutdown ordering;
+- leak diagnostics.
+
+## Verification boundary
+
+RAII proves deterministic local cleanup only when the ownership assumption and suite lifetime are correct.
 
 
 ---
 
 <!-- SOURCE: 19-NATIVE-CODE-FOUNDATION/03-UNDO-TRANSACTIONS.md -->
 
-# Undo transaction
+# Undo groups and transaction boundaries
 
-Любая пользовательская операция, меняющая project state несколькими вызовами, должна выглядеть как одна понятная undo operation, если host API для этих изменений undoable.
+AEGP undo grouping gives the user one coherent undo operation for a set of host mutations.
 
-`UndoScope`:
+It is not a database transaction and does not automatically roll back a half-completed command after an error.
 
-- открывает undo group;
-- закрывает только если start прошёл успешно;
-- не бросает exceptions;
-- не скрывает ошибку business operation.
+The foundation helper is code/UndoScope.h.
 
-Не растягивать undo scope на background/render работу и не держать его открытым через event loop.
+## AegpUndoScope behavior
+
+Constructor:
+
+~~~text
+suite present
+→ AEGP_StartUndoGroup(name)
+→ remember start error
+→ active only on A_Err_NONE
+~~~
+
+Destructor:
+
+~~~text
+active
+→ AEGP_EndUndoGroup()
+~~~
+
+If start fails, destructor does not call EndUndoGroup.
+
+The test verifies both successful and failed-start paths.
+
+## Command boundary
+
+Good structure:
+
+~~~text
+validate all possible prerequisites
+→ create UndoScope
+→ check start_error
+→ perform short user mutation
+→ scope ends
+→ return result
+~~~
+
+Validation before the first mutation reduces partial project edits.
+
+## Undo is not rollback
+
+Suppose:
+
+~~~text
+rename layer
+→ create effect
+→ third operation fails
+~~~
+
+Ending the undo group does not mean the first two operations were automatically reverted before the function returns.
+
+If the product requires all-or-nothing semantics:
+
+1. prevalidate;
+2. stage pure/external work first;
+3. perform mutations in a deliberate order;
+4. explicitly clean product-created temporary state where safe;
+5. document the remaining failure semantics.
+
+Do not claim transactionality merely because StartUndoGroup/EndUndoGroup were balanced.
+
+## Scope size
+
+Keep undo scope around the host mutation, not around unrelated long work.
+
+Bad:
+
+~~~text
+StartUndoGroup
+→ network request
+→ worker compute
+→ wait for user
+→ event loop
+→ project mutation
+→ EndUndoGroup
+~~~
+
+Better:
+
+~~~text
+external/pure work
+→ validate result
+→ short undo-scoped host mutation
+~~~
+
+## Nested ownership
+
+Pick one layer that owns the user command undo group.
+
+Low-level helpers should normally not each start their own group unless nested behavior is explicitly intended and tested.
+
+A command should appear in Undo history at the level meaningful to the artist.
+
+## Failure to start
+
+AegpUndoScope exposes start_error and active.
+
+Caller must check start_error when an undo group is required for the operation.
+
+Do not silently continue a multi-step destructive mutation after undo-group start failed unless product policy explicitly allows it.
+
+## End error limitation
+
+Current destructor discards the return value from AEGP_EndUndoGroup.
+
+This is a normal destructor-safety tradeoff but means the helper cannot report an end failure as a command result.
+
+If the target workflow requires evidence of successful EndUndoGroup, provide an explicit close method that returns A_Err, then leave the destructor as best-effort fallback.
+
+## Thread/lifecycle
+
+Undo groups belong to host project mutation workflows. Do not carry an active scope into render workers/background work.
+
+Use AEGP mutation APIs only on their documented thread/lifecycle path.
+
+## Tests
+
+Current tests prove:
+
+- successful start marks active;
+- successful active scope ends once;
+- failed start is recorded;
+- failed start does not call end;
+- null suite produces inactive scope.
+
+Product host tests still need to verify:
+
+- actual Undo menu behavior;
+- multiple host mutations appear as intended;
+- command failure behavior;
+- project state after undo/redo;
+- nested command policy if used.
+
+## Acceptance rule
+
+A user-facing multi-step command is not accepted until:
+
+- prerequisites are validated;
+- undo start failure is handled;
+- one meaningful undo entry is observed when expected;
+- undo/redo restores expected project state;
+- partial-failure behavior is documented/tested.
 
 
 ---
@@ -19841,37 +20278,302 @@ SPBasicSuite alive
 
 # Host callback ABI boundary
 
-C++ exception не должен пересечь C callback/entry point, который вызвал After Effects.
+C++ exceptions must not escape through a C callback/entry point invoked by After Effects.
 
-Граница:
+The foundation helper code/HostCallbackGuard.h provides a minimal containment boundary.
 
-```text
-AE C ABI → noexcept wrapper → C++ implementation
-```
+## Model
 
-Внутри можно использовать обычный C++, но верхний wrapper обязан поймать exception и вернуть валидный `A_Err`, выбранный проектом. `HostCallbackGuard.h` специально принимает fallback error извне и не придумывает SDK constant.
+~~~text
+After Effects C ABI
+→ noexcept wrapper
+→ C++ implementation
+→ A_Err returned to host
+~~~
+
+Inside the implementation you may use normal C++ according to project policy. At the outer host boundary, every exception path must be converted to a valid host error.
+
+## Helper behavior
+
+GuardAeHostCallback accepts:
+
+- callable;
+- fallback A_Err selected by the product.
+
+It is noexcept.
+
+Behavior:
+
+~~~text
+callable returns A_Err
+→ return it unchanged
+
+callable throws nonzero A_Err
+→ return that A_Err
+
+callable throws zero A_Err
+→ return fallback
+
+callable throws anything else
+→ return fallback
+~~~
+
+The helper deliberately does not invent one universal Adobe error constant. Different callback contexts/products may need a deliberate fallback choice.
+
+## Example
+
+~~~cpp
+extern "C" A_Err SomeHostEntry(...) {
+    return GuardAeHostCallback(
+        [&]() -> A_Err {
+            return DispatchHostCall(...);
+        },
+        kProjectChosenFallback);
+}
+~~~
+
+The exported function remains a simple ABI boundary.
+
+## Why catch-all exists
+
+Exceptions can originate from:
+
+- product code;
+- STL allocation;
+- third-party library;
+- explicit throw;
+- unexpected internal error.
+
+Letting an exception unwind through a foreign C ABI is not a safe recovery strategy.
+
+## Logging
+
+The current helper converts errors but does not log exception type/message.
+
+If diagnostics are required, log inside the product-owned C++ layer or wrap the callable with a no-throw diagnostic policy.
+
+Logging itself must not throw across the host boundary.
+
+Do not perform large synchronous logging/network work from render callbacks.
+
+## Thrown A_Err policy
+
+The helper supports code that throws A_Err, but that does not mean throwing host error integers throughout the architecture is recommended.
+
+A cleaner project may prefer:
+
+~~~text
+internal typed result/status
+→ boundary maps status to A_Err
+~~~
+
+Use thrown A_Err only if the codebase has an intentional policy.
+
+## Cleanup before conversion
+
+Exception containment does not replace ownership safety.
+
+Resources acquired before the throw still need RAII/scope cleanup.
+
+~~~text
+acquire resource owner
+→ operation throws
+→ owner destructor releases
+→ Guard maps exception
+→ host receives A_Err
+~~~
+
+This is why the callback guard and ownership helpers are designed to compose.
+
+## Do not swallow fatal process conditions blindly
+
+A catch-all handles C++ exceptions. It is not a universal recovery mechanism for arbitrary memory corruption, access violations, corrupted host state or OS fatal signals.
+
+If memory is corrupted, returning an error may not make the process safe.
+
+Treat sanitizer/crash evidence separately.
+
+## Callback-specific fallback
+
+Choose fallback based on:
+
+- callback contract;
+- whether host expects PF_Err/A_Err domain;
+- whether partial host mutation occurred;
+- whether more specific product error mapping exists.
+
+Record the project policy instead of scattering magic integers.
+
+## Test coverage
+
+tests/test_foundation.cpp verifies:
+
+- normal A_Err return passthrough;
+- std::runtime_error maps to fallback;
+- thrown nonzero A_Err is preserved;
+- thrown zero A_Err maps to fallback.
+
+Add product tests for:
+
+- allocation failure policy where feasible;
+- third-party exception;
+- callback cleanup after exception;
+- host behavior for chosen fallback.
+
+## Acceptance rule
+
+Every exported/native host callback used by product C++ must have a documented exception boundary, and no test should observe a C++ exception escaping into After Effects.
 
 
 ---
 
 <!-- SOURCE: 19-NATIVE-CODE-FOUNDATION/README.md -->
 
-# Native C++ foundation — повторно используемые безопасные куски
+# Native C++ foundation — reusable safety layer
 
-Эта папка — не ещё один sample plug-in, а маленький слой для типовых ошибок native AE разработки: suite ownership, handle cleanup, undo и exception boundary.
+This directory is not another sample plug-in. It contains small C++ helpers for recurring native After Effects failure classes:
 
-**Как использовать правильно:** graft этих файлов в ближайший официальный Adobe sample и заменить suite generations на те, которые реально есть в вашем target SDK.
+- PICA suite acquire/release;
+- AEGP resource ownership;
+- undo-group balancing;
+- C++ exception containment at host callback boundaries.
 
-## Файлы
+Use these helpers by grafting them into the closest official Adobe sample and adapting suite generations to the exact target SDK.
 
-- `code/PicaSuiteRef.h` — acquire/release одной PICA suite через `SPBasicSuite`.
-- `code/AegpOwners.h` — move-only owners для часто возвращаемых AEGP resources.
-- `code/UndoScope.h` — balanced `StartUndoGroup/EndUndoGroup` без исключений.
-- `code/HostCallbackGuard.h` — не выпускает C++ exception через host callback ABI.
+## What is included
 
-## Важное ограничение
+### code/PicaSuiteRef.h
 
-RAII работает только пока соответствующая host suite жива. Не оставлять объект, который в static destructor попытается вызвать AE после shutdown. Освобождение long-lived state выполнять из normal lifecycle/death hook **до** teardown host API.
+Move-only owner for one SPBasicSuite AcquireSuite / ReleaseSuite pair.
+
+It stores:
+
+- SPBasicSuite pointer;
+- suite name pointer;
+- public suite version;
+- acquired function-table pointer.
+
+### code/AegpOwners.h
+
+Four explicit move-only owners:
+
+- AegpStreamRefOwner;
+- AegpEffectRefOwner;
+- AegpFrameReceiptOwner;
+- AegpMemHandleOwner.
+
+They intentionally stay separate because each AE resource has a different release API.
+
+### code/UndoScope.h
+
+AegpUndoScope starts an AEGP undo group, records start failure and ends the group only if start succeeded.
+
+### code/HostCallbackGuard.h
+
+GuardAeHostCallback converts C++ exceptions into an A_Err chosen by the caller so exceptions cannot escape through the AE C ABI.
+
+## Design principles
+
+~~~text
+exact host ownership contract
+→ one narrow helper
+→ move-only lifetime
+→ no hidden host acquisition
+→ no exception from cleanup
+~~~
+
+The helpers do not attempt to build a universal AE abstraction layer.
+
+## Host lifetime remains above RAII lifetime
+
+RAII is safe only while the suite/function table used by the destructor is still valid.
+
+Bad:
+
+~~~text
+process-global static owner
+→ AE tears down suites
+→ C++ static destructor runs later
+→ destructor calls dead host function table
+~~~
+
+Good:
+
+~~~text
+host initialization
+→ acquire/create resource
+→ owner lives inside product lifecycle
+→ owner destroyed/reset
+→ release suites/host
+→ module teardown
+~~~
+
+Long-lived product state must be explicitly drained before host teardown.
+
+## Borrowed vs owned
+
+Never wrap a borrowed handle in one of these owners.
+
+Before constructing an owner, answer:
+
+1. did this API transfer ownership?;
+2. what exact matching release/checkin call is required?;
+3. on which thread/lifecycle is release legal?;
+4. can the handle be invalidated earlier by host mutation?;
+5. can cleanup fail meaningfully?
+
+RAII cannot repair a wrong ownership assumption.
+
+## Cleanup errors
+
+Current helpers intentionally discard errors returned by cleanup functions inside destructors/reset paths.
+
+That avoids throwing from destructors, but it means these helpers are inappropriate when release failure itself must become explicit acceptance evidence.
+
+For such a path, add an explicit close/checkin method that returns the host error before destruction.
+
+## Suite-generation boundary
+
+The current code names concrete suite generations from the supplied SDK baseline, for example StreamSuite6 and EffectSuite4.
+
+Do not copy those generation numbers into a different SDK blindly.
+
+The target SDK headers remain the compile-time source of truth.
+
+## Test coverage
+
+tests/test_foundation.cpp currently checks:
+
+- PICA acquire success/failure;
+- single matching release after moves/reset;
+- move-only AEGP owners;
+- release transfer;
+- four AEGP cleanup paths through stubs;
+- successful/failed/null undo start;
+- no EndUndoGroup after failed start;
+- standard exception → fallback A_Err;
+- thrown A_Err preservation;
+- zero thrown A_Err → fallback;
+- normal callback result passthrough.
+
+These are pure foundation tests with stubs. They do not prove real AE host lifetime, suite generation compatibility or thread legality.
+
+## Production checklist
+
+Before using this layer in a product:
+
+- [ ] exact SDK suite generations checked;
+- [ ] every wrapped resource confirmed owned, not borrowed;
+- [ ] suite owners destroyed before host teardown;
+- [ ] suite-name lifetime is stable;
+- [ ] release errors reviewed for whether silent cleanup is acceptable;
+- [ ] callback fallback errors chosen deliberately;
+- [ ] product logging wraps failures without throwing;
+- [ ] real host integration test exists for each used resource family.
+
+## Verification boundary
+
+The foundation tests prove local move/cleanup mechanics against stubs. Host correctness still requires compile/link plus After Effects execution on the declared platform matrix.
 
 
 ---
