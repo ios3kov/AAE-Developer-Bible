@@ -29,7 +29,7 @@ If true C-source compatibility is required, adapt the header to C-compatible int
 - validate pointer/size inputs;
 - return integer error codes; never throw through function pointers;
 - document thread/lifetime rules;
-- do not claim hot replacement unless separately implemented and host-tested.
+- do not claim hot replacement unless the product has a separately designed lifecycle and runtime evidence.
 
 Sweetie publishes a static table into `kSPRuntimeSuiteList`; it does not demonstrate generic unpublish/replacement.
 
@@ -44,17 +44,70 @@ Sweetie publishes a static table into `kSPRuntimeSuiteList`; it does not demonst
 
 Checkout demonstrates an optional dependency: missing DuckSuite does not make the whole effect fail.
 
-## Verification required before calling this working
+## Suite-name lifetime
+
+If consumer ownership helper stores the suite-name pointer until release, the name storage must remain valid for the entire acquisition.
+
+Safe:
+
+~~~text
+static suite-name literal
+→ acquire
+→ use
+→ release
+~~~
+
+Unsafe:
+
+~~~text
+temporary_string.c_str()
+→ acquire
+→ temporary destroyed
+→ later ReleaseSuite uses dangling pointer
+~~~
+
+The Bible `PicaSuiteRef` follows the first model and documents the requirement rather than copying the name.
+
+## Version evolution
+
+For incompatible ABI change:
+
+~~~text
+CoreSuite1
+→ new public version
+→ CoreSuite2
+~~~
+
+Do not silently append/reorder/change function pointers under the same public version unless provider/consumer compatibility is explicitly designed and documented.
+
+A multi-version consumer should use version-specific adapters, not cast one table layout to another.
+
+## Provider shutdown
+
+The template does not define generic hot-unpublish.
+
+A concrete product should ensure product-owned consumers/async work stop using the service before backing provider state is destroyed.
+
+PICA refcounting is not treated by Bible as proof of arbitrary module hot-unload safety.
+
+## Product validation cases
+
+If a concrete product claims these behaviors, useful runtime cases include:
 
 1. provider present/absent;
 2. wrong version;
 3. correct version;
-4. repeated acquire/release;
-5. two consumers;
-6. malformed buffer sizes;
-7. service error propagation;
-8. provider/consumer restart lifecycle;
-9. declared concurrency mode;
-10. target AE build evidence.
+4. supported version fallback;
+5. repeated acquire/release;
+6. two consumers;
+7. malformed buffer sizes;
+8. service/domain error propagation;
+9. shutdown ordering;
+10. declared concurrency mode;
+11. restart/hot-reload only if claimed.
+
+## Evidence boundary
+
+This is an ABI/source design template based on SDK 25.6 Sweetie/Checkout/PICA contracts. Bible does not claim a runtime provider/consumer result for the template.
 
 Reference sources: SDK Sweetie, Checkout, `SPBasicSuite`, `SPSuitesSuite`.
