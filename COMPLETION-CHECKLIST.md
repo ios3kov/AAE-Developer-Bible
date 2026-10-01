@@ -126,6 +126,19 @@ Checked and reconciled as one logical block:
 - Keyframer template/reference no longer treats host tests as a Bible completion requirement;
 - source-review records preserve old blob provenance and add a later consistency note instead of rewriting history.
 
+### Masks / text / markers / footage block — completed 2026-10-01
+
+Checked and reconciled as one logical block:
+
+- masks: `MaskSuite6` + `MaskOutlineSuite3`, explicit MaskRef disposal, outline StreamValue lifetime, structural invalidation and topology/index hazards;
+- text: `TextDocumentSuite1` + `StreamSuite6`, UTF-16 MemorySuite ownership, character-count semantics and static-vs-keyframed write path;
+- markers: `MarkerSuite3` + keyframe stream model, standalone marker ownership separated from stream-value payload ownership;
+- footage/import: `FootageSuite5` + Item9/Comp12/Layer9, explicit caller-owned → project-adopted transition, failure rollback and project-owned handle rules;
+- interpretation is documented as a separate undoable project mutation;
+- Footage Suite vs AEIO boundary is explicit;
+- old host-acceptance wording replaced with product-validation guidance / runtime-not-claimed evidence language;
+- source-review provenance preserved with a later consistency note rather than rewriting original findings.
+
 ## E. Recipes and reference source
 
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
