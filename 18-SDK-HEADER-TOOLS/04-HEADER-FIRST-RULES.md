@@ -1,5 +1,7 @@
 # Header-first rules
 
+> Supporting native-source reference. Canonical editorial policy: [EDITORIAL-GUIDE.md](../EDITORIAL-GUIDE.md). If wording conflicts, the Editorial Guide wins.
+
 When documentation, sample history and memory disagree, use a strict evidence order.
 
 ## Rule 1 — exact declaration comes from the build SDK
