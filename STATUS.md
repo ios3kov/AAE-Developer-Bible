@@ -1,79 +1,102 @@
 # Status
 
-**v1.1 — verified SDK syntax baseline and reproducible documentation**
+Updated: **2026-10-01**
 
-Updated: **2026-10-01**. Previously recorded native compilation baseline: **Adobe SDK 25.6, macOS arm64, C++17**. Historical compiler results are separate from the editorial/source-review milestones below.
+## Current mission
 
-## Current work — writing the Bible from the supplied SDK
+AE Developer Bible — **research-backed practical documentation for After Effects developers**.
 
-The supplied `ae25.6_61.64bit.AfterEffectsSDK` is the basis of eleven source-review records:
+Текущая работа: **писать, расширять, сверять и согласовывать Bible**. Репозиторий не должен превращаться в отдельный проект по обязательной сборке и host-QA всех демонстрационных plug-ins.
 
-1. [Effect anatomy, SmartFX and auxiliary channels](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md).
-2. [Parameters and pixels](18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md).
-3. [Memory, lifetime and MFR](18-SDK-HEADER-TOOLS/07-MEMORY-MFR-SDK25.6.md).
-4. [Registration, PiPL and AEGP lifecycle](18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md).
-5. [AEGP project and render automation](18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md).
-6. [Streams and keyframes](18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md).
-7. [Masks, text/markers and footage/import](18-SDK-HEADER-TOOLS/11-MASK-TEXT-FOOTAGE-SDK25.6.md).
-8. [AEIO and Artisan](18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md).
-9. [Native panels and BlitHook](18-SDK-HEADER-TOOLS/13-PANELS-BLITHOOK-SDK25.6.md).
-10. [PICA providers, Effect↔AEGP and legacy boundaries](18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md).
-11. [GPU, audio and Custom UI / Drawbot](18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md).
+## Current editorial state
 
-Completed editorial changes:
+Core structure covers:
 
-- [Effect anatomy](02-EFFECT-PLUGINS/01-ANATOMY.md): handler declaration, registration, lifecycle and Skeleton source.
-- [Parameters and UI](02-EFFECT-PLUGINS/02-PARAMETERS-UI.md): indexes/IDs, setup macros, animation versus interpolation, changed-param versus UI-update callbacks, controls and source discrepancies.
-- [SmartFX](02-EFFECT-PLUGINS/03-SMARTFX.md): dependency/rectangle/checkout-ID explanations, pre-render state and distinct cleanup contracts.
-- [Pixels, color and alpha](02-EFFECT-PLUGINS/06-COLOR-PIXELS.md): ARGB formats, 16-bpc range, typed access, rowbytes/origin, HDR, alpha and export boundaries.
-- [Auxiliary channels](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md): semantic types, descriptors, requested/returned datatype, raw layout and mandatory checkin.
-- [Memory, lifetime and errors](01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md): resource ownership, paired release APIs, host-managed state locks, both flatten operations, pre-render deletion, error-preserving cleanup and limits of existing helpers.
-- [MFR and thread safety](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md): exact flags and selector constraints, read-only sequence access, mutable thread-local copies, Compute Cache keys/values/receipts and waiting modes.
-- [AEGP project/render automation](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md): project/item/comp/layer handles, Undo, render queue, frame receipts, async lifetime and an open render-state recipe mismatch.
-- **Streams/properties and keyframes:** Cookbook chapters 05/06 are now aligned to SDK 25.6 `StreamSuite6` / `DynamicStreamSuite4` / `KeyframeSuite5`; expressions, dynamic hierarchy, separated dimensions, interpolation/ease and batch-keyframe ownership are documented with source limits.
-- **Masks, text/markers and footage/import:** Cookbook chapters 07–09 now use SDK 25.6 generations (`MaskSuite6`, `MaskOutlineSuite3`, `TextDocumentSuite1`, `MarkerSuite3`, `FootageSuite5`, `ItemSuite9`, `CompSuite12`, `LayerSuite9`) and document MaskRef cleanup, UTF-16 handle lifetimes, marker payload/cue-point ownership and FootageH adoption/failure cleanup.
-- **AEIO and Artisan:** import/export and custom-renderer chapters now document `AEIO_ModuleInfo`, frozen `AEIO_FunctionBlock4`, current IOIn7/IOOut6, aux-channel producer callbacks, output state, color metadata, `PR_ArtisanEntryPoints`, CanvasSuite8, PR global/instance/frame state and Artie sample-generation limits.
-- **Native panels and BlitHook:** workspace-panel identity/create/flyout/visibility contracts are now sourced from `AEGP_PanelSuite1`/Panelator; BlitHook is separated as `AEGeneral` hook protocol 3.0 with 32/64/128 pixel-buffer metadata, view coordinates and explicitly unqualified async lifetime.
-- **PICA providers and native bridges:** `SPBasicSuite` acquire/release, `SPSuitesSuite::AddSuite`, Sweetie/Checkout provider-consumer patterns, current `AEGP_EffectCallGeneric` command/time contract and historical sample/version boundaries are documented. Legacy samples are no longer treated as current ABI signatures by default.
-- **GPU, audio and Custom UI/Drawbot:** GPU capability/setup/pre-render/render/setdown and GPU-world ownership are sourced from `AE_Effect.h`, `AE_EffectGPUSuites.h` and SDK_Invert_ProcAmp; audio selectors/flags/SoundWorld/checkout are documented with the explicit limitation that the supplied archive has no bundled AUDIO_RENDER implementation; custom UI now has a dedicated event/Drawbot/async-manager chapter using Custom_ECW_UI and CCU.
-- **Scripting, panels and platform distribution:** object-model/ScriptUI chapters, CEP/UXP bridge architecture, hybrid native communication, macOS/Windows build-sign-package workflows and release/distribution gates were expanded from the public Adobe CEP/SDK guidance plus current Apple and Microsoft platform documentation. See [the dated platform source-review record](11-DISTRIBUTION/05-PLATFORM-SOURCE-REVIEW-2026-10-01.md).
-- **Testing, recipes and templates:** test evidence is now separated into unit/build/host/release layers; matrix, render correctness, MFR stress, performance and crash chapters were expanded; a new evidence/acceptance chapter defines PASS/FAIL/BLOCKED/NOT_RUN; practical recipes and reusable report/spec/release templates were aligned to the same evidence model. The CEP working template protocol field was also reconciled with the communication chapter.
-- [Registration, PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md): separate registration/dispatcher/initializer contracts, resource Kind, symbols, architectures, version domains, outflags and platform resource pipelines.
-- [AEGP lifecycle, hooks and suites](03-AEGP/01-HOOKS-SUITES.md): IDs/refcons, suite macros, callbacks and partial initialization; the existing MenuTool is reviewed, not changed or host-verified.
-- [AEGP project and render automation](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md): project graph and time, Undo versus rollback, queue states and invalidation, output settings, frame receipts, borrowed worlds, sync/async cancellation and cache boundaries.
-- AEGP navigation, recipe warnings and VERIFICATION distinguish source review from compiler/host evidence.
+- architecture and extension selection;
+- Effect / SmartFX / MFR / GPU / Custom UI / audio;
+- AEGP;
+- AEIO;
+- Artisan;
+- scripting / ScriptUI / CEP / UXP transition;
+- native panels / PICA / bridges;
+- macOS and Windows development;
+- testing / debugging / diagnostics;
+- distribution / signing / packaging;
+- recipes and templates;
+- native suite cookbook;
+- SDK header/source review;
+- reference source examples;
+- reverse-engineering atlas;
+- real-project case studies.
 
-## Latest synchronization and findings
+The current priority is a **section-by-section editorial completeness and consistency sweep**.
 
-The platform/distribution source review records the public CEP main-thread bridge contract, Adobe's dated UXP/CEP transition milestones, sample-first native build guidance, installer paths, Apple Developer ID/notarization requirements and Microsoft Authenticode tooling. It expands documentation only; no signing/notarization/installer/host result is promoted to PASS.
+## SDK 25.6 baseline
 
+The supplied Adobe After Effects SDK **25.6 build 61** anchors the native source review.
 
-The previously pending STATUS/VERIFICATION registration update was written to main in commits `a5080a132d299b8ef20888e814f3c0513365710c` and `4cd4515e605783f9255edb59cf734d0cabe0f1fd`. It reconciles chapters already present by `859b9c6c816a7cb5a360f61869d1bcf1531aede3`; it is no longer only an unapplied ZIP patch.
+Eleven source-review records cover the high-risk native areas from Effect anatomy through GPU/audio/Custom UI.
 
-The fifth review recorded the original render-queue defect: `RenderQueueRecipes.cpp` passed TRUE to an enum-status argument; TRUE=1 means UNQUEUED while QUEUED=2. The recipe has since been corrected at source level to use `AEGP_RenderItemStatus_QUEUED` and verify the state with `AEGP_GetRenderState`. Runtime queue behavior is still host-test-required; documentation CI does not turn the corrected source into an AE PASS.
+The real-header audit on 2026-10-01 records:
 
-The eleventh review records GPU/audio/custom-UI contracts and an important absence boundary: the supplied Examples tree declares audio selectors/flags but contains no bundled C/C++ effect implementation dispatching PF_Cmd_AUDIO_RENDER. It also documents the custom-UI async-manager requirement and Drawbot borrowed-vs-created resource ownership without claiming a host run.
+- **35/35 required SDK contracts present**;
+- **39/39 cookbook call-sites resolved** to expected suite generations;
+- **0 required parser diagnostics**;
+- four unrelated partial parser diagnostics retained explicitly.
 
-The tenth review records 13 SDK source hashes and clarifies two important version boundaries: old ProjDumper generic-call syntax is not the current EffectSuite4 call shape, and bundled Commando uses an initializer signature that differs from the current AEGP prototype. Sweetie/Checkout establish provider/optional-consumer patterns but do not establish generic suite hot replacement. The existing Bible SharedSuite header is documented as C++-oriented C-shaped ABI, not directly C-source-compatible.
+This establishes the **contract baseline used by the documentation**. It does not create a requirement to compile the whole repository.
 
-Earlier source findings remain in the linked records: ten-file memory/MFR review and three helper inspections; PF handle/register suite-version macro nuances; conditional threading statements; sample/comment discrepancies; 19-file registration/PiPL review and MenuTool partial-initialization limits. No original evidence has been rewritten into a host PASS.
+See [SDK tools](18-SDK-HEADER-TOOLS/README.md), [SDK source record](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md) and [real-header audit](18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md).
 
-This work remains within the agreed subject matter of [the completion plan](COMPLETION-PLAN.md). Safe-tooling Gate 2 is now closed by portable regression evidence; stages 3–4, the reuse audit, native compiler expansion and AE host gates remain open. **Native readout-adapter development remains paused; the deliverable is the Bible, not a separate testing product.** No new user AE run is requested.
+Historical filenames containing “Gate 4” are retained for stable links/history; the old build-gate completion model is superseded.
 
-**The scripting/panels communication → macOS/Windows build → distribution and testing/release-evidence blocks are written. Cross-checking reconciled the CEP command schema, corrected the render-queue enum recipe, strengthened the native generic-bridge ABI checks, and Gates 2–3 are closed with CI evidence. Gate 3A reuse audit is closed with an independent FSTR portable rerun. Gate 4 portable tooling now enforces inventory schema, parser diagnostics, required SDK 25.6 tables/functions, exact SuiteHandler generations, compiler-report identity and macOS/Windows runner syntax. Gate 4 required-contract preflight against the supplied SDK 25.6 is now PASS: 35/35 required contracts and 39/39 cookbook call-sites resolve on the source-equivalent audit snapshot. Gate 4 remains open for real macOS Clang/Xcode syntax/type acceptance on the current native source and for MSVC/Windows evidence. The Gate 4 acceptance runbook now defines the exact one-command macOS/Windows evidence flow and requires clean Git/source hashes**, while preserving the exact-SDK baseline. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
+## Major editorial work completed
 
-## Earlier baseline evidence
+- Effect lifecycle, parameter, pixel, color and SmartFX explanations.
+- Memory/ownership/threading/MFR source review.
+- AEGP lifecycle, project graph, render queue and frame-render contracts.
+- Streams/keyframes/masks/text/marker/footage cookbook alignment.
+- AEIO and Artisan architecture.
+- Native panels, PICA bridges and legacy boundaries.
+- GPU/audio/Custom UI source-review chapters.
+- Scripting/ScriptUI/CEP communication architecture.
+- macOS/Windows build, debugging, signing and packaging guidance.
+- Test/evidence/release methodology.
+- CEP protocol reconciliation.
+- Render-queue enum correction.
+- 3D Channel Extract historical classification correction.
+- FSTR Line / AE Hot Loader reuse audit.
+- Safe repository tooling where destructive behavior was possible.
 
-- Native translation units and foundation headers passed strict syntax/type checks against a locally installed Adobe SDK 25.6 in the previously recorded baseline.
-- Python tests cover incomplete parsing, missing inputs, ignored comments, conflicting tables and function-field reordering.
-- Foundation tests cover resource release, moves, acquisition failure, undo balance and callback exceptions.
-- MASTER, checksum manifest and MkDocs staging are generated by `scripts/build_docs.py`; CI validates generated documentation and builds the site.
-- The header indexer fails closed on unsupported declarations. Full real SDK indexing remains **incomplete**, not a successful SDK validation. The streams/keyframes revision corrected a documentation-version leak: `StreamSuite7` belongs to a later SDK note, while supplied 25.6 exposes `StreamSuite6`. The masks/text/footage revision similarly corrected the earlier `CompSuite13` baseline to supplied 25.6 `CompSuite12`.
+## Evidence boundary
 
-## Verification boundaries
+The Bible uses runtime evidence when it exists, but **runtime evidence is not mandatory for every source example**.
 
-Source review is not compilation. Authored Markdown fragments illustrate isolated operations or design patterns; target-platform compilation, linking and host execution of new snippets are NOT RUN. Syntax compilation does not establish PiPL correctness, host loading, pixels, operation semantics or MFR safety. No native reference binary in this edition is labelled host-verified. Windows compilation and reference-example AE host tests remain pending.
+“Source-reviewed, runtime not claimed” is a complete and valid editorial state when the text makes no runtime assertion.
 
-Previously collected native-effect research remains separately scoped in the [evidence audit](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/EVIDENCE-AUDIT-2026-09-30.md); it is not full-effect acceptance.
+Historical compiler/runtime results remain useful evidence about their snapshots, not release requirements for the documentation.
 
-See [verification commands and results](VERIFICATION.md) and [coverage matrix](FINAL-COVERAGE-AUDIT.md). Six families have reproducible exact-SDK sample workspaces; none is called host-verified until the full cycle is recorded.
+## Current editorial TODO
+
+1. Sweep every main chapter for completeness against the editorial checklist.
+2. Find underdeveloped/too-short sections and expand them.
+3. Remove stale gate/QA language left from the superseded completion model.
+4. Reconcile recipes/source examples with the latest explanatory chapters.
+5. Review dated public facts before edition freeze.
+6. Complete navigation/cross-link/provenance audit.
+7. Freeze and publish the next coherent documentation edition.
+
+## Research tracks
+
+The built-in effects atlas and project case studies remain valuable ongoing tracks.
+
+They are **appendices, not blockers**. Full reverse engineering of every bundled effect is not required before the core Bible can be editorially complete.
+
+## References
+
+- [Evidence ledger](VERIFICATION.md)
+- [Coverage matrix](FINAL-COVERAGE-AUDIT.md)
+- [Editorial completion plan](COMPLETION-PLAN.md)
+- [Editorial checklist](COMPLETION-CHECKLIST.md)
+
+No user AE action is required for the current editorial work.
