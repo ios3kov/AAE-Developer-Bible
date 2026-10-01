@@ -1,5 +1,18 @@
 # Verification — v1.1
 
+## Streams/properties and keyframes chapter review (2026-10-01)
+
+Expanded [Streams / properties / expressions](17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md) and [Keyframes](17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md) from the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md) records seven SDK file hashes, exact header/sample ranges and the reviewed Cookbook recipe blobs.
+
+The review corrected a version-mixing error in the previous Cookbook: supplied SDK 25.6 exposes `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4` and `AEGP_KeyframeSuite5`; a later `StreamSuite7` note is not the 25.6 baseline. It also records that suite struct suffixes are not numeric AcquireSuite versions (`StreamSuite6` uses version macro 11).
+
+Reviewed contracts include owned StreamRef and StreamValue lifetimes, expression MemHandle cleanup, effect parameter index 0 as the input layer, pre/post-expression sampling, expression-aware time-varying status, dynamic group/match-name operations, delete/reorder ownership, separated leader/follower behavior, keyframe count/time/value ownership, interpolation/ease/tangents/flags, batch-add transactions and Suite5 label metadata.
+
+`Easy_Cheese` and `Streamie` remain useful Adobe samples but use older suite generations (`StreamSuite2`, `KeyframeSuite3`, `DynamicStreamSuite2`). The documentation now treats them as pattern evidence rather than current-signature evidence. A concrete compatibility example is `GetStreamName`: the current StreamSuite6 returns a UTF-16 MemorySuite handle, while the old Streamie call shape used a character buffer.
+
+The existing `EffectStreamRecipes.cpp` and `KeyframeRecipes.cpp` were reviewed but not edited. Their source blobs remain `8b473f10c872aec992eb728c91444b629041c0a1` and `19d798ddd0aba617cf98a41ebd6271ddd1315624`. The static OneD recipe is intentionally more conservative than the raw `SetStreamValue` header rule because it refuses expression-driven time-varying streams. The keyframe recipe requires callers to provide a stream on which index-based keyframe APIs are legal; separated leaders need follower resolution first.
+
+**Verification level: SDK source review and documentation.** No new exact-SDK compile, loaded AEGP binary, expression/keyframe host mutation, separated-dimension test, save/reopen test, undo test or Windows host run was performed. Green documentation CI, when recorded for the resulting commit, does not upgrade these chapters to host-verified.
 ## AEGP project and render automation chapter review (2026-10-01)
 
 Expanded [AEGP project and render automation](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md) from the supplied SDK 25.6 build 61. The [fifth source-review record](18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md) records six SDK file hashes, reviewed ranges and three existing cookbook Git blobs. The source TAR SHA-256 was recalculated and matched the previously accepted archive.
