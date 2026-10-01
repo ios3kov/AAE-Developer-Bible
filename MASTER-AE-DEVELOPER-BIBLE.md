@@ -6175,46 +6175,165 @@ The source project used macOS dyld enumeration for an experiment. Treat that as 
 
 # macOS — GPU development
 
-## Principle
+Эта глава описывает platform-specific слой GPU effect development на macOS.
 
-Mac GPU backend не должен диктовать effect semantics. Один algorithm contract → CPU oracle + Mac GPU backend.
+Общая Effect/GPU lifecycle-модель находится в [GPU effects](08-MACOS/../02-EFFECT-PLUGINS/05-GPU.md). Здесь — то, что меняется именно из-за macOS, Apple Silicon, Metal, bundle layout и Xcode/toolchain.
 
-## SDK sample setup
+## Главный принцип
 
-Current After Effects GPU build guide для SDK sample указывает Boost dependency для processing kernel files и Xcode custom path `BOOST_BASE_PATH`.
+Mac GPU backend не должен определять effect semantics.
 
-Не переносить sample dependency blindly в собственную архитектуру: сначала понять, какая часть toolchain реально нужна вашему backend.
+Правильная архитектура:
+
+```text
+Effect parameter/state contract
+        ↓
+pure render intent
+   ┌────┴────┐
+   │         │
+ CPU       Metal
+oracle     backend
+```
+
+CPU и Metal могут иметь разную реализацию, но alpha policy, HDR policy, coordinate system, edge behavior, parameter meaning и ROI semantics должны быть согласованы.
+
+## Host выбирает GPU context
+
+В GPU selector path After Effects передаёт framework/device context. Не выбирайте самостоятельно «первую GPU» или отдельный global Metal device, если host уже дал нужную device identity/context.
 
 ## Apple Silicon
 
-На Apple Silicon учитывать:
-- unified memory не отменяет synchronization/correctness costs;
-- arm64 CPU reference может иметь другую floating-point performance, но semantics должны совпадать;
-- third-party GPU/native libs должны поддерживать arm64;
-- Universal release не может содержать Intel-only helper binary.
+Unified memory не означает отсутствие synchronization cost. Остаются command scheduling, resource lifetime, hazards, transient allocations и completion/wait costs.
 
-## Test matrix
+Не используйте «zero copy» как автоматический performance claim.
 
-- Apple Silicon low/mid/high GPU classes available to team;
-- 8/16/32-bpc;
-- MFR + GPU simultaneously;
-- GPU fallback to CPU;
-- sleep/wake + relaunch;
-- project reopen;
-- extreme resolution.
+## Per-device state
+
+Хорошая модель:
+
+```text
+global immutable algorithm metadata
++ per-device Metal pipelines/resources
++ per-render transient resources
+```
+
+Per-device state должен создаваться в соответствующем setup lifecycle, быть привязан к host-provided device identity и корректно уничтожаться в setdown.
+
+Не храните mutable per-frame state в одном global object, если renders могут пересекаться.
+
+## Metal resources
+
+Для product-owned Metal objects документируйте:
+
+- кто создаёт;
+- кто владеет;
+- когда освобождает;
+- можно ли reuse между frames;
+- нужен ли explicit synchronization;
+- что происходит при setup failure.
+
+Host-owned objects не уничтожаются как product-owned.
+
+## SDK sample toolchain
+
+Adobe GPU sample/toolchain может использовать дополнительные build dependencies и helper processing для shader/kernel assets.
+
+Правило: sample build plumbing — источник понимания, а не обязательная архитектура вашего продукта.
+
+Перед копированием dependency выясните, нужна ли она вашему backend, используется ли только build-time, входит ли runtime dependency в bundle и поддерживает ли architecture policy продукта.
+
+## Apple Silicon + Intel support
+
+Если продукт заявляет Universal support, main plug-in binary, nested dylibs/frameworks, helper executables и generated native libraries должны поддерживать заявленные slices.
+
+Один Intel-only helper делает Universal bundle функционально не-Universal.
+
+## CPU oracle
+
+CPU path полезно держать как correctness reference. Он должен быть deterministic, отдельно тестируемым и достаточно простым для анализа расхождений.
+
+GPU backend не должен становиться «новой математикой».
+
+## Float behavior
+
+CPU/Metal различия могут возникать из-за FMA, fast math, precision, denorm handling и order of operations. Поэтому tolerance задаётся до сравнения результатов.
+
+## ROI and origins
+
+GPU kernel не должен предполагать `origin = 0`, full-frame buffer или full-comp width. SmartFX/host может дать partial region.
+
+Coordinate transform должен учитывать host-provided origin/rect/layout.
+
+## MFR + GPU
+
+MFR и GPU — два разных concurrency layers. Проверяйте per-frame mutable state, per-device shared state, resource pools, lazy initialization и cleanup.
+
+Плохая модель — один mutable global Metal buffer, используемый всеми frames.
+
+## Failure policy
+
+Продумайте:
+
+- pipeline creation failure;
+- unsupported device/framework;
+- allocation failure;
+- partial setup;
+- render cancellation;
+- setdown after failed setup.
+
+Если product обещает CPU fallback, backend failure должен чисто выключить GPU path и перейти на CPU, а не генерировать dialog/error каждый frame.
+
+## Debugging
+
+Разделяйте setup, dispatch, correctness и lifetime failures. Wrong output и crash — разные классы проблемы.
 
 ## Profiling
 
-Разделять:
-- host checkout cost;
-- buffer preparation;
-- GPU dispatch;
-- synchronization;
-- kernel time;
-- copy/readback;
-- teardown.
+Профилируйте отдельно:
 
-Если «GPU effect медленный», без такой декомпозиции вывод бессмысленен.
+- CPU parameter/preparation;
+- host checkout;
+- allocation;
+- command encoding;
+- dispatch;
+- kernel execution;
+- synchronization;
+- readback;
+- cleanup.
+
+«GPU slow» без этой декомпозиции ничего не объясняет.
+
+## Cold vs warm behavior
+
+Отделяйте first render, pipeline/kernel warmup, steady-state render, project reopen и app relaunch.
+
+## Product test matrix
+
+Для продукта полезно покрыть 8/16/32-bpc paths, alpha, HDR, odd/tiny/large sizes, non-zero origins/ROI, MFR on/off, GPU unavailable fallback и repeated renders.
+
+Bible описывает эту матрицу; сама Bible не обязана запускать её для source examples.
+
+## Performance architecture
+
+Избегайте shader recompilation every frame, unconditional intermediate allocations, immediate blocking waits и full-frame work при маленьком ROI.
+
+Но не оптимизируйте до определения correctness contract.
+
+## Release packaging
+
+GPU assets/resources должны попасть в bundle, иметь controlled relative paths и не изменяться после signing.
+
+## Related chapters
+
+- [GPU effects](08-MACOS/../02-EFFECT-PLUGINS/05-GPU.md)
+- [Universal binary](08-MACOS/02-UNIVERSAL-BINARY.md)
+- [macOS debugging](08-MACOS/03-DEBUGGING.md)
+- [Signing/notarization](08-MACOS/05-SIGNING-NOTARIZATION.md)
+- [CPU/GPU equivalence recipe](08-MACOS/../12-RECIPES/04-CPU-GPU-EQUIVALENCE.md)
+
+## Evidence boundary
+
+GPU lifecycle/contracts в core chapter SDK/source-reviewed. Эта глава — platform architecture/testing guidance; конкретный Mac GPU runtime result заявляется только если есть отдельная запись evidence.
 
 
 ---
@@ -7645,47 +7764,151 @@ This chapter documents a Windows debugging method. Bible does not need to build 
 
 <!-- SOURCE: 09-WINDOWS/04-GPU.md -->
 
-# Windows — GPU
+# Windows — GPU development
 
-Current AE GPU SDK build guide для sample предусматривает Boost, CUDA SDK и DirectX Shader Compiler.
+Эта глава описывает Windows-specific слой GPU effect development. Общая lifecycle-модель — в [GPU effects](09-WINDOWS/../02-EFFECT-PLUGINS/05-GPU.md).
 
-## CUDA
+## Главный принцип
 
-Adobe guide рекомендует CUDA Driver API как наиболее устойчивый к будущим driver versions path.
-
-Если Runtime API необходим:
-- static linking runtime может снизить external runtime mismatch;
-- dynamic runtime требует контролировать DLL availability/version.
-
-Нельзя просто надеяться на CUDA DLL, случайно поставляемую текущим AE build.
-
-## DirectX
-
-Current guide указывает:
-- DXC dependency for sample/toolchain;
-- DirectX assets могут генерироваться рядом с binary и должны попасть в deployment;
-- effect должен заявить DirectX rendering support flag;
-- PiPL должен быть синхронизирован с capability;
-- без флага host может уйти на CPU path.
-
-## Multi-backend architecture
+Математический contract должен быть backend-independent:
 
 ```text
-RenderCore interface
-  ├── CPU
-  ├── CUDA
-  └── DirectX
+Render intent / parameter model
+       ├── CPU
+       ├── CUDA
+       └── DirectX
 ```
 
-Selection logic отдельно от mathematical algorithm.
+Backend selection — отдельный слой. CPU/CUDA/DirectX не должны иметь разные alpha/HDR/edge semantics.
 
-## GPU failure policy
+## Host framework/device context
 
-Если GPU backend init/compile/device step неуспешен:
-- fail gracefully;
-- CPU fallback, если продукт его обещает;
-- один понятный diagnostic, а не dialog на каждый frame;
-- не оставлять partially initialized global state.
+Если AE передаёт framework/device context, используйте его как source of device identity. Не создавайте скрытую GPU selection policy, расходящуюся с host scheduling.
+
+## CUDA dependency policy
+
+Решите явно:
+
+- Driver API vs Runtime API;
+- static vs dynamic runtime where applicable;
+- driver/device capability;
+- failure/fallback behavior.
+
+Нельзя зависеть от CUDA DLL только потому, что она случайно присутствует на development machine.
+
+## CUDA Driver API
+
+Driver API может уменьшить зависимость от конкретной user-space runtime DLL distribution, но не отменяет driver compatibility, device capability и error handling.
+
+## CUDA Runtime API
+
+Если используете Runtime API, зафиксируйте linkage, required DLL/runtime, installer ownership, version и search path.
+
+Не позволяйте Windows DLL search случайно подхватить несовместимую библиотеку чужого продукта.
+
+## DirectX backend
+
+DirectX path может включать shader source, generated shader binary, DXC build dependency и runtime assets.
+
+Generated assets должны входить в release package и находиться через controlled path.
+
+## Capability declarations
+
+Effect flags/PiPL должны соответствовать реально поддерживаемому backend path. Нельзя объявить DirectX support и не иметь рабочего resource/shader path.
+
+## Per-device state
+
+Используйте device-specific pipeline/context/resources и render-local transient state. Не храните один global mutable backend object для всех devices/frames.
+
+## Multi-backend selection
+
+Selection logic должна быть observable:
+
+```text
+host framework == DirectX → DirectX backend
+host framework == CUDA    → CUDA backend
+unsupported               → CPU fallback or explicit unsupported
+```
+
+## CPU fallback
+
+Если fallback заявлен, он должен сохранять effect semantics и parameter meaning. Причину fallback полезно логировать один раз, а не каждый frame.
+
+## GPU diversity
+
+Windows GPU landscape неоднороден: vendor, driver branch, integrated/discrete GPU, laptop switching, remote/virtual environment.
+
+«Работает на нашей NVIDIA» не равно общему support claim.
+
+## Driver failures
+
+Классифицируйте unsupported API, driver regression, shader load failure, allocation failure, device lost/reset, timeout и invalid resource state.
+
+## Architecture
+
+x64 и ARM64 требуют полной native dependency chain. ARM64 main `.aex` с x64-only DLL всё равно не является ARM64-ready продуктом.
+
+## Shader/kernel packaging
+
+Не полагайтесь на current working directory, developer absolute path или source-tree layout.
+
+## Debugging CUDA
+
+Разделяйте host-side C++ crash, driver error, kernel launch error, kernel memory bug, synchronization issue и numerical mismatch.
+
+## Debugging DirectX
+
+Разделяйте shader/asset, device/resource creation, command recording, synchronization, state transitions и numerical output.
+
+## MFR + GPU
+
+MFR усиливает race risks в product-owned shared state: global caches, per-device pools, temp buffers, lazy initialization и logging.
+
+GPU driver thread-safety не делает product state thread-safe.
+
+## Correctness
+
+CPU ↔ backend сравнивается по заранее определённой tolerance: float, alpha, HDR, edges, ROI, odd sizes, repeated runs.
+
+## Performance
+
+Измеряйте CPU prepare, upload/copy, compile/load, dispatch, kernel/shader, sync, readback и allocations отдельно.
+
+## Failure policy
+
+```text
+backend setup fails
+→ cleanup partial resources
+→ mark backend unavailable
+→ CPU fallback if promised
+→ actionable diagnostic
+```
+
+Half-initialized global state оставлять нельзя.
+
+## Deployment
+
+Release package должен включать main `.aex`, required DLLs, shader/kernel assets, helper binaries и notices/licenses.
+
+Для каждой DLL должен быть owner/update/uninstall policy.
+
+## Product matrix
+
+Полезно различать Win x64 + CUDA, Win x64 + DirectX, Win ARM64 + supported backend и CPU fallback.
+
+Bible документирует метод и не обязана строить каждый backend artifact.
+
+## Related chapters
+
+- [GPU effects](09-WINDOWS/../02-EFFECT-PLUGINS/05-GPU.md)
+- [Windows debugging](09-WINDOWS/03-DEBUGGING.md)
+- [Windows ARM64](09-WINDOWS/02-ARM64.md)
+- [CPU/GPU equivalence recipe](09-WINDOWS/../12-RECIPES/04-CPU-GPU-EQUIVALENCE.md)
+- [Distribution](09-WINDOWS/../11-DISTRIBUTION/README.md)
+
+## Evidence boundary
+
+Это platform architecture/release guidance. Runtime support конкретной GPU/backend/device комбинации принадлежит evidence конкретного продукта.
 
 
 ---
