@@ -119,6 +119,17 @@ Completed as one source/cookbook/reference block:
 - `KeyframeSuite5` retained as SDK 25.6 keyframe baseline;
 - source examples, Keyframer references and product-validation language aligned with `EDITORIAL-GUIDE.md`.
 
+### Masks / text / markers / footage
+
+Completed as one ownership/import block:
+
+- MaskRef/outline stream/value ownership and structural invalidation reconciled;
+- TextDocument and UTF-16 MemorySuite lifetimes clarified;
+- Marker stream timing, payload ownership and standalone marker ownership separated;
+- Footage caller-owned → project-adopted transition and failure rollback made explicit;
+- Footage Suite versus AEIO responsibility boundary made explicit;
+- product validation wording aligned with `EDITORIAL-GUIDE.md`.
+
 ## Current editorial TODO
 
 1. Sweep every main chapter for completeness against the editorial checklist.
