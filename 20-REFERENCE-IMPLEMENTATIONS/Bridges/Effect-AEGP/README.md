@@ -81,7 +81,7 @@ Keep separate:
 
 This makes diagnostics distinguish target missing from command rejected.
 
-## Tests
+## Product validation cases
 
 - target effect missing;
 - target removed/reordered;
@@ -94,6 +94,20 @@ This makes diagnostics distinguish target missing from command rejected.
 - save/reopen when persistent state involved;
 - stale-cache check;
 - cleanup on call error.
+
+## Target-ref freshness
+
+Resolve the current target effect for each semantic command whenever project edits may have invalidated an older ref.
+
+Do not keep one `AEGP_EffectRefH` in long-lived UI/background state and assume it survives effect removal/reorder/project changes.
+
+## Protocol evolution
+
+A new message version must preserve explicit size/version validation.
+
+Do not reinterpret a V1 message buffer as a larger V2 without checking the caller-provided size first.
+
+Reserved/tail fields should have defined defaults so compatible additive evolution remains possible.
 
 ## Verification boundary
 
