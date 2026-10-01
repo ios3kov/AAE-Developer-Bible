@@ -3,7 +3,7 @@
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Public header in supplied SDK:** `AE_Hook.h`, hook protocol major/minor **3.0**.
 **Bundled sample:** `GP/EMP` (External Monitor Preview).
-**Verification level:** SDK source-reviewed; no new display-hook host run.
+**Evidence level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
 
 BlitHook получает pixel buffer в момент, когда After Effects передаёт изображение display/monitoring pipeline. Это legacy/general-hook integration path, а не Effect/AEGP/AEIO/Artisan callback.
 
@@ -173,23 +173,255 @@ Not appropriate as primary mechanism for:
 
 Use Render Suite/aerender/AEIO/Effect/Artisan according to actual task.
 
-## 14. Host acceptance matrix
+## 14. Borrowed buffer lifetime
+
+The callback receives a host pixel buffer pointer.
+
+Without an explicit ownership/lifetime guarantee beyond the callback:
+
+~~~text
+BlitHook receives pixels
+→ inspect/copy synchronously
+→ return
+→ original host pointer is no longer product-owned state
+~~~
+
+Do not place the raw host `pixelsPV` pointer into a worker queue.
+
+If downstream processing needs the frame after return, copy into product-owned staging memory before the callback ends.
+
+## 15. Staging buffer design
+
+For an external monitor/streamer, use a bounded staging model:
+
+~~~text
+BlitHook
+→ validate metadata
+→ acquire/reuse product staging slot
+→ bounded row-aware copy
+→ enqueue product-owned frame descriptor
+→ return immediately
+→ worker/IPC consumes copy
+~~~
+
+Frame descriptor should contain copied metadata, not borrowed pointers:
+
+- width/height;
+- pixel format/depth;
+- copied row layout;
+- view origin/rect;
+- timestamp/generation if product defines one;
+- product-owned buffer handle/index.
+
+## 16. Backpressure
+
+Display pipeline must not grow an unbounded queue.
+
+Choose product policy explicitly:
+
+- drop newest;
+- drop oldest;
+- keep latest only;
+- bounded wait with strict latency budget.
+
+For preview/monitoring, keeping the latest frame is often more useful than preserving every stale frame, but this is product policy, not an Adobe guarantee.
+
+Record dropped-frame counters so performance failures are visible.
+
+## 17. Row copy discipline
+
+Copy rows using source `row_bytesL` and explicit pixel metadata.
+
+Do not assume:
+
+~~~text
+source row bytes == width * packed pixel size
+~~~
+
+If product staging uses tightly packed rows, copy each source row into the product layout deliberately.
+
+Validate arithmetic before allocation:
+
+- width/height;
+- row bytes;
+- plane/channel bytes;
+- total copy size;
+- integer overflow.
+
+## 18. Blank frame semantics
+
+`pix_bufP0 == NULL` means blank frame.
+
+A product must define what blank means downstream:
+
+- clear external monitor;
+- publish explicit blank-frame message;
+- drop previous frame and show black;
+- keep last frame only if product UX explicitly chooses that behavior.
+
+Do not accidentally reuse the previous pixels because no new buffer arrived.
+
+## 19. View coordinates
+
+Copied pixels and display placement are separate data.
+
+A worker/consumer that ignores:
+
+- full frame size;
+- buffer origin;
+- visible view rectangle
+
+can place a correct pixel block at the wrong location.
+
+Preserve the coordinate metadata with the staged frame when downstream display depends on it.
+
+## 20. Color/display boundary
+
+BlitHook observes the display pipeline.
+
+Therefore downstream consumer must not infer:
+
+- scene-linear values;
+- pre-display color;
+- exact Effect world semantics;
+- encoded file values.
+
+If product requires color-managed external monitoring, define the intended display/color contract explicitly and qualify it against the actual host/display path.
+
+Do not use BlitHook as a golden pixel oracle for effect math by default.
+
+## 21. Synchronous path
+
+For a simple/safe implementation:
+
+~~~text
+callback
+→ validate
+→ bounded copy/cheap consume
+→ return success
+~~~
+
+This keeps ownership obvious.
+
+Expensive encode/network/GPU processing happens after the product owns a copy.
+
+## 22. Asynchronous protocol boundary
+
+The header exposes asynchronous flag + receipt + completion callback, but the supplied sample does not establish the complete pointer/receipt timing model.
+
+Bible therefore does not invent it.
+
+If a concrete product implements asynchronous completion, its design must be derived from verified protocol details and explicitly define:
+
+- which data must be copied;
+- receipt lifetime;
+- completion exactly-once behavior;
+- cancel/shutdown interaction;
+- callback-after-shutdown prevention.
+
+Until qualified, prefer the synchronous-copy model.
+
+## 23. Worker / IPC ownership
+
+After staging:
+
+~~~text
+product owns frame copy
+→ worker or helper owns/borrows according to product protocol
+→ release slot/buffer after consumer completion/drop
+~~~
+
+Cross-process transport passes copied bytes/shared-memory ownership metadata, never AE process pointers.
+
+## 24. Shutdown / death hook
+
+Recommended order:
+
+~~~text
+mark shutting_down
+→ stop accepting/enqueueing new product work
+→ wake/cancel worker/transport
+→ prevent late UI/IPC callbacks into AE
+→ drain/drop queued product-owned frames by policy
+→ join/stop worker with bounded policy
+→ free staging buffers
+→ return from death hook
+~~~
+
+Death hook is `void`; do not throw.
+
+Do not wait indefinitely for remote/network consumers during AE shutdown.
+
+## 25. Reentrancy and state
+
+Keep callback state minimal:
+
+- atomic/locked shutdown flag;
+- bounded queue;
+- product-owned buffer pool;
+- counters/diagnostics.
+
+Do not traverse/mutate AE project from the blit callback.
+
+Do not hold a global product mutex while calling opaque host APIs elsewhere if worker/panel paths can re-enter.
+
+## 26. Performance budget
+
+A display hook has a latency budget.
+
+Measure:
+
+- callback copy time;
+- staging allocation/reuse;
+- queue contention;
+- dropped frames;
+- consumer latency;
+- preview FPS with hook disabled/enabled.
+
+A functionally correct hook that blocks display playback is not a useful monitor architecture.
+
+## 27. Product validation guidance
+
+If a concrete BlitHook product claims these behaviors, useful runtime cases include:
 
 - callback registration/load;
 - blank-frame null buffer;
 - 32/64/128 depth;
-- ARGB/BGRA handling;
+- ARGB/BGRA handling for the supported host versions;
 - non-tight rowbytes;
-- region origin/view rect;
+- view origin/rect;
 - rendering/non-rendering flags;
-- repeated preview playback;
-- scrub/cache hits;
-- external consumer backpressure;
-- app shutdown;
-- async path only if implemented from verified contract;
-- macOS + Windows.
+- repeated playback/scrub/cache hits;
+- queue saturation/drop policy;
+- consumer disconnect;
+- shutdown with pending frames;
+- macOS + Windows where claimed;
+- async path only when based on qualified protocol details.
 
-Measure preview FPS/latency with hook enabled and disabled. A display hook that is correct but causes dropped frames is not production-ready.
+Measure preview latency/FPS and dropped-frame behavior.
+
+These establish product support evidence. Bible remains SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED unless a separate runtime record exists.
+
+## 28. Anti-patterns
+
+Avoid:
+
+- enqueueing raw `pixelsPV` for later use;
+- assuming tight RGBA rows;
+- treating null buffer as “reuse previous frame” accidentally;
+- blocking network/video encode inside hook;
+- unbounded frame queues;
+- treating rendering flag as final-render guarantee;
+- using BlitHook for deterministic offline render/export;
+- inventing async pointer lifetime from the existence of the async flag.
+
+## Related chapters
+
+- [Host call flows](02-HOST-CALL-FLOWS.md)
+- [Threading boundaries](../15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
+- [Data ownership](../15-COMMUNICATION/09-DATA-OWNERSHIP.md)
+- [Performance architecture](../01-ARCHITECTURE/05-PERFORMANCE-ARCHITECTURE.md)
+- [Render frames](../17-NATIVE-SUITE-COOKBOOK/10-RENDER-FRAMES.md)
 
 ## Source record
 
