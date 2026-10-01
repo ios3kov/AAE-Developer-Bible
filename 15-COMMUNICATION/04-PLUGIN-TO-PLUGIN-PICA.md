@@ -136,4 +136,4 @@ protocol/result error
 - AE restart;
 - заявленный concurrency mode.
 
-Шаблон: [pica-shared-suite](../16-WORKING-TEMPLATES/pica-shared-suite/).
+Шаблон: [pica-shared-suite](../16-WORKING-TEMPLATES/pica-shared-suite/README.md).
