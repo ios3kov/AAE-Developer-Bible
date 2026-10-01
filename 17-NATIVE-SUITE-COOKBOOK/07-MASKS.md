@@ -2,7 +2,7 @@
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Suites in that SDK:** `AEGP_MaskSuite6`, `AEGP_MaskOutlineSuite3`, `AEGP_StreamSuite6`, `AEGP_KeyframeSuite5`, `AEGP_DynamicStreamSuite4`.
-**Verification level:** SDK source-reviewed; host mutation/render tests remain pending.
+**Evidence level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
 
 Mask в AEGP состоит из двух уровней: metadata самого mask object и animatable streams (outline/opacity/feather/expansion). Не пытайтесь хранить всю маску как один C++ объект с одним lifetime.
 
@@ -159,9 +159,9 @@ Suite3 отдельно имеет get/set/create/delete feather points. Feather
 
 Это source finding, не измеренная утечка в host. Новая production-реализация должна следовать current header и проверяться leak/lifecycle test-ом.
 
-## 11. Host acceptance matrix
+## 11. Product validation guidance
 
-Минимальные реальные тесты:
+Если конкретный product заявляет runtime support для mask editing, полезно проверить:
 
 - layer без masks / с несколькими masks;
 - create + undo/redo;
@@ -176,7 +176,65 @@ Suite3 отдельно имеет get/set/create/delete feather points. Feather
 - save/reopen;
 - repeated execution + leak diagnostics.
 
-До этого глава имеет уровень SDK source review, не host-verified.
+Это product runtime evidence. Для Bible глава завершена на уровне SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED, если отдельного runtime record нет.
+
+## 12. Recommended mask workflow
+
+Для команды create/edit mask:
+
+~~~text
+resolve fresh LayerH
+→ query current mask count / target identity
+→ StartUndoGroup for semantic user command
+→ GetLayerMaskByIndex or CreateNewMask
+→ treat MaskRefH as caller-disposable reference
+→ get outline/opacity/feather/expansion streams as needed
+→ inspect stream type/keyframe/expression policy
+→ mutate metadata and/or stream values
+→ dispose StreamValue
+→ dispose StreamRef
+→ dispose MaskRef
+→ EndUndoGroup
+→ re-query after structural changes
+~~~
+
+Не храните mask index как долговременный ID: create/delete/reorder меняют positional meaning.
+
+Если product использует mask ID, документируйте scope его стабильности отдельно и не обещайте save/reopen/import guarantees, которых header не даёт.
+
+## 13. Failure and invalidation cases
+
+Обработайте отдельно:
+
+- layer удалён;
+- mask index устарел;
+- mask удалён после получения ref;
+- outline stream unavailable/changed;
+- stream animated/expression-driven, а command рассчитан на static value;
+- vertex/feather indices сдвинулись после structural edit;
+- cleanup stream value/ref/mask ref вернул ошибку;
+- undo start/end failure;
+- mixed command частично изменил metadata и geometry.
+
+После vertex create/delete заново считывайте topology перед дальнейшими index-based edits.
+
+## 14. Anti-patterns
+
+Не делайте:
+
+- `DeleteMaskFromLayer` вместо `DisposeMask`;
+- один raw `AEGP_MaskRefH` в долгоживущем UI model;
+- outline pointer после `DisposeStreamValue`;
+- blind `SetStreamValue` на animated/expression-driven outline;
+- reuse старых vertex/feather indices после structural edit;
+- копирование старых Projector suite generations как current 25.6 API.
+
+## Related chapters
+
+- [Streams / properties](05-STREAMS-PROPERTIES.md)
+- [Keyframes](06-KEYFRAMES.md)
+- [Lifetime / threading](14-LIFETIME-THREADING.md)
+- [Undo / memory / persistence](12-MEMORY-UNDO-PERSISTENCE.md)
 
 ## Source record
 
