@@ -161,22 +161,170 @@ Published suite лучше, когда нужен повторяемый сер�
 
 Для единичной команды конкретному экземпляру effect может быть уместнее [AEGP → Effect generic call](../15-COMMUNICATION/03-AEGP-TO-EFFECT.md).
 
-## 10. Что проверять в собственном provider/consumer
+## 10. Provider state model
 
-Минимальная матрица:
+Separate:
 
-1. provider отсутствует;
-2. нужная version отсутствует;
-3. supported version присутствует;
-4. два consumers одновременно acquire/release;
-5. consumer ошибается после acquire — release всё равно происходит;
-6. provider возвращает ошибку функции;
-7. неправильный input size/version;
-8. повторный запуск AE;
-9. заявленный concurrency mode;
-10. shutdown при живых/освобождённых acquisitions.
+~~~text
+published function-table lifetime
+≠ provider service-state lifetime
+≠ consumer acquisition lifetime
+≠ per-request/per-call state
+~~~
 
-Пока эта матрица не выполнена в AE, source review остаётся source review.
+The table address must remain valid for legitimate acquisitions.
+
+Service state used by functions must also remain valid for any call the provider still accepts.
+
+Do not publish a table that forwards into an object scheduled for destruction while consumers can still call it.
+
+## 11. Suite-name lifetime
+
+`SPBasicSuite::AcquireSuite/ReleaseSuite` use suite name + public version as identity.
+
+If a RAII helper stores the `const char*` name so it can release later, that string must outlive the acquisition.
+
+Safe patterns:
+
+- compile-time/static suite-name literal;
+- product-owned stable string storage whose lifetime exceeds the acquisition.
+
+Unsafe pattern:
+
+~~~text
+temporary std::string.c_str()
+→ acquire
+→ temporary destroyed
+→ RAII destructor later calls ReleaseSuite with dangling name pointer
+~~~
+
+The Bible `PicaSuiteRef` intentionally documents this requirement rather than copying the suite name internally.
+
+## 12. Version negotiation
+
+Do not implement negotiation as:
+
+~~~text
+Acquire latest arbitrary integer
+→ cast whatever returned
+~~~
+
+Define supported public versions explicitly.
+
+Example:
+
+~~~text
+try v2
+→ if unavailable and product supports fallback: try v1
+→ adapt through version-specific wrapper
+→ never cast v1 table to v2 struct
+~~~
+
+A consumer supporting multiple versions should normalize them behind an internal product interface.
+
+## 13. Provider shutdown
+
+Do not infer a generic hot-unpublish protocol from PICA reference counting.
+
+Conservative provider shutdown model:
+
+~~~text
+stop accepting new product work
+→ prevent product-owned async callbacks from entering service
+→ ensure product consumers release their acquisitions
+→ destroy service state only after no valid product call can reach it
+→ unload provider/module according to actual host lifecycle
+~~~
+
+If the host/provider architecture does not expose a safe unload/unpublish mechanism, design for process/host lifetime rather than inventing hot replacement.
+
+## 14. Optional dependency discovery
+
+For optional service, acquire-on-use is often safer than assuming startup order.
+
+Possible policy:
+
+~~~text
+feature invoked
+→ try AcquireSuite
+→ unavailable: feature unavailable message
+→ available: use within bounded owner
+→ ReleaseSuite
+~~~
+
+If acquisition is expensive/frequent, cache a balanced acquisition only when its lifetime and shutdown ordering are explicit.
+
+## 15. Provider API evolution
+
+A new public version should be considered when changing:
+
+- table layout/order;
+- function signature/calling convention;
+- input/output struct layout;
+- ownership rules;
+- thread rules;
+- error semantics that callers must interpret;
+- required behavior.
+
+Do not use an internal version field as substitute for public ABI version.
+
+For compatible additive evolution, define compatibility in writing; do not assume “added at end” is automatically safe for every compiler/consumer.
+
+## 16. Error model
+
+Separate:
+
+1. **acquisition error** — provider/version unavailable;
+2. **service transport/ABI error** — malformed size/version/null pointer;
+3. **domain result** — request valid but operation cannot be performed;
+4. **cleanup/release error** — acquisition owner could not cleanly release.
+
+Do not collapse all four into one generic `-1` if callers need recovery/diagnostics.
+
+## 17. Product validation guidance
+
+If a concrete provider/consumer product claims these behaviors, useful runtime cases include:
+
+1. provider absent;
+2. wrong version;
+3. supported version;
+4. optional fallback;
+5. two consumers acquire/release;
+6. consumer early-return still releases;
+7. provider function/domain error;
+8. malformed size/version;
+9. declared concurrency mode;
+10. product shutdown with acquisitions released in the intended order;
+11. restart/reload behavior only if the product claims it.
+
+These are product runtime/support cases. Bible remains SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED unless a separate runtime record exists.
+
+## 18. Anti-patterns
+
+Avoid:
+
+- table pointer cached after `ReleaseSuite`;
+- dangling suite-name pointer in RAII owner;
+- provider function table backed by temporary/local storage;
+- C++ STL/classes/exceptions in public ABI;
+- one mutable global service object with unspecified thread model;
+- assuming refcount alone makes arbitrary module unload safe;
+- publishing incompatible table under the same public version;
+- using PICA as a hidden render-dependency channel.
+
+## 19. Recommended service workflow
+
+~~~text
+define stable name + public version
+→ define C-shaped table and data structs
+→ define ownership/thread/error contract
+→ publish table from stable storage
+→ consumer acquires exact supported version
+→ validate every size/version input
+→ execute bounded call
+→ release acquisition on every path
+→ shut down product state only after product borrowers are gone
+~~~
 
 ## Связанные материалы
 
