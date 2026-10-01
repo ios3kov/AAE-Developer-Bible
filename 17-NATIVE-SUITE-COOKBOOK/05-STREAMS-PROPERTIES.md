@@ -203,9 +203,9 @@ Header 25.6 прямо говорит:
 
 Это особенно важно в рекурсивном dynamic traversal и при чтении complex stream values.
 
-## 11. Что проверять в host
+## 11. Product validation guidance
 
-До статуса host-verified нужны отдельные сценарии:
+Если конкретный product заявляет runtime support для этих операций, полезно проверить:
 
 - static property без expression;
 - property с keyframes;
@@ -218,7 +218,46 @@ Header 25.6 прямо говорит:
 - save/reopen и повторное разрешение property;
 - error cleanup и отсутствие leaked refs/values.
 
-Source review подтверждает API-контракт, но не подтверждает, что наш cookbook binary загрузился и выполнил эти операции в After Effects.
+Source review подтверждает API-контракт. Bible не заявляет собственный host-observed результат для cookbook recipe; product runtime evidence добавляется только там, где продукт делает соответствующий support claim.
+
+## 12. Recommended operation workflow
+
+For a stream/property mutation:
+
+~~~text
+resolve fresh layer/effect/property context
+→ obtain owned StreamRefH
+→ inspect grouping/type/dimensionality
+→ decide static value vs keyframe path
+→ choose pre/post-expression semantics
+→ perform mutation in host-safe/undo context
+→ dispose StreamValue/MemHandle/StreamRef with their own APIs
+→ re-query after structural edits
+~~~
+
+For long-lived UI/application state, store stable product identity and re-resolve the stream at command time rather than caching `AEGP_StreamRefH`.
+
+## 13. Failure modes
+
+Handle explicitly:
+
+- property/effect disappeared;
+- stream type differs from expectation;
+- dynamic hierarchy changed;
+- expression makes static-write policy invalid;
+- separated-dimension leader requires follower resolution;
+- structural mutation invalidated refs/indices;
+- value acquisition succeeded but later mutation failed;
+- cleanup/dispose returned an error.
+
+Do not collapse all failures into “property not found”.
+
+## Related chapters
+
+- [Effects](04-EFFECTS.md)
+- [Keyframes](06-KEYFRAMES.md)
+- [Lifetime/threading](14-LIFETIME-THREADING.md)
+- [Keyframer integration](../14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md)
 
 ## Source record
 
