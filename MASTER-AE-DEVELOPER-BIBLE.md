@@ -5771,20 +5771,91 @@ The current Bible CI validates documentation and existing portable tests. This c
 
 # macOS — native SDK validation
 
-Перед Xcode build прогонять header-derived validation из `18-SDK-HEADER-TOOLS/`.
+Header-derived validation is the first native preflight, not the final Mac validation.
 
-```bash
+## Run
+
+~~~bash
 cd 18-SDK-HEADER-TOOLS
 ./run-macos.sh "/path/to/After Effects SDK/Examples/Headers"
-```
+~~~
 
-PASS означает только:
+Use the exact SDK intended for the candidate build.
 
-- headers распарсились;
-- inventory создан;
-- suite symbols в наших cookbook C++ recipes существуют в указанном SDK.
+## What PASS means
 
-После этого обязательны Xcode compile/link и запуск plug-in внутри целевого After Effects. Signing/notarization проверяются отдельным release pipeline.
+A successful header-tool run means only the checks implemented by the tool passed, such as:
+
+- supported headers were parsed;
+- inventory was generated;
+- cookbook/reference suite symbols were found according to parser rules.
+
+It does not prove complete header coverage.
+
+The indexer fails closed on unsupported declaration shapes, and full exact-SDK indexing remains a separate coverage concern.
+
+## What PASS does not mean
+
+It does not prove:
+
+- C++ source compiles;
+- resources/PiPL compile;
+- link succeeds;
+- arm64/x86_64 slices exist;
+- nested dependencies are correct;
+- bundle loads in AE;
+- pixels are correct;
+- MFR/GPU are safe;
+- code signing is valid;
+- notarization passes.
+
+Do not promote this preflight into host verification.
+
+## Required next gates
+
+~~~text
+header preflight
+→ Xcode compile
+→ resource/PiPL build
+→ link
+→ architecture/dependency inspection
+→ development sign
+→ AE load/operation tests
+→ release sign/package/notarize
+→ quarantined clean-install test
+~~~
+
+Only run gates relevant to the current development/release stage, but keep their evidence classes separate.
+
+## Artifact identity
+
+Record with validation:
+
+- SDK version/build;
+- tool Git SHA;
+- inventory hash/path;
+- plug-in source Git SHA;
+- Xcode/Clang version;
+- target architecture.
+
+## SDK upgrade
+
+When changing SDK, generate/diff inventory before accepting compiler fixes.
+
+See 18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md.
+
+## Failure handling
+
+If header tool fails:
+
+1. determine whether it found a real product/reference mismatch or an unsupported parser declaration;
+2. inspect the exact header;
+3. improve tool coverage only when the parser can do so deterministically;
+4. never add a permissive guess just to turn CI green.
+
+## Verification boundary
+
+The Bible has historical macOS arm64 syntax/type evidence for parts of the repository. This file does not upgrade any reference implementation to linked/signed/host-verified status.
 
 
 ---
@@ -6864,20 +6935,87 @@ The repository's current CI primarily covers documentation/portable checks. The 
 
 # Windows — native SDK validation
 
-Перед Visual Studio build прогонять header-derived validation из `18-SDK-HEADER-TOOLS/`.
+Header-derived validation is the first Windows native preflight.
 
-```powershell
+It is not Windows build or host evidence.
+
+## Run
+
+~~~powershell
 cd 18-SDK-HEADER-TOOLS
 .\run-windows.ps1 "C:\path\to\After Effects SDK\Examples\Headers"
-```
+~~~
 
-PASS означает только:
+Use the exact candidate SDK.
 
-- headers распарсились;
-- inventory создан;
-- suite symbols в наших cookbook C++ recipes существуют в указанном SDK.
+## What PASS means
 
-После этого обязательны MSVC compile/link и запуск plug-in внутри целевого After Effects. Code signing проверяется отдельным release pipeline.
+A successful run means only the tool's implemented checks passed, for example:
+
+- supported header declarations parsed;
+- inventory generated;
+- cookbook/reference suite symbols resolved against that inventory.
+
+The parser is deliberately conservative; unsupported declarations are not silently guessed.
+
+## What PASS does not mean
+
+It does not prove:
+
+- MSVC compilation;
+- PiPL/resource generation;
+- link;
+- x64/ARM64 architecture correctness;
+- dependency/runtime availability;
+- Authenticode;
+- installer behavior;
+- AE discovery/load;
+- render/project semantics;
+- MFR/GPU safety.
+
+## Required next gates
+
+~~~text
+header preflight
+→ MSVC compile
+→ Windows resource/PiPL step
+→ link
+→ PE/import/architecture inspection
+→ native tests
+→ AE development install/load
+→ Authenticode
+→ installer
+→ clean VM install/host smoke
+~~~
+
+Keep PDB and exact binary hashes with the evidence.
+
+## Windows architecture
+
+If ARM64 is claimed, run a real ARM64 build/dependency/host lane.
+
+A successful x64 header preflight says nothing about an ARM64 third-party library or native AE host.
+
+## SDK upgrade
+
+Diff candidate inventory against the previously accepted SDK and manually inspect high-risk changes before fixing call sites.
+
+See 18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md.
+
+## Failure handling
+
+If the tool cannot parse a declaration:
+
+- inspect the header;
+- classify parser limitation vs actual SDK change;
+- improve parser deterministically if needed;
+- leave unresolved facts unresolved.
+
+Do not cast or suppress a native mismatch to keep the validation lane green.
+
+## Verification boundary
+
+Windows compiler/link/sign/install/host acceptance remains separate. A header PASS must never be copied into the compatibility matrix as Windows PASS.
 
 
 ---
@@ -19567,41 +19705,167 @@ ExtendScript и CEP/UXP находятся **выше** native ABI. Они об�
 
 <!-- SOURCE: 18-SDK-HEADER-TOOLS/02-INVENTORY-WORKFLOW.md -->
 
-# Workflow: от SDK headers до рабочего recipe
+# Workflow — from exact SDK headers to a usable recipe
 
-1. Установить/распаковать целевой AE SDK.
-2. Запустить `ae_sdk_inventory.py` на Include/Headers.
-3. Зафиксировать JSON inventory рядом с build artifacts конкретной версии SDK.
-4. Запустить `verify_recipe_symbols.py` на C++ recipes.
-5. Если обновился SDK — построить новый JSON и прогнать `diff_sdk_inventory.py`.
-6. Любой changed signature вручную проверить в header и ближайшем Adobe sample.
-7. Только после этого обновлять compatibility matrix и минимальную AE version.
+The purpose of the header tools is to tie native documentation and recipes to one identifiable SDK instead of a floating memory of the API.
 
-## Почему это важнее статического справочника
+They are a preflight layer, not a substitute for the compiler or After Effects.
 
-Suite API versioned. Даже если имя функции не меняется, меняется generation таблицы, availability host version и иногда соседние types/macros. Статический Markdown неизбежно стареет; header-derived inventory привязан к реальной сборке.
+## 1. Pin the SDK
+
+Record:
+
+- Adobe SDK version/build;
+- archive/source identity;
+- local path used for the run;
+- relevant header/sample hashes where the review requires them.
+
+Do not label an SDK directory only latest.
+
+## 2. Generate inventory
+
+Run ae_sdk_inventory.py over the target Headers/Include tree according to the tool README.
+
+Output should be stored with the validation evidence for that SDK.
+
+The inventory is useful for:
+
+- suite names/generations;
+- declared functions;
+- constants/macros/types supported by the parser;
+- comparing two SDK snapshots.
+
+## 3. Treat parser limits as limits
+
+The inventory parser intentionally fails closed for declaration shapes it does not support.
+
+Therefore:
+
+~~~text
+symbol present in inventory
+≠ complete ABI proof
+
+symbol absent from incomplete parse
+≠ automatically removed from Adobe SDK
+~~~
+
+When a result is ambiguous, open the exact header manually.
+
+Do not teach the parser to guess through unsupported C/C++ syntax just to make a run green.
+
+## 4. Verify recipe symbols
+
+Run verify_recipe_symbols.py against the inventory and the cookbook/reference code.
+
+This catches useful mistakes:
+
+- wrong suite generation name;
+- misspelled function;
+- recipe copied from another SDK generation;
+- documentation drift.
+
+It does not establish:
+
+- exact parameter types;
+- calling convention;
+- ownership;
+- runtime suite availability;
+- semantic correctness.
+
+The compiler and host still own those gates.
+
+## 5. Review the nearest official sample
+
+For any nontrivial API family:
+
+~~~text
+header declaration
+→ header comments
+→ closest SDK sample
+→ Bible recipe
+~~~
+
+If a bundled sample is historical and differs from the current header, record the version boundary instead of forcing one to look like the other.
+
+## 6. Compile
+
+After symbol preflight:
+
+- compile Debug;
+- compile release configuration;
+- build resources/PiPL;
+- link final native artifact.
+
+Compiler/type errors outrank prose examples.
+
+Do not cast an old function table into a new suite struct to silence the compiler.
+
+## 7. Run inside the host
+
+Compilation cannot prove:
+
+- loader/PiPL correctness;
+- suite runtime availability;
+- project mutation semantics;
+- render pixels;
+- MFR safety;
+- GPU lifecycle;
+- panel behavior.
+
+Use named host fixtures and preserve environment/artifact identity.
+
+## 8. New SDK upgrade workflow
+
+When the SDK changes:
+
+~~~text
+old inventory
++ new inventory
+→ diff_sdk_inventory.py
+→ classify changes
+→ inspect changed headers/samples
+→ compile
+→ host regression
+→ compatibility decision
+~~~
+
+Do not begin by blindly fixing compiler errors until the contract diff is understood.
+
+## 9. Evidence package
+
+For an accepted SDK baseline retain:
+
+- SDK identity;
+- inventory JSON;
+- diff vs previous supported SDK;
+- parser/tool version or Git SHA;
+- recipe-symbol result;
+- compiler result;
+- host result;
+- known parser gaps;
+- known docs/sample discrepancies.
 
 ## CI gate
 
-Минимальный native CI gate:
+A mature native lane:
 
-```text
-inventory generation
-  ↓
-recipe symbol verification
-  ↓
-compile Debug
-  ↓
-compile Release
-  ↓
-unit tests pure C++
-  ↓
-package/sign
-  ↓
-host smoke test (отдельный runner/машина с AE)
-```
+~~~text
+header inventory
+→ recipe symbol preflight
+→ native compile/resources/link
+→ pure tests
+→ package
+→ host smoke
+→ release signing/package gates
+~~~
 
-Host smoke test нельзя заменить компиляцией: PiPL, loader, missing suites, signing, MFR и GPU ошибки проявляются уже внутри AE.
+The current repository does not claim that every stage is automated on every platform.
+
+## Stop rule
+
+If header tooling disagrees with compiler/manual header inspection, stop and investigate. Do not edit evidence to force agreement.
+
+See [SDK diff policy](18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md) and [header-first rules](18-SDK-HEADER-TOOLS/04-HEADER-FIRST-RULES.md).
 
 
 ---
@@ -19610,25 +19874,181 @@ Host smoke test нельзя заменить компиляцией: PiPL, load
 
 # SDK diff policy
 
-При переходе на новый SDK не начинать с «починим compiler errors». Сначала сравнить native contracts.
+An SDK upgrade is a compatibility change, not merely a compiler upgrade.
 
-## Классификация diff
+Before changing product calls, compare the native contracts.
 
-- **Added table/function** — можно использовать только после поднятия minimum host requirement или runtime feature gate.
-- **Removed table/function** — blocker; нужен compatibility path.
-- **Changed signature** — high risk; проверить ownership, constness, enum/type width и lifecycle.
-- **Only version macro changed** — проверить release notes и host availability.
-- **No header diff** — всё равно прогнать host regression: поведение AE может измениться без ABI change.
+## Inputs
 
-## Release rule
+Pin:
 
-Новая SDK версия не считается принятой в проект, пока не обновлены:
+- old accepted SDK inventory/identity;
+- candidate SDK inventory/identity;
+- diff tool version;
+- target host versions;
+- product native API families in use.
 
-- generated inventory;
-- SDK diff artifact;
-- build matrix;
-- host smoke results;
-- compatibility statement.
+Do not diff two directories of unknown provenance.
+
+## Diff classes
+
+### Added suite/table/function
+
+Potential opportunity.
+
+Before use:
+
+- determine first host/runtime availability;
+- decide whether minimum supported AE moves;
+- or add runtime feature detection/fallback;
+- compile against the candidate SDK;
+- test absence on the oldest supported host.
+
+Header availability does not imply an older host provides the suite.
+
+### Removed suite/table/function
+
+Potential blocker.
+
+Investigate:
+
+- replacement API;
+- supported older suite generation;
+- compatibility adapter;
+- product feature removal.
+
+Do not keep calling a removed function through an unsafe cast.
+
+### Changed signature
+
+High risk.
+
+Review:
+
+- parameter types;
+- pointer constness;
+- enum/width;
+- time units;
+- ownership transfer;
+- callback lifetime;
+- thread contract;
+- return/error semantics.
+
+A one-token type change can represent a major lifetime rule change.
+
+### Struct/table layout changed
+
+Treat as ABI-sensitive.
+
+Do not reinterpret a smaller/older table as a newer table.
+
+If the API provides size/version fields, validate before accessing extended members.
+
+### Macro/version constant changed
+
+Check:
+
+- whether it is compile-only metadata;
+- whether host behavior changed;
+- release notes;
+- sample changes;
+- PiPL/capability implications.
+
+Do not assume a version-macro bump is cosmetic.
+
+### Header unchanged
+
+Still run host regression.
+
+AE behavior, loader policy, GPU drivers, OS security and implementation semantics can change without a public C header diff.
+
+## Samples can move independently
+
+Classify sample diffs separately:
+
+- updated API usage;
+- project/build-system changes;
+- resource/PiPL change;
+- platform/signing change;
+- utility helper change.
+
+A sample can lag behind a header or intentionally preserve compatibility.
+
+Record the discrepancy instead of silently choosing whichever is convenient.
+
+## Product impact table
+
+For each relevant diff, record:
+
+| Change | Product call site | Risk | Compatibility decision | Test |
+|---|---|---|---|---|
+| | | | | |
+
+This makes the SDK upgrade reviewable.
+
+## Minimum-host decision
+
+A new API can lead to three valid strategies:
+
+1. raise minimum supported AE;
+2. runtime-gate the new capability;
+3. keep using the older supported API.
+
+Choose explicitly.
+
+Do not accidentally raise the minimum host by linking documentation/source against a newer suite generation.
+
+## Compiler matrix
+
+Compile at least:
+
+- primary macOS architecture;
+- additional macOS architecture if shipped;
+- Windows x64;
+- Windows ARM64 if shipped.
+
+Each dependency must exist for the same targets.
+
+A candidate SDK is not accepted from one-platform syntax success.
+
+## Host regression
+
+Run the capability matrix affected by the SDK change.
+
+Examples:
+
+- render/pixel changes → golden render;
+- MFR flags/sequence changes → concurrency stress;
+- GPU suite change → setup/render/setdown + equivalence;
+- AEGP stream change → project/keyframe fixtures;
+- panel/build change → load/open/restart;
+- installer path/signing guidance → clean install.
+
+## Acceptance package
+
+New SDK version is accepted only when the project has:
+
+- candidate inventory;
+- diff artifact;
+- manual review for high-risk changes;
+- updated compile matrix;
+- affected host regressions;
+- updated support statement;
+- recorded unresolved differences.
+
+## Rollback
+
+Keep the previous accepted SDK/toolchain recipe until the candidate baseline is accepted.
+
+Do not make every branch depend on a new SDK before its compatibility work is complete.
+
+## Stop rule
+
+Compiler errors are evidence, not instructions to cast harder.
+
+When the new SDK exposes a changed contract, change the adapter/architecture deliberately or stay on the previous supported API.
+
+See [header-first rules](18-SDK-HEADER-TOOLS/04-HEADER-FIRST-RULES.md).
 
 
 ---
@@ -19637,13 +20057,181 @@ Host smoke test нельзя заменить компиляцией: PiPL, load
 
 # Header-first rules
 
-1. Exact function name/signature → **build SDK header**.
-2. Ownership/lifecycle → header comments + official sample + guide.
-3. Host availability → suite/version macro + release notes + runtime acquisition test.
-4. Public HTML guide полезен для контекста, но найденные расхождения фиксируются в `14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md`.
-5. Никогда не «исправлять» вызов так, чтобы он совпал с HTML, если compiler/header говорит обратное.
-6. Никогда не кастовать неподходящую suite generation только ради компиляции.
-7. Если `AcquireSuite` не дал нужную version — graceful fallback или понятная ошибка, но не dereference `nullptr`.
+When documentation, sample history and memory disagree, use a strict evidence order.
+
+## Rule 1 — exact declaration comes from the build SDK
+
+For:
+
+- function signature;
+- struct layout;
+- suite generation;
+- typedef;
+- macro/constant used by the compiler;
+
+the exact target SDK header is the compile-time source of truth.
+
+Do not rewrite a call to match a web page when the exact supported SDK header says otherwise.
+
+## Rule 2 — ownership needs more than a prototype
+
+A prototype rarely describes the whole lifetime.
+
+Determine ownership from:
+
+~~~text
+header comments
++ paired acquire/dispose/checkin APIs
++ official sample usage
++ public guide
++ host test
+~~~
+
+Write down whether a returned object is:
+
+- borrowed;
+- owned;
+- locked view;
+- checkout requiring checkin;
+- host reference requiring dispose;
+- valid only inside callback.
+
+## Rule 3 — runtime availability is separate from compile availability
+
+A suite can exist in headers while an older target host does not provide it.
+
+Runtime code must:
+
+- request the exact public suite version;
+- handle acquisition failure;
+- use fallback when intentionally supported;
+- report a clear compatibility error otherwise.
+
+Never dereference a null table.
+
+## Rule 4 — current header outranks historical sample for ABI
+
+Samples are essential for workflow/lifecycle, but a bundled sample may preserve old syntax or compatibility.
+
+If sample and current header differ:
+
+1. record both;
+2. identify likely version boundary;
+3. compile against current header;
+4. do not silently publish old signature as current.
+
+The Bible already records examples of legacy/current AEGP differences.
+
+## Rule 5 — public guide provides context, not a cast license
+
+HTML documentation is useful for:
+
+- design explanation;
+- lifecycle;
+- feature introduction;
+- platform guidance.
+
+If it conflicts with exact build headers, record an erratum/version note.
+
+Do not cast a function pointer or suite table solely to reproduce guide syntax.
+
+## Rule 6 — suite generations are types, not labels
+
+Suite version changes can change:
+
+- table layout;
+- function signatures;
+- semantics;
+- ownership;
+- availability.
+
+Never reinterpret SuiteN as SuiteN+1 because the first members look similar.
+
+## Rule 7 — size/version before tail fields
+
+For versioned product messages and host structs that expose size/version:
+
+~~~text
+validate base size
+→ validate supported version
+→ validate total length
+→ only then access optional tail
+~~~
+
+This rule prevents old/new ABI reads from running past a smaller object.
+
+## Rule 8 — integer/enum width matters
+
+Do not replace enum parameters with bool/int just because constants compile.
+
+Check the exact typedef and semantic values.
+
+The existing render-queue source review contains a concrete warning where TRUE numerically maps to a different enum state than the intended QUEUED value.
+
+## Rule 9 — constness is a contract clue
+
+A new const qualifier can indicate changed mutation expectations.
+
+Do not cast const away before understanding why the API changed.
+
+MFR-era sequence-data changes are an example of lifetime/thread semantics becoming stricter.
+
+## Rule 10 — compiler success is not host proof
+
+Headers/compiler establish type compatibility.
+
+They do not prove:
+
+- suite is available in target AE;
+- PiPL loads;
+- output pixels are correct;
+- callback order assumption is valid;
+- ownership is correct;
+- thread safety;
+- installer/signing.
+
+Every public capability still needs host evidence.
+
+## Rule 11 — missing evidence stays unknown
+
+If:
+
+- parser cannot understand declaration;
+- sample is absent;
+- documentation is ambiguous;
+- host run is not available;
+
+label the fact unresolved/NOT RUN.
+
+Do not fill the gap from memory and present it as verified.
+
+## Rule 12 — preserve provenance
+
+When a Bible chapter states an exact SDK fact, preserve enough provenance to recover:
+
+- SDK version/build;
+- header path;
+- sample path if used;
+- source hash in formal review records where appropriate;
+- date of public-doc review.
+
+This is what makes future SDK diffs possible.
+
+## Practical decision table
+
+| Question | Primary source |
+|---|---|
+| exact function signature | target SDK header |
+| function-table generation | target SDK header |
+| ownership/lifetime | header comments + sample + guide |
+| introduction/deprecation | release notes/guide + runtime check |
+| how Adobe wires a project | exact SDK sample |
+| whether product supports it | product compile + host evidence |
+| current platform signing/install policy | current platform documentation |
+
+## Stop rule
+
+Never make code compile by weakening a native contract you have not understood.
 
 
 ---
