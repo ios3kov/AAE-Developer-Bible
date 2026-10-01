@@ -151,6 +151,19 @@ class CheckNativeTests(unittest.TestCase):
             self.assertEqual(failed[0]["returncode"], 9)
             self.assertIn("fixture failure", failed[0]["stderr_tail"])
 
+    def test_clean_source_identity_gate(self):
+        self.assertIsNone(
+            check_native.source_identity_error({"git_sha": "abc", "dirty": False})
+        )
+        self.assertIn(
+            "Git SHA",
+            check_native.source_identity_error({"git_sha": None, "dirty": False}),
+        )
+        self.assertIn(
+            "dirty",
+            check_native.source_identity_error({"git_sha": "abc", "dirty": True}),
+        )
+
     def test_empty_source_tree_fails_closed(self):
         with tempfile.TemporaryDirectory() as td:
             with self.assertRaises(ValueError):
