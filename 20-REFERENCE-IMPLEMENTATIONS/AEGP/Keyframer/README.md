@@ -78,7 +78,9 @@ Test failure after:
 
 Every owned stream/batch/resource still needs its matching cleanup path.
 
-## Required host tests
+## Product validation cases
+
+If a concrete product claims these operations, useful cases include:
 
 - empty project/no target;
 - valid scalar property;
