@@ -16247,6 +16247,7 @@ The supplied `ae25.6_61.64bit.AfterEffectsSDK` is the basis of ten source-review
 7. [Masks, text/markers and footage/import](18-SDK-HEADER-TOOLS/11-MASK-TEXT-FOOTAGE-SDK25.6.md).
 8. [AEIO and Artisan](18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md).
 9. [Native panels and BlitHook](18-SDK-HEADER-TOOLS/13-PANELS-BLITHOOK-SDK25.6.md).
+10. [PICA providers, Effect↔AEGP and legacy boundaries](18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md).
 
 Completed editorial changes:
 
@@ -16262,6 +16263,7 @@ Completed editorial changes:
 - **Masks, text/markers and footage/import:** Cookbook chapters 07–09 now use SDK 25.6 generations (`MaskSuite6`, `MaskOutlineSuite3`, `TextDocumentSuite1`, `MarkerSuite3`, `FootageSuite5`, `ItemSuite9`, `CompSuite12`, `LayerSuite9`) and document MaskRef cleanup, UTF-16 handle lifetimes, marker payload/cue-point ownership and FootageH adoption/failure cleanup.
 - **AEIO and Artisan:** import/export and custom-renderer chapters now document `AEIO_ModuleInfo`, frozen `AEIO_FunctionBlock4`, current IOIn7/IOOut6, aux-channel producer callbacks, output state, color metadata, `PR_ArtisanEntryPoints`, CanvasSuite8, PR global/instance/frame state and Artie sample-generation limits.
 - **Native panels and BlitHook:** workspace-panel identity/create/flyout/visibility contracts are now sourced from `AEGP_PanelSuite1`/Panelator; BlitHook is separated as `AEGeneral` hook protocol 3.0 with 32/64/128 pixel-buffer metadata, view coordinates and explicitly unqualified async lifetime.
+- **PICA providers and native bridges:** `SPBasicSuite` acquire/release, `SPSuitesSuite::AddSuite`, Sweetie/Checkout provider-consumer patterns, current `AEGP_EffectCallGeneric` command/time contract and historical sample/version boundaries are documented. Legacy samples are no longer treated as current ABI signatures by default.
 - [Registration, PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md): separate registration/dispatcher/initializer contracts, resource Kind, symbols, architectures, version domains, outflags and platform resource pipelines.
 - [AEGP lifecycle, hooks and suites](03-AEGP/01-HOOKS-SUITES.md): IDs/refcons, suite macros, callbacks and partial initialization; the existing MenuTool is reviewed, not changed or host-verified.
 - [AEGP project and render automation](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md): project graph and time, Undo versus rollback, queue states and invalidation, output settings, frame receipts, borrowed worlds, sync/async cancellation and cache boundaries.
@@ -16273,11 +16275,13 @@ The previously pending STATUS/VERIFICATION registration update was written to ma
 
 The fifth review records six SDK file hashes and reviews three existing cookbook recipes. It identifies a concrete open source finding: `RenderQueueRecipes.cpp` passes TRUE to an enum-status argument; with TRUE=1 that means UNQUEUED, not QUEUED=2. The chapter and [recipe README](17-NATIVE-SUITE-COOKBOOK/code/README.md) now warn about it. The C++ implementation is unchanged; a code correction and behavioral checks remain required. Documentation CI must not be used to close this finding.
 
+The tenth review records 13 SDK source hashes and clarifies two important version boundaries: old ProjDumper generic-call syntax is not the current EffectSuite4 call shape, and bundled Commando uses an initializer signature that differs from the current AEGP prototype. Sweetie/Checkout establish provider/optional-consumer patterns but do not establish generic suite hot replacement. The existing Bible SharedSuite header is documented as C++-oriented C-shaped ABI, not directly C-source-compatible.
+
 Earlier source findings remain in the linked records: ten-file memory/MFR review and three helper inspections; PF handle/register suite-version macro nuances; conditional threading statements; sample/comment discrepancies; 19-file registration/PiPL review and MenuTool partial-initialization limits. No original evidence has been rewritten into a host PASS.
 
 This is documentation and SDK source-review work within the agreed subject matter of [the completion plan](COMPLETION-PLAN.md). It does not complete stages 3–4 or bypass outstanding safety, reuse-audit, compiler and host gates. **Native readout-adapter development remains paused; the deliverable is the Bible, not a separate testing product.** No new user AE run is requested.
 
-**Next editorial block: shared PICA suite providers and remaining legacy/native boundaries**, after panels/BlitHook. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
+**Next editorial block: GPU, audio and Custom UI/Drawbot**, using the supplied 25.6 headers and samples. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
 
 ## Earlier baseline evidence
 
@@ -16301,6 +16305,16 @@ See [verification commands and results](VERIFICATION.md) and [coverage matrix](F
 <!-- SOURCE: VERIFICATION.md -->
 
 # Verification — v1.1
+
+## PICA providers, Effect↔AEGP and legacy-boundary chapter review (2026-10-01)
+
+Expanded [PICA suites](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md), [AEGP → Effect](15-COMMUNICATION/03-AEGP-TO-EFFECT.md), [Plug-in → Plug-in PICA](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md), [legacy/native boundaries](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) and the two existing bridge-template READMEs from the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md) records 13 SDK/source hashes and exact ranges.
+
+Reviewed contracts include SPBasic public-version acquire/release reference counting; SPSuites public/internal version separation and AddSuite publication; Sweetie’s static DuckSuite provider; Checkout’s optional acquire/use/release consumer; current EffectSuite4 generic-call command/time arguments; PF_Cmd_COMPLETELY_GENERAL dispatch; and the old ProjDumper/Shifter workflow. The review also records that bundled Commando’s initializer signature differs from the current AEGP_PluginInitFuncPrototype and therefore must not be copied as the 25.6 reference signature.
+
+Source limits are explicit: Sweetie does not demonstrate generic suite unpublish/hot replacement; suite refcount does not prove thread safety; the current Bible SharedSuite header is C++-oriented despite its C-shaped ABI; old bundled sample suite generations remain pattern evidence rather than current signatures.
+
+**Verification level: SDK source review and documentation.** The SDK TAR SHA-256 was recalculated and matched the accepted archive. No new provider/consumer host load, wrong-version acquisition run, suite unload/reload test, generic call, layer-time host test, concurrency stress, exact-SDK compile of the Bible bridge templates or Windows host run was performed. Gate 4/6/7 remain open.
 
 ## Native panels and BlitHook chapter review (2026-10-01)
 
