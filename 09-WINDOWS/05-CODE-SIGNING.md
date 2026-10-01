@@ -111,4 +111,4 @@ Do not weaken signing/security to chase reputation behavior.
 
 ## Verification boundary
 
-This chapter follows current Microsoft SignTool/AuthentiCode guidance. The Bible has not yet signed and host-tested all Windows reference artifacts; the Windows release gate remains open.
+This chapter follows current Microsoft SignTool/AuthentiCode guidance. This chapter documents the Windows signing workflow. Bible does not claim that its reference source has been shipped as signed Windows artifacts, and such binaries are not required for editorial completion.
