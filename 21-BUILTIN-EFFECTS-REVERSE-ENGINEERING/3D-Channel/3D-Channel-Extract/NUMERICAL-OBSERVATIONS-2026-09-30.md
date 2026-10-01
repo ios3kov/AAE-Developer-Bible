@@ -142,7 +142,7 @@ The following scoped claims now have numerical user-run evidence: baseline respo
 
 Still OPEN: edge-specific AA and DPTH/DPAA tracing; negative/HDR and non-finite edge inputs; missing-channel and datatype-mismatch behavior; source/bit-depth UI rules; remaining auxiliary channels and ID boundaries; transparency/ROI; raw frame exports and loaded binary identity; CPU/GPU/MFR; independent-implementation equivalence.
 
-**Gate 8 and complete plug-in acceptance are not closed.** The result is a substantial numerical milestone, not a substitute for the remaining gates in [the runtime protocol](RUNTIME-ACCEPTANCE-MACOS-AE25.6.md).
+**Complete plug-in research is not finished.** The atlas is an ongoing appendix and does not block core Bible editorial readiness. The result is a substantial numerical milestone, not a substitute for the remaining gates in [the runtime protocol](RUNTIME-ACCEPTANCE-MACOS-AE25.6.md).
 
 ## Reproduce the central comparisons from the original report
 
