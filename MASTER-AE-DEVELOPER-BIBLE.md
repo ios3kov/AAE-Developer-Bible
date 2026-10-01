@@ -10573,45 +10573,135 @@ For release evidence, see [Testing strategy](12-RECIPES/../10-TESTING/README.md)
 
 ## Summary
 
-One sentence.
+One sentence describing the observable failure.
+
+## Impact
+
+- severity:
+- user workflow blocked:
+- data/project corruption risk:
+- crash/hang:
+- workaround:
+
+## Artifact identity
+
+- plug-in version:
+- internal build:
+- git SHA if internal:
+- binary SHA-256:
+- installer/package version:
+- panel/native protocol version if relevant:
 
 ## Environment
 
-- Plug-in version/build:
-- Git SHA if internal:
 - After Effects version/build:
-- OS version:
+- AE Beta/GA:
+- OS version/build:
 - CPU architecture:
 - CPU:
 - GPU:
 - GPU driver:
+- RAM:
 - MFR on/off:
 - GPU backend:
 - project bit depth:
+- render mode: preview / render queue / aerender
+- install path:
 
 ## Reproduction
+
+Preconditions:
+
+1.
+2.
+
+Steps:
 
 1.
 2.
 3.
 
-Frequency: always / often / rare.
+Frequency:
+
+- [ ] always
+- [ ] often
+- [ ] rare
+- [ ] happened once
+
+Approximate rate if known:
 
 ## Expected
 
+State the measurable/observable expected behavior.
+
 ## Actual
+
+State the exact observed behavior.
+
+## First failing version
+
+- last known good:
+- first known bad:
+- unknown:
+
+## Isolation
+
+- [ ] reproduces after AE restart
+- [ ] reproduces in minimal project
+- [ ] reproduces with MFR off
+- [ ] reproduces with GPU off
+- [ ] reproduces after cache purge
+- [ ] reproduces after clean plug-in reinstall
+- [ ] compared with known-good/Adobe sample where relevant
+
+Result of isolation:
 
 ## Artifacts
 
-- project:
+- minimal project:
 - source media:
-- rendered frame:
-- log:
-- crash report/dump:
+- rendered output:
+- golden/diff report:
+- plug-in log:
+- AE log:
+- macOS .ips / Windows dump:
+- thread sample if hang:
+- installer log:
+- screenshot/video:
+- symbol archive reference:
 
-## Regression
+## Crash/hang
 
-Last known good version:
+If crash:
+
+- crashing module:
+- top symbolized frames:
+- exception/code:
+- dSYM/PDB match confirmed: yes/no
+
+If hang:
+
+- timeout duration:
+- thread dump/sample attached: yes/no
+- last known operation/request ID:
+
+## Privacy
+
+- project/media safe to share: yes/no
+- redactions required:
+- dump contains sensitive data warning acknowledged:
+
+## Investigation notes
+
+Facts only. Separate observed evidence from hypotheses.
+
+## Resolution
+
+- root cause:
+- fix commit:
+- regression test:
+- affected versions:
+- release containing fix:
 
 
 ---
@@ -10620,11 +10710,94 @@ Last known good version:
 
 # Compatibility matrix template
 
-| AE version | macOS arm64 | macOS x86_64 | Windows x64 | Windows ARM64 | CPU render | GPU render | MFR | Notes |
-|---|---|---|---|---|---|---|---|---|
-| 25.x | | | | | | | | |
-| 26.x | | | | | | | | |
-| 27.x Beta | lab | lab | lab | lab | | | | never claim production from beta only |
+## Product artifact
+
+- product version:
+- build:
+- git SHA:
+- binary/package hashes:
+- AE SDK:
+- protocol/schema versions:
+
+## Status vocabulary
+
+Use:
+
+- PASS — required test executed and passed;
+- FAIL — executed and failed;
+- BLOCKED — named dependency/environment unavailable;
+- NOT_RUN — required but not executed;
+- LAB — exploratory/beta observation only.
+
+Do not use a blank cell to mean both unsupported and untested.
+
+## Host/platform matrix
+
+| AE exact version/build | OS exact version | CPU arch | Install/load | CPU render | GPU backend | MFR | Save/reopen | Installer | Status/evidence |
+|---|---|---|---|---|---|---|---|---|---|
+| | macOS | arm64 | | | | | | | |
+| | macOS | x86_64 | | | | | | | |
+| | Windows | x64 | | | | | | | |
+| | Windows | ARM64 | | | | | | | |
+
+Add rows for every claimed AE/OS combination.
+
+## Bit depth matrix
+
+| Environment ID | 8-bpc | 16-bpc | 32-bpc | Alpha | HDR | Evidence |
+|---|---|---|---|---|---|---|
+| | | | | | | |
+
+## Feature matrix
+
+| Environment ID | SmartFX ROI | MFR | CPU fallback | GPU | CEP/UXP panel | AEGP | Notes |
+|---|---|---|---|---|---|---|---|
+| | | | | | | | |
+
+## Installer matrix
+
+| Platform | Fresh | N-1 -> N | Uninstall | Reinstall | AE running | No AE | Evidence |
+|---|---|---|---|---|---|---|---|
+| macOS | | | | | | | |
+| Windows x64 | | | | | | | |
+| Windows ARM64 | | | | | | | |
+
+## Project migration
+
+| Fixture | Created with product | Created with AE | Open | Render | Save/reopen | Evidence |
+|---|---|---|---|---|---|---|
+| legacy-1 | | | | | | |
+
+## Beta
+
+Beta rows are LAB until the corresponding GA environment is tested.
+
+Example:
+
+| AE exact version/build | OS | Arch | Status |
+|---|---|---|---|
+| 27.x Beta | | | LAB |
+
+Never turn a beta-only observation into a production support claim.
+
+## Unsupported combinations
+
+List explicitly:
+
+- combination:
+- reason:
+- behavior expected from installer/plug-in:
+- user-facing message/documentation:
+
+## Release conclusion
+
+Supported matrix for this exact artifact:
+
+Unsupported:
+
+Blocked/not run:
+
+Evidence root/location:
 
 
 ---
@@ -10633,42 +10806,126 @@ Last known good version:
 
 # Performance report template
 
-## Build
+## Candidate
 
-- version:
+- product version:
+- build:
 - git SHA:
-- compiler:
-- AE build:
-- machine:
+- binary SHA-256:
+- compiler/toolchain:
+- AE SDK:
+
+## Baseline
+
+- product version:
+- build:
+- binary SHA-256:
+
+## Environment
+
+- After Effects exact build:
+- OS:
+- CPU:
+- CPU architecture:
+- RAM:
+- GPU:
+- GPU driver:
+- power/thermal mode notes:
 
 ## Scenario
 
-- project:
+- fixture/project:
+- fixture hash/version:
 - resolution:
-- duration:
-- bpc:
+- duration/frames:
+- bit depth:
+- working space if relevant:
 - MFR:
-- GPU:
+- GPU backend:
+- cache state: cold/warm
+- repetitions:
+
+## Correctness prerequisite
+
+- golden fixture:
+- comparison metric:
+- tolerance:
+- candidate correctness: PASS / FAIL
+- diff artifact:
+
+If FAIL, performance result cannot approve release.
 
 ## Results
 
-| Metric | Baseline | Candidate | Delta |
-|---|---:|---:|---:|
-| First frame | | | |
-| Full render | | | |
-| Median frame | | | |
-| p95 frame | | | |
-| Peak memory | | | |
+| Metric | Baseline | Candidate | Delta | Threshold | Result |
+|---|---:|---:|---:|---:|---|
+| cold first frame | | | | | |
+| warm median frame | | | | | |
+| p95 frame | | | | | |
+| p99 frame | | | | | |
+| full render | | | | | |
+| peak memory | | | | | |
+| steady retained memory | | | | | |
+| CPU utilization | | | | | |
+| lock wait | | | | | |
+| GPU transfer | | | | | |
+| GPU compute | | | | | |
+| cache hit rate | | | | | |
 
-## Correctness
+## Raw sample summary
 
-- golden diff:
-- tolerance:
-- pass/fail:
+- sample count:
+- min:
+- median:
+- p95:
+- max:
+- standard deviation/noise estimate:
 
-## Conclusion
+Raw results location:
 
-Ship / investigate / reject optimization.
+## MFR scaling
+
+| Mode/workers | Wall time | Speedup | Peak memory | Notes |
+|---|---:|---:|---:|---|
+| off | | 1.0x | | |
+| on | | | | |
+
+## GPU breakdown
+
+| Stage | Baseline | Candidate |
+|---|---:|---:|
+| setup/buffer acquisition | | |
+| upload | | |
+| kernel/compute | | |
+| sync | | |
+| download/conversion | | |
+
+## Profiling evidence
+
+- profiler:
+- trace:
+- allocation report:
+- lock/contention report:
+- GPU trace:
+
+## Interpretation
+
+What changed and why?
+
+Separate measured facts from hypothesis.
+
+## Decision
+
+- [ ] accept
+- [ ] accept with documented tradeoff
+- [ ] investigate
+- [ ] reject
+
+Reason:
+
+Approved by:
+
+Date:
 
 
 ---
@@ -10679,14 +10936,25 @@ Ship / investigate / reject optimization.
 
 ## Product
 
-- Name:
-- Version target:
-- Owner:
-- Repository:
+- name:
+- target version:
+- owner:
+- repository:
+- product type/status:
 
 ## Problem
 
 What artist/user problem is solved?
+
+What is explicitly out of scope?
+
+## Success criteria
+
+Measurable criteria:
+
+1.
+2.
+3.
 
 ## Extension type
 
@@ -10694,71 +10962,264 @@ What artist/user problem is solved?
 - [ ] AEGP
 - [ ] AEIO
 - [ ] Artisan
+- [ ] Native panel
 - [ ] ExtendScript
+- [ ] ScriptUI
 - [ ] CEP
 - [ ] UXP
+- [ ] External helper
 - [ ] Hybrid
 
-Why this type?
+Why is this type required?
 
-## Support matrix
+Which simpler type was considered and rejected?
+
+## Public support matrix
 
 ### After Effects
-- Minimum:
-- Maximum tested:
+
+- minimum supported:
+- newest GA tested:
+- beta/lab:
+- unsupported versions:
 
 ### macOS
-- Minimum OS:
-- arm64: yes/no
-- x86_64: yes/no
+
+- minimum OS:
+- arm64:
+- x86_64:
+- GPU requirements:
 
 ### Windows
-- x64: yes/no
-- ARM64: yes/no
+
+- minimum OS:
+- x64:
+- ARM64:
+- GPU requirements:
+
+Do not write "all versions" without a real matrix.
+
+## SDK / toolchain
+
+- AE SDK exact version/build:
+- macOS Xcode/Clang:
+- Windows Visual Studio/MSVC:
+- C++ standard:
+- external SDKs:
+
+## Registration / identity
+
+- plug-in kind:
+- entry point:
+- PiPL/resource source:
+- match name:
+- category/display name:
+- version fields:
 
 ## Render
 
-- 8 bpc:
-- 16 bpc:
-- 32 bpc:
+- 8-bpc:
+- 16-bpc:
+- 32-bpc:
+- alpha behavior:
 - SmartFX:
+- ROI:
+- auxiliary channels:
 - MFR:
 - GPU backends:
 - CPU fallback:
+- audio if applicable:
 
-## State
+## Render invariants
+
+- coordinate/origin assumptions:
+- rowbytes policy:
+- color-space assumptions:
+- deterministic expectations:
+- numerical tolerance:
+
+## State and ownership
+
+### Global
 
 - global_data:
+- mutable/immutable:
+- setup/setdown owner:
+
+### Instance/sequence
+
 - sequence_data:
-- serialization version:
-- caches:
+- schema version:
+- flatten/migration:
+- MFR access rules:
+
+### Caches
+
+- cache key:
+- owner:
+- eviction:
+- invalidation:
+- thread safety:
+
+### Borrowed host objects
+
+List host-owned references and lifetime limits.
 
 ## UI
 
-- standard params:
+- standard parameters:
 - custom Drawbot:
+- ScriptUI:
 - panel:
+- CEP/UXP:
+- accessibility/localization requirements:
+
+## Communication
+
+- panel/script/native topology:
+- protocol version:
+- request envelope:
+- error envelope:
+- cancellation:
+- stale-response policy:
+- large-data/data-plane transport:
+- helper IPC/authentication:
+
+## Threading
+
+- callbacks that may be concurrent:
+- worker-thread responsibilities:
+- host-thread-only operations:
+- locks:
+- third-party thread-safety assumptions:
+
+## Persistence / project compatibility
+
+- parameter ID policy:
+- sequence schema:
+- old project fixtures:
+- migration rules:
+- downgrade expectation:
+
+## Filesystem / network
+
+- paths read/written:
+- user data location:
+- temp/cache location:
+- network endpoints:
+- offline behavior:
+
+## Licensing/security
+
+- entitlement model:
+- render-farm/headless policy:
+- secrets:
+- token storage:
+- failure states:
+- telemetry/privacy:
+
+## Dependencies
+
+| Dependency | Version | License | mac arm64 | mac x86_64 | Win x64 | Win ARM64 |
+|---|---|---|---|---|---|---|
+| | | | | | | |
 
 ## Performance budget
 
 - target frame/resolution:
-- target latency/render time:
+- cold first-frame budget:
+- warm-frame/render budget:
+- panel latency:
 - memory budget:
+- MFR scaling target:
+- GPU crossover/target:
 
 ## Failure behavior
 
-- unsupported GPU:
-- missing license/network:
-- corrupt project state:
+Define behavior for:
+
+- unsupported GPU;
+- allocation failure;
+- cancel;
+- corrupted persisted state;
+- missing native/helper component;
+- protocol mismatch;
+- network/server down;
+- invalid license;
+- installer upgrade failure.
+
+## Build/distribution
+
+### macOS
+
+- architectures:
+- development signing:
+- Developer ID identity:
+- notarization:
+- installer/package:
+- install path policy:
+- dSYM retention:
+
+### Windows
+
+- architectures:
+- Authenticode:
+- installer:
+- registry path policy:
+- PDB retention:
 
 ## Test plan
 
-- unit:
-- golden render:
+### Unit/contract
+
+- pure core:
+- schema/protocol:
+- error handling:
+
+### Render
+
+- golden fixtures:
+- BPC:
+- alpha/HDR:
+- ROI/origins:
+- CPU/GPU:
+
+### Concurrency
+
 - MFR:
-- GPU:
-- cross-version:
-- installer:
+- cancel:
+- stress repetitions:
+
+### Host
+
+- AE matrix:
+- save/reopen:
+- panel lifecycle:
+
+### Distribution
+
+- fresh install:
+- upgrade:
+- uninstall:
+- clean-machine trust/signing:
+
+## Acceptance evidence
+
+Link/ID for each required capability:
+
+| Capability | Test ID | Required environments | Status |
+|---|---|---|---|
+| | | | NOT_RUN |
+
+## Release blockers
+
+1.
+2.
+
+## Open questions
+
+1.
+2.
 
 
 ---
@@ -10769,27 +11230,125 @@ Why this type?
 
 # Product X.Y.Z
 
+Build:
+
+Release date:
+
+## Highlights
+
+Short user-facing summary.
+
 ## Added
+
+-
 
 ## Changed
 
+-
+
 ## Fixed
+
+-
 
 ## Performance
 
+Only include measured claims.
+
+Example:
+
+> Reduced render time by 18% on fixture X, AE Y, machine Z.
+
+Avoid "much faster" without a defined measurement.
+
 ## Compatibility
 
-Tested with:
+### Tested
+
 - After Effects:
 - macOS:
 - Windows:
-- architectures:
+- CPU architectures:
+- GPU backends:
+- MFR:
+- bit depths:
 
-## Known issues
+### No longer supported
+
+-
+
+### Lab / not production-supported
+
+-
+
+Do not present beta-only checks as production support.
+
+## Project compatibility
+
+- old projects:
+- sequence/schema migration:
+- downgrade behavior:
+- parameter changes:
+
+## Panel / protocol compatibility
+
+- CEP/UXP shell:
+- native component minimum:
+- protocol version:
+- action if mixed versions are installed:
+
+## Installation
+
+### macOS
+
+- package:
+- install location policy:
+- signing/notarization:
+
+### Windows
+
+- package:
+- install location policy:
+- signing:
 
 ## Upgrade notes
 
+- from supported previous versions:
+- restart AE required:
+- user settings/presets preserved:
+- special migration:
+
+## Known issues
+
+1.
+
+Include workaround and affected environments when known.
+
+## Security / licensing changes
+
+Only if relevant:
+
+-
+
 ## Checksums
+
+- macOS package SHA-256:
+- Windows x64 package SHA-256:
+- Windows ARM64 package SHA-256:
+
+## Build provenance
+
+For support/internal release record:
+
+- git tag/SHA:
+- AE SDK:
+- toolchain:
+- evidence/report location:
+
+## Rollback
+
+Last known supported release:
+
+Rollback caveats:
 
 
 ---
