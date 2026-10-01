@@ -21430,7 +21430,7 @@ UI intent
 
 **Current suite:** `AEGP_EffectSuite5`.
 
-Existing Bible source examples may use the older `AEGP_EffectSuite4` subset for compatibility. Do not treat that source dependency as the current SDK generation and never cast suite tables between generations.
+Historical/compatibility source examples may use the older `AEGP_EffectSuite4` subset. The canonical Bible effect recipe and ownership helper are now aligned to current SDK 25.6 `AEGP_EffectSuite5`. Never cast suite tables between generations.
 
 ## Layer effect refs are owned references
 
@@ -21680,15 +21680,17 @@ resolve fresh LayerH
 → re-query state
 ```
 
-## Current Suite5 vs older Suite4 source examples
+## Current Suite5 vs historical Suite4 source
 
-Why older Bible C++ may still say `EffectSuite4()`:
+Current Bible baseline and canonical source now use `AEGP_EffectSuite5`.
 
-- it uses a compatibility subset;
-- SDK 25.6 still contains historical generations via SuiteHandler support;
-- source dependency is not the definition of current header generation.
+Older Adobe samples or explicitly compatibility-shaped source may still use Suite4 or earlier generations. Read those as historical/compatibility dependencies only:
 
-New Bible baseline manifest now pins `AEGP_EffectSuite5`.
+- do not infer current generation from old sample source;
+- do not cast Suite4 to Suite5;
+- do not silently downgrade new baseline examples to an older table merely because the called member exists there.
+
+The required-contract manifest pins `AEGP_EffectSuite5` for SDK 25.6.
 
 ## Related chapters
 
@@ -21912,9 +21914,9 @@ Header 25.6 прямо говорит:
 
 Это особенно важно в рекурсивном dynamic traversal и при чтении complex stream values.
 
-## 11. Что проверять в host
+## 11. Product validation guidance
 
-До статуса host-verified нужны отдельные сценарии:
+Если конкретный product заявляет runtime support для этих операций, полезно проверить:
 
 - static property без expression;
 - property с keyframes;
@@ -21927,7 +21929,46 @@ Header 25.6 прямо говорит:
 - save/reopen и повторное разрешение property;
 - error cleanup и отсутствие leaked refs/values.
 
-Source review подтверждает API-контракт, но не подтверждает, что наш cookbook binary загрузился и выполнил эти операции в After Effects.
+Source review подтверждает API-контракт. Bible не заявляет собственный host-observed результат для cookbook recipe; product runtime evidence добавляется только там, где продукт делает соответствующий support claim.
+
+## 12. Recommended operation workflow
+
+For a stream/property mutation:
+
+~~~text
+resolve fresh layer/effect/property context
+→ obtain owned StreamRefH
+→ inspect grouping/type/dimensionality
+→ decide static value vs keyframe path
+→ choose pre/post-expression semantics
+→ perform mutation in host-safe/undo context
+→ dispose StreamValue/MemHandle/StreamRef with their own APIs
+→ re-query after structural edits
+~~~
+
+For long-lived UI/application state, store stable product identity and re-resolve the stream at command time rather than caching `AEGP_StreamRefH`.
+
+## 13. Failure modes
+
+Handle explicitly:
+
+- property/effect disappeared;
+- stream type differs from expectation;
+- dynamic hierarchy changed;
+- expression makes static-write policy invalid;
+- separated-dimension leader requires follower resolution;
+- structural mutation invalidated refs/indices;
+- value acquisition succeeded but later mutation failed;
+- cleanup/dispose returned an error.
+
+Do not collapse all failures into “property not found”.
+
+## Related chapters
+
+- [Effects](17-NATIVE-SUITE-COOKBOOK/04-EFFECTS.md)
+- [Keyframes](17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md)
+- [Lifetime/threading](17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md)
+- [Keyframer integration](17-NATIVE-SUITE-COOKBOOK/../14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md)
 
 ## Source record
 
@@ -22101,7 +22142,7 @@ if (addH) {
 
 `EndAddKeyframes(FALSE, ...)` — explicit non-commit path batch API. Он не заменяет глобальную Undo-модель команды: если операция одновременно меняет другие части проекта, проектируйте общий undo scope отдельно.
 
-Существующий `Bible_AddOneDKeyframes` использует этот pattern и производит value через `AEGP_GetNewStreamValue`, а не вручную заполняет неизвестный union. Это хороший defensive pattern, но runtime correctness самого recipe остаётся host-pending.
+Существующий `Bible_AddOneDKeyframes` использует этот pattern и производит value через `AEGP_GetNewStreamValue`, а не вручную заполняет неизвестный union. Это defensive source pattern; Bible не заявляет runtime result для recipe.
 
 ## 9. Delete и mutation во время обхода
 
@@ -22158,9 +22199,9 @@ SDK 25.6 `AEGP_KeyframeSuite5` добавляет `GetKeyframeLabelColorIndex` �
 
 Но новый код не должен механически закрепляться на старой suite generation только потому, что sample исторический.
 
-## 14. Host acceptance matrix
+## 14. Product validation matrix
 
-Для keyframer-примера нужны минимум:
+Если конкретный keyframer product заявляет runtime support, полезно проверить:
 
 - 1D static → animated;
 - existing key at same time;
@@ -22176,7 +22217,46 @@ SDK 25.6 `AEGP_KeyframeSuite5` добавляет `GetKeyframeLabelColorIndex` �
 - error injection + cleanup;
 - repeated execution without leaked refs/values.
 
-До этих проверок chapter/source review имеет статус DOCUMENTED/SDK-reviewed, а не host-verified.
+Эти проверки относятся к product runtime/support evidence. Для Bible chapter/source review остаётся SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED, если отдельного runtime record нет.
+
+## 15. Recommended keyframer workflow
+
+~~~text
+resolve fresh stream
+→ inspect type/dimensionality/separation state
+→ normalize desired times/values as pure data
+→ open semantic undo scope
+→ choose single-key or batch API
+→ write values/interpolation/ease/tangents/flags deliberately
+→ close batch on every path
+→ dispose every acquired StreamValue/StreamRef
+→ return fresh keyframe summary
+~~~
+
+Keep computation of large key sets separate from host mutation. Background code can prepare pure times/values; host refs should be resolved and mutated only in the documented host-safe context.
+
+## 16. Failure modes
+
+Plan for:
+
+- unsupported stream type;
+- separated leader passed to index-based keyframe API;
+- duplicate-time semantics;
+- dimensionality mismatch;
+- interpolation unsupported for target stream;
+- batch start/add/set/end failure;
+- expression policy conflict;
+- project/property changed during async planning;
+- cleanup error after primary mutation error.
+
+Undo grouping does not make these failures transactional automatically.
+
+## Related chapters
+
+- [Streams/properties](17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md)
+- [Lifetime/threading](17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md)
+- [Keyframer integration](17-NATIVE-SUITE-COOKBOOK/../14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md)
+- [Keyframer batch template](17-NATIVE-SUITE-COOKBOOK/../16-WORKING-TEMPLATES/keyframer-batch/README.md)
 
 ## Source record
 
