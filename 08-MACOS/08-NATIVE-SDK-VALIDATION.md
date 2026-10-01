@@ -15,7 +15,7 @@ Use the exact SDK intended for the candidate build.
 
 A successful header-tool run means only the checks implemented by the tool passed, such as:
 
-- supported headers were parsed with no unresolved parser diagnostics;
+- supported headers were parsed with no unresolved **required-contract** diagnostics; unrelated diagnostics remain recorded;
 - inventory schema/version validation passed;
 - cookbook/reference suite symbols were found according to parser rules;
 - the current Bible native C++ translation units passed Clang C++17 syntax/type checks;
