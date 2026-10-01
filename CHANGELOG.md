@@ -1,5 +1,15 @@
 # Changelog
 
+## Editorial progress — 2026-10-01
+
+- Expanded ExtendScript object-model and ScriptUI chapters with reference invalidation, stable targeting, command boundaries and long-operation rules.
+- Expanded CEP communication into a versioned request/response protocol with main-thread scheduling, stale-response, path, large-data and security boundaries.
+- Added a dated After Effects UXP migration plan based on Adobe's 2026-09-24 transition announcement without treating the future beta as a verified API.
+- Expanded macOS Xcode/Universal/signing/notarization/install/CI chapters and Windows Visual Studio/x64-ARM64/AuthentiCode/install/CI chapters.
+- Expanded distribution versioning, licensing/security, install-location policy and release acceptance checklist.
+- Added a dated source-review record; no native build, signing, notarization, installer or host-test status was upgraded by this editorial pass.
+
+
 ## v1.1 — 2026-09-30
 
 - Fixed Minimal Gain registration macro, About callback context, selector spelling and suite includes.
