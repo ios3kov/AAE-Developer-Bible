@@ -14,7 +14,7 @@ $._aeBible.dispatch = function (json) {
         req = JSON.parse(json);
         out.requestId = req.requestId || null;
 
-        if (req.version !== 1) {
+        if (req.protocol !== 1) {
             throw { code: "UNSUPPORTED_VERSION", message: "Unsupported protocol version" };
         }
 
