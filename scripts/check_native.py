@@ -154,6 +154,40 @@ def _relative_source(path: Path, root: Path = ROOT) -> str:
         return str(path)
 
 
+def git_identity(root: Path) -> dict:
+    try:
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=root,
+            text=True,
+            capture_output=True,
+            timeout=10,
+            check=False,
+        )
+        status = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=root,
+            text=True,
+            capture_output=True,
+            timeout=10,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return {"git_sha": None, "dirty": None}
+
+    if head.returncode != 0:
+        return {"git_sha": None, "dirty": None}
+
+    return {
+        "git_sha": head.stdout.strip() or None,
+        "dirty": bool(status.stdout.strip()) if status.returncode == 0 else None,
+    }
+
+
+def file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def run_checks(
     examples: Path,
     compiler: str,
@@ -188,6 +222,10 @@ def run_checks(
             "examples_root": str(examples),
             "header_count": header_count,
             "header_manifest_sha256": header_manifest_sha256,
+        },
+        "source": {
+            "root": str(root.resolve()),
+            **git_identity(root),
         },
         "compiler": {
             "path": shutil.which(compiler) or compiler,
@@ -247,6 +285,7 @@ def run_checks(
             report["results"].append(
                 {
                     "source": label,
+                    "source_sha256": file_sha256(source),
                     "command": command,
                     "returncode": returncode,
                     "status": "PASS" if returncode == 0 else "FAIL",
