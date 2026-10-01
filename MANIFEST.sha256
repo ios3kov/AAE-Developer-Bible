@@ -1,7 +1,7 @@
 e73fcc36f0e9158ed4bac7f874e9d701741d30656136b2c97b21266c41971b4b  .github/workflows/acx-channel-gate.yml
 7911684c37357e978055945cd25336dda55561bd44bd21c16697f4add74f9fe3  .github/workflows/acx-fixture.yml
 362b06ebde93d2ac9acef4394bcefecd6dfb7319882b55730d775f09d940d38f  .github/workflows/regenerate-effects-catalog.yml
-6a49cec3995697f15d0d30dfd63ad51f87f84b46e47d681d3ec0d0a087c879be  .github/workflows/validate.yml
+8dc74810f2ea01cf5ee531867006693bbd9066e2097b353f71a268fa7ea08ce2  .github/workflows/validate.yml
 857aed2c1949d010ede7b8011c71e2907b0fc1377fbb7762f0a61d5d85bb57d6  .gitignore
 74c73a478f7cbde4831259e05535e3cd968501e266ebdc90483ad3d3cbf04869  00-START-HERE/00-DECISION-TREE.md
 6dc489cb5cc6f7b13dfc393a715b3d5689365d0cdc12cc98e8a0d9f39cfdad43  00-START-HERE/01-EXTENSION-TYPES.md
