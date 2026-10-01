@@ -184,3 +184,12 @@ Added end-to-end release-flow chapters for [macOS](08-MACOS/09-PRODUCTION-BUILD-
 Added [release artifacts, installers and update strategy](11-DISTRIBUTION/05-RELEASE-ARTIFACTS-UPDATES.md), covering release-set identity, installer ownership, upgrade/rollback, staged auto-update, download integrity and compatibility/support metadata.
 
 **Verification level: documentation/architecture review only.** No new CEP panel was executed in AE, no ExtendScript dispatcher was host-tested, no macOS release binary was signed/notarized in this update, no Windows binary was Authenticode-signed, no installer was built, and no clean-machine AE load cycle was performed. These chapters define the required production process; they do not close completion-plan host/build gates.
+
+
+## Host-verification and release-evidence guidance (2026-10-01)
+
+Added [After Effects host verification](10-TESTING/06-HOST-VERIFICATION.md), [test evidence and acceptance records](10-TESTING/07-TEST-EVIDENCE.md), and [clean-machine release acceptance](10-TESTING/08-CLEAN-MACHINE-ACCEPTANCE.md). The chapters establish a strict evidence ladder from documented/compiled/linked through load-, behavior-, stress- and release-verified states, require exact artifact/environment identity, define PASS/FAIL/BLOCKED/NOT RUN semantics, and make package-level clean-machine installation the final release boundary.
+
+These chapters deliberately prevent compiler checks, screenshots, manual developer-folder installs or one-platform results from being promoted into broader compatibility claims.
+
+**Verification level: documentation/process definition only.** No new AE host run, release-candidate install, upgrade/uninstall, signing/notarization, Authenticode verification, MFR stress or cross-platform execution was performed by this editorial update. Existing completion-plan gates remain open until the named evidence is actually collected.
