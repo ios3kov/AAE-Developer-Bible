@@ -83,4 +83,4 @@ Do not cast or suppress a native mismatch to keep the validation lane green.
 Windows compiler/link/sign/install/host acceptance remains separate. A header PASS must never be copied into the compatibility matrix as Windows PASS.
 
 
-For the SDK contract-audit method, see [SDK contract audit runbook](../18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
+For the SDK contract-audit method, see [SDK contract audit runbook](../18-SDK-HEADER-TOOLS/16-SDK-CONTRACT-AUDIT-RUNBOOK.md).
