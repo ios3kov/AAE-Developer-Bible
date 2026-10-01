@@ -5317,43 +5317,140 @@ PASS означает только:
 
 # Windows — Visual Studio setup
 
-## Start from Adobe sample
+## Start from an Adobe sample
 
-Adobe SDK Guide прямо советует не реконструировать Windows effect project с нуля: custom PiPL resource generation step легко потерять.
+Do not reconstruct an After Effects effect project from an empty Visual Studio project unless you have a specific reason and understand every host-specific build step.
 
-Для effect plug-in:
-1. скопировать Skeleton/closest sample;
-2. открыть solution в поддерживаемой Visual Studio;
-3. собрать untouched sample;
-4. убедиться, что `.aex` реально загружается AE;
-5. только потом переименовывать и менять код.
+The SDK guide explicitly recommends starting from Skeleton or the nearest sample because Windows effect projects contain PiPL resource-generation steps that are easy to lose.
+
+Safe bootstrap:
+
+~~~text
+copy closest SDK sample
+→ build untouched x64 sample
+→ load untouched sample in AE
+→ preserve resource/custom build steps
+→ rename identifiers
+→ replace implementation incrementally
+~~~
+
+If the untouched sample does not load, stop there. Do not continue layering product code onto a broken project baseline.
+
+## BuildAll and individual projects
+
+The SDK includes BuildAll.sln for the examples, but product development should still make the individual target reproducible on its own.
+
+Record:
+
+- Visual Studio version;
+- MSVC toolset;
+- Windows SDK version;
+- AE SDK version/build;
+- configuration;
+- target architecture.
+
+## PiPL generation is part of the build
+
+Windows uses the cross-platform .r resource source and a conversion/custom build step to generate Windows resource input.
+
+The important contract is not the exact historical tool name. It is:
+
+~~~text
+.r source
+→ Adobe PiPL conversion step
+→ Windows resource
+→ linked into final .aex
+~~~
+
+Do not copy only the C++ files out of a sample and forget the resource step.
+
+PiPL/global setup capability declarations must remain consistent.
+
+## Development output
+
+The SDK sample guidance supports a development output path such as:
+
+    C:\Program Files\Adobe\Common\Plug-ins\7.0\MediaCore\
+
+The sample projects also support AE_PLUGIN_BUILD_DIR for a common development output directory.
+
+This is a development convenience. Production installers should obtain Adobe install paths through the documented registry values instead of hardcoding the development path.
+
+## Privileges
+
+Writing directly under Program Files may require elevation.
+
+Do not solve every build problem by permanently running Visual Studio as Administrator. A cleaner product workflow is:
+
+~~~text
+normal build directory
+→ post-build/dev install step with explicit privilege if needed
+→ AE load
+~~~
+
+Keep compile output and privileged installation conceptually separate.
 
 ## Configurations
 
-Минимум:
+Minimum practical set:
+
 - Debug x64;
 - Release x64;
-- ARM64 equivalents, если поддерживаются.
+- ARM64 equivalents only when the product intentionally supports a native Windows-on-Arm host.
 
-Сохранять PDB каждого released build в symbol archive.
+For release builds:
 
-## Output during development
+- optimization enabled deliberately;
+- symbols generated;
+- runtime library settings consistent across your code/dependencies;
+- no accidental Debug CRT dependency;
+- warnings reviewed.
 
-SDK Guide показывает common dev path вида:
+Archive the PDB for every shipped binary.
 
-```text
-C:\Program Files\Adobe\Common\Plug-ins\7.0\MediaCore\
-```
+## Runtime library and ABI discipline
 
-Но для installer path использовать Adobe registry guidance, а не предполагать, что одна строка подходит всегда.
+All native components loaded into the same product should have deliberate runtime/ABI choices.
 
-## Build hygiene
+Check:
 
-- warning level высокий для собственного кода;
-- `/permissive-`/conformance changes вводить осознанно;
-- runtime library setting единообразно по зависимостям;
-- no accidental Debug CRT dependency in Release;
-- dependency audit before packaging.
+- /MD vs /MDd;
+- iterator/debug ABI mismatches;
+- third-party library toolset;
+- exception/RTTI choices if shared headers cross boundaries;
+- exported symbol surface.
+
+Do not expose STL objects as a long-lived binary ABI between independently versioned modules.
+
+## Export surface
+
+A native AE plug-in should export only what the host/product needs.
+
+Avoid leaking third-party library symbols from the .aex. Symbol collisions inside the host process can produce failures far away from the component that caused them.
+
+Treat exported-symbol review as a release check for products linking large C++ libraries.
+
+## Warning policy
+
+Use a high warning level for product code and move warning suppressions to the smallest possible scope.
+
+Do not disable a useful warning globally because a legacy SDK header emits it.
+
+## Reproducibility
+
+A release record should make it possible to answer:
+
+- which compiler built this exact binary?;
+- which AE SDK was used?;
+- which architecture?;
+- which resource/PiPL source?;
+- which git SHA?;
+- which PDB matches it?;
+- what is the SHA-256 of the shipped .aex?
+
+## Verification boundary
+
+The Bible currently records a macOS exact-SDK syntax/type baseline; Windows native compilation remains a separate pending verification gate. This chapter defines the build workflow and does not mark Windows examples host-verified.
 
 
 ---
@@ -5362,43 +5459,151 @@ C:\Program Files\Adobe\Common\Plug-ins\7.0\MediaCore\
 
 # Windows — x64 and ARM64
 
-## x64
+Windows uses separate architecture-specific PE binaries rather than a macOS-style Universal executable.
 
-Основной historical Windows target для After Effects plug-ins.
+## x64 baseline
 
-## ARM64
+x64 is the established Windows target for After Effects plug-ins and should remain the first Windows release lane unless the product support policy says otherwise.
 
-Current AE SDK Guide рекомендует готовиться к Windows on Arm. Для ARM64 binary нужен Visual Studio 17.4+.
+A successful x64 build proves only x64 compilation. It does not prove:
 
-PiPL example:
+- ARM64 compilation;
+- Windows-on-Arm native host compatibility;
+- GPU backend parity;
+- installer architecture selection.
 
-```text
+## Windows on Arm
+
+The current AE SDK guide documents Windows-on-Arm plug-in support for native Adobe hosts and requires Visual Studio 17.4 or later to build the ARM64 target.
+
+For an effect resource, the architecture declarations can be:
+
+~~~text
 #if defined(AE_OS_WIN)
   CodeWinARM64 {"EffectMain"},
   CodeWin64X86 {"EffectMain"},
 #endif
-```
+~~~
 
-## Important
+Use the actual exported entry point.
 
-Наличие ARM64 compile target ещё не означает, что:
-- нужный After Effects version работает native ARM64;
-- все third-party libraries имеют ARM64 builds;
-- GPU backend доступен так же, как x64;
-- installer выбирает правильный artifact.
+## Do not confuse compile support with host support
 
-## Artifact strategy
+Before shipping ARM64, verify the exact After Effects version you claim actually runs natively in that environment.
 
-Windows обычно распространяет отдельные architecture binaries/installer payloads, а не Universal binary как macOS.
+The support chain is:
 
-Manifest:
+~~~text
+native ARM64 Windows
+→ native ARM64 AE build
+→ ARM64 plug-in artifact
+→ ARM64 third-party dependencies
+→ tested installer selection
+→ host load and operation
+~~~
 
-```text
-MyPlugin/win-x64/MyPlugin.aex
-MyPlugin/win-arm64/MyPlugin.aex
-```
+Any missing link makes "ARM64 supported" misleading.
 
-Installer выбирает совместимый target или ставит оба в корректно организованный layout, если host loader/product design это допускает.
+## Separate artifacts
+
+Recommended staging:
+
+~~~text
+artifacts/
+├── win-x64/
+│   ├── MyPlugin.aex
+│   └── MyPlugin.pdb
+└── win-arm64/
+    ├── MyPlugin.aex
+    └── MyPlugin.pdb
+~~~
+
+Do not name both architecture binaries identically in one flat staging directory and rely on human memory.
+
+## Installer architecture policy
+
+Choose and document one policy.
+
+### Architecture-specific installers
+
+Example:
+
+~~~text
+MyPlugin-1.2.3-win-x64.exe
+MyPlugin-1.2.3-win-arm64.exe
+~~~
+
+Simple and explicit, but creates more user choices.
+
+### One installer with architecture detection
+
+The installer detects the machine/host architecture and installs the matching payload.
+
+Requirements:
+
+- deterministic detection;
+- explicit logging;
+- no x64 binary accidentally copied into an ARM64-native-only location;
+- upgrade removes/replaces the previously selected architecture correctly.
+
+### Install both
+
+Only if the host loader/layout supports a deliberate architecture-separated structure and it has been verified.
+
+Do not assume the loader will choose correctly from two same-name binaries in an arbitrary directory.
+
+## Third-party dependencies
+
+Every dependency needs a native build for each architecture shipped.
+
+Audit:
+
+- static libraries;
+- DLLs;
+- helper EXEs;
+- GPU runtime components;
+- licensing libraries;
+- crash/reporting SDKs.
+
+A clean ARM64 compile of your source can still produce a non-shippable product if one commercial SDK remains x64-only.
+
+## Source portability
+
+Common x64 -> ARM64 problems include:
+
+- assumptions that pointer fits in 32-bit integer fields;
+- intrinsics tied to x86;
+- inline assembly;
+- byte packing/alignment assumptions;
+- architecture-specific external libraries;
+- accidental serialization of pointer-sized values.
+
+Do not "fix" binary file formats by simply changing sizeof-dependent fields. Persisted formats need explicit fixed-width types.
+
+## GPU and performance
+
+ARM64 support must be verified functionally before performance comparisons.
+
+Measure separately:
+
+- CPU correctness;
+- GPU correctness;
+- fallback;
+- cancellation;
+- large frame stress;
+- architecture-specific performance.
+
+Do not promise that ARM64 is faster/slower from architecture alone.
+
+## Symbols
+
+Archive x64 and ARM64 PDBs separately, tied to exact binary hashes.
+
+A PDB from another architecture/build is not useful crash evidence.
+
+## Verification boundary
+
+The SDK documents the ARM64 build path, but the Bible has not yet performed the full Windows x64/ARM64 compiler + installer + AE host matrix. Those remain acceptance tasks.
 
 
 ---
@@ -5507,41 +5712,118 @@ Selection logic отдельно от mathematical algorithm.
 
 # Windows — code signing
 
+Windows Authenticode signing establishes publisher identity and lets Windows verify that the signed file has not changed since signing.
+
+It does not prove the plug-in is functionally correct.
+
 ## Tool
 
-Microsoft SignTool входит в Windows SDK и используется для Authenticode signing/verification/timestamping.
+Microsoft SignTool is part of the Windows SDK.
 
-Современные SignTool версии требуют явно задавать digest algorithms; SHA-256 — нормальный baseline.
+Current SignTool guidance requires explicit file digest and timestamp digest algorithms. SHA-256 is the normal baseline.
 
-## Conceptual command
+Conceptual signing command:
 
-```bat
+~~~bat
 signtool sign /fd SHA256 /td SHA256 /tr <RFC3161_TIMESTAMP_URL> /a MyPlugin.aex
-```
+~~~
 
-Actual certificate selection (`/a`, `/n`, `/sha1`, PFX, Trusted Signing etc.) зависит от вашей release infrastructure.
+Actual certificate selection depends on release infrastructure:
+
+- certificate store;
+- hardware token/HSM;
+- PFX in a protected environment;
+- managed/trusted signing service.
+
+Do not encode a private-key deployment strategy into the product repository.
 
 ## Verify
 
-```bat
+~~~bat
 signtool verify /pa /v MyPlugin.aex
-```
+~~~
 
-## Sign what ships
+Verify the exact staged/shipping file after all mutations are complete.
 
-Подписывать:
-- `.aex`;
-- helper `.exe/.dll`;
-- installer executable/MSI as applicable.
+## Sign final binaries
 
-Signing должен быть после final binary mutation. Любой post-sign patch invalidates signature.
+Correct order:
+
+~~~text
+compile/link
+→ final resource/version metadata
+→ dependency staging
+→ sign .aex / helper .dll/.exe
+→ verify
+→ build installer
+→ sign installer
+→ verify installer
+~~~
+
+Any post-sign binary/resource patch changes the file and invalidates the signature.
+
+## What to sign
+
+Sign executable code you distribute:
+
+- .aex;
+- product DLLs;
+- helper EXEs;
+- installer EXE/MSI or bootstrapper as applicable.
+
+Do not assume signing only the outer installer is equivalent to signing the native code inside it.
+
+## Timestamp
+
+Use an appropriate timestamp service so the signature retains meaningful validation after the signing certificate itself expires, subject to Windows trust policy.
+
+A timestamp failure should fail a release signing job unless your release policy explicitly defines a safe recovery path.
 
 ## Certificate security
 
-- private key не хранить в repo;
-- CI credentials isolated;
-- access only release jobs;
-- timestamp releases so signatures remain verifiable after certificate expiry, subject to trust policy.
+Release key rules:
+
+- never commit private keys;
+- do not expose signing credentials to pull-request jobs;
+- protect the release environment;
+- require least privilege;
+- log the certificate identity/serial metadata needed for audit, not the private material;
+- rotate/revoke according to incident policy.
+
+## Reproducibility vs signing
+
+Two separately signed binaries can differ even if built from identical source because signing adds metadata.
+
+Track both:
+
+~~~text
+unsigned/staged binary hash
+signed binary hash
+signing identity
+timestamp metadata
+source git SHA
+~~~
+
+This preserves provenance.
+
+## SmartScreen reputation is not correctness
+
+A valid Authenticode signature can improve identity/trust UX, but it does not guarantee an installer will never receive a SmartScreen warning.
+
+Do not weaken signing/security to chase reputation behavior.
+
+## Failure cases to test
+
+- signature valid;
+- binary modified after signing -> verification fails;
+- timestamp unavailable -> release job fails;
+- wrong certificate selected -> release job fails;
+- certificate expired/revoked scenario is understood;
+- installer contains only intended signed payload.
+
+## Verification boundary
+
+This chapter follows current Microsoft SignTool/AuthentiCode guidance. The Bible has not yet signed and host-tested all Windows reference artifacts; the Windows release gate remains open.
 
 
 ---
@@ -5550,40 +5832,175 @@ Signing должен быть после final binary mutation. Любой post-
 
 # Windows — installation and packaging
 
-## Adobe common install path
+A Windows plug-in installer must resolve Adobe's supported install paths, own only its files, handle upgrades deterministically and preserve signed payload integrity.
 
-After Effects SDK Guide рекомендует installer'у получать common plug-in path из registry, например family key:
+## Common Adobe plug-in path
 
-```text
-HKLM\SOFTWARE\Adobe\After Effects\[version]\CommonPluginInstallPath
-```
+The AE SDK installer guidance documents the common path through the registry:
 
-AE-specific path также доступен через соответствующий Adobe registry value.
+    HKLM\SOFTWARE\Adobe\After Effects\[version]\CommonPluginInstallPath
 
-Не полагаться только на hardcoded `C:\Program Files\...` в production installer.
+For AE-specific installation it also documents the corresponding PluginInstallPath value.
+
+Do not derive production destinations only from a guessed Program Files string.
+
+## Development path is not installer policy
+
+The common development path:
+
+    C:\Program Files\Adobe\Common\Plug-ins\7.0\MediaCore\
+
+is useful while developing.
+
+A production installer should use Adobe's registry guidance so it follows the installed host configuration instead of an assumption.
+
+## 32-bit vs 64-bit registry view
+
+Installer code must deliberately use the appropriate registry view for the target application/OS.
+
+Do not let installer technology defaults redirect a lookup into a different registry view and then conclude that After Effects is not installed.
+
+Log which key/view was queried.
 
 ## Installer technology
 
-Подойдут, в зависимости от продукта:
+Possible implementations:
+
 - MSI/WiX;
 - signed bootstrapper;
-- Inno Setup/другая зрелая installer system.
+- Inno Setup or another mature installer system.
 
-Technology менее важна, чем корректные upgrade/uninstall/signing semantics.
+Technology is less important than correct semantics:
 
-## Installer tests
-
-- fresh install;
-- upgrade N-1 → N;
-- downgrade policy;
+- privileged copy;
+- architecture selection;
+- upgrade;
+- rollback;
 - repair;
 - uninstall;
-- multiple AE versions installed;
+- logging;
+- signed payload preservation.
+
+## File ownership manifest
+
+The installer should know exactly which files belong to the product.
+
+Never recursively delete a shared Adobe plug-in directory.
+
+Uninstall should remove:
+
+- product-owned .aex;
+- product-owned DLL/helper files;
+- product-owned receipts/metadata.
+
+User-created presets/config/license data require a separate explicit policy.
+
+## Architecture selection
+
+If both x64 and ARM64 payloads exist:
+
+~~~text
+detect supported host/machine architecture
+→ choose intended payload
+→ log decision
+→ install only supported architecture/layout
+→ verify installed binary architecture
+~~~
+
+Upgrade must correctly replace the previously installed architecture.
+
+## Atomic install
+
+Prefer staging and validation before final copy.
+
+A failed install should not leave:
+
+- half-copied .aex;
+- mixed old/new DLLs;
+- unsigned replacement next to signed old binary;
+- orphaned architecture payloads.
+
+If installer technology supports transactional rollback, test it.
+
+## Upgrade
+
+Required scenario:
+
+~~~text
+N-1 installed
+→ N installer starts
+→ detect old files/version
+→ stage N
+→ replace owned payload
+→ preserve user data
+→ verify
+→ commit
+~~~
+
+If product filenames changed, explicitly remove the old owned file. Do not rely on directory cleanup.
+
+## Installer signing
+
+Sign executable payload and installer according to the Windows signing chapter.
+
+Do not extract signed files, patch them, then install the modified copies.
+
+## Runtime dependencies
+
+Decide whether dependencies are:
+
+- statically linked;
+- product-local DLLs;
+- installed through a Microsoft runtime prerequisite;
+- another documented system dependency.
+
+Do not make release success depend on whatever Visual Studio happened to install on the developer machine.
+
+## Required tests
+
+- fresh install;
+- upgrade N-1 -> N;
+- repair if supported;
+- uninstall;
+- reinstall;
+- multiple AE versions;
 - no AE installed;
 - no admin rights;
-- x64/ARM64 architecture selection;
-- antivirus/SmartScreen behavior;
-- long/Unicode user/profile paths where applicable.
+- x64 and ARM64 decision;
+- corrupted payload/checksum;
+- locked file because AE is running;
+- Unicode/long user paths for user-side data;
+- antivirus/SmartScreen interaction;
+- clean AE launch/load after install.
+
+## AE-running policy
+
+Define what happens if After Effects is running while replacing the plug-in.
+
+Safe policies include:
+
+- block install and ask user to close AE;
+- schedule replacement only with a well-tested installer mechanism.
+
+Do not silently overwrite a loaded module and report success without verifying the final on-disk state.
+
+## Logs
+
+Record:
+
+- installer/product version;
+- host versions detected;
+- registry paths resolved;
+- architecture selected;
+- old version;
+- files installed/removed;
+- terminal result/error code.
+
+Do not log license secrets.
+
+## Verification boundary
+
+Registry path guidance is documented by the AE SDK guide. The current Bible has not yet executed the full Windows installer matrix; this remains a completion gate.
 
 
 ---
@@ -5592,49 +6009,178 @@ Technology менее важна, чем корректные upgrade/uninstall/
 
 # Windows — CI pipeline
 
-## Stages
+## Goal
 
-```text
-static analysis
-→ build x64 Debug/Release
-→ build ARM64 if supported
-→ unit tests
-→ inspect dependencies
-→ package .aex + runtime assets
-→ sign release binaries
-→ build installer
+CI must produce a reproducible native artifact, preserve symbols and provenance, and ensure the exact QA candidate is what the release signing/package job publishes.
+
+## Pull request lane
+
+~~~text
+format/lint
+→ portable tests
+→ build x64
+→ build ARM64 if supported by project policy
+→ static analysis
+→ inspect imports/exports
+→ package unsigned QA artifacts
+~~~
+
+Never expose production signing credentials to untrusted pull requests.
+
+## Release candidate lane
+
+~~~text
+pinned commit/tag
+→ clean x64 build
+→ clean ARM64 build if claimed
+→ unit/integration checks
+→ PiPL/resource verification
+→ dependency inspection
+→ archive PDBs
+→ generate manifest/checksums
+→ publish immutable candidate
+~~~
+
+QA should test this candidate.
+
+## Signing/package lane
+
+~~~text
+approved candidate
+→ sign native binaries
+→ verify Authenticode
+→ construct installer
 → sign installer
-→ verify signatures
-→ publish artifact + manifest + symbols
-```
+→ verify installer
+→ clean install test
+→ AE load/operation test
+→ publish final hashes
+~~~
 
-## SDK
+Do not silently rebuild source after QA unless the rebuilt output is treated as a new candidate.
 
-Не redistributing Adobe SDK в public repository без разрешения. CI получает SDK из approved private source/local runner setup.
+## SDK handling
+
+Do not redistribute the Adobe SDK through a public repository unless its license explicitly allows the chosen distribution.
+
+Use:
+
+- controlled self-hosted Windows runner;
+- private artifact store;
+- authenticated internal SDK cache;
+- local developer SDK path for manual validation.
+
+Pin/record the AE SDK version/build identity.
+
+## Toolchain identity
+
+Record:
+
+- Windows runner image/build;
+- Visual Studio version;
+- MSVC toolset;
+- Windows SDK version;
+- target architecture;
+- AE SDK version/build;
+- configuration.
+
+Native output can change after a hosted-runner image/toolset upgrade even if source does not.
 
 ## Symbols
 
-PDB хранить отдельно от public installer, но навсегда связывать с:
-- semantic version;
-- git SHA;
-- binary hash;
-- architecture.
+Archive PDB per binary.
 
-## Signing
+Bind metadata:
 
-Использовать protected release environment. Signing job не должен запускаться для untrusted pull requests.
-
-## Artifact manifest
-
-```json
+~~~json
 {
-  "version": "1.2.3",
+  "product_version": "1.2.3",
+  "build": 1042,
   "git_sha": "...",
+  "platform": "windows",
   "arch": "x64",
-  "signed": true,
-  "runtime_assets": ["..."]
+  "binary_sha256": "...",
+  "pdb_sha256": "..."
 }
-```
+~~~
+
+Do not publish private symbols to end users by default, but do not lose them.
+
+## Dependency inspection
+
+Before signing, verify the final .aex imports and packaged DLLs.
+
+Reject unexpected development-only dependencies.
+
+Examples of release defects this catches:
+
+- Debug CRT;
+- local absolute DLL assumptions;
+- accidental extra runtime;
+- x64 helper inside ARM64 payload;
+- unplanned third-party component.
+
+## Signing security
+
+Use a protected release environment.
+
+Signing job rules:
+
+- no secrets on PRs;
+- least-privilege access;
+- explicit release trigger/approval;
+- immutable candidate input;
+- sign only known hashes;
+- archive signing identity/timestamp result.
+
+## Installer test lane
+
+A VM or clean runner should test:
+
+~~~text
+snapshot
+→ install
+→ verify files/signatures
+→ launch supported AE
+→ verify discovery/operation
+→ close AE
+→ uninstall
+→ verify only owned files removed
+→ restore snapshot
+~~~
+
+Upgrade testing requires an N-1 snapshot/artifact too.
+
+## Host tests are separate from compile
+
+A green Visual Studio build does not prove AE can load the .aex.
+
+Record host tests with:
+
+- AE exact version/build;
+- OS architecture;
+- plug-in architecture;
+- install path;
+- observed operation;
+- render/output result where applicable.
+
+## Failure policy
+
+Release fails on:
+
+- compile/test failure;
+- PiPL/resource mismatch;
+- unexpected imports;
+- missing PDB;
+- signature verification failure;
+- architecture mismatch;
+- installer failure;
+- clean-host load failure;
+- manifest/hash mismatch.
+
+## Verification boundary
+
+The repository's current CI primarily covers documentation/portable checks. The Windows native build/sign/install/host cycle specified here remains to be implemented and recorded.
 
 
 ---
