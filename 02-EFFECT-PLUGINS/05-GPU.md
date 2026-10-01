@@ -1,65 +1,176 @@
 # GPU effects
 
-GPU path — не отдельный продукт, а оптимизированный backend того же математического эффекта.
+Обновлено **2026-10-01** по Adobe After Effects SDK **25.6 build 61**. GPU — не отдельный тип plug-in: это backend Effect API, который должен сохранять ту же визуальную семантику, что CPU path.
 
-## Сначала CPU reference
+Source review: [GPU, audio and Custom UI / Drawbot](../18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md).
+
+## 1. GPU support — не один флаг
+
+В SDK 25.6 GPU-возможность складывается из нескольких стадий:
+
+```text
+GLOBAL_SETUP
+  declare PF_OutFlag2_SUPPORTS_GPU_RENDER_F32
+  (+ DirectX flag where applicable)
+        ↓
+GPU_DEVICE_SETUP
+  create per-device state
+        ↓
+SMART_PRE_RENDER
+  decide whether THIS frame/context can use GPU
+  set PF_RenderOutputFlag_GPU_RENDER_POSSIBLE
+        ↓
+SMART_RENDER_GPU
+  render with GPU worlds
+        ↓
+GPU_DEVICE_SETDOWN
+  dispose per-device state
+```
+
+То есть глобальная capability не означает, что каждый кадр будет GPU-rendered.
+
+## 2. Framework и device identity приходят от host
+
+`PF_GPU_Framework` в этой поставке содержит NONE, OPENCL, METAL, CUDA и DIRECTX. Setup/render extras передают framework и device index.
+
+Не выбирайте «первую GPU в системе» самостоятельно, если host уже передал конкретный device context.
+
+`PF_GPUDeviceInfo` содержит platform/device/context/queue pointers. Они host-owned. Не уничтожайте их через native API платформы как свои объекты.
+
+## 3. Per-device state
+
+`PF_GPUDeviceSetupOutput::gpu_data` — effect-owned pointer, который потом приходит в setdown с требованием effect dispose.
+
+Хорошая модель:
+
+```text
+one immutable/global algorithm description
++ per-device compiled kernels/pipelines
++ per-render transient buffers
+```
+
+Не храните один CUDA/Metal/OpenCL/DirectX context как глобальный singleton без привязки к device index.
+
+Bundled `SDK_Invert_ProcAmp` создаёт framework-specific state в GPU_DEVICE_SETUP и маршрутизирует отдельный SMART_RENDER_GPU path.
+
+## 4. PF_GPUDeviceSuite1: ownership
+
+Текущий suite документирует пары:
+
+- AllocateDeviceMemory → FreeDeviceMemory;
+- AllocateHostMemory → FreeHostMemory;
+- CreateGPUWorld → DisposeGPUWorld.
+
+Только созданные самим plug-in GPU worlds plug-in имеет право Dispose.
+
+Suite comments рекомендуют device allocations делать через host suite; purge рассматривается как emergency path, а не обычный allocator.
+
+## 5. Exclusive device access
+
+Suite имеет Acquire/ReleaseExclusiveDeviceAccess. Но comment отдельно говорит, что для full GPU plug-ins с отдельным GPU render entry point exclusive access уже удерживается host.
+
+Не добавляйте лишний lock вокруг любого GPU selector «на всякий случай». Сначала определить, какой execution model используется.
+
+## 6. Pixel format GPU path
+
+Bundled sample проверяет `PF_PixelFormat_GPU_BGRA128` в GPU Smart Render и использует 16 bytes/pixel.
+
+Из этого можно говорить о конкретном sample path, но не о том, что любой GPU effect обязан принимать только этот формат во всех будущих SDK.
+
+Нужно проверять актуальный pixel-format contract для каждого supported SDK/host.
+
+## 7. Pre-render решает применимость GPU
+
+Sample выставляет:
+
+```text
+PF_RenderOutputFlag_GPU_RENDER_POSSIBLE
+```
+
+в pre-render.
+
+В production этот флаг должен зависеть от реальной возможности выполнить текущий кадр:
+
+- текущие параметры;
+- доступный backend;
+- поддерживаемый pixel format;
+- нужные resources;
+- известные fallback conditions.
+
+Не заявляйте GPU possible, если далее обязательно вернёте unsupported path.
+
+## 8. CPU reference обязателен
 
 CPU implementation должна быть:
+
 - правильной;
 - deterministic;
-- тестируемой;
-- достаточно простой, чтобы служить oracle для GPU comparison.
+- отдельно тестируемой;
+- достаточно простой, чтобы служить oracle для GPU.
 
-## Build dependencies из актуального SDK Guide
+GPU backend не должен тихо иметь другую clamp, alpha или HDR policy.
 
-Adobe's GPU sample `SDK_Invert_ProcAmp` требует дополнительные зависимости.
+## 9. CPU ↔ GPU correctness
 
-### macOS
+До benchmark определить tolerance и сравнивать минимум:
 
-Guide указывает Boost для processing GPU kernel files в sample project. Конкретный path задаётся через Xcode custom path/environment настройки sample-а.
-
-### Windows
-
-Guide на 2025/2026 указывает:
-- Boost;
-- CUDA SDK версии, совместимой с используемым AE build;
-- DirectX Shader Compiler (DXC).
-
-Не фиксировать CUDA version навечно в библии продукта: проверять SDK Guide/release notes для каждого supported AE generation.
-
-## DirectX
-
-Если используется DirectX rendering path:
-- нужный capability flag должен быть заявлен;
-- PiPL должен соответствовать runtime flags;
-- generated DirectX assets должны быть установлены рядом/в ожидаемом runtime layout;
-- обязателен CPU fallback.
-
-## CUDA
-
-Adobe рекомендует Driver API для лучшей driver compatibility. Если используется Runtime API, осознанно выбрать static/dynamic strategy и контролировать deployment runtime libraries.
-
-## GPU correctness
-
-Сравнивать CPU ↔ GPU:
-- 8/16/32-bpc;
-- alpha 0/1/partial;
-- HDR/negative float values;
-- tiny images, odd widths, nontrivial rowbytes;
-- extreme parameters;
+- 32-bpc float основной GPU path;
+- alpha 0 / partial / 1;
+- negative и >1 HDR values;
+- extreme params;
+- tiny/odd dimensions;
+- non-zero origins/ROI;
 - edge pixels;
-- multiple GPUs / unsupported GPU fallback where possible.
+- repeated renders;
+- MFR on/off там, где feature поддерживается;
+- fallback when backend/device unavailable.
 
-Tolerance должна быть указана **до** теста, а не подобрана после расхождения.
+Не подбирайте tolerance после того, как увидели расхождение.
 
-## GPU performance
+## 10. Backend-specific compilation
+
+Bundled sample содержит CUDA, OpenCL, DirectX и Metal branches, но source presence не означает, что все они собираются в любой конфигурации.
+
+Для каждой shipping platform нужно отдельно фиксировать:
+
+```text
+toolchain
+kernel source/binary generation
+runtime dependency
+host framework selection
+artifact contents
+actual device test
+```
+
+## 11. Device loss / allocation failure
+
+Минимальный error-path test:
+
+- setup compilation failure;
+- GPU allocation failure;
+- unsupported framework;
+- unsupported pixel format;
+- intermediate world creation failure;
+- render cancellation;
+- setdown after partial setup.
+
+Каждый успешно созданный resource должен иметь определённый release path даже после поздней ошибки.
+
+## 12. Performance measurement
 
 Профилировать отдельно:
-- upload/download;
-- kernel dispatch;
+
+- CPU preparation;
+- host↔device transfer;
+- kernel compile/warmup;
+- dispatch;
 - kernel time;
 - intermediate allocations;
 - synchronization;
-- shader compilation/cache warmup.
+- readback.
 
-На маленьком кадре CPU может быть быстрее. Backend selection может учитывать workload size, но не должен менять визуальную семантику.
+«GPU быстрее» без размера кадра, backend, device, warm/cold state и transfer cost — не benchmark.
+
+## Verification boundary
+
+Текст сверён с SDK/source sample. Новый GPU binary в этой итерации не собирался и CPU↔GPU host comparison не запускался. Gate 6/7 остаются открытыми.
