@@ -321,41 +321,286 @@ UI не должен владеть render state. Native core не должен 
 
 # Environment matrix
 
-Перед началом разработки зафиксировать матрицу. Не использовать «последний Mac/Windows» как спецификацию.
+Перед разработкой зафиксируйте **целевую среду продукта**.
+
+Не используйте:
+
+- “latest AE”;
+- “latest macOS”;
+- “обычный Windows PC”;
+- “GPU enabled”;
+
+как спецификацию. Эти формулировки невозможно воспроизвести.
+
+## Зачем нужна матрица
+
+Она отвечает на четыре разных вопроса:
+
+1. **Что продукт обещает поддерживать?**
+2. **На чём продукт разрабатывается?**
+3. **Что реально проверялось?**
+4. **Что является только planned/experimental?**
+
+Не смешивайте эти четыре статуса.
+
+## Core dimensions
+
+| Dimension | Что зафиксировать |
+|---|---|
+| After Effects | product-supported versions/build families |
+| Adobe SDK | baseline version/build used for native contracts |
+| OS | supported minimum/maximum policy |
+| CPU architecture | arm64/x86_64/x64/ARM64 as relevant |
+| compiler/toolchain | Xcode/Clang or Visual Studio/MSVC generation |
+| extension type | Effect / AEGP / AEIO / Artisan / Script / CEP / hybrid |
+| pixel formats | 8/16/32 bpc actually supported by feature |
+| SmartFX | yes/no + ROI assumptions |
+| MFR | supported/disabled/experimental |
+| GPU | backend/device requirements |
+| panel runtime | CEP version / migration boundary |
+| signing | development vs release policy |
+| dependencies | bundled/runtime/framework requirements |
+| host products | AE only vs Premiere compatibility where applicable |
+
+## Platform baseline
 
 | Dimension | macOS | Windows |
 |---|---|---|
 | IDE | Xcode | Visual Studio |
-| Primary CPU | arm64 + x86_64 Universal | x64; ARM64 where supported |
-| Native effect suffix/package | bundle/plugin from SDK project | `.aex` |
-| Shared plug-in location | `/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/` | registry-driven installer path; common dev path under `Adobe\Common\Plug-ins\7.0\MediaCore` |
-| User dev location | `~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/` | usually admin/common path or custom dev copy step |
-| Debugger | Xcode / lldb | Visual Studio debugger |
-| Signing | codesign + Developer ID | Authenticode / SignTool |
-| Release trust | notarization + Gatekeeper | certificate reputation / Windows trust |
+| Main native architecture | arm64; x86_64 only if product still supports Intel | x64; ARM64 only if product intentionally supports it |
+| Native effect package | plug-in bundle from SDK project | `.aex` |
+| Common dev plug-in location | Adobe Common MediaCore path | Adobe Common MediaCore path / registry-driven product install |
+| Debugger | Xcode / LLDB | Visual Studio / WinDbg |
+| Development signing | ad-hoc where platform requires it | usually not required for local load |
+| Release signing | Developer ID | Authenticode |
+| OS trust path | Gatekeeper/notarization | Windows certificate/reputation chain |
 
-## Record for each project
+Exact paths and platform details live in the platform chapters.
 
-```yaml
-product: MyPlugin
-min_ae: 25.x
-max_tested_ae: 26.x
+## Status dimensions
+
+For each row/property use explicit state:
+
+- **supported** — product policy says yes;
+- **tested** — concrete evidence exists;
+- **experimental** — feature exists but product does not promise it;
+- **planned** — roadmap only;
+- **unsupported** — deliberately not supported;
+- **unknown** — not yet decided.
+
+Do not use a green checkmark for both “supported” and “tested”; they are different claims.
+
+## Example project matrix
+
+~~~yaml
+product: ExamplePlugin
+product_version: 1.0.0
+
+after_effects:
+  supported:
+    - "25.x"
+    - "26.x"
+  sdk_baseline: "25.6 build 61"
+
 macos:
-  min_os: TBD by product policy
-  arch: [arm64, x86_64]
-windows:
-  arch: [x64]
-  arm64: planned-or-supported
-gpu:
-  mac: enabled-or-none
-  windows_cuda: enabled-or-none
-  windows_directx: enabled-or-none
-mfr: true-or-false
-smartfx: true-or-false
-premiere_compatible: true-or-false
-```
+  supported: true
+  min_os: "product policy"
+  arch:
+    arm64: supported
+    x86_64: unsupported
+  toolchain: "Xcode release policy"
 
-Это становится входом для CI, test matrix и release notes.
+windows:
+  supported: true
+  arch:
+    x64: supported
+    arm64: planned
+  toolchain: "Visual Studio release policy"
+
+effect:
+  bpc:
+    8: supported
+    16: supported
+    32: supported
+  smartfx: supported
+  mfr: experimental
+
+gpu:
+  mac:
+    metal: supported
+  windows:
+    directx: experimental
+    cuda: unsupported
+
+panel:
+  runtime: "CEP"
+  migration_target: "UXP when target APIs are available"
+
+premiere:
+  compatible: unsupported
+~~~
+
+## Development matrix vs support matrix
+
+### Development matrix
+
+What engineers need to build/debug:
+
+- toolchains;
+- SDK path;
+- debug host;
+- signing setup;
+- local install path;
+- symbols.
+
+### Support matrix
+
+What customers/users are promised:
+
+- AE versions;
+- OS versions;
+- architectures;
+- GPU/backend;
+- feature limitations.
+
+### Test/evidence matrix
+
+What was actually exercised.
+
+Keep these separately even if they are generated from one source file.
+
+## AE version identity
+
+Record enough to distinguish:
+
+- major/minor product version;
+- exact build when diagnosing regressions;
+- Beta vs release where behavior may differ.
+
+A project saying only “AE 26” is often insufficient for compatibility debugging.
+
+## SDK baseline is not support range
+
+The SDK used to read/build native contracts does not automatically equal:
+
+- minimum supported AE;
+- maximum supported AE;
+- binary compatibility range.
+
+The product's compatibility policy must be stated separately.
+
+## Architecture matrix
+
+### macOS
+
+Decide deliberately:
+
+- arm64 only;
+- Universal arm64+x86_64;
+- separate artifacts.
+
+Do not accidentally claim Intel support just because one dependency happens to contain an x86_64 slice.
+
+### Windows
+
+Decide deliberately:
+
+- x64;
+- Windows ARM64;
+- separate installers/packages if needed.
+
+Third-party libraries can constrain architecture even when your own code compiles.
+
+## GPU matrix
+
+Do not use one boolean `gpu: true`.
+
+Record:
+
+- backend;
+- supported devices/families;
+- minimum API/OS policy if relevant;
+- CPU fallback;
+- feature parity expectations.
+
+Example:
+
+~~~yaml
+gpu:
+  cpu_fallback: true
+  mac:
+    metal: supported
+  windows:
+    directx: supported
+    cuda: unsupported
+~~~
+
+## MFR matrix
+
+Record separately:
+
+- code path thread-safe by design;
+- capability advertised;
+- enabled in release policy;
+- known exclusions.
+
+A product can have MFR-safe architecture while still shipping with MFR disabled for a particular release.
+
+## Panels
+
+Panel support needs its own lifecycle/version boundary:
+
+- CEP runtime;
+- host version;
+- Node usage;
+- external helper;
+- migration plan.
+
+Do not put business logic directly into CEP-specific APIs if a UXP migration is expected.
+
+## Third-party dependencies
+
+For each native dependency record:
+
+- version;
+- architecture slices;
+- linkage model;
+- license;
+- signing/notarization implications;
+- GPU/runtime requirements.
+
+Dependency policy belongs in the environment matrix because it can reduce supported platforms before your own code does.
+
+## Matrix as product input
+
+Use the matrix to drive:
+
+~~~text
+architecture decisions
+→ build variants
+→ CI lanes
+→ test coverage
+→ installer rules
+→ compatibility page
+→ release notes
+→ support diagnostics
+~~~
+
+Do not maintain seven contradictory copies manually if one structured source can generate them.
+
+## Bible vs product matrix
+
+AE Developer Bible documents **how to design this matrix**.
+
+Bible itself does not need to build every combination listed in examples. When Bible reports a historical runtime/compiler result, it records that exact environment as evidence for that claim only.
+
+## Related chapters
+
+- [Version compatibility](00-START-HERE/../01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md)
+- [macOS](00-START-HERE/../08-MACOS/README.md)
+- [Windows](00-START-HERE/../09-WINDOWS/README.md)
+- [Testing](00-START-HERE/../10-TESTING/README.md)
+- [Distribution](00-START-HERE/../11-DISTRIBUTION/README.md)
 
 
 ---
@@ -807,38 +1052,327 @@ Public PiPL/registration/loading guidance in this chapter remains based on the d
 
 # Version compatibility
 
-## Policy
+Compatibility in After Effects development is not one boolean.
 
-Собирать обычно разумно с новыми SDK headers, но **заявлять поддержку только тех AE versions, которые реально протестированы**.
+A plug-in can be:
 
-Новый SDK не означает обязательный новый binary на каждую версию AE, но новая функция может потребовать suite/API gating.
+- source-compatible but not binary-compatible;
+- binary-loadable but semantically broken;
+- compatible on one CPU architecture and not another;
+- compatible in AE but not in another host;
+- compatible for basic render but not for MFR/GPU/custom UI.
 
-## Runtime checks
+Define the contract explicitly.
 
-Effect plug-in может ориентироваться на host/API version из данных, передаваемых host. AEGP также получает version information. Для точного app version при необходимости можно использовать поддержанные host/script mechanisms.
+## Compatibility layers
 
-## Compatibility contract
+### 1. Source compatibility
 
-Для каждой release записывать:
+Can the code compile against a given SDK/toolchain?
 
-| AE | mac arm64 | mac x86_64 | Win x64 | Win ARM64 | Status |
+Affected by:
+
+- removed/changed declarations;
+- suite generations;
+- calling conventions;
+- platform headers;
+- compiler language rules.
+
+### 2. Binary/loader compatibility
+
+Can the built artifact be discovered and loaded?
+
+Affected by:
+
+- PiPL/resource declarations;
+- architecture;
+- exported entry points;
+- package layout;
+- dependent libraries;
+- signing/platform trust.
+
+### 3. Runtime API compatibility
+
+Do required suites/selectors/features exist at runtime?
+
+Affected by:
+
+- host version;
+- suite acquisition/version;
+- optional capabilities;
+- host-product differences.
+
+### 4. Semantic compatibility
+
+Does the same operation still behave as the product expects?
+
+Examples:
+
+- project mutation semantics;
+- color behavior;
+- render/cache behavior;
+- custom UI lifecycle;
+- GPU backend behavior.
+
+### 5. Project/data compatibility
+
+Can projects created with one plug-in version reopen safely with another?
+
+Affected by:
+
+- parameter IDs;
+- match names;
+- sequence data;
+- persistent schemas;
+- defaults;
+- migration logic.
+
+## SDK baseline vs supported AE range
+
+Do not write:
+
+> built with SDK 25.6, therefore supports AE 25.6+
+
+That inference is not automatic.
+
+An SDK baseline tells you which source contracts you used. Product support range is a separate policy.
+
+## Suite version gating
+
+For PICA/AEGP suites:
+
+~~~text
+need feature
+→ know suite name + public version
+→ acquire
+→ handle unavailable/older version
+→ use
+→ release
+~~~
+
+Do not cast an older suite pointer to a newer struct just to avoid branching.
+
+If feature is optional, degrade gracefully.
+
+If feature is fundamental, fail early with a useful compatibility message.
+
+## Effect selectors and flags
+
+Effect plug-ins also have compatibility contracts in:
+
+- PiPL;
+- API version fields;
+- global outflags;
+- selector handling;
+- SmartFX/MFR/GPU capability declarations.
+
+Advertising a capability can cause the host to call selectors/paths the plug-in must actually implement.
+
+## Stable identity
+
+Changing these can break existing projects:
+
+- match name;
+- parameter IDs;
+- persistent data schema;
+- effect registration identity.
+
+Display name is not the same thing as persistent identity.
+
+Plan renames separately from ABI/project identity.
+
+## Parameter evolution
+
+Safe parameter evolution requires deliberate IDs.
+
+Typical rules:
+
+- never recycle an old parameter ID for a different meaning;
+- append/add parameters carefully;
+- define migration/default behavior;
+- preserve project interpretation.
+
+UI index and persistent ID are different concepts.
+
+## Persistent data
+
+Version your own stored data.
+
+Example:
+
+~~~text
+magic
+schema version
+payload size
+payload
+~~~
+
+On load:
+
+1. validate size/version;
+2. migrate known old version;
+3. reject/repair malformed state deliberately;
+4. never reinterpret arbitrary old bytes as a new struct.
+
+C/C++ struct layout is not a durable serialization format by default.
+
+## Cross-architecture compatibility
+
+### macOS
+
+Universal support implies all native dependencies and nested components support required slices.
+
+### Windows
+
+ARM64 support is not implied by x64 source compiling.
+
+Check:
+
+- dependencies;
+- installer paths;
+- helper processes;
+- GPU backends;
+- code-generation assumptions.
+
+## Host-product compatibility
+
+Some AE SDK concepts overlap with Premiere or other Adobe hosts, but support must be explicit.
+
+Do not infer Premiere compatibility from:
+
+- shared headers;
+- similar pixel structs;
+- same MediaCore install path.
+
+Check the exact host contract.
+
+## Compatibility matrix
+
+Product support statement should distinguish **supported** and **tested evidence**.
+
+Example:
+
+| Host | mac arm64 | mac x86_64 | Win x64 | Win ARM64 | Policy |
 |---|---:|---:|---:|---:|---|
-| 25.x | ✅/❌ | ✅/❌ | ✅/❌ | ✅/❌ | tested |
-| 26.x | ✅/❌ | ✅/❌ | ✅/❌ | ✅/❌ | tested |
-| Beta | lab only | lab only | lab only | lab only | never claim from smoke only |
+| AE 25.x | supported | no | supported | no | supported |
+| AE 26.x | supported | no | supported | planned | supported with stated limits |
+| Beta | lab | no | lab | lab | no customer support promise |
 
-## Forward compatibility rule
+Avoid treating “Beta opened once” as a support claim.
 
-При выходе нового AE:
-1. install on clean test system;
-2. load test;
-3. render golden projects;
-4. MFR on/off;
-5. GPU on/off and available backends;
-6. save/reopen project;
-7. render queue/export;
-8. performance comparison;
-9. only then update support statement.
+## New AE release workflow
+
+When a new AE release appears:
+
+1. read Adobe release/SDK notes;
+2. diff relevant SDK/header contracts if SDK changed;
+3. identify changed high-risk areas;
+4. load existing product artifact where policy allows;
+5. exercise representative project/render workflows;
+6. check MFR/GPU/UI paths used by the product;
+7. check save/reopen and persistent state;
+8. update support statement only after evidence is adequate.
+
+This workflow belongs to the product team. Bible documents the method; it does not need to perform it for every version.
+
+## New SDK adoption workflow
+
+Do not begin with “fix compiler errors until green”.
+
+Use:
+
+~~~text
+old SDK contract
++ new SDK contract
+→ declaration diff
+→ classify changes
+→ inspect official samples/comments
+→ update source/gating
+→ update documentation/support policy
+~~~
+
+The [SDK contract tools](01-ARCHITECTURE/../18-SDK-HEADER-TOOLS/README.md) exist to help with this review.
+
+## Version-sensitive documentation
+
+When Bible names a specific suite generation or platform rule, include its boundary.
+
+Good:
+
+> SDK 25.6 exposes StreamSuite6 in the supplied baseline.
+
+Bad:
+
+> StreamSuite6 is always the current stream API.
+
+Future editions may use another baseline.
+
+## Deprecation and legacy samples
+
+Official SDK bundles can contain old samples using older suite generations.
+
+Treat them as:
+
+- pattern evidence;
+- lifecycle examples;
+- historical compatibility examples.
+
+Do not automatically treat sample signatures as the newest contract when current headers differ.
+
+## Graceful degradation
+
+Feature gating should be deliberate.
+
+Example:
+
+~~~text
+if new suite available:
+    enable advanced feature
+else:
+    use documented fallback
+~~~
+
+Do not silently run a partially equivalent fallback that changes project/render semantics.
+
+## Compatibility failures to plan for
+
+- suite unavailable;
+- newer project data loaded by older plug-in;
+- unsupported CPU architecture;
+- missing nested dylib/DLL;
+- changed GPU capability;
+- host calls optional selector now advertised by flags;
+- old sample copied with obsolete ABI;
+- panel runtime migration;
+- installer finds multiple AE versions.
+
+## Documentation/release language
+
+Prefer precise language:
+
+- “supported”;
+- “tested on”;
+- “known issue”;
+- “experimental”;
+- “not supported”.
+
+Avoid:
+
+- “should work everywhere”;
+- “compatible with all newer AE versions”;
+- “future proof”.
+
+## Related chapters
+
+- [Environment matrix](01-ARCHITECTURE/../00-START-HERE/02-ENVIRONMENT-MATRIX.md)
+- [PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md)
+- [SDK diff policy](01-ARCHITECTURE/../18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md)
+- [Compatibility matrix template](01-ARCHITECTURE/../13-TEMPLATES/COMPATIBILITY-MATRIX.md)
+- [Distribution](01-ARCHITECTURE/../11-DISTRIBUTION/README.md)
+
+## Evidence boundary
+
+Current Bible native baseline is SDK 25.6 build 61. The chapter describes compatibility design methodology; it does not claim universal compatibility for Bible source examples.
 
 
 ---
@@ -1274,40 +1808,425 @@ See [macOS](01-ARCHITECTURE/../08-MACOS/README.md), [Windows](01-ARCHITECTURE/..
 
 <!-- SOURCE: 01-ARCHITECTURE/07-COMMUNICATION-ARCHITECTURE.md -->
 
-# Communication architecture — one-page rulebook
+# Communication architecture
+
+Коммуникация в After Effects — это не просто вопрос «как передать данные». Правильный bridge должен сохранять:
+
+- **host lifecycle**;
+- **threading rules**;
+- **ownership/lifetime**;
+- **dependency visibility**;
+- **version compatibility**;
+- **failure semantics**.
+
+Если канал обходит эти правила, он может работать в простом тесте и всё равно ломать cache, MFR, undo, project state или shutdown.
+
+## Сначала определить владельца состояния
+
+Перед выбором транспорта ответьте:
+
+1. Кто источник истины?
+2. Кто имеет право изменять состояние?
+3. Кто инициирует команду?
+4. На каком thread разрешён host API?
+5. Нужно ли состояние видеть render/cache dependency model?
+6. Нужно ли переживать reload/restart?
+7. Может ли ответ устареть до доставки?
+
+Плохая архитектура часто начинается с двух компонентов, которые оба считают себя владельцем одного state.
 
 ## Host-owned channels
 
-- Effect: AE -> `PF_Cmd` -> `EffectMain`.
-- AEGP: AE -> registered hooks; AEGP -> AE via suites.
-- AEIO: AE -> registered function block.
-- Artisan: AE -> renderer entry points.
-- Script: JS -> AE scripting DOM.
-- CEP: panel JS -> `evalScript` -> ExtendScript -> AE.
+### Effect plug-in
+
+~~~text
+After Effects
+→ PF_Cmd selector
+→ EffectMain
+→ output / out_data / host callbacks
+~~~
+
+Effect должен получать render-affecting state через host-visible parameters, sequence/frame data и documented APIs.
+
+Не прячьте render dependency в:
+
+- global singleton;
+- panel DOM;
+- temp JSON file;
+- undocumented process memory;
+- external service without explicit cache invalidation strategy.
+
+### AEGP
+
+~~~text
+After Effects
+→ registered hook/callback
+→ AEGP code
+→ host suites
+~~~
+
+AEGP хорошо подходит для project/control-plane operations: commands, project/items/layers, render queue, idle/update hooks и native integration.
+
+### AEIO
+
+Host вызывает зарегистрированный function block. AEIO callbacks — часть host-driven import/export lifecycle, а не произвольный RPC surface.
+
+### Artisan
+
+Host вызывает renderer entry points и предоставляет suite/context state. Renderer не должен превращаться в общий application service только потому, что он native.
+
+### ExtendScript
+
+~~~text
+script
+→ scripting DOM
+→ After Effects project/UI state
+~~~
+
+Подходит для orchestration и project automation. Не подходит как heavy binary data path.
+
+### CEP / panel
+
+~~~text
+HTML/JS panel
+→ evalScript / event bridge
+→ ExtendScript / host-facing layer
+→ AE
+~~~
+
+Panel — control surface. DOM panel-а не должен быть persistent source of truth для project/render state.
 
 ## Cross-component channels
 
-1. **AEGP -> Effect**: `AEGP_EffectCallGeneric` / `PF_Cmd_COMPLETELY_GENERAL`.
-2. **Native -> Native**: published PICA suite.
-3. **AEGP -> Script**: `AEGP_ExecuteScript`.
-4. **CEP -> Script**: `CSInterface.evalScript`.
-5. **CEP events**: event bus for UI/event notification, not bulk binary transfer.
-6. **External service**: explicit IPC you own; do not depend on undocumented AE internals.
+### AEGP → Effect
 
-## Choose by payload
+Для scoped native command к конкретному effect instance:
 
-| Payload | Best channel |
+- `AEGP_EffectCallGeneric`;
+- `PF_Cmd_COMPLETELY_GENERAL`.
+
+Использовать для небольших versioned control messages. Не передавать long-lived host pointers между независимыми lifetimes.
+
+### Native → Native through PICA
+
+Published suite подходит, когда один native module предоставляет сервис другому.
+
+Contract должен включать:
+
+- suite name;
+- public version;
+- function-table ABI;
+- ownership;
+- thread assumptions;
+- provider lifetime;
+- failure if suite unavailable.
+
+### Native → scripting
+
+`AEGP_ExecuteScript` полезен, когда нужная операция доступна только scripting layer или когда продукт осознанно использует script as orchestration.
+
+Это не причина переносить heavy native workflow в строки.
+
+### CEP → ExtendScript
+
+`CSInterface.evalScript` — control-plane bridge.
+
+Хорошие payloads:
+
+- command;
+- IDs;
+- small state snapshots;
+- options;
+- progress;
+- structured errors.
+
+Плохие payloads:
+
+- pixels;
+- audio buffers;
+- huge project dumps every frame;
+- ML tensors;
+- binary archives encoded as strings.
+
+### External helper / process
+
+Если нужен отдельный process, используйте IPC, которым владеет продукт:
+
+- local socket;
+- named pipe;
+- loopback protocol;
+- file handoff;
+- shared memory;
+- process-specific RPC.
+
+Document:
+
+- discovery;
+- authentication/trust boundary;
+- message version;
+- retry rules;
+- process lifetime;
+- shutdown;
+- stale requests;
+- large-payload ownership.
+
+Не используйте undocumented AE internal IPC как production contract.
+
+## Control plane vs data plane
+
+### Control plane
+
+Небольшие сообщения:
+
+- commands;
+- IDs;
+- configuration;
+- state summaries;
+- progress;
+- errors.
+
+### Data plane
+
+Большие/частые данные:
+
+- pixels;
+- audio;
+- large binary buffers;
+- tensors;
+- cached frames.
+
+Правило:
+
+> control plane можно сериализовать; data plane должен оставаться там, где его не приходится постоянно превращать в текст.
+
+## Synchronous vs asynchronous
+
+### Synchronous
+
+Используйте, когда:
+
+- операция быстрая;
+- caller должен немедленно получить результат;
+- host contract сам synchronous;
+- нельзя безопасно продолжить без ответа.
+
+Опасность: blocking main thread.
+
+### Asynchronous
+
+Используйте, когда:
+
+- helper/process выполняет долгую работу;
+- panel ждёт background task;
+- ответ может прийти позже.
+
+Нужны:
+
+- request ID;
+- generation/revision;
+- timeout;
+- cancellation policy;
+- stale-response rejection;
+- explicit completion/error state.
+
+Async callback не делает host API thread-safe автоматически.
+
+## Request identity
+
+Минимальный versioned request:
+
+~~~json
+{
+  "protocol": 1,
+  "requestId": "panel-42",
+  "command": "refreshProject",
+  "payload": {}
+}
+~~~
+
+Response:
+
+~~~json
+{
+  "protocol": 1,
+  "requestId": "panel-42",
+  "ok": true,
+  "result": {}
+}
+~~~
+
+Error:
+
+~~~json
+{
+  "protocol": 1,
+  "requestId": "panel-42",
+  "ok": false,
+  "error": {
+    "code": "NO_ACTIVE_COMP",
+    "message": "No active composition"
+  }
+}
+~~~
+
+Transport error и domain error — разные вещи.
+
+## Ownership across a bridge
+
+Через bridge лучше передавать:
+
+- values;
+- immutable IDs;
+- copied strings;
+- serialized state;
+- file/resource handles with explicit ownership contract.
+
+Не передавать как long-lived opaque state:
+
+- raw AE handles;
+- borrowed worlds;
+- suite pointers;
+- stack pointers;
+- callback-local references.
+
+Если host ref нужен позже, документированный API должен позволять безопасно получить его заново.
+
+## Dependency visibility
+
+Самая опасная ошибка — скрытое состояние, влияющее на render.
+
+Пример плохого дизайна:
+
+~~~text
+panel changes global native variable
+→ render code reads global variable
+→ AE parameter/dependency graph ничего не знает
+~~~
+
+Возможные последствия:
+
+- stale cache;
+- разные результаты MFR;
+- render queue отличается от UI preview;
+- project reopen не восстанавливает state.
+
+Render-affecting persistent state должен находиться в host-visible model либо иметь документированную invalidation/dependency strategy.
+
+## Undo and project mutation
+
+Bridge не должен автоматически означать «одна UI команда = много независимых host mutations».
+
+Для project-changing command определите:
+
+- кто открывает undo group;
+- кто закрывает;
+- что происходит при partial failure;
+- нужен ли refresh после mutation;
+- что возвращает command — old state, new state или только operation ID.
+
+Undo не является database rollback. Если операция частично выполнена и затем упала, это нужно документировать отдельно.
+
+## Threading
+
+Главное правило:
+
+> host API не считается thread-safe, пока конкретный API явно этого не обещает.
+
+Panel/helper/background thread может:
+
+- парсить JSON;
+- считать pure data;
+- делать network/file IO;
+- готовить command payload.
+
+Host mutation обычно должна быть marshalled в documented host/main-thread path.
+
+Подробнее: [Threading boundaries](01-ARCHITECTURE/../15-COMMUNICATION/08-THREADING-BOUNDARIES.md).
+
+## Failure model
+
+Продумайте минимум:
+
+- transport unavailable;
+- malformed payload;
+- version mismatch;
+- timeout;
+- stale response;
+- duplicate request;
+- command unsupported;
+- host state changed meanwhile;
+- partial mutation;
+- helper process died;
+- component unloaded.
+
+Failure должен быть machine-readable там, где это нужно логике продукта.
+
+## Channel selection table
+
+| Need | Recommended channel |
 |---|---|
-| effect parameter / render dependency | AE parameter stream / Effect API |
+| effect parameter/render dependency | Effect parameters / stream / host-visible state |
 | project mutation | AEGP or scripting DOM |
-| native control message | generic effect call or published suite |
-| UI command | CEP/UXP -> script/native command bridge |
-| large pixels/binary | native memory/GPU/file/IPC; not ExtendScript JSON |
-| cross-process batch metadata | JSON/protobuf over owned IPC |
+| native command to effect instance | generic effect call |
+| shared native service | PICA suite |
+| panel project command | panel → script/native command bridge |
+| scripting-only operation from native | ExecuteScript, deliberately |
+| heavy pixels/audio | native/GPU/shared memory/file/data-plane path |
+| cross-process helper | explicit owned IPC |
+| UI notification | panel event/state channel |
+| persistent product configuration | owned config storage with version/migration |
 
-## Absolute rule
+## Anti-patterns
 
-The communication path must preserve **dependency visibility, thread rules and ownership**. Fast but hidden state is not an optimization; in AE it is a future cache/crash bug.
+### One giant bridge
+
+Один `execute("anything", json)` без schema/version/ownership быстро превращается в скрытый internal API.
+
+### eval of arbitrary script strings
+
+Предпочтительнее dispatcher с известными commands.
+
+### Polling everything continuously
+
+Polling допустим как explicit fallback, но нужно учитывать cost, visibility и staleness.
+
+### Shared mutable global state
+
+Особенно опасно для render/MFR.
+
+### “Fire and forget” project mutation
+
+Без request ID/result невозможно отличить success от lost command.
+
+### Treating process path as module identity
+
+Фактически загруженный module может отличаться от installer expectation. Проверяйте real loaded image при debugging.
+
+## Production workflow
+
+1. Определить source of truth.
+2. Разделить control/data plane.
+3. Выбрать documented channel.
+4. Описать request/response version.
+5. Описать ownership.
+6. Описать threading/marshalling.
+7. Описать timeout/stale/failure.
+8. Описать undo/project mutation semantics.
+9. Описать shutdown/reload.
+10. Только после этого оптимизировать transport.
+
+## Related chapters
+
+- [Communication section](01-ARCHITECTURE/../15-COMMUNICATION/README.md)
+- [Threading boundaries](01-ARCHITECTURE/../15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
+- [Data ownership](01-ARCHITECTURE/../15-COMMUNICATION/09-DATA-OWNERSHIP.md)
+- [CEP → ExtendScript](01-ARCHITECTURE/../15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md)
+- [Native ↔ script/panel](01-ARCHITECTURE/../15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md)
+- [PICA suites](01-ARCHITECTURE/../14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md)
+
+## Evidence boundary
+
+Native generic-call/PICA contracts are SDK-contract-reviewed against the SDK 25.6 source material. Panel/script/IPC guidance is architecture and public-documentation guidance unless a specific runtime observation is explicitly cited.
 
 
 ---
@@ -6388,53 +7307,338 @@ The SDK documents the ARM64 build path, but the Bible has not yet performed the 
 
 <!-- SOURCE: 09-WINDOWS/03-DEBUGGING.md -->
 
-# Windows — debugging
+# Windows — debugging After Effects plug-ins
 
-## Visual Studio launch
+Windows debugging should answer three questions quickly:
 
-Настроить project Debugging:
-- Command → `AfterFX.exe` нужной версии;
-- Working Directory → directory host-а;
-- plug-in output/copy step → dev MediaCore path.
+1. Did After Effects load the artifact you think it loaded?
+2. Are the matching symbols loaded?
+3. Is the failure inside your code, host interaction, dependency loading or another subsystem?
 
-Путь к AfterFX.exe не зашивать в shared project навечно: использовать local property sheet/env variable.
+## Launch from Visual Studio
 
-## Attach
+Project Debugging settings:
 
-Можно:
-1. запустить AE;
-2. Visual Studio → Attach to Process → AfterFX.exe;
-3. убедиться, что symbols для вашего `.aex` loaded.
+- **Command** → exact target `AfterFX.exe`;
+- **Working Directory** → host directory;
+- **Environment** → product-specific debug variables if needed;
+- output/copy step → development plug-in location.
+
+Do not hardcode one developer's AE path into shared project files. Prefer:
+
+- environment variable;
+- local property sheet;
+- user-local VS settings;
+- generated dev config.
+
+## Attach to an existing AE process
+
+Workflow:
+
+1. launch AE normally;
+2. Visual Studio → **Attach to Process**;
+3. choose the correct `AfterFX.exe`;
+4. confirm code type/native debugger;
+5. inspect loaded modules;
+6. verify symbols for your `.aex`.
+
+Attaching to the wrong AE instance or Beta/release process is a common source of “breakpoint never hits”.
+
+## Verify the actual loaded module
+
+Do not assume that because you copied:
+
+~~~text
+C:\some\path\MyPlugin.aex
+~~~
+
+AE loaded that exact file.
+
+In debugger/module view record:
+
+- loaded full path;
+- image timestamp/build identity if available;
+- module architecture;
+- matching PDB status.
+
+This matters when:
+
+- several AE versions share MediaCore;
+- an old copy exists in another plug-in folder;
+- installer/dev copy both exist;
+- user-level and machine-level locations differ.
+
+## Symbols
+
+A breakpoint with hollow warning icon usually means one of:
+
+- module not loaded;
+- PDB not found;
+- PDB does not match binary;
+- optimized code changed location;
+- source differs from built artifact.
+
+Never fix this by randomly loading a different PDB with the same filename.
 
 ## PDB discipline
 
-Для каждого release:
-- PDB сохраняется;
-- binary hash/version фиксируется;
-- PDB не заменяется новым build под тем же version label.
+For every product build worth debugging retain:
 
-## Crash dump
+- binary;
+- exact PDB;
+- Git SHA/build ID;
+- compiler/toolset;
+- SHA-256 or equivalent artifact identity.
 
-При user crash запрашивать:
-- exact plug-in version/build;
+A PDB belongs to one exact binary build.
+
+## Debug vs Release
+
+Debug-only bug and Release-only bug can have different causes.
+
+### Debug-only
+
+Possible causes:
+
+- assertions;
+- debug allocator;
+- different CRT;
+- uninitialized memory pattern differences;
+- debug-only timing.
+
+### Release-only
+
+Possible causes:
+
+- optimizer exposing UB;
+- race/timing change;
+- omitted debug initialization;
+- LTO/inlining;
+- assumptions about object lifetime.
+
+Do not stop after “Debug works”.
+
+## First-chance exceptions
+
+Native debugger can break before AE's error handling sees an exception.
+
+Useful for:
+
+- access violations;
+- C++ exceptions crossing boundaries;
+- invalid parameter;
+- heap corruption.
+
+But AE and libraries may intentionally throw/catch internal exceptions. Filter by module/call stack before treating every first-chance event as your defect.
+
+## C ABI boundaries
+
+Never allow C++ exception to escape an AE C callback/entry point.
+
+Use a boundary guard:
+
+~~~text
+extern "C" callback
+→ try
+→ implementation
+→ catch
+→ translate to host error
+~~~
+
+See [Host call boundary](09-WINDOWS/../19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md).
+
+## Loader/dependency failures
+
+If AE does not load the plug-in:
+
+Check in order:
+
+1. correct architecture;
+2. PiPL/resource present;
+3. exported entry point;
+4. dependent DLLs;
+5. MSVC runtime dependency policy;
+6. plug-in search path;
+7. duplicate/old copies;
+8. security/antivirus/quarantine policy;
+9. host startup log/error.
+
+Use dependency/import inspection tools rather than guessing.
+
+## Architecture mismatch
+
+Typical Windows native targets:
+
+- x64;
+- ARM64 where intentionally supported.
+
+A native DLL dependency with the wrong architecture can make the top-level `.aex` appear “broken” even when your own binary is correct.
+
+Check the complete dependency tree.
+
+## Crash dumps
+
+For a crash report preserve:
+
+- exact plug-in build;
 - AE version/build;
 - Windows build;
 - CPU architecture;
-- GPU + driver;
-- dump/crash report;
-- project/repro steps;
-- MFR/GPU state.
+- GPU/driver;
+- dump;
+- project/repro;
+- MFR/GPU state;
+- loaded module path.
 
-Debugging без matching PDB часто превращается в угадывание.
+Without matching PDB, dump analysis may not identify your source line.
+
+## WinDbg workflow
+
+For production dump analysis:
+
+~~~text
+open dump
+→ configure symbols
+→ load matching PDB
+→ inspect exception code
+→ stack
+→ module list
+→ threads
+→ locks/waits if relevant
+→ correlate with exact artifact
+~~~
+
+Do not infer causality from the top frame alone; memory corruption often crashes later in unrelated code.
+
+## Hang / deadlock
+
+If AE hangs:
+
+1. break all threads;
+2. inspect main thread;
+3. inspect threads waiting on your locks;
+4. look for host call while holding mutex;
+5. inspect worker↔main-thread circular waits;
+6. compare with MFR/GPU state.
+
+Common anti-pattern:
+
+~~~text
+worker holds product mutex
+→ calls host
+→ host waits for main thread
+→ main thread waits for same product mutex
+~~~
+
+## MFR debugging
+
+For render-race bugs record:
+
+- frame numbers;
+- thread IDs;
+- instance identity;
+- sequence/frame data addresses only for debugging, not as persistent IDs;
+- render start/end;
+- mutation of shared state.
+
+Do not “fix” race by a global mutex around the whole render without understanding performance and host-call consequences.
+
+## GPU debugging
+
+Separate:
+
+- CPU host-side setup;
+- GPU resource/lifecycle;
+- shader/kernel;
+- device reset/loss;
+- synchronization;
+- CPU/GPU numerical mismatch.
+
+Use the backend-specific tooling appropriate to the product.
+
+Do not debug a GPU output mismatch only from AE screenshots; capture deterministic inputs/parameters.
+
+## Memory corruption
+
+Useful options depend on toolchain/product, but possible approaches include:
+
+- debugger heap checks;
+- Application Verifier where compatible;
+- compiler sanitizers for pure/internal code where supported;
+- guarded allocators in standalone test harnesses.
+
+AE host constraints can make some instrumentation impractical inside the final process. Test pure components outside AE when possible.
+
+## Logging
+
+Logs should include enough identity to connect runtime to source:
+
+~~~text
+product version
+Git/build ID
+AE build
+architecture
+module path
+operation/request ID
+thread ID where useful
+error code + context
+~~~
+
+Avoid writing synchronous verbose logs inside hot render loops in production.
+
+## Project/repro capture
+
+Good bug report:
+
+- minimal project;
+- deterministic steps;
+- expected;
+- actual;
+- exact artifact identity;
+- platform matrix;
+- feature flags.
+
+Bad bug report:
+
+> “AE randomly crashes sometimes.”
 
 ## Tools
 
-По необходимости:
+Depending on problem:
+
 - Visual Studio debugger;
-- WinDbg for dumps;
-- Application Verifier/sanitizer-like tooling where compatible;
-- GPU vendor/profiling tools;
-- ETW/perf tools for contention/IO.
+- WinDbg;
+- Modules/Symbols views;
+- dump tools;
+- dependency/import inspection;
+- Application Verifier where compatible;
+- ETW/performance tooling;
+- GPU vendor/backend profilers.
+
+## Product debugging workflow
+
+~~~text
+reproduce
+→ prove exact module identity
+→ load exact symbols
+→ classify loader/crash/hang/render/UI
+→ reduce repro
+→ inspect ownership/threading boundary
+→ fix
+→ preserve regression evidence
+~~~
+
+## Bible evidence boundary
+
+This chapter documents a Windows debugging method. Bible does not need to build or debug its reference source on Windows to make the workflow useful; concrete runtime claims are only made where a recorded runtime result exists.
+
+## Related chapters
+
+- [Visual Studio setup](09-WINDOWS/01-VISUAL-STUDIO-SETUP.md)
+- [Windows ARM64](09-WINDOWS/02-ARM64.md)
+- [Testing](09-WINDOWS/../10-TESTING/README.md)
+- [Crash diagnostics](09-WINDOWS/../10-TESTING/05-CRASH-DIAGNOSTICS.md)
+- [Host call boundary](09-WINDOWS/../19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md)
 
 
 ---
@@ -12745,28 +13949,325 @@ AEGP не является general multithreaded API. Проектные изм�
 
 # Keyframers
 
-Keyframer — specialization AEGP, обычно видимый как команда в **Animation > Keyframe Assistant**.
+Keyframer — AEGP-oriented tool that reads and changes property streams/keyframes. Historically such tools often appear under **Animation → Keyframe Assistant**, but product UI can be elsewhere if the architecture requires it.
 
-## Основная модель
+The important part is not the menu location. The important part is the property/keyframe contract.
 
-1. Получить selection/property stream.
-2. Проверить, keyframe-able ли stream.
-3. Начать undo transaction.
-4. Для массового добавления использовать begin/add/end family API, а не много независимых insert calls.
-5. Изменить interpolation/ease/value/time.
-6. Закончить undo transaction.
+## When to use
 
-## Почему batching важен
+Use a native Keyframer/AEGP path when the tool needs:
 
-Каждый отдельный insert может создавать дорогую undo/update работу. Для массовых операций использовать `AEGP_StartAddKeyframes` → add/set → `AEGP_EndAddKeyframes`.
+- large keyframe batches;
+- access to stream/keyframe metadata not convenient in scripting;
+- native performance;
+- integration with AEGP commands/hooks;
+- shared native logic with another plug-in component.
 
-## Что хранить
+For ordinary project automation, ExtendScript may be simpler.
 
-Не хранить `AEGP_StreamRefH` дольше, чем гарантирует API. Многие opaque handles становятся невалидными после структурных изменений проекта.
+## When not to use
 
-## Reference sample
+Do not choose a native keyframer only because “C++ is faster”.
 
-Adobe SDK sample **Easy Cheese** — базовый ориентир Keyframe Assistant. Исторический **Mangler** показывает более сложный keyframer UI, но его старые ADM UI решения не следует переносить в новый продукт.
+Avoid it when:
+
+- operation is small and scripting already exposes the needed property;
+- UI/pipeline iteration speed matters more than native throughput;
+- product would become dependent on opaque handles for no practical benefit.
+
+## Core model
+
+~~~text
+find target property/stream
+→ validate property type/capability
+→ decide value-time vs keyframe-index operation
+→ open undo scope if mutating
+→ perform single or batch keyframe operation
+→ dispose owned refs/values
+→ refresh/report result
+~~~
+
+## Streams first, keyframes second
+
+AEGP keyframe API operates on streams/properties.
+
+Before changing keys, determine:
+
+- which stream is targeted;
+- stream type;
+- value dimensionality;
+- temporal dimensionality;
+- whether it is time-varying;
+- number of keyframes;
+- whether dimensions are separated;
+- whether the passed ref is a leader or follower where relevant.
+
+Do not treat “property has zero keys” as equivalent to “property is constant”: an expression may still drive the property.
+
+## SDK 25.6 baseline
+
+Current Bible baseline uses:
+
+- `AEGP_StreamSuite6`;
+- `AEGP_DynamicStreamSuite4`;
+- `AEGP_KeyframeSuite5`.
+
+Older Adobe samples may use earlier suite generations. They are useful for patterns, not as current signature authority.
+
+See the [SDK 25.6 stream/keyframe source review](14-NATIVE-INTEGRATIONS/../18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md).
+
+## Ownership
+
+### Stream refs
+
+APIs returning a **new** `AEGP_StreamRefH` generally create caller-owned refs that must be disposed with the matching Stream Suite function.
+
+Do not keep a stream ref forever.
+
+Structural project/property changes can invalidate assumptions about:
+
+- index;
+- hierarchy;
+- parent;
+- selection;
+- stream identity.
+
+If long-lived product state needs to refer to a property, store a stable product-level description/ID where possible and re-resolve the host ref at operation time.
+
+### Stream values
+
+Functions returning `AEGP_StreamValue2` via “GetNew...” create values that require the documented dispose path.
+
+Set-functions do not imply transfer of ownership unless documented.
+
+### Strings/memory handles
+
+Expression/name APIs may return Memory Suite handles rather than C++ strings. Lock/copy/unlock/free according to the memory contract.
+
+## Time models
+
+Do not casually mix:
+
+- layer time;
+- composition time;
+- stream time;
+- keyframe index.
+
+A keyframe API may use `A_Time` plus an AEGP time mode; another API may address a key by index.
+
+Keep conversions explicit at the boundary.
+
+## Value dimensionality vs temporal dimensionality
+
+These are different questions.
+
+Examples:
+
+- spatial value may have multiple value dimensions;
+- temporal ease array is indexed by temporal dimensionality;
+- separated dimensions can change which stream is legal for keyframe-index operations.
+
+Do not size ease/tangent data by guessing from UI appearance.
+
+## Separated dimensions
+
+For separated properties, value access and keyframe-index access do not necessarily have the same legal target.
+
+Practical rule:
+
+1. inspect separation state;
+2. resolve the correct follower stream where keyframe-index API requires it;
+3. perform operation on that stream;
+4. dispose the resolved ref.
+
+Do not assume leader key indexes map 1:1 to follower keys.
+
+## Reading keyframes
+
+Typical questions:
+
+- number of keys;
+- key time;
+- key value;
+- interpolation type;
+- temporal ease;
+- spatial tangents;
+- flags;
+- label color.
+
+Read only what the feature needs. A “dump everything” helper quickly becomes slow on large projects.
+
+## Single-key mutation
+
+Typical sequence:
+
+~~~text
+resolve stream
+→ validate stream supports keys
+→ find/insert target key
+→ set value/interpolation/ease/flags
+→ release temporary values/refs
+~~~
+
+`InsertKeyframe` may return an existing key index when a key already exists at that time; do not automatically interpret that as a newly-created key.
+
+## Batch mutation
+
+For many keys use the batch family instead of repeated independent insertion:
+
+~~~text
+AEGP_StartAddKeyframes
+→ AEGP_AddKeyframes
+→ AEGP_SetAddKeyframe
+→ ...
+→ AEGP_EndAddKeyframes
+~~~
+
+Benefits:
+
+- clearer transaction boundary;
+- less repeated host bookkeeping;
+- easier error/cleanup reasoning;
+- better fit for bulk generation.
+
+Do not forget to close the batch if a middle operation fails. Use structured cleanup/RAII around host transactions where practical.
+
+## Undo
+
+Wrap user-visible mutation in an appropriate undo group.
+
+Undo is not identical to database rollback:
+
+- an operation can partially mutate before an error;
+- cleanup can also fail;
+- nested/host-owned undo behavior has its own contract.
+
+Document product behavior for partial failure.
+
+## Interpolation and ease
+
+Treat separately:
+
+- temporal interpolation;
+- spatial interpolation;
+- temporal ease;
+- spatial tangents;
+- key flags.
+
+Changing one does not imply the others.
+
+Preserve existing properties the tool is not intentionally changing.
+
+## Expressions
+
+A property can have:
+
+- keyframes;
+- expression;
+- both.
+
+A keyframer should define whether it:
+
+- preserves expression;
+- disables expression;
+- refuses the operation;
+- edits keys underneath the expression.
+
+Do not silently change expression state unless that is the feature.
+
+## Selection
+
+If the tool starts from UI selection, treat selection only as an **input snapshot**.
+
+Before committing mutation:
+
+- validate active comp;
+- validate selected properties;
+- validate expected layer/property identity;
+- reject stale/unsupported targets.
+
+Avoid storing selection-derived refs across unrelated user actions.
+
+## Threading
+
+Project/property mutation belongs on a documented host-safe execution path.
+
+Do not mutate AEGP streams from an arbitrary worker thread because the computation that produced the key values happened in background.
+
+Safe pattern:
+
+~~~text
+worker: compute pure values/times
+→ main/host-safe callback: resolve streams + mutate keys
+~~~
+
+## Failure model
+
+Handle at least:
+
+- no active comp;
+- no target property;
+- unsupported stream type;
+- stale/invalid stream;
+- expression policy conflict;
+- separated-dimension mismatch;
+- invalid time/value;
+- failure to start batch/undo;
+- partial batch failure;
+- cleanup/dispose error.
+
+User-facing errors should identify the property/operation, not just an opaque numeric host code.
+
+## Production workflow
+
+1. Define exact target-property rules.
+2. Build pure representation of desired keys.
+3. Resolve host property immediately before mutation.
+4. Validate stream/keyframe capabilities.
+5. Open undo scope.
+6. Use batch API for bulk keys.
+7. Preserve unrelated interpolation/expression state.
+8. Dispose every owned ref/value.
+9. Refresh/report result.
+10. Re-resolve on next command rather than caching opaque refs indefinitely.
+
+## Reference samples
+
+### Easy Cheese
+
+Useful for:
+
+- expression/value inspection;
+- stream info;
+- interpolation/ease patterns.
+
+It uses historical suite generations; do not copy those generations as the current SDK baseline.
+
+### Streamie
+
+Useful for:
+
+- stream hierarchy;
+- structural stream operations;
+- cleanup patterns.
+
+It also contains historical API shapes.
+
+### Mangler
+
+Historically demonstrates more elaborate keyframer UI concepts, but old ADM-era UI architecture is not a recommended new-product UI stack.
+
+## Related Bible material
+
+- [Streams/properties cookbook](14-NATIVE-INTEGRATIONS/../17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md)
+- [Keyframes cookbook](14-NATIVE-INTEGRATIONS/../17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md)
+- [Keyframer batch template](14-NATIVE-INTEGRATIONS/../16-WORKING-TEMPLATES/keyframer-batch/README.md)
+- [Undo transactions](14-NATIVE-INTEGRATIONS/../19-NATIVE-CODE-FOUNDATION/03-UNDO-TRANSACTIONS.md)
+- [Lifetime/threading](14-NATIVE-INTEGRATIONS/../17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md)
+
+## Evidence boundary
+
+The suite generations and lifecycle rules above are SDK-contract-reviewed against the supplied SDK 25.6 source material. Bible does not claim a universal runtime result for a particular Keyframer binary.
 
 
 ---
