@@ -18,7 +18,7 @@ Edition: **v1.1 working line**, updated 2026-10-01. A chapter being present does
 | JSX / ScriptUI | Usage guidance | Scripts supplied | AE execution pending |
 | CEP | Dispatcher architecture | Logic files; packaging dependencies external | Host execution pending |
 | GPU | Backend design and testing guidance | SDK_Invert_ProcAmp sample path | GPU comparison pending |
-| SDK tooling | Reproducible commands and limits | Declaration index, symbol-name check, textual/order diff | Synthetic regression tests; full SDK index incomplete |
+| SDK tooling | Reproducible commands, required-contract manifest and evidence boundaries | Declaration inventory, required table/function gate, exact SuiteHandler-generation check, compiler-report driver | Real SDK 25.6 required preflight PASS: 35/35 contracts, 39/39 cookbook calls; 4 non-required partial diagnostics retained; current macOS/MSVC compile still pending |
 | C++ foundation | Ownership/undo/callback guidance | Helpers | Behavioral stub tests and SDK syntax/type check |
 | macOS / Windows | Build/sign/package plus clean-machine release pipelines | Sample materializer + syntax drivers | historical macOS syntax baseline; Windows native compile/host still pending |
 | Built-in effect research atlas | Evidence levels, execution plan and effect catalog | 3D Channel Extract evidence/function-map pilot | partial static/runtime evidence; full-effect acceptance and catalog completion remain open |
