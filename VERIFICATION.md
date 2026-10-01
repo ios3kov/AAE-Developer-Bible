@@ -1,5 +1,14 @@
 # Verification — v1.1
 
+## Native panels and BlitHook chapter review (2026-10-01)
+
+Rewrote [native dockable panels](14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md) and [BlitHook](14-NATIVE-INTEGRATIONS/10-BLITHOOK.md) from the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/13-PANELS-BLITHOOK-SDK25.6.md) records ten source hashes and the reviewed Panelator/EMP contracts.
+
+Panel review establishes `AEGP_PanelSuite1`, non-localized UTF-8 match-name identity, CreatePanelHook/per-panel refcon/function-table separation, NSView*/HWND platform containers, snap/flyout callbacks, title/visibility state and explicit UnRegisterCreatePanelHook. Panelator remains a useful Window-menu/platform UI skeleton but its reviewed source does not show a complete global teardown/unregister path; this is source evidence only, not a measured leak.
+
+BlitHook review separates the `AEGeneral` PiPL/plugin entry contract from AEGP. `AE_Hook.h` protocol 3.0 describes 32/64/128-bit AE_PixBuffer metadata, ARGB/BGRA format, non-tight row bytes, view origin/visible rectangle, nullable blank frame and receipt/completion/async fields. Bundled EMP does not process pixels or exercise asynchronous completion, so the Bible does not invent pixel-pointer lifetime or async timing beyond the header.
+
+**Verification level: SDK source review and documentation.** No new native panel binary, dock/reopen/workspace/shutdown run, BlitHook display callback, async completion test, preview-latency benchmark or macOS/Windows host matrix was performed. Gate 6/7 remain open.
 ## AEIO and Artisan chapter review (2026-10-01)
 
 Rewrote [AEIO](04-AEIO/README.md), [AEIO native integration](14-NATIVE-INTEGRATIONS/08-AEIO.md), [Artisan](05-ARTISAN/README.md) and [Artisan native integration](14-NATIVE-INTEGRATIONS/09-ARTISAN.md) from the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md) records nine source hashes and exact header/sample ranges.
