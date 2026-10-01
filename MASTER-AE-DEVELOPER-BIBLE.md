@@ -6519,41 +6519,184 @@ AE plug-in нельзя тестировать одной фразой «отк�
 
 # Versioning and compatibility
 
-## Semantic product version
+A native AE product has several independent version domains. Treating them as one number creates migration and support bugs.
 
-Recommended:
+## Product version
 
-```text
-MAJOR.MINOR.PATCH+build
-```
+A practical public version:
 
-Отдельно хранить:
-- marketing version;
-- binary/build number;
-- schema/sequence-data version;
-- bridge protocol version, если panel ↔ native.
+    MAJOR.MINOR.PATCH
 
-## Project compatibility
+Optionally attach a build identifier in internal manifests:
 
-Если старый project содержит effect instance:
-- parameter IDs/order должны интерпретироваться правильно;
-- sequence data versioned;
-- migration deterministic;
-- downgrade expectations documented.
+    1.4.2+1042
 
-## Compatibility statement
+Do not overload the patch number with CI run IDs if customers/support need semantic meaning.
 
-Писать:
+## Keep version domains separate
 
-> Tested with After Effects 25.x and 26.x on macOS arm64 and Windows x64.
+Track independently:
 
-а не:
+- marketing/product version;
+- build number;
+- native binary version metadata;
+- PiPL/effect version where relevant;
+- parameter layout/schema version;
+- flattened sequence-data version;
+- panel/native protocol version;
+- installer schema/product code version;
+- project-owned metadata version.
+
+A change in one domain does not automatically require the same kind of change in all others.
+
+## Effect project compatibility
+
+When an old AE project contains an effect instance, compatibility depends on stable interpretation of persisted state.
+
+Protect:
+
+- parameter IDs;
+- parameter semantic meaning;
+- ordering assumptions where the host/API relies on them;
+- sequence data;
+- arbitrary/persistent data;
+- custom marker/comment metadata used by scripts/panels.
+
+Do not reuse an old parameter ID for a new meaning because a UI label was deleted.
+
+## Sequence-data migration
+
+Persisted binary data should start with an explicit schema/version and fixed-width fields.
+
+Conceptual:
+
+~~~cpp
+struct Header {
+    uint32_t magic;
+    uint16_t schema_version;
+    uint16_t header_size;
+    uint32_t payload_size;
+};
+~~~
+
+On load:
+
+~~~text
+validate magic/size
+→ identify schema
+→ migrate old schema to current in memory
+→ reject unsupported/corrupt input safely
+~~~
+
+Never deserialize persisted files/projects directly into a compiler-dependent C++ struct with raw pointers, size_t or STL members.
+
+## Bridge protocol compatibility
+
+A CEP/UXP/script/native protocol should carry an explicit protocol version independent of product marketing version.
+
+Example:
+
+~~~json
+{
+  "protocol": 3,
+  "requestId": "42",
+  "command": "analyze"
+}
+~~~
+
+When panel and native pieces can update independently, define:
+
+- minimum supported protocol;
+- maximum supported protocol;
+- capability negotiation if needed;
+- user-facing recovery when components are mismatched.
+
+Fail with "component mismatch" rather than executing an unknown payload shape.
+
+## Installer upgrade compatibility
+
+Installer versioning must answer:
+
+- can N upgrade N-1?;
+- is downgrade allowed?;
+- does uninstall of N remove only N-owned files?;
+- what happens to shared user/license data?;
+- what happens if old product filenames changed?;
+- can x64 -> ARM64 migration occur safely?
+
+Record upgrade policy as part of the release, not as tribal knowledge.
+
+## Host support statement
+
+Good:
+
+> Tested with After Effects 25.6 and 26.x on macOS arm64; Windows x64 validation pending.
+
+Bad:
 
 > Works with all After Effects versions.
 
+Separate:
+
+- **tested** host/OS/architecture combinations;
+- **expected compatible but not tested** combinations;
+- **unsupported** combinations.
+
+Do not turn compilation against one SDK into a claim for all future AE releases.
+
+## Minimum and maximum host versions
+
+A support policy should identify:
+
+- oldest host you actively test;
+- newest GA host tested;
+- beta host observations, separately;
+- architecture/OS constraints.
+
+If the native API lets the binary load into a wider range than the product supports, documentation/support policy still needs to state the tested range.
+
 ## Beta versions
 
-Beta smoke tests полезны для раннего detection, но не заменяют GA validation и не должны автоматически менять official support matrix.
+Beta smoke tests are valuable for early breakage detection.
+
+They do not:
+
+- replace GA validation;
+- automatically expand the supported matrix;
+- justify migrating production data formats without backward-compatibility tests.
+
+Record beta observations as beta evidence.
+
+## Deprecation
+
+When dropping an AE version, OS or CPU architecture:
+
+1. announce last supported product version;
+2. stop claiming the platform in current docs;
+3. keep installer/resource declarations consistent with shipped binaries;
+4. preserve old release artifacts according to business/security policy;
+5. define whether old versions continue receiving critical fixes.
+
+## Compatibility test fixtures
+
+Keep representative projects/assets from older supported versions.
+
+At minimum test:
+
+~~~text
+create in old product
+→ save project
+→ open in new product
+→ inspect params/state
+→ render expected output
+→ save/reopen again
+~~~
+
+Also test malformed/old sequence data if custom persistence exists.
+
+## Verification boundary
+
+A documented support matrix is not proof by itself. Every "tested" cell must ultimately link to build/install/host evidence for that exact platform/AE range.
 
 
 ---
@@ -6562,40 +6705,212 @@ Beta smoke tests полезны для раннего detection, но не за�
 
 # Security and licensing architecture
 
-## Principle
+Security and licensing run inside or next to a large creative host process. Protecting revenue must not make After Effects unstable.
 
-Licensing code не должен ухудшать host stability.
+## Primary rule
 
-## Never in render hot path
+Licensing failure should degrade the product deliberately.
 
-Не делать на каждый frame:
-- network license call;
-- filesystem license scan;
-- crypto-heavy handshake;
-- UI dialog;
-- blocking mutex around licensing state.
+It should not:
 
-License state должен быть resolved/cached безопасно вне hot loop.
+- crash AE;
+- deadlock render threads;
+- corrupt a project;
+- block every frame on the network;
+- display UI from an unsafe render callback;
+- delete user data.
+
+## Never put network licensing in the render hot path
+
+Do not perform per frame:
+
+- license-server HTTP calls;
+- disk-wide license scans;
+- expensive crypto handshakes;
+- modal dialogs;
+- long global mutex waits.
+
+Resolve entitlement state outside the hot loop and expose a small immutable/cached state to render code.
+
+If state can expire, define when it is safely refreshed.
+
+## Threading
+
+A render callback may run concurrently under MFR.
+
+License state read by render code should therefore be:
+
+- immutable snapshot;
+- atomic small state;
+- otherwise synchronized without holding a lock across host calls.
+
+Do not make one global license mutex serialize all render frames.
 
 ## Offline behavior
 
-Заранее определить:
-- offline grace;
-- machine changes;
-- clock changes;
-- server unavailable;
+Define before implementation:
+
+- normal offline grace;
+- first activation while offline;
+- server outage;
+- certificate/TLS failure;
+- machine hardware change;
+- clock rollback;
 - license revoked;
-- render farm / headless policy.
+- subscription expires;
+- render farm/headless usage;
+- user signs out;
+- product update while offline.
+
+"Try the server and see" is not a policy.
+
+## Failure classes
+
+Differentiate:
+
+~~~text
+VALID
+INVALID
+EXPIRED
+OFFLINE_GRACE
+SERVER_UNAVAILABLE
+CLOCK_SUSPECT
+COMPONENT_ERROR
+~~~
+
+Do not collapse a server outage into "pirated license".
+
+This improves both UX and support diagnostics.
 
 ## Secrets
 
-Клиентский plug-in нельзя считать secret storage. Любой embedded secret потенциально извлекаем.
+Client software is not a trusted secret vault.
 
-Не помещать server master keys/API admin secrets в binary/panel.
+Anything embedded in:
+
+- .aex/.plugin;
+- CEP JavaScript;
+- JSX;
+- helper executable;
+- local config
+
+can potentially be extracted.
+
+Never ship:
+
+- server master API keys;
+- admin credentials;
+- private signing keys;
+- database passwords;
+- a symmetric key whose compromise grants universal licenses.
+
+Use server-side authority where a true secret is required.
+
+## Panel security
+
+For CEP/UXP-style UI:
+
+- do not expose arbitrary "execute script" endpoints;
+- validate command payloads;
+- allowlist helper operations;
+- validate downloaded data before native parsing;
+- do not trust remote HTML/JS as product code;
+- keep auth tokens out of logs.
+
+A local panel is still an input surface into AE.
+
+## Helper IPC security
+
+If a helper listens on localhost or a named pipe/socket:
+
+- authenticate or bind access appropriately for the threat model;
+- version the protocol;
+- validate length/count/offset fields;
+- cap message size;
+- reject unknown opcodes;
+- prevent arbitrary file execution;
+- decide whether another local process may issue commands.
+
+"localhost" is not the same as "trusted".
+
+## Update security
+
+If the product auto-downloads updates:
+
+~~~text
+fetch metadata
+→ validate channel/version
+→ download artifact
+→ verify signature/hash against trusted metadata
+→ stage
+→ install
+~~~
+
+Never execute an update solely because a URL returned HTTP 200.
+
+Prefer platform code signing plus your own signed update metadata where appropriate.
 
 ## Tamper resistance
 
-Obfuscation/anti-debugging не должна ломать AE, crash diagnostics или легальных пользователей. Stability важнее агрессивной защиты.
+Obfuscation and anti-debugging can raise reverse-engineering cost, but cannot turn a client binary into a secure server.
+
+Aggressive protection must not:
+
+- break AE debugging/support;
+- trigger false positives;
+- destabilize MFR/GPU;
+- block legitimate offline users;
+- make crash dumps unusable.
+
+Host stability wins.
+
+## Privacy
+
+Collect only diagnostics/telemetry needed by a defined purpose.
+
+Document:
+
+- what is collected;
+- when;
+- retention;
+- opt-in/opt-out policy where applicable;
+- whether project names/paths/content are ever included.
+
+Avoid uploading creative content as "debug data" by accident.
+
+## Logging
+
+Safe licensing logs can include:
+
+- product/build;
+- state code;
+- anonymized/account-safe entitlement identifier if policy allows;
+- server response class;
+- request correlation ID;
+- timestamp.
+
+Do not log:
+
+- auth tokens;
+- full license keys;
+- passwords;
+- private project content.
+
+## Render farm policy
+
+Decide explicitly whether headless/aerender/render-node use is:
+
+- included;
+- separately licensed;
+- machine-counted;
+- floating;
+- offline-token based.
+
+Do not discover this only when a customer's farm hangs because a render process attempted interactive login.
+
+## Verification boundary
+
+This chapter is architectural guidance. A real licensing implementation requires its own threat model, privacy review, failure-injection tests and host stability tests.
 
 
 ---
@@ -6604,14 +6919,36 @@ Obfuscation/anti-debugging не должна ломать AE, crash diagnostics 
 
 # Release checklist
 
-## Code
+A release is the exact artifact that passed these gates. Rebuilding after approval creates a new candidate.
 
-- [ ] clean working tree / tagged commit
-- [ ] version/build/schema numbers correct
+## Source and provenance
+
+- [ ] release commit/tag fixed
+- [ ] working tree clean
+- [ ] product/build/schema/protocol versions correct
+- [ ] AE SDK version/build recorded
+- [ ] compiler/toolchain versions recorded
+- [ ] dependency versions/licenses recorded
+- [ ] artifact manifest generated
+- [ ] SHA-256 checksums stored
+- [ ] rollback artifact retained
+
+## Code quality
+
 - [ ] compiler warnings reviewed
-- [ ] no debug backdoors/test endpoints
-- [ ] exceptions contained at host boundaries
-- [ ] dependency licenses reviewed
+- [ ] no Debug-only dependency in Release
+- [ ] no debug backdoor/test endpoint
+- [ ] exceptions contained at host ABI boundaries
+- [ ] malformed external input fails closed
+- [ ] secrets absent from source/package/log defaults
+
+## PiPL / registration
+
+- [ ] PiPL entry point matches exported symbol
+- [ ] PiPL architecture declarations match actual binaries
+- [ ] PiPL capability flags agree with runtime setup
+- [ ] version/category/name metadata correct
+- [ ] Windows PiPL resource generated from intended .r source
 
 ## Effect correctness
 
@@ -6619,72 +6956,158 @@ Obfuscation/anti-debugging не должна ломать AE, crash diagnostics 
 - [ ] 16-bpc
 - [ ] 32-bpc if claimed
 - [ ] alpha/transparency
-- [ ] extreme params
-- [ ] animated params
+- [ ] extreme parameter values
+- [ ] animated parameters
+- [ ] unusual/odd frame sizes
+- [ ] nonzero origins where relevant
+- [ ] partial/empty ROI where relevant
+- [ ] cancellation
 - [ ] save/reopen
 - [ ] old project migration
+- [ ] corrupted/unsupported persisted state handled safely
 
 ## MFR
 
 - [ ] MFR off passes
-- [ ] MFR on passes
-- [ ] repeated stress run passes
-- [ ] no mutable unsafe globals
-- [ ] no lock held across host calls
+- [ ] MFR on passes if claimed
+- [ ] concurrent-frame stress passes
+- [ ] no unsafe mutable global render state
+- [ ] sequence/thread-local state ownership reviewed
+- [ ] no lock held across unsafe host calls
+- [ ] cancellation/error cleanup passes
 
 ## GPU
 
 - [ ] CPU path passes
-- [ ] every GPU backend passes
-- [ ] CPU/GPU diff within defined tolerance
-- [ ] CPU fallback works
-- [ ] missing/unsupported GPU handled cleanly
+- [ ] every claimed GPU backend passes
+- [ ] CPU/GPU output diff within defined tolerance
+- [ ] unsupported GPU fallback works
+- [ ] GPU setup/setdown lifecycle passes
+- [ ] GPU error/cancel path passes
+- [ ] large/odd frame stress passes
 
-## macOS
+## AEGP / panels / scripting if shipped
+
+- [ ] command/menu registration lifecycle passes
+- [ ] shutdown/death hook passes
+- [ ] panel opens after fresh install
+- [ ] panel survives host restart/reopen
+- [ ] bridge protocol version checked
+- [ ] malformed/unknown command rejected
+- [ ] stale async response ignored safely
+- [ ] ExtendScript failure returns structured error
+- [ ] no unbounded evalScript polling
+- [ ] CEP/UXP shell version matches native/script component
+
+## macOS build
 
 - [ ] arm64 slice
 - [ ] x86_64 slice if claimed
-- [ ] PiPL entry declarations correct
-- [ ] release Developer ID signature valid
+- [ ] every native dependency has required slice
+- [ ] unexpected dylib dependency absent
+- [ ] Release dSYM archived
+- [ ] binary hash recorded
+
+## macOS signing/distribution
+
+- [ ] final nested code signed
+- [ ] final plug-in signed with intended Developer ID identity
+- [ ] production entitlements reviewed
+- [ ] no accidental get-task-allow
+- [ ] signature verification passes
 - [ ] notarization accepted
-- [ ] clean-machine install/load
-- [ ] dSYM archived
+- [ ] notary submission/log archived
+- [ ] ticket stapled where applicable
+- [ ] quarantined clean-machine install/load passes
+- [ ] package not modified after signing/notarization
 
-## Windows
+## Windows build
 
-- [ ] x64 build
-- [ ] ARM64 build if claimed
-- [ ] PiPL resource generated
-- [ ] runtime dependencies packaged
-- [ ] Authenticode signature valid
-- [ ] installer signature valid
-- [ ] clean-machine install/load
-- [ ] PDB archived
+- [ ] x64 build passes
+- [ ] ARM64 build passes if claimed
+- [ ] every dependency matches target architecture
+- [ ] no accidental Debug CRT/development dependency
+- [ ] exported/imported symbol review passes
+- [ ] PDB archived per architecture
+- [ ] binary hash recorded
 
-## AE versions
+## Windows signing
 
-- [ ] every supported AE version load test
-- [ ] render golden project
-- [ ] render queue
-- [ ] MFR
-- [ ] GPU
-- [ ] new AE version compatibility statement accurate
+- [ ] .aex signed
+- [ ] helper DLL/EXE signed
+- [ ] SHA-256 file digest explicit
+- [ ] RFC3161 timestamp policy applied
+- [ ] signature verifies with intended publisher identity
+- [ ] installer signed
+- [ ] installer signature verifies
+- [ ] signed payload not mutated afterward
 
-## Installer
+## Host support matrix
+
+For every cell claimed "tested":
+
+- [ ] exact AE version/build recorded
+- [ ] exact OS version recorded
+- [ ] CPU architecture recorded
+- [ ] install path recorded
+- [ ] plug-in discovered by AE
+- [ ] core operation executed
+- [ ] golden render/project scenario passes
+- [ ] restart/reopen passes
+
+## Installer — macOS and Windows
 
 - [ ] fresh install
-- [ ] upgrade
+- [ ] upgrade N-1 -> N
 - [ ] uninstall
+- [ ] reinstall
 - [ ] multiple AE versions
-- [ ] no destructive user-data deletion
+- [ ] no AE installed behavior defined
+- [ ] insufficient permission behavior correct
+- [ ] AE-running/locked-file behavior correct
+- [ ] only product-owned files removed
+- [ ] user presets/projects/data preserved by policy
+- [ ] installer log contains actionable result
+- [ ] rollback/failure does not leave mixed-version payload
+
+## Compatibility
+
+- [ ] support matrix accurate
+- [ ] oldest supported project fixture opens
+- [ ] persisted sequence/schema migration passes
+- [ ] unsupported old schema fails safely
+- [ ] panel/native protocol mismatch produces clear recovery
+- [ ] removed OS/architecture no longer appears in package/docs
+
+## Security/licensing
+
+- [ ] no network licensing in render hot path
+- [ ] offline/server-down behavior tested
+- [ ] render farm/headless policy tested
+- [ ] helper IPC validates size/version/opcode
+- [ ] update artifact signature/hash verified
+- [ ] secrets absent from logs
+- [ ] privacy/telemetry behavior reviewed
 
 ## Release assets
 
 - [ ] changelog
 - [ ] known issues
 - [ ] support matrix
+- [ ] install/uninstall instructions
 - [ ] checksums/build manifest
+- [ ] symbol archive internal location recorded
 - [ ] rollback artifact retained
+- [ ] source/license notices included as required
+
+## Stop rule
+
+If a required checkbox has no evidence, either:
+
+1. run the missing validation, or
+2. remove/narrow the capability claim.
+
+Do not convert "not tested" into "passed" because documentation or CI site generation is green.
 
 
 ---
@@ -6693,69 +7116,101 @@ Obfuscation/anti-debugging не должна ломать AE, crash diagnostics 
 
 # Install locations cheat sheet
 
-## Native C++ — macOS
+Paths below are routing guidance, not permission to blindly copy into every Adobe directory.
+
+## Native C++ — macOS development
+
+AE SDK recommended per-user development path:
+
+    ~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
+
+Use this for normal Xcode development to avoid writing build output into the root-owned system Library.
+
+## Native C++ — macOS common release
 
 Common MediaCore:
 
-```text
-/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
-```
+    /Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
 
-Per-user development:
+Use when the plug-in is intended to be available to compatible Adobe video hosts.
 
-```text
-~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/
-```
+The historical CC version directory remains 7.0.
 
-AE-specific:
+## Native C++ — macOS AE-specific
 
-```text
-/Applications/Adobe After Effects [version]/Plug-ins/
-```
+    /Applications/Adobe After Effects [version]/Plug-ins/
 
-## Native C++ — Windows
+Use only when product policy intentionally targets a specific AE installation/version.
 
-Installer should use Adobe registry path guidance:
+## Native C++ — Windows development
 
-```text
-HKLM\SOFTWARE\Adobe\After Effects\[version]\CommonPluginInstallPath
-```
+Typical SDK development output:
 
-Typical common dev path:
+    C:\Program Files\Adobe\Common\Plug-ins\7.0\MediaCore\
 
-```text
-C:\Program Files\Adobe\Common\Plug-ins\7.0\MediaCore\
-```
+Adobe sample projects also support AE_PLUGIN_BUILD_DIR for the development output path.
+
+Do not turn this hardcoded development path into installer logic.
+
+## Native C++ — Windows release
+
+Resolve the common install path through Adobe's registry guidance:
+
+    HKLM\SOFTWARE\Adobe\After Effects\[version]\CommonPluginInstallPath
+
+AE-specific path is available through the corresponding PluginInstallPath value.
+
+Installer must deliberately use the correct registry view.
 
 ## CEP — macOS
 
 System:
 
-```text
-/Library/Application Support/Adobe/CEP/extensions
-```
+    /Library/Application Support/Adobe/CEP/extensions
 
 User:
 
-```text
-~/Library/Application Support/Adobe/CEP/extensions
-```
+    ~/Library/Application Support/Adobe/CEP/extensions
 
 ## CEP — Windows
 
 System:
 
-```text
-C:\Program Files (x86)\Common Files\Adobe\CEP\extensions
-```
+    C:\Program Files (x86)\Common Files\Adobe\CEP\extensions
 
 User:
 
-```text
-%AppData%\Roaming\Adobe\CEP\extensions
-```
+    %AppData%\Roaming\Adobe\CEP\extensions
 
-Paths are version/platform sensitive. Installer code should prefer official registry/platform rules over string guessing.
+CEP runtime/version and signing/debug-mode policy still apply. A directory existing does not prove the host accepts the package.
+
+## UXP
+
+After Effects UXP is in a transition period in this 2026 snapshot. Do not invent AE UXP install paths from another Adobe host.
+
+When AE UXP public beta/GA documentation is available, follow the AE-specific packaging/install workflow and update this chapter with a dated source.
+
+## Common vs AE-specific policy
+
+Prefer common MediaCore only when the plug-in can safely be discovered by other compatible Adobe video hosts.
+
+Use AE-specific placement when the product depends on After Effects-only suites/behavior and discovery by another host would be misleading or unsafe.
+
+## Installer rules
+
+Regardless of path:
+
+- resolve documented platform/registry path;
+- verify destination before privileged copy;
+- install only product-owned files;
+- never recursively clean a shared Adobe directory;
+- log final path/version;
+- test upgrade/uninstall;
+- verify the installed signed binary, not only the source package.
+
+## Verification boundary
+
+These paths follow current AE SDK/CEP guidance. Host discovery, permissions and installer behavior still require actual clean-machine tests.
 
 
 ---
