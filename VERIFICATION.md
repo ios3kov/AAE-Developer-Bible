@@ -1,5 +1,16 @@
 # Verification — v1.1
 
+## AEIO and Artisan chapter review (2026-10-01)
+
+Rewrote [AEIO](04-AEIO/README.md), [AEIO native integration](14-NATIVE-INTEGRATIONS/08-AEIO.md), [Artisan](05-ARTISAN/README.md) and [Artisan native integration](14-NATIVE-INTEGRATIONS/09-ARTISAN.md) from the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md) records nine source hashes and exact header/sample ranges.
+
+AEIO review distinguishes the frozen 49-slot `AEIO_FunctionBlock4` from current host suites `AEGP_IOInSuite7`/`AEGP_IOOutSuite6`; ModuleInfo capability flags from actual callback behavior; options flatten/inflate and MemorySuite lifetimes; sparse-region drawing; importer-side auxiliary-channel producer callbacks; output Start/Add/End state; audio; ICC/CICP metadata; and semantic `AEIO_Err_USE_DFLT_CALLBACK`. The bundled IO/FBIO examples remain fake-format skeletons, not codec correctness evidence.
+
+Artisan review records PR API 1.0, `PR_ArtisanEntryPoints` global/instance/frame/query lifecycle, plugin-owned private data, registration and match-name identity, current `AEGP_CanvasSuite8`/`ArtisanUtilSuite1`, texture/world/render-receipt cleanup families and the relation between render context and scene evaluation. Bundled Artie uses older Canvas/Layer/Item/Stream suite generations and is treated as renderer-flow evidence, not current-signature or production-quality renderer evidence.
+
+Source caveats are preserved rather than silently fixed: IO's legacy comment about not freeing a replaced old InSpec options handle during sync; Artie's mostly-empty global/instance/frame/query lifecycle callbacks; Artie's old suite generations and helper that does not handle text-layer source dimensions; Artie registration sets both artisan version major/minor from `Artie_MAJOR_VERSION`. None is promoted to a measured AE defect without host reproduction.
+
+**Verification level: SDK source review and documentation.** No new exact-SDK compile, AEIO registration/import/export run, decoder/encoder output comparison, aux-channel import test, Artisan registration/selectability/render, interactive viewport test, persistence test, leak/cancel/error injection run or Windows host test was performed. Gate 6/7 remain open.
 ## Masks, text/markers and footage/import chapter review (2026-10-01)
 
 Rewrote [Masks](17-NATIVE-SUITE-COOKBOOK/07-MASKS.md), [Text + markers](17-NATIVE-SUITE-COOKBOOK/08-TEXT-MARKERS.md) and [Footage / import](17-NATIVE-SUITE-COOKBOOK/09-FOOTAGE-IMPORT.md) against the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/11-MASK-TEXT-FOOTAGE-SDK25.6.md) records six SDK/source hashes, current suite generations, sample ranges and ownership findings.
