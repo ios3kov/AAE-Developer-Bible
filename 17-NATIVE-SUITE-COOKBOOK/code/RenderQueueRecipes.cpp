@@ -44,8 +44,17 @@ A_Err Bible_AddCompAndSetFirstOutputPath(
     ERR(suites.OutputModuleSuite4()->AEGP_SetOutputFilePath(
         rq_itemH, outmodH, final_pathZ));
 
+    // RQItemSuite3 takes AEGP_RenderItemStatusType, not A_Boolean.
     ERR(suites.RQItemSuite3()->AEGP_SetRenderState(
-        rq_itemH, TRUE));
+        rq_itemH, AEGP_RenderItemStatus_QUEUED));
+
+    AEGP_RenderItemStatusType actual_state = AEGP_RenderItemStatus_NONE;
+    ERR(suites.RQItemSuite3()->AEGP_GetRenderState(
+        rq_itemH, &actual_state));
+
+    if (!err && actual_state != AEGP_RenderItemStatus_QUEUED) {
+        err = A_Err_GENERIC;
+    }
 
     return err;
 }
