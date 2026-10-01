@@ -2,7 +2,7 @@
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Current suite generations in that SDK:** `AEGP_FootageSuite5`, `AEGP_ItemSuite9`, `AEGP_CompSuite12`, `AEGP_LayerSuite9`.
-**Verification level:** SDK source-reviewed; exact host import/load/render acceptance remains pending.
+**Evidence level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
 
 Предыдущая версия главы смешивала baseline 25.6 с более поздним `CompSuite13`. Для supplied SDK 25.6 current declaration — `CompSuite12`. Это исправлено здесь.
 
@@ -26,7 +26,7 @@ UTF-16 path + optional layered/sequence options
 
 Это не `AEGP_NewFootage`. Нужен **AEIO/File Import** path. Footage Suite просит host импортировать уже поддерживаемый тип; она не реализует decoder.
 
-См. `04-AEIO/` и native integration chapters.
+См. [AEIO](../04-AEIO/README.md) и [AEIO native integration](../14-NATIVE-INTEGRATIONS/08-AEIO.md).
 
 ## 2. Ownership AEGP_FootageH меняется при adoption
 
@@ -222,7 +222,9 @@ Projector создаёт layered PSD footage, ordinary footage, proxy и мен�
 
 Слишком короткий helper обычно скрывает один из этих contracts.
 
-## 14. Host acceptance matrix
+## 14. Product validation guidance
+
+If a concrete product claims footage/import behavior, useful runtime cases include:
 
 - still file;
 - numbered sequence;
@@ -239,7 +241,96 @@ Projector создаёт layered PSD footage, ordinary footage, proxy и мен�
 - multi-file/auxiliary footage inventory;
 - repeated import without duplicate ownership errors.
 
-Exact import flags/behavior считаются host-verified только после выполнения этих сценариев в named AE build.
+These cases establish product runtime/support evidence. Bible does not require running them to document the SDK contract accurately.
+
+## 15. Recommended import/adoption workflow
+
+For host-supported media:
+
+~~~text
+normalize UTF-16 path + import options
+→ NewFootage
+→ plugin owns FootageH
+→ validate destination/project context
+→ AddFootageToProject / SetProxy / Replace
+→ on success: ownership transfers to project
+→ on failure: plugin still disposes FootageH
+→ use returned ItemH / project-owned footage only through project APIs
+~~~
+
+Implement the ownership transition explicitly. A small state object/RAII wrapper can represent:
+
+~~~text
+OwnedByPlugin
+→ AdoptedByProject
+~~~
+
+and release its cleanup obligation only after successful adoption.
+
+## 16. Interpretation workflow
+
+Treat interpretation as a distinct project mutation:
+
+~~~text
+import/adopt footage
+→ obtain ItemH
+→ GetFootageInterpretation
+→ modify only intended fields
+→ SetFootageInterpretation
+→ preserve unrelated interpretation settings
+~~~
+
+Do not hide interpretation changes inside a generic "import file" helper unless that is part of the product contract.
+
+## 17. Failure and rollback cases
+
+Plan for:
+
+- invalid/missing path;
+- unsupported media;
+- NewFootage failed;
+- NewFootage succeeded but adoption failed;
+- proxy/replace failed after caller acquired new footage;
+- destination folder/item invalidated;
+- sequence range/options malformed;
+- placeholder path/file-type mismatch;
+- interpretation mutation failed;
+- path MemHandle acquired but later read/copy failed;
+- project changed during async path preparation.
+
+Most important ownership rule:
+
+> after `NewFootage`, failure before successful adoption still leaves a caller-owned resource to dispose.
+
+## 18. Path and identity policy
+
+Do not keep a returned path pointer beyond MemorySuite lock lifetime.
+
+For long-lived product state store copied path/config data, not locked MemHandle pointers or detached host handles.
+
+Do not treat path alone as permanent project-item identity; relink/replace/proxy workflows can change file associations.
+
+## 19. Anti-patterns
+
+Avoid:
+
+- passing Boolean `FALSE` where `AEGP_InterpretationStyle` is expected;
+- disposing footage already adopted by project;
+- forgetting disposal when adoption fails;
+- disposing project-owned footage returned from Item APIs;
+- assuming `GetFootageNumFiles` describes semantic Z-depth/Object-ID channels;
+- treating Footage Suite as custom decoder API instead of using AEIO;
+- hiding interpretation mutation inside unrelated import logic;
+- copying sample suite generations without checking current headers.
+
+## Related chapters
+
+- [Project / items](01-PROJECT-ITEMS.md)
+- [Compositions](02-COMPOSITIONS.md)
+- [Layers](03-LAYERS.md)
+- [Memory / Undo / Persistent Data](12-MEMORY-UNDO-PERSISTENCE.md)
+- [AEIO](../04-AEIO/README.md)
+- [AEIO native integration](../14-NATIVE-INTEGRATIONS/08-AEIO.md)
 
 ## Source record
 
