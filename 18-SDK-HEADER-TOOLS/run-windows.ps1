@@ -44,7 +44,8 @@ py (Join-Path $Root "scripts\check_native.py") `
   $SdkExamples `
   --compiler $Compiler `
   --compiler-style msvc `
-  --report $CompileReport
+  --report $CompileReport `
+  --require-clean
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host "Gate-4 local SDK lane: inventory + symbol-name + MSVC syntax/type checks PASS"
