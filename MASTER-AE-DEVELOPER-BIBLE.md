@@ -16982,6 +16982,7 @@ The supplied `ae25.6_61.64bit.AfterEffectsSDK` is the basis of ten source-review
 8. [AEIO and Artisan](18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md).
 9. [Native panels and BlitHook](18-SDK-HEADER-TOOLS/13-PANELS-BLITHOOK-SDK25.6.md).
 10. [PICA providers, Effect↔AEGP and legacy boundaries](18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md).
+11. [GPU, audio and Custom UI / Drawbot](18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md).
 
 Completed editorial changes:
 
@@ -16998,6 +16999,7 @@ Completed editorial changes:
 - **AEIO and Artisan:** import/export and custom-renderer chapters now document `AEIO_ModuleInfo`, frozen `AEIO_FunctionBlock4`, current IOIn7/IOOut6, aux-channel producer callbacks, output state, color metadata, `PR_ArtisanEntryPoints`, CanvasSuite8, PR global/instance/frame state and Artie sample-generation limits.
 - **Native panels and BlitHook:** workspace-panel identity/create/flyout/visibility contracts are now sourced from `AEGP_PanelSuite1`/Panelator; BlitHook is separated as `AEGeneral` hook protocol 3.0 with 32/64/128 pixel-buffer metadata, view coordinates and explicitly unqualified async lifetime.
 - **PICA providers and native bridges:** `SPBasicSuite` acquire/release, `SPSuitesSuite::AddSuite`, Sweetie/Checkout provider-consumer patterns, current `AEGP_EffectCallGeneric` command/time contract and historical sample/version boundaries are documented. Legacy samples are no longer treated as current ABI signatures by default.
+- **GPU, audio and Custom UI/Drawbot:** GPU capability/setup/pre-render/render/setdown and GPU-world ownership are sourced from `AE_Effect.h`, `AE_EffectGPUSuites.h` and SDK_Invert_ProcAmp; audio selectors/flags/SoundWorld/checkout are documented with the explicit limitation that the supplied archive has no bundled AUDIO_RENDER implementation; custom UI now has a dedicated event/Drawbot/async-manager chapter using Custom_ECW_UI and CCU.
 - [Registration, PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md): separate registration/dispatcher/initializer contracts, resource Kind, symbols, architectures, version domains, outflags and platform resource pipelines.
 - [AEGP lifecycle, hooks and suites](03-AEGP/01-HOOKS-SUITES.md): IDs/refcons, suite macros, callbacks and partial initialization; the existing MenuTool is reviewed, not changed or host-verified.
 - [AEGP project and render automation](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md): project graph and time, Undo versus rollback, queue states and invalidation, output settings, frame receipts, borrowed worlds, sync/async cancellation and cache boundaries.
@@ -17009,13 +17011,15 @@ The previously pending STATUS/VERIFICATION registration update was written to ma
 
 The fifth review records six SDK file hashes and reviews three existing cookbook recipes. It identifies a concrete open source finding: `RenderQueueRecipes.cpp` passes TRUE to an enum-status argument; with TRUE=1 that means UNQUEUED, not QUEUED=2. The chapter and [recipe README](17-NATIVE-SUITE-COOKBOOK/code/README.md) now warn about it. The C++ implementation is unchanged; a code correction and behavioral checks remain required. Documentation CI must not be used to close this finding.
 
+The eleventh review records GPU/audio/custom-UI contracts and an important absence boundary: the supplied Examples tree declares audio selectors/flags but contains no bundled C/C++ effect implementation dispatching PF_Cmd_AUDIO_RENDER. It also documents the custom-UI async-manager requirement and Drawbot borrowed-vs-created resource ownership without claiming a host run.
+
 The tenth review records 13 SDK source hashes and clarifies two important version boundaries: old ProjDumper generic-call syntax is not the current EffectSuite4 call shape, and bundled Commando uses an initializer signature that differs from the current AEGP prototype. Sweetie/Checkout establish provider/optional-consumer patterns but do not establish generic suite hot replacement. The existing Bible SharedSuite header is documented as C++-oriented C-shaped ABI, not directly C-source-compatible.
 
 Earlier source findings remain in the linked records: ten-file memory/MFR review and three helper inspections; PF handle/register suite-version macro nuances; conditional threading statements; sample/comment discrepancies; 19-file registration/PiPL review and MenuTool partial-initialization limits. No original evidence has been rewritten into a host PASS.
 
 This is documentation and SDK source-review work within the agreed subject matter of [the completion plan](COMPLETION-PLAN.md). It does not complete stages 3–4 or bypass outstanding safety, reuse-audit, compiler and host gates. **Native readout-adapter development remains paused; the deliverable is the Bible, not a separate testing product.** No new user AE run is requested.
 
-**Next editorial block: GPU, audio and Custom UI/Drawbot**, using the supplied 25.6 headers and samples. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
+**Next editorial block: scripting/panels communication and platform build/distribution chapters**, while preserving the exact-SDK baseline. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
 
 ## Earlier baseline evidence
 
@@ -17039,6 +17043,18 @@ See [verification commands and results](VERIFICATION.md) and [coverage matrix](F
 <!-- SOURCE: VERIFICATION.md -->
 
 # Verification — v1.1
+
+## GPU, audio and Custom UI / Drawbot chapter review (2026-10-01)
+
+Expanded [GPU effects](02-EFFECT-PLUGINS/05-GPU.md), [Audio effects](02-EFFECT-PLUGINS/07-AUDIO.md), added [Custom UI / Drawbot](02-EFFECT-PLUGINS/09-CUSTOM-UI-DRAWBOT.md), and aligned the Effect capability map to the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md) records relevant header/sample hashes and line ranges.
+
+GPU review distinguishes global capability from per-frame GPU_RENDER_POSSIBLE, per-device setup/setdown state, GPU framework/device identity, GPUDeviceSuite allocation/world ownership and the bundled SDK_Invert_ProcAmp lifecycle. Source presence is not treated as proof every CUDA/OpenCL/DirectX/Metal branch is buildable or available on every target.
+
+Audio review records AUDIO_SETUP/RENDER/SETDOWN, audio capability flags, PF_SoundWorld, sample formats and checkout/checkin. A source search of the supplied Examples tree found no bundled C/C++ effect implementation dispatching PF_Cmd_AUDIO_RENDER; therefore the chapter does not invent a sample-backed DSP lifecycle or scheduling guarantee.
+
+Custom UI review records PF_Cmd_EVENT, event contexts, PF_CustomUIInfo, PF_EffectCustomUISuite, Drawbot supplier/surface borrowed ownership versus created-object ReleaseObject, Custom_ECW_UI/CCU patterns and the documented async-manager requirement for rendered UI frames after the UI/render-thread split.
+
+**Verification level: SDK source review and documentation.** No new GPU binary, device setup/render, CPU↔GPU comparison, audio processing host run, custom UI interaction, async-manager lifecycle, Drawbot leak test, HiDPI/theme test or Windows host run was performed. Gate 4/6/7 remain open.
 
 ## PICA providers, Effect↔AEGP and legacy-boundary chapter review (2026-10-01)
 
