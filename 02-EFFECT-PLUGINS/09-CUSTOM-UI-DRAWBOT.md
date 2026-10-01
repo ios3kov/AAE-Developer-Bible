@@ -188,4 +188,4 @@ Interaction state может быть transient, но любое состоян�
 
 ## Verification boundary
 
-Bundled Custom_ECW_UI/CCU source reviewed. Новый UI binary, actual Drawbot drawing, async manager, Retina/theme behavior and leak tests не запускались. Gate 6/7 остаются открытыми.
+Bundled Custom_ECW_UI/CCU source reviewed. Bible не заявляет собственный UI runtime result; отдельная demo implementation/host QA не является completion requirement документации.
