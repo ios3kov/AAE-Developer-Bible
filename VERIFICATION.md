@@ -1,5 +1,16 @@
 # Verification — v1.1
 
+## Testing, recipes and templates editorial review (2026-10-01)
+
+Expanded the complete 10-TESTING section and added [Evidence and acceptance](10-TESTING/06-EVIDENCE-AND-ACCEPTANCE.md). The matrix now distinguishes PR/nightly/pre-release lanes; render correctness covers exact/tolerance comparisons, alpha, ROI/origins and golden-update policy; MFR stress now has state-bleed, repeatability, hang and memory evidence; performance requires fixed baselines; crash diagnostics now ties exact symbols to artifact identity.
+
+The practical recipes and templates were aligned to the same evidence vocabulary. During that cross-check one concrete documentation/template mismatch was found and corrected: the CEP bridge chapter standardized the request field as `protocol`, while the working template still used `version`. The CEP README, panel JavaScript and host dispatcher now use the same `protocol` field. ScriptUI/JSX example status wording was also corrected so source that is intended to run is not mislabeled as host-verified.
+
+The regeneration workflow was hardened after several simultaneous documentation pushes produced non-fast-forward failures in the generated-doc commit step. The workflow now serializes main-branch regeneration and retries from the latest main before generating/pushing MASTER and MANIFEST.
+
+**Verification level: documentation/template review.** No new AE host execution, native SDK compile, render, installer, signing or performance run was performed by this pass. The CEP/JSX/ScriptUI changes are source-level alignment until an actual host result is recorded.
+
+
 ## Scripting, panels and platform distribution chapter review (2026-10-01)
 
 Expanded the ExtendScript object model and ScriptUI chapters, CEP/UXP panel guidance, Script/CEP/native communication chapters, macOS and Windows build/sign/package/CI chapters, and the distribution compatibility/security/release checklist. The [dated source-review record](11-DISTRIBUTION/05-PLATFORM-SOURCE-REVIEW-2026-10-01.md) lists the public Adobe CEP/SDK, Adobe UXP-transition, Apple Developer ID/notarization and Microsoft SignTool sources used for this pass.
