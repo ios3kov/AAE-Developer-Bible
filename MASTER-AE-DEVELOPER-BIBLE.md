@@ -8336,33 +8336,168 @@ protocol/result error
 
 # ExtendScript -> After Effects
 
-ExtendScript выполняется внутри scripting engine AE и работает через scripting DOM (`app`, project, items, comps, layers, properties, renderQueue...).
+ExtendScript executes inside the After Effects scripting environment and accesses the host through the scripting DOM: app, project, items, compositions, layers, properties/keyframes, import and render queue.
 
-## Типичный flow
+It is a control and automation API, not a per-pixel render API.
 
-```jsx
+## Typical command flow
+
+~~~jsx
 app.beginUndoGroup("My Tool");
+
 try {
     var comp = app.project.activeItem;
-    if (comp && comp.numLayers > 0) {
-        comp.layer(1).name = "Renamed by Tool";
+
+    if (!(comp instanceof CompItem)) {
+        throw new Error("No active composition.");
     }
+
+    if (comp.numLayers < 1) {
+        throw new Error("Composition has no layers.");
+    }
+
+    comp.layer(1).name = "Renamed by Tool";
 } finally {
     app.endUndoGroup();
 }
-```
+~~~
+
+Validate prerequisites before mutation. beginUndoGroup/endUndoGroup creates coherent user undo history; it does not promise automatic rollback after an exception.
 
 ## Main-thread implication
 
-Script execution — host-side operation; длинный script блокирует interactive responsiveness. Делить тяжёлый workflow на небольшие операции, а heavy compute выносить наружу только с ясным protocol/lifetime.
+Host-side scripting is synchronous from the point of view of the AE operation. In CEP, Adobe explicitly documents that evalScript executes in the host ExtendScript engine on the host main thread.
+
+Design consequences:
+
+- prefer short commands to one giant script;
+- do not poll AE state continuously from a panel;
+- keep binary/heavy compute out of JSON/string bridge traffic;
+- validate and batch project mutations;
+- return a compact result instead of hundreds of UI-side follow-up queries.
+
+## Stable identifiers
+
+For effects/properties, prefer match names where available. User-visible layer/effect names are presentation data and can be localized or renamed.
+
+If the script creates product-owned objects, store a deliberate stable identifier instead of depending only on layer.name.
+
+## Structural mutation invalidates references
+
+Adding, moving or removing properties in indexed groups can invalidate saved ExtendScript references.
+
+A protocol handler that performs a structural edit should reacquire the affected objects before the next operation.
+
+Do not expose a fake pointer-identity model to a panel. A panel should request objects by stable product ID or by a deliberately resolved path each time.
+
+## Script -> effect/property
+
+A script or panel can control a native effect through normal project state:
+
+~~~text
+script
+→ layer
+→ Effects property group
+→ target effect by match name
+→ parameter property
+→ setValue / setValueAtTime
+~~~
+
+This is often the safest bridge when the operation can naturally be expressed as effect parameters or project data.
+
+Advantages:
+
+- AE owns project persistence;
+- undo/keyframes use normal host concepts;
+- parameter dependencies remain visible to the host;
+- no custom IPC is needed.
+
+Do not abuse effect parameters as an unbounded binary transport.
 
 ## Script -> menu command
 
-`app.executeCommand(id)` может запускать host command, но numeric command IDs не являются хорошим стабильным public contract между версиями/локалями. Использовать осторожно.
+app.executeCommand(id) can invoke a host command, but numeric command IDs are not a strong public compatibility contract across versions/localizations.
+
+Use only when:
+
+- no better public scripting API exists;
+- the dependency is isolated;
+- supported host versions were actually tested;
+- failure has a safe fallback;
+- the command ID dependency is documented in the support matrix.
+
+Do not build a large product around undocumented menu-ID archaeology.
 
 ## Native -> script
 
-AEGP Utility Suite имеет `AEGP_ExecuteScript`, поэтому native AEGP может выполнить ExtendScript, когда scripting DOM предоставляет capability, отсутствующую в C API. Это полезный, но синхронный bridge; не превращать его в основное high-frequency IPC.
+AEGP Utility Suite exposes AEGP_ExecuteScript, allowing native AEGP code to execute ExtendScript for a capability better exposed through the scripting DOM.
+
+Treat this as a synchronous host bridge:
+
+- keep the called script small;
+- obey the actual suite ownership contract for returned data;
+- do not call from arbitrary worker threads;
+- avoid circular designs where JSX calls native and native immediately invokes a large JSX workflow back.
+
+One layer should own the command lifecycle.
+
+## Request and response contract
+
+A script command should accept plain data and return plain data.
+
+Request:
+
+~~~json
+{
+  "protocol": 1,
+  "requestId": "7",
+  "command": "renameSelected",
+  "payload": {"name": "Hero"}
+}
+~~~
+
+Failure:
+
+~~~json
+{
+  "ok": false,
+  "requestId": "7",
+  "error": {
+    "code": "NO_ACTIVE_COMP",
+    "message": "No active composition"
+  }
+}
+~~~
+
+The UI can localize a stable error code while logs retain the source message.
+
+## Cancellation
+
+ExtendScript does not make every long host mutation safely cancellable automatically.
+
+If a workflow supports cancel:
+
+1. define checkpoints between atomic chunks;
+2. decide what partial result is valid;
+3. close undo groups and files in finally blocks;
+4. never interrupt a product-owned file halfway through an unsafe write;
+5. return CANCELLED as a normal protocol result where appropriate.
+
+## Recommended boundary
+
+~~~text
+plain request
+→ validate
+→ resolve AE host objects
+→ perform short query/mutation
+→ normalize plain response
+~~~
+
+Never leak raw host object references into CEP, helper-process or native IPC protocols.
+
+## Verification boundary
+
+This chapter describes the scripting communication contract. It does not upgrade the current JSX examples to host-verified status; AE execution remains pending in the completion matrix.
 
 
 ---
@@ -8371,60 +8506,269 @@ AEGP Utility Suite имеет `AEGP_ExecuteScript`, поэтому native AEGP �
 
 # CEP panel <-> ExtendScript
 
-На production AE 26.5 CEP остаётся рабочим panel runtime; UXP announced, но AE public beta заявлена позже 2026.
+CEP has two separate JavaScript environments:
 
-## HTML/JS -> AE
+~~~text
+CEP HTML/JS runtime
+        |
+        | CSInterface.evalScript(script, callback)
+        v
+After Effects ExtendScript engine
+        |
+        v
+AE scripting DOM
+~~~
 
-Основной bridge:
+The panel cannot directly use app.project, and ExtendScript cannot directly manipulate the panel's HTML DOM.
 
-```js
-const cs = new CSInterface();
-cs.evalScript('$._myTool.renameSelected()', function(result) {
-  console.log(result);
+## Panel -> AE
+
+The fundamental bridge is CSInterface.evalScript.
+
+Simple form:
+
+~~~js
+var cs = new CSInterface();
+
+cs.evalScript('$._myTool.ping()', function (result) {
+    console.log(result);
 });
-```
+~~~
 
-Вызванный код выполняется в ExtendScript engine host application.
+A production product should not create different executable script strings throughout the UI.
 
-## AE/ExtendScript -> panel
+Bad:
 
-CEP events / CSXS events:
-
-```text
-ExtendScript/native side -> event dispatch -> CSInterface.addEventListener(...) -> panel JS
-```
-
-CEP также поддерживает `dispatchEvent/addEventListener` между extensions; native point product communication uses PlugPlug event infrastructure where host supports it.
-
-## Production protocol
-
-Не строить API из строк-конкатенаций типа:
-
-```js
+~~~js
 cs.evalScript('doThing("' + userText + '")');
-```
+~~~
 
-Вместо этого сериализовать JSON, escape один раз и иметь одну dispatcher function:
+Quotes, backslashes and attacker-controlled text can turn data into source code.
 
-```js
-cs.evalScript('$._myTool.dispatch(' + JSON.stringify(JSON.stringify(msg)) + ')', cb);
-```
+## One dispatcher
 
-ExtendScript разбирает JSON и возвращает JSON envelope.
+Centralize bridge calls:
+
+~~~js
+function callAe(message, done) {
+    var json = JSON.stringify(message);
+    var arg = JSON.stringify(json);
+
+    cs.evalScript('$._myTool.dispatch(' + arg + ')', function (raw) {
+        done(raw);
+    });
+}
+~~~
+
+ExtendScript side:
+
+~~~jsx
+$._myTool = $._myTool || {};
+
+$._myTool.dispatch = function (raw) {
+    var request = null;
+
+    try {
+        request = JSON.parse(raw);
+        return JSON.stringify(Dispatcher.handle(request));
+    } catch (e) {
+        return JSON.stringify({
+            ok: false,
+            requestId: request && request.requestId,
+            error: {
+                code: "UNHANDLED",
+                message: e.toString()
+            }
+        });
+    }
+};
+~~~
+
+Keep dispatch separate from actual command implementations.
+
+## Request contract
+
+~~~json
+{
+  "protocol": 1,
+  "requestId": "42",
+  "command": "renameSelected",
+  "payload": {
+    "name": "Hero"
+  }
+}
+~~~
+
+Validate:
+
+- protocol version;
+- command allowlist;
+- required payload fields;
+- string/number ranges;
+- file path policy;
+- maximum payload size where appropriate.
+
+Unknown commands must fail closed.
 
 ## Response envelope
 
-```json
-{"ok":true,"requestId":"42","result":{"changed":3}}
-```
+Success:
 
-или
+~~~json
+{
+  "ok": true,
+  "requestId": "42",
+  "result": {
+    "changed": 3
+  }
+}
+~~~
 
-```json
-{"ok":false,"requestId":"42","error":{"code":"NO_COMP","message":"No active comp"}}
-```
+Failure:
 
-См. `16-WORKING-TEMPLATES/cep-panel-bridge/`.
+~~~json
+{
+  "ok": false,
+  "requestId": "42",
+  "error": {
+    "code": "NO_COMP",
+    "message": "No active composition"
+  }
+}
+~~~
+
+An empty, malformed or non-JSON callback result is a transport/protocol failure, not a successful command that returned "nothing".
+
+## Main-thread scheduling
+
+Adobe's CEP 12 cookbook states that evalScript and manifest ScriptPath JSX execute in the host application's ExtendScript engine on the host main thread. It also notes that CEP events depend on host main-thread scheduling.
+
+Therefore:
+
+- avoid long single evalScript calls;
+- do not call evalScript on every UI repaint;
+- batch related reads and writes;
+- split long jobs into explicit chunks;
+- keep pure CPU work in the panel/helper where appropriate;
+- keep large binary data out of the JSX string bridge.
+
+The callback is asynchronous from the CEP JavaScript API perspective. The host-side work is still a synchronous script operation.
+
+## AE / ExtendScript -> panel
+
+ExtendScript cannot access the CEP browser DOM directly. Use CEP/CSXS events when host-side code needs to notify the panel.
+
+Conceptual flow:
+
+~~~text
+ExtendScript/native source
+→ CSXS / PlugPlug event
+→ CEP event bus
+→ CSInterface.addEventListener(...)
+→ panel reducer/state update
+~~~
+
+Prefer events as invalidation signals.
+
+Good:
+
+~~~json
+{
+  "protocol": 1,
+  "type": "selectionChanged",
+  "revision": 183
+}
+~~~
+
+The panel then requests one normalized state snapshot.
+
+Avoid sending hundreds of tiny mutation events whose correctness depends on timing/order.
+
+## Request IDs and stale replies
+
+Rapid UI interaction can create overlapping requests.
+
+Track:
+
+- request ID;
+- project/context revision;
+- panel instance lifetime;
+- expected protocol version.
+
+If the user changes context before a late callback returns, ignore the stale response instead of painting old state into the new UI.
+
+## File paths
+
+CEP JavaScript, ExtendScript and the OS may represent paths differently.
+
+At the boundary:
+
+- define whether the protocol carries native paths or file URIs;
+- normalize in one adapter;
+- validate before touching disk;
+- reject traversal when a command should remain inside a product-owned directory;
+- test Unicode and long paths.
+
+Do not scatter path conversion through every command.
+
+## Large data
+
+Do not send frames, large binary caches or megabytes of analysis through repeated evalScript strings.
+
+For large payloads use a deliberate data plane:
+
+- product-owned file plus atomic completion/rename;
+- external helper protocol;
+- native storage/cache;
+- another supported IPC path.
+
+CEP/JSX should remain the control plane.
+
+## Timeouts and lifecycle
+
+evalScript does not provide a complete request timeout/cancellation model by itself.
+
+A bridge layer should track:
+
+- request start time;
+- whether the panel is still alive;
+- whether a late callback may be ignored;
+- protocol version;
+- expected response schema.
+
+Timeout in the UI does not mean the host-side operation was magically cancelled. Design cancellation separately.
+
+## Security
+
+Treat every bridge message as untrusted input.
+
+Never:
+
+- concatenate user/remote strings into executable JSX;
+- expose "run arbitrary JSX" as a production API;
+- dispatch command names without an allowlist;
+- accept arbitrary helper executable paths;
+- write secrets into bridge logs.
+
+## Debugging order
+
+When a command fails:
+
+1. confirm the panel handler ran;
+2. log request ID and command without secrets;
+3. confirm the evalScript callback fired;
+4. validate returned JSON;
+5. inspect the ExtendScript error code/message;
+6. reproduce the dispatcher command in a tiny JSX harness;
+7. only then debug the larger UI.
+
+This separates browser, bridge and AE failures.
+
+## Reference implementation
+
+See 16-WORKING-TEMPLATES/cep-panel-bridge/.
+
+Its existence is implementation evidence, not host verification. Release-quality acceptance still needs installation, panel open/reload, success/failure commands, host restart and clean uninstall on the supported matrix.
 
 
 ---
