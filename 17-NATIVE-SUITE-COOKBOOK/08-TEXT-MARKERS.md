@@ -2,7 +2,7 @@
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Suites in that SDK:** `AEGP_TextDocumentSuite1`, `AEGP_MarkerSuite3`, `AEGP_StreamSuite6`, `AEGP_KeyframeSuite5`.
-**Verification level:** SDK source-reviewed; no new AE host mutation test in this editorial iteration.
+**Evidence level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
 
 Text и marker в AEGP связаны со streams, но их payload lifetimes разные. Text Document хранится в special stream value; marker — payload keyframe в marker stream.
 
@@ -144,7 +144,9 @@ Insert/find keyframe
 
 Не смешивайте marker duration с длиной keyframe interval: keyframe задаёт anchor time, duration — часть marker payload.
 
-## 12. Host acceptance matrix
+## 12. Product validation guidance
+
+If a concrete product claims text/marker editing behavior, useful runtime cases include:
 
 Text:
 
@@ -168,7 +170,89 @@ Markers:
 - duplicate marker;
 - repeated batch edits + cleanup.
 
-До этих тестов документация source-reviewed, но не host-verified.
+These are product runtime/support checks. Bible itself remains SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED unless a separate runtime record exists.
+
+## 13. Recommended text workflow
+
+~~~text
+resolve fresh text LayerH
+→ acquire SOURCE_TEXT StreamRefH
+→ verify TEXT_DOCUMENT stream type
+→ choose static stream write vs keyframe path
+→ GetNewStreamValue / GetNewKeyframeValue
+→ obtain text_documentH inside value
+→ optional GetNewText → copy UTF-16 → free MemHandle
+→ SetText(character count, not byte count)
+→ SetStreamValue / SetKeyframeValue
+→ DisposeStreamValue
+→ DisposeStream
+~~~
+
+Do not persist `AEGP_TextDocumentH` or the locked UTF-16 pointer beyond the lifetime of the value/memory handle that owns it.
+
+## 14. Recommended marker workflow
+
+For an existing marker key:
+
+~~~text
+resolve marker stream
+→ resolve keyframe time/index
+→ GetNewKeyframeValue
+→ use value.val.markerP
+→ edit strings/flags/cue params/duration/label
+→ SetKeyframeValue
+→ DisposeStreamValue
+~~~
+
+For a newly-created standalone marker:
+
+~~~text
+NewMarker
+→ caller owns marker
+→ build payload
+→ transfer/adopt only through a documented value/container path
+→ otherwise DisposeMarker
+~~~
+
+Do not combine `DisposeMarker` and `DisposeStreamValue` for the same payload unless the exact ownership transition is documented.
+
+## 15. Failure and invalidation cases
+
+Text:
+
+- layer/property disappeared;
+- Source Text is keyframed but command assumes static;
+- expression policy conflicts with direct editing;
+- UTF-16 length/count wrong;
+- GetNewText handle acquired but later operation fails;
+- stream value cleanup fails after primary error.
+
+Markers:
+
+- marker stream/key index changed;
+- cue param index shifted after insert/delete;
+- two returned cue-param MemHandles require independent cleanup;
+- standalone marker ownership is ambiguous;
+- marker value write fails after payload mutation;
+- duration/label/flag operation unsupported by product policy.
+
+## 16. Anti-patterns
+
+Avoid:
+
+- `strlen()` on UTF-16 text;
+- keeping `text_documentH` after disposing the containing stream value;
+- using localized text/property names as durable identity;
+- treating marker duration as timeline interval identity;
+- assuming `InsertCuePointParam` writes the key/value;
+- guessing ownership from Mangler's historical sample shortcut.
+
+## Related chapters
+
+- [Streams / properties](05-STREAMS-PROPERTIES.md)
+- [Keyframes](06-KEYFRAMES.md)
+- [Memory / Undo / Persistent Data](12-MEMORY-UNDO-PERSISTENCE.md)
+- [Lifetime / threading](14-LIFETIME-THREADING.md)
 
 ## Source record
 
