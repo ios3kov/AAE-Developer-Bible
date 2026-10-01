@@ -13,8 +13,11 @@ Effect plug-in — основной путь, если инструмент до
 5. [Дополнительные каналы](08-AUXILIARY-CHANNELS.md): глубина, ID, нормали, descriptors, типы и сырые buffers.
 6. [Память, lifetime и ошибки](../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md): owned/borrowed/transferred ресурсы, state handles, различия flattening, обязательный cleanup и ограничения существующих RAII helpers.
 7. [MFR и потокобезопасность](04-MFR-THREAD-SAFETY.md): действующие flags, пересечение selectors, read-only sequence state, mutable render copies и Compute Cache с точными режимами ожидания. Глава расширена по SDK; MFR-тесты не объявляются выполненными.
+8. [GPU effects](05-GPU.md): capability chain, per-device state, GPU worlds, allocation ownership, framework/device boundaries and CPU↔GPU acceptance.
+9. [Audio effects](07-AUDIO.md): audio selectors, SoundWorld, checkout/checkin, format/history semantics and missing bundled sample boundary.
+10. [Custom UI / Drawbot](09-CUSTOM-UI-DRAWBOT.md): event lifecycle, Drawbot ownership, invalidation and async custom-UI boundary.
 
-[Первая сверка поставки](../18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md), [сверка параметров/пикселей](../18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md) и [сверка памяти/MFR](../18-SDK-HEADER-TOOLS/07-MEMORY-MFR-SDK25.6.md) содержат SHA-256, точные диапазоны источников и границы проверки. Расхождения комментариев и образцов сохраняются явно. Учебные фрагменты не являются новыми эталонными плагинами; обновление текста не закрывает сборку, загрузку и рендер примеров.
+[Первая сверка поставки](../18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md), [сверка параметров/пикселей](../18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md), [сверка памяти/MFR](../18-SDK-HEADER-TOOLS/07-MEMORY-MFR-SDK25.6.md) и [GPU/audio/Custom UI review](../18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md) содержат SHA-256, диапазоны источников и границы проверки. Расхождения комментариев и образцов сохраняются явно. Учебные фрагменты не являются новыми эталонными плагинами; обновление текста не закрывает сборку, загрузку и рендер примеров.
 
 ## Порядок разработки
 
