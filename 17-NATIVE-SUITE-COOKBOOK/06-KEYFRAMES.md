@@ -161,7 +161,7 @@ if (addH) {
 
 `EndAddKeyframes(FALSE, ...)` — explicit non-commit path batch API. Он не заменяет глобальную Undo-модель команды: если операция одновременно меняет другие части проекта, проектируйте общий undo scope отдельно.
 
-Существующий `Bible_AddOneDKeyframes` использует этот pattern и производит value через `AEGP_GetNewStreamValue`, а не вручную заполняет неизвестный union. Это хороший defensive pattern, но runtime correctness самого recipe остаётся host-pending.
+Существующий `Bible_AddOneDKeyframes` использует этот pattern и производит value через `AEGP_GetNewStreamValue`, а не вручную заполняет неизвестный union. Это defensive source pattern; Bible не заявляет runtime result для recipe.
 
 ## 9. Delete и mutation во время обхода
 
@@ -218,9 +218,9 @@ SDK 25.6 `AEGP_KeyframeSuite5` добавляет `GetKeyframeLabelColorIndex` �
 
 Но новый код не должен механически закрепляться на старой suite generation только потому, что sample исторический.
 
-## 14. Host acceptance matrix
+## 14. Product validation matrix
 
-Для keyframer-примера нужны минимум:
+Если конкретный keyframer product заявляет runtime support, полезно проверить:
 
 - 1D static → animated;
 - existing key at same time;
@@ -236,7 +236,46 @@ SDK 25.6 `AEGP_KeyframeSuite5` добавляет `GetKeyframeLabelColorIndex` �
 - error injection + cleanup;
 - repeated execution without leaked refs/values.
 
-До этих проверок chapter/source review имеет статус DOCUMENTED/SDK-reviewed, а не host-verified.
+Эти проверки относятся к product runtime/support evidence. Для Bible chapter/source review остаётся SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED, если отдельного runtime record нет.
+
+## 15. Recommended keyframer workflow
+
+~~~text
+resolve fresh stream
+→ inspect type/dimensionality/separation state
+→ normalize desired times/values as pure data
+→ open semantic undo scope
+→ choose single-key or batch API
+→ write values/interpolation/ease/tangents/flags deliberately
+→ close batch on every path
+→ dispose every acquired StreamValue/StreamRef
+→ return fresh keyframe summary
+~~~
+
+Keep computation of large key sets separate from host mutation. Background code can prepare pure times/values; host refs should be resolved and mutated only in the documented host-safe context.
+
+## 16. Failure modes
+
+Plan for:
+
+- unsupported stream type;
+- separated leader passed to index-based keyframe API;
+- duplicate-time semantics;
+- dimensionality mismatch;
+- interpolation unsupported for target stream;
+- batch start/add/set/end failure;
+- expression policy conflict;
+- project/property changed during async planning;
+- cleanup error after primary mutation error.
+
+Undo grouping does not make these failures transactional automatically.
+
+## Related chapters
+
+- [Streams/properties](05-STREAMS-PROPERTIES.md)
+- [Lifetime/threading](14-LIFETIME-THREADING.md)
+- [Keyframer integration](../14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md)
+- [Keyframer batch template](../16-WORKING-TEMPLATES/keyframer-batch/README.md)
 
 ## Source record
 
