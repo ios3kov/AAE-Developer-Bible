@@ -82,10 +82,20 @@ If a bundled sample is historical and differs from the current header, record th
 
 ## 6. Compile
 
-After symbol preflight:
+The platform runners now add a compiler/type lane after symbol preflight:
 
-- compile Debug;
-- compile release configuration;
+~~~text
+inventory
+→ schema/diagnostic gate
+→ recipe symbol names
+→ C++17 syntax/type compile report
+~~~
+
+`scripts/check_native.py` records an aggregate hash of the SDK header set, compiler identity, exact per-source command and result. SDK include roots are treated as external/system headers; Bible project headers remain normal warning-bearing includes.
+
+After this source-level lane, the real sample/project build must still:
+
+- compile the chosen Debug/Release project configuration;
 - build resources/PiPL;
 - link final native artifact.
 
@@ -152,7 +162,7 @@ header inventory
 → release signing/package gates
 ~~~
 
-The current repository does not claim that every stage is automated on every platform.
+The repository has portable tests for the compiler-driver command construction and report identity, but a real Windows/macOS licensed-SDK run is separate evidence. The current repository does not claim that every stage is automated on every platform.
 
 ## Stop rule
 
