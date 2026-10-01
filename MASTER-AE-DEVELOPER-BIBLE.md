@@ -25860,15 +25860,15 @@ Display Name
 
 Первый результат должен быть полной таблицей всех эффектов, даже если часть строк остаётся `UNKNOWN`.
 
-## Phase 3 — HOST-BUILTIN first
+## Phase 3 — classify first, then follow the implementation class
 
-Первый приоритет — эффекты, доказанно встроенные в host.
+Изначальный план ставил первым приоритетом доказанные HOST-BUILTIN эффекты и использовал **3D Channel Extract** как первый pilot. Этот pilot уточнил саму методику: более широкий filesystem/binary review доказал отдельный Adobe module `Aux_Channel_Extract.plugin` на macOS AE 25.6.
 
-Начальная очередь следует `MASTER-EFFECT-LIST.md`.
+Поэтому ранняя рабочая гипотеза `3D Channel Extract = HOST-BUILTIN` **superseded**. Текущая macOS classification для этого pilot: **SHIPPED-PLUGIN**. FLT остаётся evidence host-side dispatch/subsystem, но не заменяет найденный physical module.
 
-Первый target: **3D Channel → 3D Channel Extract**.
+Для каждого следующего target сначала фиксировать classification, и только затем выбирать analysis path.
 
-Для HOST-BUILTIN анализировать:
+Для доказанного HOST-BUILTIN:
 
 ```text
 After Effects executable/framework
@@ -25883,6 +25883,8 @@ After Effects executable/framework
 → threading/memory
 → reconstructed render pipeline
 ```
+
+Для SHIPPED-PLUGIN начинать с фактического `.plugin` / `.aex` module, его identity/hash/entry points/resources и только затем связывать его с host dispatch infrastructure.
 
 ## Phase 4 — static analysis
 
@@ -26014,7 +26016,7 @@ Build the macOS installation scanner and generate the first:
 
 mapping.
 
-Then begin the first full analysis with **3D Channel Extract**.
+Continue the **3D Channel Extract** pilot as a **SHIPPED-PLUGIN** analysis from the proven `Aux_Channel_Extract.plugin` module, while keeping FLT findings as separate host-dispatch evidence.
 
 
 ---
@@ -26025,13 +26027,13 @@ Then begin the first full analysis with **3D Channel Extract**.
 
 Source baseline: Adobe After Effects Effect List, updated **2026-05-13**.
 
-**Binary mapping status for every entry below:** `TO VERIFY FROM INSTALLED AE` until a macOS/Windows installation is inspected.  
-**Match name status:** `TO VERIFY FROM INSTALLED AE`.
+**Default binary mapping status:** `TO VERIFY FROM INSTALLED AE` unless an entry is explicitly annotated below.  
+**Default match-name status:** `TO VERIFY FROM INSTALLED AE` unless an entry is explicitly annotated below.
 
-This is the queue for binary-first reverse engineering. Names and categories follow Adobe's current effect catalog.
+This is the queue for binary-first reverse engineering. Names and categories follow Adobe's current effect catalog. Proven pilot results are annotated in place so the master list does not contradict the evidence records.
 
 ## 3D Channel
-- 3D Channel Extract
+- **3D Channel Extract** — macOS AE 25.6: **PROVEN SHIPPED-PLUGIN**, module `Aux_Channel_Extract.plugin`, match name `ADBE AUX CHANNEL EXTRACT`. Full algorithm/runtime acceptance remains open; Windows mapping remains TO VERIFY.
 - Cryptomatte
 - Depth Matte
 - Depth of Field
@@ -27594,6 +27596,14 @@ See [verification commands and results](VERIFICATION.md) and [coverage matrix](F
 ---
 
 <!-- SOURCE: VERIFICATION.md -->
+
+## Gate 3 post-close consistency correction — 3D Channel Extract (2026-10-01)
+
+A follow-up consistency scan after the recorded Gate 3 closure found two stale planning statements, not new runtime evidence. The master effect list still defaulted every entry to TO VERIFY, and the execution plan still placed 3D Channel Extract under the original HOST-BUILTIN-first pilot wording.
+
+Both were reconciled with the already-retained binary evidence: macOS AE 25.6 contains the physical `Aux_Channel_Extract.plugin` module, so the current pilot classification is SHIPPED-PLUGIN. The earlier absent/HOST-BUILTIN interpretation remains preserved only as a superseded historical hypothesis. FLT evidence remains host-dispatch/subsystem evidence.
+
+**Verification level: documentation consistency correction using existing evidence.** No new AE execution, binary capture or algorithm acceptance was performed.
 
 # Verification — v1.1
 
