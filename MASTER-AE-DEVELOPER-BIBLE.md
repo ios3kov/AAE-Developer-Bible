@@ -3003,7 +3003,7 @@ Async-вариант рассматриваемого suite относится �
 
 ### Ошибка, которая компилируется: TRUE вместо статуса
 
-В существующем [RenderQueueRecipes.cpp](03-AEGP/../17-NATIVE-SUITE-COOKBOOK/code/RenderQueueRecipes.cpp) последний вызов выглядит как `AEGP_SetRenderState(rq_itemH, TRUE)`. Но аргумент — `AEGP_RenderItemStatusType`, не `A_Boolean`. При обычном TRUE=1 это **UNQUEUED**, тогда как QUEUED равен 2. Источники: H:3210–3225; Old:206–208; `SPTypes.h:60–61`.
+В более ранней версии [RenderQueueRecipes.cpp](03-AEGP/../17-NATIVE-SUITE-COOKBOOK/code/RenderQueueRecipes.cpp) последний вызов передавал `TRUE` в `AEGP_SetRenderState`. Но аргумент — `AEGP_RenderItemStatusType`, не `A_Boolean`. При обычном TRUE=1 это **UNQUEUED**, тогда как QUEUED равен 2. Источники: H:3210–3225; Old:206–208; `SPTypes.h:60–61`. Текущий рецепт исправлен на именованный `AEGP_RenderItemStatus_QUEUED` и проверяет результат через `AEGP_GetRenderState`.
 
 Иллюстрация нужного выбора enum для уже проверенных suite/ref:
 
@@ -3018,7 +3018,7 @@ if (!err) {
 // Успех операции постановки требует также actual == AEGP_RenderItemStatus_QUEUED.
 ```
 
-Это фрагмент контракта, не законченный плагин; получение suites, preflight и обработка несоответствия в него не включены. **Исходный рецепт пока не исправлен и не должен считаться рабочим образцом постановки в очередь.** В этом редакционном обновлении ошибка отмечена, а не скрыта зелёной сборкой документации.
+Это фрагмент контракта, не законченный плагин. Текущий cookbook-рецепт теперь применяет тот же named-enum + readback pattern. Это закрывает исходную ошибку выбора аргумента, но не заменяет host test: состояние общей очереди, output configuration, invalidation и реальный запуск должны проверяться внутри AE.
 
 Запись с TRUE встречается и в QueueBert:131. Рядом sample использует нулевые/числовые refs и фиксированный путь, а Projector:670–703 добавляет несколько элементов и содержит старт рендера в закомментированном блоке. Читайте samples как конкретный исходник с историческими особенностями, а не как готовый безопасный installer/automation pipeline.
 
@@ -14997,7 +14997,7 @@ The reusable piece is a single versioned dispatcher protocol:
 
 ```json
 {
-  "version": 1,
+  "protocol": 1,
   "requestId": "123-1",
   "command": "renameSelected",
   "payload": {
@@ -18150,17 +18150,25 @@ Current source is **SDK 25.6 syntax/type-checked**; linking, host execution and 
 - `EffectStreamRecipes.cpp` — find/apply effect, read/write scalar stream.
 - `KeyframeRecipes.cpp` — batch keyframe transaction pattern.
 - `RenderRecipes.cpp` — checkout/get-world/checkin pattern.
-- `RenderQueueRecipes.cpp` — add comp, re-query queue and set output path; **the final render-state argument has an open correctness finding below**.
+- `RenderQueueRecipes.cpp` — add comp, re-query queue, set output path, queue the item with the named enum and verify state by readback.
 
-## Known source-review finding — 2026-10-01
+## Render-queue enum correction — 2026-10-01
 
-`RenderQueueRecipes.cpp` calls `AEGP_SetRenderState(rq_itemH, TRUE)`. The supplied SDK's RQItemSuite3 takes `AEGP_RenderItemStatusType`, not a Boolean. With the usual TRUE=1 this requests **UNQUEUED**, not **QUEUED=2**. The earlier description “enable render” was therefore misleading. Do not use the recipe unchanged as a verified queue-enabling operation.
+Earlier source review found that this recipe passed `TRUE` to `AEGP_SetRenderState`. The supplied SDK declares an `AEGP_RenderItemStatusType` there; `TRUE=1` maps to `UNQUEUED`, while `QUEUED=2`.
 
-[The SDK review](17-NATIVE-SUITE-COOKBOOK/code/../../18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md) records exact source ranges; [the AEGP chapter](17-NATIVE-SUITE-COOKBOOK/code/../../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md) explains named status constants, readback, queue invalidation and partial failures. The C++ implementation has not been changed or host-tested in this editorial iteration. Code correction and its behavioral checks remain open; documentation CI does not close them.
+The recipe is now corrected to:
+
+- pass `AEGP_RenderItemStatus_QUEUED`;
+- call `AEGP_GetRenderState` afterwards;
+- fail if the readback is not `AEGP_RenderItemStatus_QUEUED`.
+
+This closes the **source-level argument-selection defect**. It does **not** prove runtime queue behavior inside After Effects. Queue STOPPED requirements, valid output configuration, invalidation behavior and actual render execution still require host verification.
+
+[The SDK review](17-NATIVE-SUITE-COOKBOOK/code/../../18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md) preserves the original finding and source evidence.
 
 ## Verification label
 
-**Historical SDK 25.6 macOS syntax/type baseline; linking and host tests pending.** A successful compiler check does not prove correct enum selection or operation semantics. The finding above remains open despite the earlier syntax baseline.
+**Historical SDK 25.6 macOS syntax/type baseline; linking and host tests pending.** The enum-selection source defect has been corrected, but this revised source has not yet been promoted to host-verified queue behavior.
 
 Команда и результаты: [VERIFICATION.md](17-NATIVE-SUITE-COOKBOOK/code/../../VERIFICATION.md). Сохраните relative includes к `19-NATIVE-CODE-FOUNDATION` или перенесите helpers вместе с recipes. Host callbacks, вызывающие recipes, должны иметь exception boundary.
 
@@ -18685,7 +18693,7 @@ SHA-256 приложенного TAR повторно рассчитан: `eee39
 
 **`AEGP_SetRenderState(rq_itemH, TRUE)` не означает QUEUED.** В рассматриваемом SDK `AEGP_RenderItemStatus_UNQUEUED=1`, `QUEUED=2` (H:3210–3225); `SPTypes.h:60–61` определяет TRUE как 1, если он ещё не определён. Old:206–208 подтверждает enum-аргумент и для используемой рецептом RQItemSuite3. При обычном TRUE=1 рецепт просит UNQUEUED. Это обнаруженная ошибка выбора аргумента, а не новый результат выполнения AE.
 
-Такая же запись есть в QueueBert:131. Наличие её в sample не меняет объявленный контракт. Главой показан именованный QUEUED и обязательный readback. **Исходный рецепт в этой редакционной итерации не исправлен и не является проверенным способом постановки в очередь.** Исправление кода с проверкой исходов относится к отдельной задаче безопасных инструментов/примеров. Сборка документации не закрывает эту ошибку.
+Такая же запись есть в QueueBert:131. Наличие её в sample не меняет объявленный контракт. Главой показан именованный QUEUED и обязательный readback. **Первоначальный source-review зафиксировал ошибку до исправления.** Позднее cookbook-рецепт был изменён: теперь он передаёт `AEGP_RenderItemStatus_QUEUED` и делает readback через `AEGP_GetRenderState`. Историческое наблюдение сохраняется как evidence того, почему Boolean здесь недопустим. Исправление source-level аргумента не является host verification очереди.
 
 `RenderRecipes.cpp` использует RenderSuite4, тогда как новые объяснения отдельно ссылаются на RenderSuite5 в основной части header. Версии не кастуются друг в друга. Нормальный путь рецепта возвращает checkin error, если не было основной ошибки; аварийный RAII cleanup имеет ограничения уже разобранного owner. Это не проверка отмены, shutdown или асинхронного получения кадров.
 
@@ -20057,13 +20065,32 @@ Native examples intentionally do **not** invent replacement Xcode/Visual Studio 
 
 <!-- SOURCE: 20-REFERENCE-IMPLEMENTATIONS/Scripts/ScriptUI-Panel/README.md -->
 
-# Runnable ScriptUI panel
+# ScriptUI panel reference source
 
-Status: **runnable**.
+Status: **source supplied / After Effects host test pending**.
 
-Copy `AEDeveloperBiblePanel.jsx` into the After Effects ScriptUI Panels folder, restart AE, then open it from the Window menu. The button renames selected layers inside a single undo group.
+Copy AEDeveloperBiblePanel.jsx into the After Effects ScriptUI Panels folder for the target installation, restart AE when required, then open the panel from the Window menu.
 
-This demonstrates the script-host communication path: ScriptUI event → ExtendScript DOM → After Effects project model.
+The source demonstrates:
+
+- one reusable command function independent of the widgets;
+- validation before opening the undo group;
+- one undo group around actual mutations;
+- dockable Panel vs standalone palette construction;
+- resize handling;
+- non-modal status reporting instead of an alert for normal command errors.
+
+Communication path:
+
+~~~text
+ScriptUI event
+→ command function
+→ ExtendScript DOM
+→ After Effects project model
+→ plain command result/status
+~~~
+
+The file is intentionally small. It does not establish host verification until the actual target AE/OS run is recorded in VERIFICATION/evidence.
 
 
 ---
