@@ -250,9 +250,9 @@ For cross-project lessons also record the source repository, pinned document/cod
 
 ## Immediate execution order
 
-1. Gate 2: repair host_cycle.py and add destructive/failure tests.
-2. Gate 3: resolve documentation contradictions and expose section 21.
-3. Gate 3A: audit FSTR Line / AE Hot Loader candidates before creating new examples; preserve accepted lessons and transfer decisions in section 22.
+1. **DONE — Gate 2:** safe transactional tooling + destructive/false-success tests.
+2. **DONE — Gate 3:** documentation consistency + section 21 navigation + superseded-claim cleanup.
+3. **CURRENT — Gate 3A:** audit FSTR Line / AE Hot Loader candidates before creating new examples; preserve accepted lessons and transfer decisions in section 22.
 4. Gate 4: strengthen exact-SDK verification.
 5. Gate 5: host-verify Minimal Gain, SmartFX Copy and MenuTool using audited reusable components where appropriate.
 6. Gates 6–7: complete families and correctness/stress coverage.
