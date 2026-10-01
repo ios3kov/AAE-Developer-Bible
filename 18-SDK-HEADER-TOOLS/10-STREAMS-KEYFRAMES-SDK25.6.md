@@ -6,7 +6,7 @@
 
 ## Место в плане
 
-Итерация продолжает содержательную сверку Библии с SDK в рамках этапов 3–4 `COMPLETION-PLAN.md`. Она не закрывает Gate 3A, exact-SDK compiler gate, AEGP keyframer host acceptance или общие Gates 5–7.
+Итерация продолжает содержательную сверку Bible с SDK. Она фиксирует source-level contracts и не заявляет отдельный keyframer runtime result; compiler/host evidence для конкретного продукта остаётся optional.
 
 Обновлены:
 
