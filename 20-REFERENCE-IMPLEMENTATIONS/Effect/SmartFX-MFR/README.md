@@ -1,6 +1,6 @@
 # SmartFX pass-through reference
 
-Status: **source implementation / SDK 25.6 macOS syntax-checked / host-test-required**.
+Status: **source implementation / SDK 25.6 macOS syntax-checked / runtime result not claimed**.
 
 SmartFxMfr.cpp is intentionally a small pass-through reference with SmartFX support. It does **not** currently declare MFR support.
 
