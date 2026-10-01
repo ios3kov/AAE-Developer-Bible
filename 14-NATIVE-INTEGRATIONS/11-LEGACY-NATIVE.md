@@ -14,7 +14,7 @@
 
 - `ProjDumper` использует `EffectSuite2` и `StreamSuite2`;
 - `Streamie` использует `DynamicStreamSuite2` и старые stream call shapes;
-- current header 25.6 содержит `StreamSuite6`, `DynamicStreamSuite4`, `KeyframeSuite5`, `EffectSuite4`.
+- current header 25.6 содержит `StreamSuite6`, `DynamicStreamSuite4`, `KeyframeSuite5`, `EffectSuite5`.
 
 Поэтому правило:
 
@@ -29,7 +29,7 @@ current header = compile-time signature source of truth
 
 `ProjDumper` вызывает старую форму `AEGP_EffectCallGeneric(plugin, effect, time, extra)`.
 
-Current `EffectSuite4` добавляет отдельный `PF_Cmd effect_cmd`; header говорит передать `PF_Cmd_COMPLETELY_GENERAL` для старого поведения.
+Current `EffectSuite5` содержит отдельный `PF_Cmd effect_cmd`; header говорит передать `PF_Cmd_COMPLETELY_GENERAL` для старого поведения.
 
 Это хороший пример эволюции API внутри поставки: sample полезен как сценарий, но новая реализация должна следовать текущему declaration.
 
@@ -95,9 +95,35 @@ host-verified behavior
 3. сравнить current declarations;
 4. заменить только подтверждённые changed contracts;
 5. сохранить project/parameter compatibility отдельно;
-6. собрать с warnings-as-errors;
-7. выполнить host lifecycle tests;
-8. только после этого удалять compatibility branches.
+6. для конкретного продукта — собрать/проверить target configurations, которые он обещает поддерживать;
+7. получить runtime/lifecycle evidence для product claims, которые зависят от host behavior;
+8. только после подтверждённой миграции удалять compatibility branches.
+
+## 8. Legacy classification before migration
+
+Before changing old code, classify every dependency:
+
+| Finding | Action |
+|---|---|
+| old suite generation but same supported workflow | adapt to current header with explicit version boundary |
+| old initializer ABI | replace with current target SDK prototype |
+| removed/unsupported platform API | isolate/migrate, do not emulate blindly |
+| historical sample shortcut | keep only as pattern evidence |
+| undocumented host/internal API | research-only unless product intentionally accepts that risk |
+| unknown old behavior | preserve until source/runtime evidence resolves it |
+
+Do not “modernize” by replacing every old identifier mechanically. Migration can break project identity, persistence or semantics even when compilation improves.
+
+## 9. Product compatibility boundary
+
+Legacy product migration has two separate goals:
+
+1. **source modernization** — current types/signatures/toolchain;
+2. **behavior/project compatibility** — old projects/users still behave as promised.
+
+One does not prove the other.
+
+Bible documents both dimensions but does not require building a legacy product itself.
 
 См. также:
 
