@@ -1,6 +1,6 @@
 # Custom UI / Drawbot reference
 
-Status: **acquisition skeleton / SDK 25.6 macOS syntax-checked / host-test-required**.
+Status: **acquisition skeleton / SDK 25.6 macOS syntax-checked / runtime result not claimed**.
 
 EventSkeleton.cpp intentionally stops after obtaining the drawing reference. It does not draw a path, text, icon or control.
 
