@@ -14862,89 +14862,262 @@ Not necessarily published to users:
 
 # Native SDK taxonomy
 
-## Effect plug-ins
+Этот chapter классифицирует **native integration families After Effects** по тому, кто инициирует вызов, каким state владеет host и какой lifecycle получает plug-in.
+
+Taxonomy важнее языка/IDE: неправильный тип расширения создаёт архитектурные проблемы, которые нельзя исправить красивым C++.
+
+## Summary
+
+| Family | Initiator | Primary state | Main use |
+|---|---|---|---|
+| Effect | AE render graph | effect instance/frame | pixels/audio/parameters |
+| AEGP | AE hooks/commands | project/host model | native tools/automation |
+| Keyframer | AEGP command flow | streams/keyframes | bulk keyframe tools |
+| Native panel | AE workspace | panel/view | native dockable UI |
+| AEIO | media pipeline | in/out spec | import/export |
+| Artisan | composition renderer | scene/render context | 3D renderer |
+| BlitHook | display pipeline | display frame | monitor/display consumer |
+| PICA provider | native consumer | shared service | module-to-module API |
+
+## Effect family
 
 ### Core image effect
-Получает input world + parameters и пишет output world. Host инициирует все вызовы.
+
+Host вызывает `EffectMain` selectors. Effect получает parameters/input и производит output.
+
+Natural owner: render graph.
 
 ### SmartFX
-Использует `PF_Cmd_SMART_PRE_RENDER` и `PF_Cmd_SMART_RENDER`. Нужен для корректного deep/floating-point pipeline и сложной dependency/ROI логики.
+
+Не отдельный plug-in type.
+
+Добавляет pre-render/dependency/ROI + Smart Render model.
 
 ### MFR-aware effect
-Не отдельный API. Effect объявляет поддержку MFR только после того, как render path и sequence state безопасны для нескольких одновременно рендерящихся кадров.
+
+Не отдельный API family.
+
+Это Effect, чей state/render path безопасен для concurrent frames и корректно объявляет capability.
 
 ### GPU effect
-Не отдельный plug-in type. CPU effect получает GPU lifecycle/render selectors и `PF_GPUDeviceSuite`/GPU-specific context.
+
+Effect с GPU lifecycle/selectors/backend. GPU не меняет ownership эффекта как render-graph component.
 
 ### Custom UI effect
-Effect получает `PF_Cmd_EVENT`; рисует/обрабатывает custom controls в Effect Controls и/или Composition/Layer panels. Drawbot — рекомендуемый host drawing layer.
+
+Effect event/UI path для effect-local controls/overlays.
+
+Не заменяет полноценный dockable application panel.
 
 ### Arbitrary parameter effect
-Хранит свой data type внутри parameter stream и реализует copy/flatten/compare/interpolate/print callbacks.
+
+Effect parameter model с custom data type и callbacks для copy/flatten/compare/interpolate/print semantics.
 
 ### Audio effect
-Effect API, но render contract оперирует `PF_SoundWorld`/samples вместо image world.
+
+Effect API с audio selector/sample contract вместо image-world processing.
 
 ## AEGP family
 
+AEGP — native host-tool architecture.
+
 ### General tool
-Меню, команды, проект, composition, items, layers, streams, masks, text, effects, render queue, preferences.
+
+Menus/commands, project/items/comps/layers, effects, streams, render queue, frames, preferences, scripting bridge.
 
 ### Keyframer
-Пакетно читает/создаёт/изменяет keyframes. Обычно виден в Animation > Keyframe Assistant.
+
+AEGP specialization around streams/keyframes and Keyframe Assistant-style workflows.
 
 ### Native panel
-Dockable panel, построенная через native panel APIs. Рабочий путь, но значительно тяжелее HTML panel.
 
-### Suite provider
-Публикует собственный PICA suite, чтобы другие native plug-ins вызывали стабильный C ABI без прямого линкования.
+Workspace panel registration + platform-native UI container.
 
-### File/project importer helper
-AEGP может регистрироваться с File Import Manager Suite для специализированного import workflow.
+### PICA suite provider
 
-## Specialized AEGP
+Publishes versioned function table as native service for other components.
 
-### AEIO
-Регистрирует `AEIO_ModuleInfo` и `AEIO_FunctionBlock*`; получает import/export callbacks.
+### Specialized registrations
 
-### Artisan
-Регистрирует `PR_ArtisanEntryPoints`; получает render context и берёт на себя 3D render композиции.
+AEGP registration layer also participates in AEIO/Artisan/panel integration.
 
-### Interactive Artisan
-Вариант Artisan для интерактивного preview/render.
+## AEIO
 
-## Display / output hooks
+AEIO belongs to host media lifecycle.
 
-### BlitHook
-AE пушит отображаемые frames в plug-in. Подходит для внешнего display/monitor-like поведения. Не превращать его в скрытый render engine.
+Responsibilities:
+
+- verify/recognize media;
+- create input/output specs;
+- decode/encode frame/audio;
+- options/metadata;
+- aux channels;
+- color interpretation.
+
+Do not use AEIO for general filesystem helper operations.
+
+## Artisan
+
+Artisan is composition 3D renderer integration.
+
+It receives render/scene context and collaborates with AE through Canvas/scene-related suites.
+
+Do not use Artisan simply because an Effect contains 3D math or GPU code.
+
+## Interactive Artisan
+
+Interactive renderer registration adds viewport/UI interaction concerns on top of Artisan renderer state.
+
+Treat as increased scope, not a checkbox.
+
+## BlitHook
+
+BlitHook belongs to display/preview pipeline.
+
+Useful for external monitor/display consumers.
+
+Not equivalent to:
+
+- Render Queue output;
+- Effect render path;
+- AEIO encoder;
+- Artisan renderer.
+
+## Shared PICA service
+
+Provider publishes a C-shaped/versioned function table; consumer acquires/releases through SPBasic/PICA.
+
+This is a native module API boundary. Define ABI, ownership and threading explicitly.
 
 ## Legacy native APIs
 
-- Photoshop format plug-ins/filters — поддерживаются исторически, но не являются рекомендуемым путём нового AE integration.
-- Foreign Project Format (FPF) — deprecated в пользу более современных integration APIs.
-- ADM-based palette UI — исторический путь; не стартовать новый UI на ADM.
+Examples:
 
-## Почему эта taxonomy важна
+- Photoshop format/filter integrations;
+- Foreign Project Format;
+- ADM-era UI.
 
-Если продукт одновременно делает несколько вещей, он может состоять из **нескольких модулей**:
+Legacy presence does not make them preferred for new products.
+
+Keep legacy coverage so maintainers can recognize old code and migration paths.
+
+## What is NOT a native plug-in family
+
+### SmartFX
+
+Effect render model.
+
+### MFR
+
+Effect execution model.
+
+### GPU
+
+Effect backend/lifecycle capability.
+
+### Drawbot
+
+Drawing abstraction used by UI paths.
+
+### CEP / UXP / ExtendScript
+
+JavaScript/extensibility layers, not C++ native module families.
+
+## Multi-module products
+
+Complex product may legitimately use several families:
 
 ```text
 [CEP/UXP panel]
-      |
-      v
-[ExtendScript / command bridge]
-      |
-      v
-[AE project model]
+      ↓ commands
+[script/native bridge]
+      ↓
+[AEGP service] ← PICA → [Effect]
+      ↓
+project model
 
-[Native AEGP service] <----PICA----> [Effect plug-in]
-        |
-        +---- AEGP suites ----> project/layers/keyframes
-
-[Effect plug-in] <---- PF selectors ---- [AE render graph]
+[Effect]
+      ↑ PF selectors
+AE render graph
 ```
 
-Не надо пытаться заставить один Effect выполнять работу AEGP или наоборот.
+Do not force all responsibilities into one module.
+
+## Selection by owner
+
+| Need | Natural integration |
+|---|---|
+| pixels/audio parameters | Effect |
+| project mutation | AEGP / scripting |
+| bulk native keyframes | Keyframer |
+| native workspace UI | Panel |
+| media format | AEIO |
+| composition 3D renderer | Artisan |
+| display observer | BlitHook |
+| native shared service | PICA |
+
+## Selection by callback owner
+
+Ask: who must initiate?
+
+- render graph → Effect;
+- user/menu/host command → AEGP;
+- media pipeline → AEIO;
+- renderer selection → Artisan;
+- workspace lifecycle → Panel;
+- display frame → BlitHook;
+- native consumer → PICA provider.
+
+## Selection by state lifetime
+
+Wrong API often reveals itself through state mismatch.
+
+Examples:
+
+- trying to keep project model inside Effect global state;
+- using panel widgets as render truth;
+- using AEIO spec as generic app state;
+- using BlitHook buffer as offline render source.
+
+## Migration thinking
+
+Architecture should isolate family-specific adapters.
+
+```text
+domain/service core
+→ Effect adapter
+→ AEGP adapter
+→ panel/script adapter
+```
+
+This lets UI/runtime evolve without rewriting algorithms.
+
+## Common taxonomy mistakes
+
+- “C++ means AEGP”;
+- “GPU means Artisan”;
+- “dockable UI means Effect custom UI”;
+- “frame callback means final render”;
+- “AEIO is just file IO”;
+- “Keyframer is a separate render type”;
+- “PICA reference counting means service thread-safe”.
+
+## Read order
+
+- [Host call flows](14-NATIVE-INTEGRATIONS/02-HOST-CALL-FLOWS.md)
+- [PICA suites](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md)
+- [Effects](14-NATIVE-INTEGRATIONS/04-EFFECTS.md)
+- [AEGP tools](14-NATIVE-INTEGRATIONS/05-AEGP-TOOLS.md)
+- [Keyframers](14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md)
+- [Native panels](14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md)
+- [AEIO](14-NATIVE-INTEGRATIONS/08-AEIO.md)
+- [Artisan](14-NATIVE-INTEGRATIONS/09-ARTISAN.md)
+- [BlitHook](14-NATIVE-INTEGRATIONS/10-BLITHOOK.md)
+- [Legacy native](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md)
+
+## Evidence boundary
+
+Current taxonomy is anchored to the supplied SDK 25.6 source-review baseline. Later-version suites/features are version-gated rather than silently replacing the baseline.
 
 
 ---
@@ -17186,68 +17359,219 @@ Do not encode “suite version 7 exists everywhere” into product logic. Acquir
 
 # Public SDK docs errata / verification notes
 
-Research snapshot: **2026-09-30**
+Research baseline: **SDK 25.6 source review + dated public documentation review**.
 
-Публичный C++ SDK Guide — основной reference, но code всегда должен компилироваться против **реальных headers установленного SDK**. В HTML бывают typographical/stale-signature проблемы.
+Purpose of this file: preserve places where public guide, bundled sample, historical code and exact SDK headers can disagree.
 
-## Подтверждённые/наблюдаемые расхождения
+Главное правило:
+
+> **не выбирать источник по удобству. Классифицировать, что именно каждый источник доказывает.**
+
+## Evidence order
+
+For exact native declarations:
+
+1. exact target SDK header;
+2. SuiteHandler/utility from same SDK;
+3. official sample from same distribution;
+4. public guide;
+5. historical/community material.
+
+Для lifecycle/ownership prototype alone недостаточен: нужны comments, paired APIs и sample behavior.
+
+## Erratum vs version difference
+
+Не всякое расхождение — ошибка документации.
+
+Possible classes:
+
+- typo;
+- stale generated HTML;
+- sample intentionally uses older suite;
+- API changed between SDK versions;
+- public guide describes concept, not exact signature;
+- sample has simplified teaching code.
+
+Всегда записывайте class before “fixing” Bible text.
+
+## Confirmed/observed mismatches
 
 ### Project Suite
 
-Публичная страница в одном месте отображает имя:
+В одном public render встречалось:
 
 ```text
 AEGP_GetProjectProjectByIndex
 ```
 
-В header-derived bindings и реальном API используется:
+Exact API/header baseline uses:
 
 ```text
 AEGP_GetProjectByIndex
 ```
 
+Treat the doubled `Project` form as documentation typo, not alternate function.
+
 ### Item Suite — CreateNewFolder
 
-В части публичной HTML-документации исторически показывался лишний `AEGP_ProjectH` в сигнатуре. Header/community sample shape современных SDK:
+Some historical/public HTML showed an extra project argument.
 
-```cpp
-AEGP_CreateNewFolder(
-    const A_UTF16Char* nameZ,
-    AEGP_ItemH parent_folderH0,
-    AEGP_ItemH* new_folderPH);
-```
+Current reviewed header shape for the relevant baseline does not use that extra project handle.
+
+Rule: copy signature from exact header, not remembered HTML.
 
 ### Layer Suite — AddLayer
 
-Некоторые HTML renders показывали третий argument как `A_Boolean*`. Header-derived contract:
+Some HTML renderings showed an incorrect third-argument type.
 
-```cpp
-AEGP_AddLayer(
-    AEGP_ItemH itemH,
-    AEGP_CompH compH,
-    AEGP_LayerH* new_layerPH);
+Reviewed header contract uses output `AEGP_LayerH*`.
+
+## Legacy sample generations
+
+Bundled samples can intentionally use old suites.
+
+Examples already documented in Bible include older Stream/Keyframe/DynamicStream generations in samples shipped alongside newer headers.
+
+Correct use:
+
+- learn workflow/lifecycle from sample;
+- take current signature/generation from exact header;
+- record version boundary.
+
+Incorrect use:
+
+- declare sample generation “current” because Adobe shipped it in the SDK folder.
+
+## Suite-number trap
+
+Type suffix and public suite version macro are not guaranteed to be the same number.
+
+Example pattern:
+
+```text
+AEGP_StreamSuite6
+but AcquireSuite public version constant may have another numeric value
 ```
 
-## Suite version labels
+Use the official suite-name/version macro pair rather than deriving number from struct suffix.
 
-Не считать заголовок старой секции документации доказательством «latest version». На 26.5 официально подтверждены новые:
-- `AEGP_GuideSuite2`;
-- `AEGP_ItemViewSuite2`;
-- `AEGP_CompSuite13`;
-- `AEGP_StreamSuite7`.
+## Guide/ItemView later-version notes
 
-Для остальных suite generations source of truth при сборке:
-1. SDK headers;
-2. `AEGP_SuiteHandler` из той же SDK distribution;
-3. official sample compiled from той же версии.
+Later SDK research includes newer Guide/ItemView/Comp/Stream suite generations.
 
-## Policy для Bible
+These notes must remain explicit version-gated additions; they cannot silently become SDK 25.6 baseline.
 
-Каждый executable-looking snippet:
-- либо проверяется по официальному published signature;
-- либо помечается как source-level / runtime-not-claimed;
-- не выдумывает undocumented struct layout;
-- не заявляется binary-tested без AE host.
+## PiPL/sample comments
+
+Comments in old `.r` samples can be stale even when constants are correct.
+
+Treat:
+
+```text
+constant value
+header macro
+current resource contract
+```
+
+as stronger evidence than a historical explanatory comment.
+
+## Callback signature drift
+
+Old AEGP samples may use initializer/callback signatures that differ from current typedefs.
+
+Do not force compiler casts to reproduce old sample ABI.
+
+Instead:
+
+1. read current typedef;
+2. compare sample;
+3. document version/history;
+4. adapt current code to current contract.
+
+## Boolean vs enum mistake
+
+Native APIs with enum parameter must not receive `TRUE/FALSE` merely because C++ accepts integer conversion.
+
+Bible's render-queue review found a concrete case where `TRUE == 1` mapped to a different enum state than intended `QUEUED`.
+
+Lesson: semantic type matters even when binary width looks compatible.
+
+## Ownership errata
+
+Public prose can omit cleanup detail.
+
+Whenever docs say “returns X”, search for:
+
+- `GetNew...` naming;
+- dispose/release/checkin pair;
+- sample cleanup;
+- header comment;
+- handle type.
+
+Do not infer borrowed/owned from pointer syntax.
+
+## UTF-8 / UTF-16 evolution
+
+Historical samples may use char buffers where newer suite generations return UTF-16 MemHandle.
+
+Do not port only function name and ignore string/ownership contract changes.
+
+## Platform docs
+
+Signing, debugger attach, installer and UXP/CEP roadmap facts are time-sensitive.
+
+For these, current Apple/Microsoft/Adobe platform documentation may outrank old SDK guide snapshots.
+
+Record review date.
+
+## How to write an erratum
+
+Use a compact record:
+
+```text
+topic
+observed source A
+observed source B
+exact baseline chosen
+reason
+version boundary
+impact on Bible/code
+```
+
+## Bible policy
+
+Executable-looking native snippet should be one of:
+
+- SDK-CONTRACT-REVIEWED;
+- SOURCE EXAMPLE with explicit baseline;
+- historical/sample-derived with version note;
+- RECONSTRUCTED and clearly labeled.
+
+Do not label source `binary-tested`/`runtime-observed` without corresponding evidence.
+
+## What absence of runtime evidence means
+
+It means only:
+
+> Bible does not claim that runtime result.
+
+It does **not** mean the documentation is incomplete if the chapter is about documented/source contract rather than measured runtime behavior.
+
+## Stop rule
+
+When header, sample and guide disagree:
+
+1. stop;
+2. identify exact SDK baseline;
+3. classify mismatch;
+4. update Bible with explicit provenance;
+5. never cast/guess merely to make an example look consistent.
+
+## Related
+
+- [Header-first rules](14-NATIVE-INTEGRATIONS/../18-SDK-HEADER-TOOLS/04-HEADER-FIRST-RULES.md)
+- [SDK diff policy](14-NATIVE-INTEGRATIONS/../18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md)
+- [SDK contract audit tools](14-NATIVE-INTEGRATIONS/../18-SDK-HEADER-TOOLS/README.md)
 
 
 ---
