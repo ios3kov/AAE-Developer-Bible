@@ -25278,7 +25278,7 @@ Return A_Err
 
 ## Version discipline
 
-Главы `02-COMPOSITIONS.md` / `03-LAYERS.md` и `05-STREAMS-PROPERTIES.md` / `06-KEYFRAMES.md` перепроверены по supplied SDK 25.6. Composition/layer baseline: `AEGP_CompSuite12` + `AEGP_LayerSuite9`. Streams/keyframes: `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`, `AEGP_KeyframeSuite5`. Главы `07-MASKS.md`, `08-TEXT-MARKERS.md`, `09-FOOTAGE-IMPORT.md` также приведены к baseline 25.6: `MaskSuite6`, `MaskOutlineSuite3`, `TextDocumentSuite1`, `MarkerSuite3`, `FootageSuite5`, `ItemSuite9`, `CompSuite12`, `LayerSuite9`. Более поздние API не должны молча становиться baseline 25.6. Источники: `18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md` и `11-MASK-TEXT-FOOTAGE-SDK25.6.md`.
+Главы `02-COMPOSITIONS.md` / `03-LAYERS.md` и `05-STREAMS-PROPERTIES.md` / `06-KEYFRAMES.md` перепроверены по supplied SDK 25.6. Composition/layer baseline: `AEGP_CompSuite12` + `AEGP_LayerSuite9`. Streams/keyframes: `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`, `AEGP_KeyframeSuite5`. Главы `07-MASKS.md`, `08-TEXT-MARKERS.md`, `09-FOOTAGE-IMPORT.md` также приведены к baseline 25.6: `MaskSuite6`, `MaskOutlineSuite3`, `TextDocumentSuite1`, `MarkerSuite3`, `FootageSuite5`, `ItemSuite9`, `CompSuite12`, `LayerSuite9`. Their later editorial pass also reconciles ownership transfer, structural invalidation, static-vs-keyframed writes, Footage-vs-AEIO boundaries and product-validation wording. Более поздние API не должны молча становиться baseline 25.6. Источники: `18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md` и `11-MASK-TEXT-FOOTAGE-SDK25.6.md`.
 
 
 ## Render Queue / frame-render baseline
@@ -26785,6 +26785,35 @@ Placeholder-with-path contract отдельно предупреждает: `AEI
 | Windows host checks | NOT RUN |
 
 Следующий editorial block после этого может охватить AEIO/Artisan или оставшиеся Cookbook families; editorial readiness определяется полнотой и согласованностью документации.
+
+## Later cookbook consistency update — 2026-10-01
+
+A later editorial block completed the production-guidance layer around the already-reviewed SDK 25.6 contracts.
+
+The exact suite baseline did **not** change:
+
+- `AEGP_MaskSuite6`;
+- `AEGP_MaskOutlineSuite3`;
+- `AEGP_TextDocumentSuite1`;
+- `AEGP_MarkerSuite3`;
+- `AEGP_FootageSuite5`;
+- `AEGP_ItemSuite9`;
+- `AEGP_CompSuite12`;
+- `AEGP_LayerSuite9`.
+
+The later pass added/reconciled:
+
+- mask create/edit/dispose workflow, structural invalidation, vertex/feather-index hazards and anti-patterns;
+- text Source Text workflow, UTF-16 MemorySuite lifetime and static-vs-keyframed write path;
+- marker keyframe/value workflow versus standalone `NewMarker` ownership;
+- footage explicit `OwnedByPlugin → AdoptedByProject` transition and failure rollback;
+- footage interpretation as a separate undoable mutation rather than an implicit side effect of import;
+- Footage Suite versus AEIO boundary for host-supported media versus new file formats;
+- product-validation guidance replacing old “host acceptance pending” wording.
+
+The original source hashes/findings above remain provenance for the SDK review and are not rewritten retroactively.
+
+**Evidence level after this pass:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new AE runtime result is asserted.
 
 
 ---
@@ -33380,6 +33409,19 @@ Checked and reconciled as one logical block:
 - Keyframer template/reference no longer treats host tests as a Bible completion requirement;
 - source-review records preserve old blob provenance and add a later consistency note instead of rewriting history.
 
+### Masks / text / markers / footage block — completed 2026-10-01
+
+Checked and reconciled as one logical block:
+
+- masks: `MaskSuite6` + `MaskOutlineSuite3`, explicit MaskRef disposal, outline StreamValue lifetime, structural invalidation and topology/index hazards;
+- text: `TextDocumentSuite1` + `StreamSuite6`, UTF-16 MemorySuite ownership, character-count semantics and static-vs-keyframed write path;
+- markers: `MarkerSuite3` + keyframe stream model, standalone marker ownership separated from stream-value payload ownership;
+- footage/import: `FootageSuite5` + Item9/Comp12/Layer9, explicit caller-owned → project-adopted transition, failure rollback and project-owned handle rules;
+- interpretation is documented as a separate undoable project mutation;
+- Footage Suite vs AEIO boundary is explicit;
+- old host-acceptance wording replaced with product-validation guidance / runtime-not-claimed evidence language;
+- source-review provenance preserved with a later consistency note rather than rewriting original findings.
+
 ## E. Recipes and reference source
 
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
@@ -34638,6 +34680,17 @@ Completed as one source/cookbook/reference block:
 - `KeyframeSuite5` retained as SDK 25.6 keyframe baseline;
 - source examples, Keyframer references and product-validation language aligned with `EDITORIAL-GUIDE.md`.
 
+### Masks / text / markers / footage
+
+Completed as one ownership/import block:
+
+- MaskRef/outline stream/value ownership and structural invalidation reconciled;
+- TextDocument and UTF-16 MemorySuite lifetimes clarified;
+- Marker stream timing, payload ownership and standalone marker ownership separated;
+- Footage caller-owned → project-adopted transition and failure rollback made explicit;
+- Footage Suite versus AEIO responsibility boundary made explicit;
+- product validation wording aligned with `EDITORIAL-GUIDE.md`.
+
 ## Current editorial TODO
 
 1. Sweep every main chapter for completeness against the editorial checklist.
@@ -35024,3 +35077,34 @@ Current-source corrections:
 The earlier source-review blob hashes remain historical provenance for the earlier snapshots. They are not retroactively relabeled.
 
 **Verification level:** source/editorial consistency plus existing portable source tests. No new AE runtime result is claimed.
+
+
+## Masks / text / markers / footage ownership block (2026-10-01)
+
+The cookbook ownership block was reconciled around the already-reviewed SDK 25.6 contracts.
+
+Current baseline:
+
+```text
+MaskSuite6 + MaskOutlineSuite3
+TextDocumentSuite1
+MarkerSuite3
+FootageSuite5
+ItemSuite9 + CompSuite12 + LayerSuite9
+```
+
+Editorial/source conclusions:
+
+- `MaskRefH` returned by layer/create operations remains caller-disposable; deleting a mask does not replace `DisposeMask`;
+- mask outline payload inside `AEGP_StreamValue2` does not outlive the stream-value cleanup;
+- text document payload and UTF-16 MemorySuite handles have separate lifetimes;
+- marker timing belongs to the stream/keyframe model while marker payload belongs to Marker Suite;
+- standalone marker ownership is kept distinct from marker payload obtained inside a stream value;
+- `AEGP_NewFootage` creates caller-owned footage until successful adoption by project/proxy/replace operations;
+- project-owned footage returned from Item APIs must not be disposed as caller-owned footage;
+- failed footage adoption keeps cleanup responsibility with the caller;
+- Footage Suite imports media the host already supports; new file-format decoding belongs to AEIO.
+
+Old “host acceptance matrix/pending” wording was replaced with product-validation guidance consistent with `EDITORIAL-GUIDE.md`.
+
+**Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new AE runtime import/mask/text/marker result is claimed.
