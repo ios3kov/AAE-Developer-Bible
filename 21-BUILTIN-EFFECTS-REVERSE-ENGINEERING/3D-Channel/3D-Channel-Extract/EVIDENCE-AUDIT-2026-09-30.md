@@ -102,7 +102,7 @@ Thus “core static reconstruction complete for all eight families” is withdra
 
 Preserve originals and hashes; never edit reports into PASS. Complete source-backed errata and callback identification from the existing dump. Prepare separate auxiliary footage with independently inventoried identifiers, datatypes, dimensions and known values, plus a separate missing-channel control. Define expected outputs/tolerances before testing. Keep nested Z-Depth, footage channels, output conversion and concurrency as separate suites within one package. Implement actual test bodies; NOT RUN/BLOCKED keeps its gate open even when collection completes. Review fixture coverage and portable tests before delivery. Do not rerun completed depth matrices for cosmetic changes.
 
-**No user AE action is required now. Gate 8 remains OPEN.**
+**No user AE action is required now. The atlas investigation remains ongoing; this does not block core Bible editorial readiness.**
 
 ## Evidence hashes
 
