@@ -154,6 +154,23 @@ Checked and reconciled as one logical block:
 - AEIO registration template/reference now use RUNTIME-NOT-CLAIMED/product-validation language;
 - SDK source-review provenance preserved with a later consistency note.
 
+### Artisan renderer lifecycle block — completed 2026-10-01
+
+Checked and reconciled as one logical block:
+
+- current SDK 25.6 baseline: `PR_ArtisanEntryPoints`, `RegisterArtisan/RegisterInteractiveArtisan`, `CanvasSuite8`, `ArtisanUtilSuite1`;
+- global / instance / render / temporary-resource lifetimes separated;
+- versioned flatten/inflate persistence defined for instance settings;
+- render/query/layer contexts kept borrowed and out of long-lived product caches;
+- scene extraction separated from renderer core;
+- texture/world/receipt cleanup families kept distinct;
+- bins, track mattes, mixed layer types, camera/light time, motion blur, ROI/downsample and unsupported-feature policy documented;
+- interactive viewport state separated from final/persistent renderer state;
+- cancellation, partial failure, threading and performance-stage guidance added;
+- Artie old-suite usage retained as historical pattern evidence only;
+- Artisan template/reference evidence wording aligned with `EDITORIAL-GUIDE.md`;
+- SDK source-review provenance preserved with a later consistency note.
+
 ## E. Recipes and reference source
 
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
