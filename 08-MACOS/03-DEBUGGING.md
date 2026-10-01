@@ -58,3 +58,10 @@ sudo touch "/Library/Application Support/Adobe/After Effects (Beta)/developer-mo
 - MFR/GPU state.
 
 Без exact `.dSYM` shipped build symbolication может быть бесполезна.
+
+
+## Loaded-image identity lesson
+
+The [AE Hot Loader reuse audit](../22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md) preserves a concrete debugging lesson: installation intent is not proof of the module AE actually loaded. When diagnosing path/version mismatches, record the **real loaded image path and identity** before reasoning from an installer destination.
+
+The source project used macOS dyld enumeration for an experiment. Treat that as a platform diagnostic technique, not a cross-platform After Effects SDK contract.
