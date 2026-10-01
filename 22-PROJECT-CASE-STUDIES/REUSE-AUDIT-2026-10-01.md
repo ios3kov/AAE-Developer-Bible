@@ -417,7 +417,7 @@ Therefore:
 
 - source/test mapping: **COMPLETE**;
 - original project-reported portable results: **PRESERVED**;
-- independent Bible rerun of the FSTR snapshot: **NOT RUN**.
+- independent Bible rerun of the FSTR snapshot: **PASS**, audit run `36841872858` on workflow-only child commit `165bfac15ef9...`.
 
 A future copied/adapted implementation must receive Bible-owned regression tests instead of inheriting the source project's PASS.
 
@@ -441,10 +441,30 @@ For accepted adaptations:
 
 Private loader work has no destination in supported example gates.
 
-# Gate 3A remaining item
+# Independent FSTR portable rerun
 
-The code/test/build mapping, provenance review, transfer decisions and Bible-side acceptance requirements are now written.
+To remove the final Gate 3A ambiguity, a dedicated audit branch was created directly from the pinned snapshot:
 
-One checklist item remains intentionally open: **an independent portable rerun of the selected FSTR source snapshot was not performed in this audit**. The original test records are preserved but are not relabelled as Bible-run evidence.
+- base snapshot: `c69e3663de59dc44cbdef18042891f6dd1ce5ee6`;
+- audit branch: `audit/bible-reuse-2026-10-01`;
+- audit commit: `165bfac15ef9401ba8f2aaec747d2a6bc487a0b1`;
+- compare result: exactly one added file, `.github/workflows/bible-reuse-audit.yml`; no product source/test file changed;
+- GitHub Actions run: `36841872858`;
+- result: **PASS**.
 
-Gate 3A must not be closed until that distinction is either accepted as sufficient for a no-code-copy architecture transfer or the selected portable source is independently rerun in an appropriate execution environment.
+Passed steps:
+
+- locked dependency install;
+- `npm run check` — TypeScript build + pure core/adapter tests;
+- `npm run check:cep` — CEP build + ExtendScript static checks;
+- `git diff --check`.
+
+This is portable source/build evidence only. It is not an After Effects host test and does not close any Gate 5–7 runtime requirement.
+
+# Gate 3A conclusion
+
+The candidate code/test/build mapping, original evidence review, independent FSTR portable rerun, provenance review, transfer decisions, target-chapter links and Bible-side acceptance requirements are complete.
+
+**Gate 3A acceptance is met.**
+
+No source-project host result is promoted into Bible host verification. FSTR SYNC-001 remains a source-project limitation, and AE Hot Loader's private loader remains research-only.
