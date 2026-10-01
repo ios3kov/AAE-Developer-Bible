@@ -184,3 +184,4 @@ nav:
       - "Master effect list": 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/MASTER-EFFECT-LIST.md
   - 22-PROJECT-CASE-STUDIES:
       - "Практические кейсы — FSTR Line и AE Hot Loader": 22-PROJECT-CASE-STUDIES/README.md
+      - "Reuse audit — 2026-10-01": 22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md
