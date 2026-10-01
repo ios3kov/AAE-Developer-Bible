@@ -22,4 +22,4 @@ Original evidence is preserved without rewriting its statuses. The [evidence aud
 
 Use separately inventoried auxiliary footage with known channels and values, plus a separate missing-channel control. Define expected outputs and tolerances before execution. Keep nested Z-Depth, imported auxiliary footage, output processing, transparency/ROI and concurrency as separate test suites even when delivered in one package. A placeholder or unsupported input stays NOT RUN/BLOCKED and cannot become acceptance PASS merely because collection completes.
 
-Existing depth measurements must not be discarded or rerun just to rename a tool. **Full-effect acceptance and Gate 8 remain OPEN.**
+Existing depth measurements must not be discarded or rerun just to rename a tool. **Full-effect research remains incomplete; this is an ongoing atlas track, not a core Bible release blocker.**
