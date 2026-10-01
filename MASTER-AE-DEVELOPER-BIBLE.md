@@ -29019,6 +29019,39 @@ NOT RUN in this iteration:
 These are optional future implementation/runtime evidence areas, not Bible completion requirements.
 
 
+## Later PICA / Effect bridge / legacy consistency update — 2026-10-01
+
+A later logical block completed the production/editorial layer around the already-reviewed SDK 25.6 contracts.
+
+The baseline remains:
+
+- `SPBasicSuite::AcquireSuite / ReleaseSuite`;
+- `SPSuitesSuite` low-level provider registry;
+- Sweetie as provider pattern;
+- Checkout as optional consumer pattern;
+- current `AEGP_EffectSuite5::AEGP_EffectCallGeneric`;
+- `PF_Cmd_COMPLETELY_GENERAL`;
+- current AEGP initializer prototype from SDK 25.6.
+
+The later pass added/reconciled:
+
+- provider function-table lifetime versus backing service-state lifetime;
+- stable suite-name storage requirements for acquire/release owners;
+- explicit multi-version negotiation via adapters instead of table casting;
+- conservative provider shutdown without inventing generic hot-unpublish/hot-reload;
+- acquisition/service/domain/cleanup error separation;
+- product-validation wording rather than mandatory Bible host testing;
+- EffectRef freshness and late target resolution;
+- message size/version evolution and additive-tail rules;
+- generic-call reentrancy/mutex guidance and persistent-vs-transient command distinction;
+- legacy migration classification and product source-modernization versus behavior/project-compatibility split;
+- stale legacy text corrected from current EffectSuite4 to current EffectSuite5.
+
+The original hashes/sample findings above remain provenance for the source review.
+
+**Evidence level after this pass:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No provider/consumer or generic-call runtime result is newly asserted.
+
+
 ---
 
 <!-- SOURCE: 18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md -->
@@ -35335,6 +35368,24 @@ Checked and reconciled as one logical block:
 - related threading/data-ownership validation wording aligned with `EDITORIAL-GUIDE.md`;
 - SDK source-review provenance preserved with a later consistency note.
 
+### PICA / Effect↔AEGP / legacy boundaries block — completed 2026-10-01
+
+Checked and reconciled as one logical block:
+
+- PICA provider/consumer baseline anchored to `SPBasicSuite`, `SPSuitesSuite`, Sweetie and Checkout;
+- stable suite name + public version documented as ABI identity;
+- suite-name pointer lifetime in `PicaSuiteRef` made explicit;
+- provider table lifetime separated from backing service-state lifetime;
+- multi-version negotiation uses explicit adapters rather than table casting;
+- refcounting no longer implied to provide generic hot-unload/hot-replacement safety;
+- acquisition/service/domain/cleanup errors separated;
+- current Effect↔AEGP path fixed on `EffectSuite5 + PF_Cmd_COMPLETELY_GENERAL`;
+- EffectRef freshness, layer-time conversion, payload size/version evolution, reentrancy and persistence boundaries expanded;
+- PICA/generic-call references/templates use product-validation / RUNTIME-NOT-CLAIMED language;
+- legacy chapter corrected from stale EffectSuite4 current claim to EffectSuite5;
+- legacy migration distinguishes source modernization from behavior/project compatibility;
+- SDK source-review provenance preserved with a later consistency note.
+
 ## E. Recipes and reference source
 
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
@@ -36637,6 +36688,16 @@ Completed as one workspace/display-lifecycle block:
 - asynchronous BlitHook behavior remains deliberately unclaimed beyond verified source contract;
 - template/reference/source-review and communication evidence language aligned with `EDITORIAL-GUIDE.md`.
 
+### PICA / Effect↔AEGP / legacy boundaries
+
+Completed as one native-service/bridge/migration block:
+
+- PICA ABI identity, provider/consumer lifetime, version adapters, shutdown and suite-name ownership clarified;
+- Effect↔AEGP generic bridge aligned to current `EffectSuite5`, late target resolution and size/versioned synchronous payload semantics;
+- render dependency and persistent-state boundaries clarified;
+- legacy current-generation typo fixed and migration guidance split into source modernization versus behavior/project compatibility;
+- templates/references/source-review evidence wording aligned with `EDITORIAL-GUIDE.md`.
+
 ## Current editorial TODO
 
 1. Sweep every main chapter for completeness against the editorial checklist.
@@ -37165,3 +37226,62 @@ Editorial/source conclusions:
 The related threading/data-ownership chapters now label runtime scenarios as product-validation cases rather than Bible completion tests.
 
 **Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new panel or BlitHook host result is asserted.
+
+
+## PICA / Effect↔AEGP / legacy boundaries block (2026-10-01)
+
+The native service/bridge/legacy block was reconciled around the supplied SDK 25.6 contracts.
+
+### PICA provider/consumer
+
+```text
+provider publishes stable versioned function table
+→ consumer AcquireSuite(name, public_version)
+→ use according to ABI/thread/ownership contract
+→ matching ReleaseSuite
+→ provider backing state outlives valid product calls/acquisitions
+```
+
+Editorial/source conclusions:
+
+- suite name + public version form the consumer-facing ABI identity;
+- public version is distinct from low-level internal provider version;
+- published table lifetime and backing service-state lifetime are separate;
+- `PicaSuiteRef` stores a borrowed suite-name pointer, so suite-name storage must outlive the acquisition;
+- optional dependency and required dependency have different failure policies;
+- multi-version support uses explicit version adapters, not table casting;
+- suite reference counting is not treated as a universal hot-unload/hot-replacement guarantee;
+- threading and host-call permission are separate service contracts.
+
+### Effect ↔ AEGP generic bridge
+
+Current path:
+
+```text
+AEGP resolves current EffectRef
+→ builds size/versioned payload
+→ converts to target layer timebase
+→ EffectSuite5::AEGP_EffectCallGeneric
+→ PF_Cmd_COMPLETELY_GENERAL
+→ synchronous read/write of payload
+→ dispose EffectRef
+```
+
+The payload pointer is not retained after return without a stronger product-owned protocol.
+
+Host delivery error, protocol validation error and domain result remain separate.
+
+Render-affecting persistent state must remain visible to AE's supported dependency/persistence model rather than hidden behind the generic call.
+
+### Legacy boundary
+
+The legacy chapter was corrected to the current SDK 25.6 `EffectSuite5` baseline.
+
+Historical sample generations remain workflow evidence only. Legacy migration now distinguishes:
+
+- source modernization;
+- behavior/project compatibility.
+
+One does not prove the other.
+
+**Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new PICA provider/consumer or Effect↔AEGP host run is claimed.
