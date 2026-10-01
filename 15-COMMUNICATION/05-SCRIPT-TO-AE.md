@@ -1,164 +1,206 @@
-# ExtendScript -> After Effects
+# ExtendScript → After Effects
 
-ExtendScript executes inside the After Effects scripting environment and accesses the host through the scripting DOM: app, project, items, compositions, layers, properties/keyframes, import and render queue.
+Обновлено **2026-10-01**. ExtendScript работает внутри scripting engine After Effects и управляет host через high-level scripting DOM. Это control/automation API, а не render API и не low-level native ABI.
 
-It is a control and automation API, not a per-pixel render API.
+Связанные главы:
 
-## Typical command flow
+- [After Effects scripting object model](../06-SCRIPTING/01-OBJECT-MODEL.md)
+- [CEP ↔ ExtendScript](06-CEP-TO-EXTENDSCRIPT.md)
+- [Threading boundaries](08-THREADING-BOUNDARIES.md)
+
+## 1. Execution path
+
+~~~text
+script / JSX command
+        ↓
+After Effects ExtendScript engine
+        ↓
+app → project → items/comps → layers → properties
+        ↓
+host-owned project state
+~~~
+
+Script получает host objects, а не копию проекта. Structural mutation, selection changes и удаление объектов могут менять валидность ранее сохранённых ссылок.
+
+## 2. Validate before mutate
+
+~~~jsx
+function renameFirstLayer(newName) {
+    if (!app.project) {
+        throw new Error("NO_PROJECT");
+    }
+
+    var comp = app.project.activeItem;
+    if (!(comp instanceof CompItem)) {
+        throw new Error("NO_ACTIVE_COMP");
+    }
+
+    if (comp.numLayers < 1) {
+        throw new Error("NO_LAYER");
+    }
+
+    comp.layer(1).name = newName;
+}
+~~~
+
+До первого изменения проверяйте:
+
+- тип active item;
+- существование слоя/property/effect;
+- диапазоны 1-based индексов;
+- наличие файла/папки;
+- capability flags вроде canAddProperty/canSetExpression;
+- support/version gate.
+
+## 3. Undo group — история, не transaction
 
 ~~~jsx
 app.beginUndoGroup("My Tool");
 
 try {
-    var comp = app.project.activeItem;
-
-    if (!(comp instanceof CompItem)) {
-        throw new Error("No active composition.");
-    }
-
-    if (comp.numLayers < 1) {
-        throw new Error("Composition has no layers.");
-    }
-
-    comp.layer(1).name = "Renamed by Tool";
+    // validate and mutate
 } finally {
     app.endUndoGroup();
 }
 ~~~
 
-Validate prerequisites before mutation. beginUndoGroup/endUndoGroup creates coherent user undo history; it does not promise automatic rollback after an exception.
+Undo group объединяет изменения в историю Undo, но exception сам по себе не откатывает уже выполненную половину команды.
 
-## Main-thread implication
+Если partial mutation недопустим:
 
-Host-side scripting is synchronous from the point of view of the AE operation. In CEP, Adobe explicitly documents that evalScript executes in the host ExtendScript engine on the host main thread.
+1. проверить prerequisites до первого edit;
+2. только потом менять проект;
+3. явно чистить product-owned temporary objects на failure path;
+4. держать undo ownership на command boundary.
 
-Design consequences:
+## 4. Reacquire after structural mutation
 
-- prefer short commands to one giant script;
-- do not poll AE state continuously from a panel;
-- keep binary/heavy compute out of JSON/string bridge traffic;
-- validate and batch project mutations;
-- return a compact result instead of hundreds of UI-side follow-up queries.
+Indexed property groups могут перестраиваться после add/remove/move.
 
-## Stable identifiers
+~~~jsx
+var effects = layer.property("ADBE Effect Parade");
+var slider = effects.addProperty("ADBE Slider Control");
+var sliderIndex = slider.propertyIndex;
 
-For effects/properties, prefer match names where available. User-visible layer/effect names are presentation data and can be localized or renamed.
+effects.addProperty("ADBE Color Control");
+slider = effects.property(sliderIndex);
+~~~
 
-If the script creates product-owned objects, store a deliberate stable identifier instead of depending only on layer.name.
+Не считать host object reference бессрочной.
 
-## Structural mutation invalidates references
+## 5. Stable identity
 
-Adding, moving or removing properties in indexed groups can invalidate saved ExtendScript references.
+Display name — UI label, не всегда machine identity.
 
-A protocol handler that performs a structural edit should reacquire the affected objects before the next operation.
+Для effects/properties предпочитайте match names там, где API их предоставляет. Для product-owned объектов храните собственный stable ID, а не полагайтесь только на имя слоя.
 
-Do not expose a fake pointer-identity model to a panel. A panel should request objects by stable product ID or by a deliberately resolved path each time.
-
-## Script -> effect/property
-
-A script or panel can control a native effect through normal project state:
+## 6. Command layer
 
 ~~~text
-script
-→ layer
-→ Effects property group
-→ target effect by match name
-→ parameter property
-→ setValue / setValueAtTime
+UI / panel / test harness
+        ↓
+plain command + validated payload
+        ↓
+scripting service
+        ↓
+AE scripting DOM
+        ↓
+plain result
 ~~~
 
-This is often the safest bridge when the operation can naturally be expressed as effect parameters or project data.
+Одна операция должна быть вызываема из ScriptUI, CEP, JSX harness, native AEGP через ExecuteScript и будущего panel adapter без переписывания business logic.
 
-Advantages:
+## 7. Native → script через AEGP Utility Suite
 
-- AE owns project persistence;
-- undo/keyframes use normal host concepts;
-- parameter dependencies remain visible to the host;
-- no custom IPC is needed.
+Public AEGP Utility Suite предоставляет AEGP_IsScriptingAvailable и AEGP_ExecuteScript.
 
-Do not abuse effect parameters as an unbounded binary transport.
+AEGP_ExecuteScript принимает script string и может вернуть result последней строки и error string как AEGP_MemHandle.
 
-## Script -> menu command
-
-app.executeCommand(id) can invoke a host command, but numeric command IDs are not a strong public compatibility contract across versions/localizations.
-
-Use only when:
-
-- no better public scripting API exists;
-- the dependency is isolated;
-- supported host versions were actually tested;
-- failure has a safe fallback;
-- the command ID dependency is documented in the support matrix.
-
-Do not build a large product around undocumented menu-ID archaeology.
-
-## Native -> script
-
-AEGP Utility Suite exposes AEGP_ExecuteScript, allowing native AEGP code to execute ExtendScript for a capability better exposed through the scripting DOM.
-
-Treat this as a synchronous host bridge:
-
-- keep the called script small;
-- obey the actual suite ownership contract for returned data;
-- do not call from arbitrary worker threads;
-- avoid circular designs where JSX calls native and native immediately invokes a large JSX workflow back.
-
-One layer should own the command lifecycle.
-
-## Request and response contract
-
-A script command should accept plain data and return plain data.
-
-Request:
-
-~~~json
-{
-  "protocol": 1,
-  "requestId": "7",
-  "command": "renameSelected",
-  "payload": {"name": "Hero"}
-}
+~~~text
+check scripting available
+→ ExecuteScript
+→ inspect returned result/error handles
+→ release owned memory handles with matching Memory Suite API
 ~~~
 
-Failure:
+Не теряйте result/error handles на early return.
+
+Bridge подходит для редких host automation calls, но не для high-frequency IPC и больших данных.
+
+Источник публичного контракта: AEGP_UtilitySuite6 в After Effects C++ SDK Guide. Shipping code всё равно сверяется с headers целевого SDK.
+
+## 8. app.executeCommand boundary
+
+app.executeCommand(id) может вызвать host menu command, но numeric command ID не является хорошим стабильным product protocol.
+
+Использовать только если:
+
+- нет лучшего public DOM/API;
+- ID подтверждён на поддерживаемых версиях;
+- behavior покрыт host test;
+- есть clear failure/fallback.
+
+## 9. Error contract
 
 ~~~json
 {
   "ok": false,
-  "requestId": "7",
+  "requestId": "42",
   "error": {
     "code": "NO_ACTIVE_COMP",
-    "message": "No active composition"
+    "message": "Open a composition first"
   }
 }
 ~~~
 
-The UI can localize a stable error code while logs retain the source message.
+Разделяйте:
 
-## Cancellation
+1. script parse/runtime failure;
+2. command validation failure;
+3. AE operation failure;
+4. transport failure, если script вызван через CEP/native bridge.
 
-ExtendScript does not make every long host mutation safely cancellable automatically.
+Machine code должен быть стабильнее human text.
 
-If a workflow supports cancel:
+## 10. Long work
 
-1. define checkpoints between atomic chunks;
-2. decide what partial result is valid;
-3. close undo groups and files in finally blocks;
-4. never interrupt a product-owned file halfway through an unsafe write;
-5. return CANCELLED as a normal protocol result where appropriate.
-
-## Recommended boundary
+ExtendScript — плохое место для heavy CPU, больших binary transforms и tight polling.
 
 ~~~text
-plain request
-→ validate
-→ resolve AE host objects
-→ perform short query/mutation
-→ normalize plain response
+external/pure compute
+→ compact result
+→ short host mutation
+→ normalized response
 ~~~
 
-Never leak raw host object references into CEP, helper-process or native IPC protocols.
+Для длинной операции добавляйте осмысленные chunks и cancellation/progress boundary.
+
+## 11. Project persistence
+
+Runtime JavaScript object не является надёжным persistent storage.
+
+Если state должен пережить reopen/restart, заранее выберите owner:
+
+- project objects/properties;
+- deliberate serialized metadata;
+- external product state, если он не обязан ехать вместе с project.
+
+## 12. Acceptance checklist
+
+Проверить:
+
+- no project;
+- wrong active item;
+- empty comp;
+- missing effect/property;
+- localized UI;
+- cancel path;
+- partial failure;
+- save/reopen;
+- repeated invocation;
+- supported AE versions;
+- ExecuteScript result/error cleanup, если bridge используется.
 
 ## Verification boundary
 
-This chapter describes the scripting communication contract. It does not upgrade the current JSX examples to host-verified status; AE execution remains pending in the completion matrix.
+Глава описывает public scripting model и production architecture pattern. Текущий editorial pass не является новым host run. Native AEGP_ExecuteScript и scripting workflows проверяются отдельно на заявленной версии SDK/AE.

@@ -1,86 +1,72 @@
-# CEP panel <-> ExtendScript
+# CEP panel ↔ ExtendScript
 
-CEP has two separate JavaScript environments:
+Обновлено **2026-10-01**. CEP panel и ExtendScript — два разных JavaScript runtime. Panel не получает scripting DOM напрямую: доступ к AE идёт через host bridge.
+
+Связанные главы:
+
+- [CEP development](../07-PANELS/01-CEP.md)
+- [UXP transition](../07-PANELS/02-UXP-TRANSITION.md)
+- [Script → AE](05-SCRIPT-TO-AE.md)
+
+## 1. Runtime model
 
 ~~~text
 CEP HTML/JS runtime
-        |
-        | CSInterface.evalScript(script, callback)
-        v
+      |
+      | CSInterface.evalScript(...)
+      v
 After Effects ExtendScript engine
-        |
-        v
+      |
+      v
 AE scripting DOM
 ~~~
 
-The panel cannot directly use app.project, and ExtendScript cannot directly manipulate the panel's HTML DOM.
+Официальный CEP cookbook разделяет HTML DOM и host Application/ExtendScript DOM.
 
-## Panel -> AE
+evalScript запускает script в host ExtendScript engine. Cookbook также указывает, что host script и CEP event dispatch зависят от host main-thread scheduling.
 
-The fundamental bridge is CSInterface.evalScript.
+Asynchronous callback в panel API не делает host-side script background worker.
 
-Simple form:
+## 2. One bridge, not evalScript everywhere
 
-~~~js
-var cs = new CSInterface();
+Плохо:
 
-cs.evalScript('$._myTool.ping()', function (result) {
-    console.log(result);
-});
+~~~text
+ButtonA -> evalScript
+ButtonB -> evalScript
+component -> evalScript
+timer -> evalScript
 ~~~
 
-A production product should not create different executable script strings throughout the UI.
+Хорошо:
 
-Bad:
-
-~~~js
-cs.evalScript('doThing("' + userText + '")');
+~~~text
+UI
+ ↓
+Bridge.request(command, payload)
+ ↓
+one evalScript dispatcher
+ ↓
+$._myTool.dispatch(...)
+ ↓
+AE scripting service
 ~~~
 
-Quotes, backslashes and attacker-controlled text can turn data into source code.
+Так protocol можно тестировать отдельно от UI.
 
-## One dispatcher
-
-Centralize bridge calls:
-
-~~~js
-function callAe(message, done) {
-    var json = JSON.stringify(message);
-    var arg = JSON.stringify(json);
-
-    cs.evalScript('$._myTool.dispatch(' + arg + ')', function (raw) {
-        done(raw);
-    });
-}
-~~~
-
-ExtendScript side:
+## 3. Namespace and bootstrap
 
 ~~~jsx
 $._myTool = $._myTool || {};
 
-$._myTool.dispatch = function (raw) {
-    var request = null;
-
-    try {
-        request = JSON.parse(raw);
-        return JSON.stringify(Dispatcher.handle(request));
-    } catch (e) {
-        return JSON.stringify({
-            ok: false,
-            requestId: request && request.requestId,
-            error: {
-                code: "UNHANDLED",
-                message: e.toString()
-            }
-        });
-    }
+$._myTool.dispatch = function(jsonText) {
+    // parse → validate → route → stringify response
 };
 ~~~
 
-Keep dispatch separate from actual command implementations.
+Не полагайтесь на то, что много JSX-файлов безопасно определяют одинаковые globals: последняя загрузка может перезаписать предыдущую.
 
-## Request contract
+## 4. Request protocol
 
 ~~~json
 {
@@ -93,18 +79,40 @@ Keep dispatch separate from actual command implementations.
 }
 ~~~
 
-Validate:
+Dispatcher:
 
-- protocol version;
-- command allowlist;
-- required payload fields;
-- string/number ranges;
-- file path policy;
-- maximum payload size where appropriate.
+1. parse JSON;
+2. validate protocol;
+3. allowlist command;
+4. validate payload shape/range;
+5. execute;
+6. return normalized JSON envelope.
 
-Unknown commands must fail closed.
+## 5. User data is data, not script source
 
-## Response envelope
+Нельзя:
+
+~~~js
+cs.evalScript('rename("' + userText + '")');
+~~~
+
+Один практический pattern:
+
+~~~js
+const wire = JSON.stringify(message);
+const jsxArg = JSON.stringify(wire);
+cs.evalScript('$._myTool.dispatch(' + jsxArg + ')', onResult);
+~~~
+
+В ExtendScript:
+
+~~~jsx
+var message = JSON.parse(jsonText);
+~~~
+
+Quoting/escaping централизуется на transport layer.
+
+## 6. Response envelope
 
 Success:
 
@@ -112,9 +120,7 @@ Success:
 {
   "ok": true,
   "requestId": "42",
-  "result": {
-    "changed": 3
-  }
+  "result": {"changed": 3}
 }
 ~~~
 
@@ -131,135 +137,124 @@ Failure:
 }
 ~~~
 
-An empty, malformed or non-JSON callback result is a transport/protocol failure, not a successful command that returned "nothing".
+Human-readable строка не должна быть единственным machine contract.
 
-## Main-thread scheduling
+## 7. Transport error ≠ application error
 
-Adobe's CEP 12 cookbook states that evalScript and manifest ScriptPath JSX execute in the host application's ExtendScript engine on the host main thread. It also notes that CEP events depend on host main-thread scheduling.
-
-Therefore:
-
-- avoid long single evalScript calls;
-- do not call evalScript on every UI repaint;
-- batch related reads and writes;
-- split long jobs into explicit chunks;
-- keep pure CPU work in the panel/helper where appropriate;
-- keep large binary data out of the JSX string bridge.
-
-The callback is asynchronous from the CEP JavaScript API perspective. The host-side work is still a synchronous script operation.
-
-## AE / ExtendScript -> panel
-
-ExtendScript cannot access the CEP browser DOM directly. Use CEP/CSXS events when host-side code needs to notify the panel.
-
-Conceptual flow:
+Различайте:
 
 ~~~text
-ExtendScript/native source
-→ CSXS / PlugPlug event
-→ CEP event bus
-→ CSInterface.addEventListener(...)
-→ panel reducer/state update
+CEP/evalScript transport failed
+script failed before envelope
+protocol rejected
+domain command failed
+command succeeded
 ~~~
 
-Prefer events as invalidation signals.
+Panel должен показывать diagnostic, не превращая всё в Unknown error.
 
-Good:
+## 8. Request IDs and stale responses
 
-~~~json
-{
-  "protocol": 1,
-  "type": "selectionChanged",
-  "revision": 183
-}
+Каждый запрос имеет requestId. Для snapshots полезен generation/revision.
+
+~~~text
+request generation 12
+→ UI moved to 13
+→ old response arrives
+→ ignore as stale
 ~~~
 
-The panel then requests one normalized state snapshot.
+Старый callback не должен перетирать новое состояние.
 
-Avoid sending hundreds of tiny mutation events whose correctness depends on timing/order.
+## 9. Backpressure
 
-## Request IDs and stale replies
+Не запускать десятки evalScript calls на каждый mousemove.
 
-Rapid UI interaction can create overlapping requests.
+Для high-frequency UI:
 
-Track:
+- debounce/coalesce reads;
+- batch related writes;
+- latest-wins для transient preview, если semantic допускает;
+- serial queue для order-sensitive mutations;
+- explicit Apply для дорогой операции.
 
-- request ID;
-- project/context revision;
-- panel instance lifetime;
-- expected protocol version.
+## 10. AE/ExtendScript → panel
 
-If the user changes context before a late callback returns, ignore the stale response instead of painting old state into the new UI.
+ExtendScript не может напрямую менять CEP HTML DOM. Для notification используется CEP/CSXS event path.
 
-## File paths
+~~~text
+host state changed
+→ small state-invalidated event
+→ panel receives event
+→ panel requests fresh normalized snapshot
+~~~
 
-CEP JavaScript, ExtendScript and the OS may represent paths differently.
+Для большого state лучше invalidation + pull, чем сотни mutation events.
 
-At the boundary:
+## 11. Event payload
 
-- define whether the protocol carries native paths or file URIs;
-- normalize in one adapter;
-- validate before touching disk;
-- reject traversal when a command should remain inside a product-owned directory;
-- test Unicode and long paths.
+Event payload должен быть versioned, small, serializable, без raw pointers/handles и не единственным source of truth.
 
-Do not scatter path conversion through every command.
+## 12. Idempotency and retry
 
-## Large data
+Не retry автоматически destructive command, если неизвестно, выполнился ли первый вызов.
 
-Do not send frames, large binary caches or megabytes of analysis through repeated evalScript strings.
+Для reconnect/reload:
 
-For large payloads use a deliberate data plane:
+- request/operation IDs;
+- idempotent commands где возможно;
+- duplicate detection, если это важно.
 
-- product-owned file plus atomic completion/rename;
-- external helper protocol;
-- native storage/cache;
-- another supported IPC path.
+## 13. Reload / extension restart
 
-CEP/JSX should remain the control plane.
+~~~text
+panel boot
+→ protocol handshake
+→ query host snapshot
+→ reconstruct UI state
+→ resume interaction
+~~~
 
-## Timeouts and lifecycle
+DOM state после reload не authoritative.
 
-evalScript does not provide a complete request timeout/cancellation model by itself.
+## 14. Payload size
 
-A bridge layer should track:
+String bridge подходит для control data и small snapshots.
 
-- request start time;
-- whether the panel is still alive;
-- whether a late callback may be ignored;
-- protocol version;
-- expected response schema.
+Не гоняйте через evalScript:
 
-Timeout in the UI does not mean the host-side operation was magically cancelled. Design cancellation separately.
+- pixel buffers;
+- audio blocks;
+- large binary models;
+- huge Base64 blobs;
+- frequent telemetry streams.
 
-## Security
+## 15. Security boundary
 
-Treat every bridge message as untrusted input.
+- allowlist commands;
+- validate paths/enums/ranges;
+- never eval downloaded code;
+- не вставлять remote/user text в script source;
+- не хранить secrets в panel bundle;
+- downloaded code и downloaded data — разные trust classes.
 
-Never:
+## 16. Acceptance checklist
 
-- concatenate user/remote strings into executable JSX;
-- expose "run arbitrary JSX" as a production API;
-- dispatch command names without an allowlist;
-- accept arbitrary helper executable paths;
-- write secrets into bridge logs.
+Проверить:
 
-## Debugging order
+- malformed JSON;
+- unknown protocol/command;
+- quotes/newlines/unicode;
+- long allowed string;
+- rapid requests;
+- stale callback;
+- panel reload;
+- project change while panel open;
+- script exception;
+- event during long host call;
+- missing JSX bootstrap;
+- clean AE restart.
 
-When a command fails:
+## Verification boundary
 
-1. confirm the panel handler ran;
-2. log request ID and command without secrets;
-3. confirm the evalScript callback fired;
-4. validate returned JSON;
-5. inspect the ExtendScript error code/message;
-6. reproduce the dispatcher command in a tiny JSX harness;
-7. only then debug the larger UI.
-
-This separates browser, bridge and AE failures.
-
-## Reference implementation
-
-See 16-WORKING-TEMPLATES/cep-panel-bridge/.
-
-Its existence is implementation evidence, not host verification. Release-quality acceptance still needs installation, panel open/reload, success/failure commands, host restart and clean uninstall on the supported matrix.
+CEP bridge rules сверены с Adobe CEP cookbook/CEP resources, включая разделение HTML и host DOM и main-thread scheduling evalScript/events. Этот editorial pass не является новым AE host test.

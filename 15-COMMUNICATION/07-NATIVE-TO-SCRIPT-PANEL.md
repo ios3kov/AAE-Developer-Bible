@@ -1,247 +1,199 @@
-# Native <-> script/panel: hybrid product architecture
+# Native ↔ script/panel: архитектура гибридного продукта
 
-A hybrid After Effects product can contain:
+Обновлено **2026-10-01**. UI, host automation и heavy native compute — разные слои. Связь между ними должна быть явной, versioned и малой по объёму.
 
-- CEP, UXP or ScriptUI interface;
-- ExtendScript automation;
-- native Effect plug-in;
-- AEGP service;
-- external helper process.
-
-The architectural failure mode is allowing every layer to call every other layer ad hoc.
-
-## Recommended layers
+## 1. Recommended layers
 
 ~~~text
 UI shell
-  CEP now / UXP later / ScriptUI for small tools
-       |
-       | typed commands + plain data
-       v
-Automation / command layer
-  ExtendScript dispatcher or future host adapter
-       |
-       +---- project edits ----------> AE scripting DOM
-       |
-       +---- native control ---------> effect params / documented bridge
-       |
-       +---- external service -------> explicit IPC adapter
-
+  CEP now / UXP later
+        |
+        | versioned commands + JSON
+        v
+Automation layer
+  ExtendScript dispatcher
+        |
+        +---- project edits ------> AE scripting DOM
+        |
+        +---- control request ----> native rendezvous
+                                   |
+                                   v
 Native layer
-  Effect plug-in / AEGP
-       |
-       +---- PF/AEGP suites ---------> After Effects
-       +---- PICA/shared suite ------> another native module
+  Effect / AEGP / helper
+        |
+        +---- PICA suites -------> AE C++ APIs
+        +---- shared suite ------> sibling native module
+        +---- external IPC ------> helper/service
 ~~~
 
-Keep the UI unaware of raw AE handles and keep native code unaware of DOM widgets.
+Business logic не должна знать concrete panel runtime.
 
-## Control plane vs data plane
+## 2. Control plane vs data plane
 
-Use panel/script messaging for control:
+**Control:** commands, IDs, paths, small settings, progress, status/error, invalidation.
 
-- start analysis;
-- choose mode;
-- set parameters;
-- request status;
-- receive small result summaries.
+**Data:** frames, pixel buffers, audio, ML tensors, large caches/assets.
 
-Do not push heavy data through it:
+CEP/ExtendScript JSON bridge подходит для control plane. Heavy data должен оставаться native/external.
 
-- pixel frames;
-- large ML tensors;
-- multi-megabyte caches;
-- thousands of messages per frame.
+## 3. Выбор bridge
 
-Large data should stay native or in a helper, while UI sends commands/references.
+### Panel → AE project
 
-## Simplest bridge first: project state
+ExtendScript/host-supported panel API для layers/items, properties/keyframes, import/render queue и project automation.
 
-If a native effect can be configured using normal AE parameters, let script/panel modify those parameters through the scripting DOM.
+### AEGP → конкретный Effect
 
-~~~text
-panel
-→ dispatcher.jsx
-→ layer/effect/parameter
-→ native effect receives normal parameter state during render
-~~~
+AEGP_EffectCallGeneric — маленький synchronous request/response к конкретному effect instance, если это лучший documented bridge. Не скрытая render dependency.
 
-Benefits:
+### Native → native
 
-- AE owns project persistence;
-- undo and keyframes use normal host concepts;
-- render dependencies are visible to the host;
-- no private transport is required.
+Published PICA suite — in-process versioned service между native modules.
 
-Use a custom bridge only when the normal project model cannot express the operation.
+### Native → scripting DOM
 
-## AEGP / PICA bridge
+AEGP_ExecuteScript — редкий bridge к scripting-only capability.
 
-For native-to-native communication use documented AEGP/PICA mechanisms described elsewhere in this section.
+### Process → process
 
-If a shared suite is used, define:
+Использовать явный IPC:
 
-- suite name;
-- suite version;
-- POD/C-compatible function table boundary where practical;
-- ownership of every pointer and returned object;
-- thread constraints;
-- acquire/release lifetime;
-- behavior when the provider is absent;
-- behavior when the requested version is unsupported.
-
-Do not invent a raw global pointer bridge between separately loaded modules.
-
-## Native -> script
-
-AEGP_ExecuteScript can bridge from native AEGP code into ExtendScript when the scripting DOM exposes a useful capability not available in the native route.
-
-Use it deliberately, not as high-frequency IPC.
-
-Avoid:
-
-~~~text
-CEP
-→ huge JSX command
-→ native call
-→ huge ExecuteScript call back
-→ CEP event storm
-~~~
-
-One layer must own the request lifecycle.
-
-## CEP event bridge
-
-For CEP products, native/ExtendScript code can use supported CSXS/PlugPlug event mechanisms for notifications.
-
-Treat the event bus as messages:
-
-~~~text
-producer
-→ event type + small payload
-→ panel listener
-→ state invalidation / reload
-~~~
-
-Do not make undocumented Adobe internal events or internal IPC a production contract.
-
-## External helper IPC
-
-When UI/native/service are separate processes, choose explicit versioned IPC.
-
-Reasonable transports:
-
-- localhost socket;
-- Windows named pipe;
-- macOS Unix domain socket;
+- named pipe / Unix domain socket;
+- localhost socket с security model;
 - child-process stdin/stdout;
-- product-owned temporary files with atomic rename;
-- shared memory only after profiling and with explicit synchronization/ownership.
+- temp file + atomic rename для large batch;
+- shared memory только после profiling и с explicit ownership.
 
-The transport is secondary. The protocol contract is primary.
+Undocumented AE internal IPC не считать product API.
 
-## Protocol header
+## 4. Heavy binary не через JSX
 
-For a native binary protocol, validate compatibility before parsing payload:
-
-~~~cpp
-struct MsgHeader {
-    uint32_t size;
-    uint32_t version;
-    uint32_t opcode;
-    uint32_t flags;
-    uint64_t request_id;
-};
-~~~
-
-Validate size, version, opcode, offsets and element counts before use.
-
-A JSON protocol should carry the same concepts explicitly.
-
-## Request lifecycle
-
-Every asynchronous operation needs a state model:
+Плохо:
 
 ~~~text
-created
-→ accepted
-→ running
-→ completed | failed | cancelled
+native pixels
+→ Base64
+→ ExtendScript string
+→ evalScript
+→ CEP JS
 ~~~
 
-Define:
+Цена: copying, encoding, temporary memory, main-thread pressure.
 
-- who owns cancellation;
-- whether cancellation is best-effort;
-- whether a result may arrive after UI disposal;
-- how duplicate request IDs are handled;
-- what helper/native restart does to outstanding requests;
-- whether partial output is valid after cancel.
+UI должен отправлять control request и получать compact metadata/progress.
 
-A progress bar is not a lifecycle protocol.
+## 5. Version handshake
 
-## Host object ownership
+~~~json
+{
+  "protocol": 3,
+  "uiVersion": "2.4.1",
+  "nativeApi": 5,
+  "capabilities": [
+    "preview-v2",
+    "cancel-v1"
+  ]
+}
+~~~
 
-Never pass across process/module boundaries:
+Panel, native plug-in и helper могут оказаться разных версий после partial update/rollback, поэтому package version недостаточно.
 
-- PF_InData pointers;
-- selector-specific extra pointers;
-- borrowed PF_EffectWorld pointers;
-- AEGP handles with callback/project-dependent lifetime;
-- pointers to temporary C++ objects;
-- STL container objects as a cross-module ABI.
-
-Copy or serialize the minimum plain data needed at the boundary.
-
-## Threading
-
-A worker thread may own pure compute and product-owned buffers.
-
-Host callbacks/handles/suites should remain on documented host-safe threads. Do not assume that because your helper is asynchronous, AE project APIs become thread-safe.
-
-For UI commands that eventually touch AE:
+## 6. Compatibility rule
 
 ~~~text
-worker/helper
-→ finish pure work
-→ enqueue/return result
-→ host-side command
-→ mutate/read AE
+same protocol major
++ larger message size
++ unknown optional field
+→ old peer may ignore extension
 ~~~
 
-## Backpressure
+Если изменился meaning поля, ownership или required call order — новая protocol/API version.
 
-If the UI can produce commands faster than native work completes, define policy:
+## 7. Native → panel notification
 
-- reject while busy;
-- coalesce latest state;
-- queue with a fixed maximum;
-- cancel previous request and replace.
+Не хранить direct pointer на UI.
 
-Never allow an unbounded queue of stale analysis jobs.
+~~~text
+native state changes
+→ small notification/invalidation
+→ scripting/panel bridge
+→ panel requests fresh state
+~~~
 
-## Failure isolation
+UI должен уметь восстановиться explicit refresh.
 
-The panel should survive a helper/native failure and show a structured status rather than becoming permanently stuck.
+## 8. Persistent state
 
-The native/helper side should reject malformed messages without crashing AE.
+| State | Typical owner |
+|---|---|
+| effect render parameters | AE project/effect params |
+| panel layout/preferences | panel/product preferences |
+| large transient cache | native/helper runtime |
+| external asset index | product database/cache |
+| current selected AE object | AE host; query/revalidate |
 
-Log enough to correlate:
+Render-affecting state не хранить только в panel DOM или global singleton.
 
-- request ID;
-- protocol version;
-- component version;
-- command/opcode;
-- terminal result.
+## 9. Liveness
 
-Do not log secrets or full private user content by default.
+Panel reload, helper crash, missing plug-in/provider, closed project, removed effect и AE shutdown — нормальные failure states.
 
-## Migration rule
+~~~text
+starting
+ready
+busy
+canceling
+failed
+stopped
+~~~
 
-A hybrid product is migration-ready when replacing CEP with UXP does not require changing the native protocol or core business model.
+Молчание peer не равно infinite busy.
 
-The shell changes; the stable command contract remains.
+## 10. Cancellation
+
+~~~text
+start(requestId)
+→ progress(requestId)
+→ cancel(requestId)
+→ canceled(requestId) / completed(requestId)
+~~~
+
+Late completion старой generation не должен менять новый UI state.
+
+## 11. Security
+
+- identify peer where needed;
+- do not expose external interface without need;
+- validate message size before allocation;
+- allowlist opcodes;
+- normalize paths;
+- never execute arbitrary command strings from panel/network;
+- не передавать secrets через visible command line/logs.
+
+## 12. Failure taxonomy
+
+Различайте UI validation, panel transport, scripting, native bridge, native operation, helper transport, protocol mismatch, cancellation и stale result.
+
+## 13. Observability
+
+Логируйте timestamp, requestId, protocol, component, operation, state transition, duration и result/error code. Не логируйте secrets и huge payloads.
+
+## 14. Acceptance checklist
+
+- panel without native;
+- native without panel;
+- wrong protocol;
+- helper killed mid-request;
+- project closed;
+- effect removed/reordered;
+- panel reload;
+- repeated start/stop;
+- cancel + late completion;
+- partial update;
+- rollback;
+- clean shutdown;
+- crash restart.
 
 ## Verification boundary
 
-These are architecture rules derived from the documented AE/CEP/PICA boundaries. They do not claim that the current Bible hybrid templates have completed end-to-end host tests.
+Глава задаёт production architecture pattern поверх public bridges. Generic call/PICA exact-SDK boundaries описаны в source review 25.6; end-to-end hybrid проверки остаются отдельными acceptance tests.

@@ -1,10 +1,17 @@
 # Как компоненты общаются друг с другом и с After Effects
 
-Это центральный раздел архитектуры AE Developer Bible.
+Это центральный архитектурный раздел AE Developer Bible. Он отвечает не только чем вызвать API, но и:
+
+- кто инициирует вызов;
+- на каком thread он допустим;
+- кто владеет данными;
+- что считается transport/application error;
+- какой state persistent;
+- какой bridge подходит для control plane, а какой — для heavy data.
 
 ## Карта
 
-```text
+~~~text
                            +-----------------------+
                            |     After Effects     |
                            | project + render host |
@@ -29,20 +36,64 @@
                                                      |
                                                      v
                                               AE scripting DOM
-```
+~~~
+
+## Выбор канала
+
+| Need | Preferred direction |
+|---|---|
+| panel changes project | panel → ExtendScript/host panel API |
+| AEGP calls one effect instance | AEGP_EffectCallGeneric when appropriate |
+| native modules share service | published PICA suite |
+| native needs scripting-only capability | AEGP Utility ExecuteScript |
+| UI controls heavy native compute | small control protocol; heavy data stays native/helper |
+| cross-process helper | explicit versioned IPC |
+
+Ни один bridge не должен превращаться в скрытую render dependency.
+
+## Control plane vs data plane
+
+~~~text
+control:
+commands / IDs / state / progress / errors
+
+data:
+pixels / audio / large binary buffers / ML tensors
+~~~
+
+JSON/evalScript подходит в основном для control plane. Heavy binary data нельзя без причины гонять через string-based bridge.
+
+## Главные инварианты
+
+1. size/version проверяются до payload.
+2. Raw host pointers не переживают documented lifetime.
+3. Acquire имеет matching release; checkout — checkin; lock — unlock.
+4. Host API не считается thread-safe без явного обещания.
+5. Transport error и domain error — разные вещи.
+6. Async result имеет request/generation ID и может стать stale.
+7. Render-affecting state видим dependency/cache model After Effects.
+8. Panel DOM не persistent source of truth.
+9. Independently shipped components делают version handshake.
+10. Undocumented AE internal IPC не stable API.
 
 ## Разделы
 
-- [`01-AE-TO-EFFECT.md`](01-AE-TO-EFFECT.md)
-- [`02-AE-TO-AEGP.md`](02-AE-TO-AEGP.md)
-- [`03-AEGP-TO-EFFECT.md`](03-AEGP-TO-EFFECT.md)
-- [`04-PLUGIN-TO-PLUGIN-PICA.md`](04-PLUGIN-TO-PLUGIN-PICA.md)
-- [`05-SCRIPT-TO-AE.md`](05-SCRIPT-TO-AE.md)
-- [`06-CEP-TO-EXTENDSCRIPT.md`](06-CEP-TO-EXTENDSCRIPT.md)
-- [`07-NATIVE-TO-SCRIPT-PANEL.md`](07-NATIVE-TO-SCRIPT-PANEL.md)
-- [`08-THREADING-BOUNDARIES.md`](08-THREADING-BOUNDARIES.md)
-- [`09-DATA-OWNERSHIP.md`](09-DATA-OWNERSHIP.md)
+1. [01-AE-TO-EFFECT.md](01-AE-TO-EFFECT.md)
+2. [02-AE-TO-AEGP.md](02-AE-TO-AEGP.md)
+3. [03-AEGP-TO-EFFECT.md](03-AEGP-TO-EFFECT.md)
+4. [04-PLUGIN-TO-PLUGIN-PICA.md](04-PLUGIN-TO-PLUGIN-PICA.md)
+5. [05-SCRIPT-TO-AE.md](05-SCRIPT-TO-AE.md)
+6. [06-CEP-TO-EXTENDSCRIPT.md](06-CEP-TO-EXTENDSCRIPT.md)
+7. [07-NATIVE-TO-SCRIPT-PANEL.md](07-NATIVE-TO-SCRIPT-PANEL.md)
+8. [08-THREADING-BOUNDARIES.md](08-THREADING-BOUNDARIES.md)
+9. [09-DATA-OWNERSHIP.md](09-DATA-OWNERSHIP.md)
 
-## SDK 25.6 bridge review
+## Source/verification status
 
-The native bridge chapters 03/04 were rechecked against `AEGP_EffectSuite4`, `SPBasicSuite`, `SPSuitesSuite`, Sweetie, Checkout, ProjDumper and Shifter. See [the source-review record](../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md). Source review does not equal host verification.
+Native bridge chapters 03/04 были rechecked against SDK 25.6 AEGP_EffectSuite4, SPBasicSuite, SPSuitesSuite, Sweetie, Checkout, ProjDumper and Shifter.
+
+См. [source-review record](../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md).
+
+Chapters 05–09 дополнены architecture/lifetime/thread rules. CEP main-thread behavior опирается на Adobe CEP cookbook; AEGP ExecuteScript/idle wake-up details должны всё равно сверяться с headers target SDK перед shipping.
+
+Source review и documentation review не равны host verification.
