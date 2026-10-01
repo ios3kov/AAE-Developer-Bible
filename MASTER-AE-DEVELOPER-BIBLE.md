@@ -15859,7 +15859,7 @@ If a reader turns a template into a product, use the platform/build/testing chap
 
 # AEGP menu command working template
 
-Status: **drop-in source pattern / host verification pending**.
+Status: **drop-in/source pattern; runtime result not claimed by Bible**.
 
 MenuTool.cpp is intended to replace the implementation layer inside an official AEGP sample project from the exact target SDK.
 
@@ -16379,7 +16379,7 @@ This example assumes the effect command is already on the correct SDK callback p
 
 # Minimal Gain effect — working template
 
-Status: **source implementation / SDK 25.6 macOS syntax-checked / host-test pending**.
+Status: **source example / SDK 25.6 contract-aligned; runtime result not claimed by Bible**.
 
 Requires C++17, the SDK utility sources and the official sample project/PiPL build configuration.
 
@@ -16521,7 +16521,7 @@ Do not turn the minimal template into every feature at once.
 
 ## Verification boundary
 
-Syntax/type checking is not load/render evidence. Record actual build/install/host results in VERIFICATION/evidence before changing host-test pending to PASS.
+Syntax/type checking is not load/render evidence. Only claim a build/install/host result when such evidence actually exists; Bible does not require generating that evidence for editorial completion.
 
 
 ---
@@ -16631,7 +16631,7 @@ The source is directly runnable in principle, but the repository only records ho
 
 # Keyframer batch working pattern
 
-Status: **API recipe / host-test-required**.
+Status: **API/source recipe; runtime result not claimed by Bible**.
 
 Use this inside an AEGP based on the exact SDK sample such as Easy Cheese, with suite generations checked against target headers.
 
@@ -16778,7 +16778,7 @@ The actual native view class is deliberately not faked here: Cocoa/AppKit and Wi
 
 # Published PICA suite contract
 
-Status: **ABI design template, not a complete provider implementation and not host-verified**.
+Status: **ABI/source design template; no runtime result is claimed by Bible**.
 
 Source review baseline: Adobe After Effects SDK **25.6 build 61**, especially Sweetie + Checkout. See [PICA chapter](16-WORKING-TEMPLATES/pica-shared-suite/../../14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md) and [source review](16-WORKING-TEMPLATES/pica-shared-suite/../../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md).
 
@@ -23593,7 +23593,7 @@ Sweetie/Checkout prove a provider/consumer pattern in the SDK, not this product 
 
 # Custom UI / Drawbot reference
 
-Status: **acquisition skeleton / SDK 25.6 macOS syntax-checked / host-test-required**.
+Status: **acquisition skeleton / SDK 25.6 macOS syntax-checked / runtime result not claimed**.
 
 EventSkeleton.cpp intentionally stops after obtaining the drawing reference. It does not draw a path, text, icon or control.
 
@@ -24030,7 +24030,7 @@ ScriptUI event
 → plain command result/status
 ~~~
 
-The file is intentionally small. It does not establish host verification until the actual target AE/OS run is recorded in VERIFICATION/evidence.
+The file is intentionally small. Bible does not claim a host-observed result for this source example; a reader may validate it in the target product/environment if needed.
 
 
 ---
