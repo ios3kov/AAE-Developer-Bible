@@ -63,3 +63,17 @@ Return A_Err
 ## Version discipline
 
 Главы `05-STREAMS-PROPERTIES.md` и `06-KEYFRAMES.md` перепроверены по supplied SDK 25.6: `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`, `AEGP_KeyframeSuite5`. Главы `07-MASKS.md`, `08-TEXT-MARKERS.md`, `09-FOOTAGE-IMPORT.md` также приведены к baseline 25.6: `MaskSuite6`, `MaskOutlineSuite3`, `TextDocumentSuite1`, `MarkerSuite3`, `FootageSuite5`, `ItemSuite9`, `CompSuite12`, `LayerSuite9`. Более поздние API не должны молча становиться baseline 25.6. Источники: `18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md` и `11-MASK-TEXT-FOOTAGE-SDK25.6.md`.
+
+
+## Render Queue / frame-render baseline
+
+The SDK 25.6 current header baseline used by the explanatory chapters is:
+
+- `AEGP_RenderQueueSuite1`;
+- `AEGP_RQItemSuite4`;
+- `AEGP_OutputModuleSuite4`;
+- `AEGP_RenderOptionsSuite4`;
+- `AEGP_RenderSuite5`;
+- `AEGP_WorldSuite3`.
+
+Some existing C++ recipes deliberately use older compatible Suite3/Suite4 subsets. Those source dependencies are preserved explicitly; they must not be mistaken for the current SDK generation.
