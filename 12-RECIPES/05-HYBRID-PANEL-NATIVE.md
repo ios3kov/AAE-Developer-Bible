@@ -2,31 +2,53 @@
 
 ## Goal
 
-Build a hybrid product where the panel is replaceable, native code handles the work that belongs natively, and no layer depends on undocumented shared state.
+Build a panel-driven product without coupling UI runtime, After Effects automation and heavy native compute into one fragile component.
 
-## Architecture
+In the 2026 transition period, keep the UI shell replaceable so CEP-specific code can later be exchanged for a verified AE UXP path.
+
+## 1. Draw the ownership diagram first
 
 ~~~text
 UI shell
-  CEP today / future AE UXP
-       |
-       | versioned plain command
-       v
+  CEP now / future verified AE UXP
+        |
+        | commands / responses
+        v
 Bridge adapter
-       |
-       +---- project automation ---> ExtendScript / supported host API
-       |
-       +---- native control -------> Effect params / AEGP / PICA / helper IPC
-                                      |
-                                      v
-                                 compute core
+        |
+        v
+AE automation layer
+  ExtendScript / supported host API
+        |
+        +---- project mutation
+        |
+        +---- control request
+                  |
+                  v
+Native core
+  Effect / AEGP / shared suite / helper
 ~~~
 
-Use the simplest bridge that fits the operation.
+Assign one owner for every persistent state.
 
-## 1 — define commands before transport
+## 2. Separate control and data planes
 
-Example:
+Panel bridge carries:
+
+- command IDs;
+- small parameter objects;
+- paths/IDs;
+- progress;
+- status/error;
+- invalidation.
+
+Do not send pixel/audio/large binary buffers as giant evalScript/Base64 messages unless there is a measured, unavoidable reason.
+
+Keep heavy data native or in a purpose-built helper/data path.
+
+## 3. Define protocol version 1 before UI implementation
+
+Request:
 
 ~~~json
 {
@@ -34,7 +56,7 @@ Example:
   "requestId": "123",
   "command": "analyzeFrame",
   "payload": {
-    "layerId": "product-stable-id",
+    "layerId": 42,
     "time": 1.25
   }
 }
@@ -47,138 +69,154 @@ Response:
   "ok": true,
   "requestId": "123",
   "result": {
-    "jobId": "job-44"
+    "status": "ready"
   }
 }
 ~~~
 
-Do not expose raw pointers/AE handles.
+Error:
 
-## 2 — prefer project state when enough
-
-If the panel only needs to control an effect:
-
-~~~text
-panel
-→ JSX dispatcher
-→ find effect by match name
-→ set normal parameter
-→ AE persists/animates it
+~~~json
+{
+  "ok": false,
+  "requestId": "123",
+  "error": {
+    "code": "NO_LAYER",
+    "message": "Target layer is not available"
+  }
+}
 ~~~
 
-This is preferable to inventing custom IPC for values that naturally belong in the project.
+Human text is not the only machine-readable error contract.
 
-## 3 — choose native bridge only for native need
+## 4. One panel bridge
 
-Use AEGP/PICA/helper IPC when you need:
-
-- high-performance compute;
-- native service lifecycle;
-- data not suitable for effect parameters;
-- integration unavailable to scripting.
-
-Document why the extra bridge exists.
-
-## 4 — control plane vs data plane
-
-Panel/JSX messages carry:
-
-- commands;
-- IDs;
-- options;
-- progress/status;
-- small summaries.
-
-Large frames/buffers stay native/helper-side.
-
-Do not JSON-serialize megabytes of pixels through evalScript.
-
-## 5 — request lifecycle
-
-Define:
+Do not scatter evalScript or native IPC calls through UI components.
 
 ~~~text
-created
-→ accepted
-→ running
-→ completed | failed | cancelled
+component
+→ domain command
+→ bridge.request
+→ transport adapter
 ~~~
 
-Panel must know what happens if:
+This is what makes a future panel-runtime migration practical.
 
-- user closes panel;
-- project changes;
-- helper restarts;
-- AE quits;
-- a late response arrives;
-- user starts a newer request.
+## 5. Validate every boundary
 
-Use request IDs/revisions to drop stale replies.
+Panel side validates user inputs.
 
-## 6 — threading
+Automation/native side validates again:
 
-Worker/helper thread:
+- protocol;
+- command allowlist;
+- message size;
+- enum/range;
+- path;
+- target project object existence;
+- native capability/version.
 
-- pure compute;
-- product-owned buffers;
-- filesystem/network if designed there.
+Never assume local UI input is trusted because it came from your own panel.
 
-Host-side command:
+## 6. Use explicit handshake
 
-- resolve AE objects;
-- call documented suites;
-- mutate project.
+At startup:
 
-Do not touch project handles from arbitrary worker threads.
+~~~text
+panel boot
+→ bridge handshake
+→ protocol versions/capabilities
+→ query authoritative host state
+→ render UI
+~~~
 
-## 7 — backpressure
+If native/helper version is incompatible, fail clearly with component mismatch instead of sending unknown commands.
 
-Pick a policy:
+## 7. Avoid stale responses
 
-- reject while busy;
-- cancel previous;
-- coalesce to latest;
-- bounded queue.
+Use request/generation identity.
 
-Never create an unbounded queue because a slider fires faster than analysis completes.
+~~~text
+request generation 7
+user changes selection → generation 8
+response 7 arrives
+→ ignore
+~~~
 
-## 8 — security
+This matters for selection/preview-heavy panels.
 
-Reject:
+## 8. Choose the native bridge deliberately
 
-- unknown protocol versions;
-- unknown commands;
-- oversized payloads;
-- arbitrary executable paths;
-- arbitrary JSX strings;
-- invalid file traversal.
+Possible documented/product-owned paths:
 
-Treat local IPC as input, not trusted memory.
+- AEGP EffectCallGeneric for small synchronous commands to one effect instance;
+- published PICA suite for in-process native service;
+- AEGP ExecuteScript for rare scripting-DOM capability;
+- explicit external IPC for a helper/service.
 
-## 9 — CEP today
+Do not make undocumented AE internal IPC a shipping dependency.
 
-Centralize all evalScript calls in one adapter.
+## 9. Long operation lifecycle
 
-Adobe's CEP documentation states host JSX runs on the host main thread, so split long commands and avoid polling.
+~~~text
+start(requestId)
+→ progress
+→ cancel(requestId)
+→ canceled or completed
+~~~
 
-## 10 — UXP migration
+Panel reload must not resurrect an old operation result into new state.
 
-When AE UXP is actually available, implement a new AeBridge adapter only after its AE-specific API is verified.
+Define timeout/liveness behavior for helpers.
 
-Do not rewrite the domain model just to change panel runtime.
+## 10. Panel reload/restart
 
-## Acceptance
+Panel DOM is not authoritative persistence.
 
-Test:
+On reload:
 
-- normal command;
-- invalid payload;
-- native/helper unavailable;
-- cancellation;
-- stale response;
-- project switch;
-- panel reload;
-- AE restart;
-- version mismatch.
+1. create bridge;
+2. handshake;
+3. query host/product state;
+4. rebuild UI;
+5. ignore stale responses from the previous generation.
 
-A UI demo that only completes the happy path is not a finished hybrid protocol.
+Test AE restart too.
+
+## 11. Thread boundary
+
+Heavy worker may do pure compute/IO.
+
+AE project/suite access stays on the documented host path unless a specific API explicitly permits other threads.
+
+Do not hold a product mutex while calling back into AE.
+
+## 12. Packaging/version skew
+
+Treat these as independently identifiable components:
+
+- panel;
+- JSX/automation bundle;
+- native plug-in;
+- helper.
+
+Installer/update tests must cover partial mismatch or ensure atomic replacement.
+
+## 13. Acceptance gate
+
+The hybrid product baseline passes when:
+
+- fresh install opens panel;
+- handshake succeeds;
+- one read command works;
+- one project mutation works;
+- one native command works;
+- malformed command is rejected;
+- stale response is ignored;
+- cancel works;
+- panel reload reconstructs state;
+- AE restart works;
+- missing/wrong native component gives clear recovery;
+- no large binary traffic is accidentally routed through JSX.
+
+See [Communication architecture](../15-COMMUNICATION/README.md).

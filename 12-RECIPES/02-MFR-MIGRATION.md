@@ -1,152 +1,183 @@
 # Recipe — migrate an existing effect to MFR
 
-## Rule 0
+## Goal
 
-Keep MFR capability disabled in the shipping build until concurrency evidence exists.
+Enable Multi-Frame Rendering only after the effect is actually safe under concurrent render selectors.
 
-Use a separately identifiable experimental build while migrating.
+The public AE SDK guidance requires an effect to be thread-safe before it sets PF_OutFlag2_SUPPORTS_THREADED_RENDERING.
 
-## Step 1 — inventory mutable state
+## Phase 1 — keep the shipping flag off
+
+Start with the effect behaving as non-MFR capable.
+
+Create a separate migration branch/build. Do not set the support flag first and use crashes as the discovery method.
+
+## Phase 2 — inventory mutable state
 
 List every:
 
 - global/static variable;
+- global_data write;
+- sequence_data read/write;
 - singleton;
-- sequence/instance object;
-- cache;
-- lazy initializer;
-- third-party library;
+- lazy initialization path;
 - scratch buffer;
-- log/profiler object.
+- cache;
+- third-party library global;
+- random-number generator;
+- log sink;
+- GPU/device state;
+- lock.
 
-For each, classify:
+Classify each:
 
 ~~~text
 immutable shared
-per-effect-instance
-per-render-frame/thread
-host-owned borrowed
-product cache with synchronization
+instance-owned
+frame-local
+thread-local
+host-owned
 unsafe/unknown
 ~~~
 
-Unknown is a blocker until resolved.
+Unknown is not thread-safe.
 
-## Step 2 — inspect render writes
+## Phase 3 — inspect render-time sequence state
 
-Search every render/pre-render callback for writes to shared or sequence state.
+For modern MFR behavior, treat render-time sequence data as read-only unless using the SDK mechanisms intended for mutable render state.
 
-Ask:
+Prefer:
 
-- can two frames write this simultaneously?;
-- can two effect instances collide?;
-- is state keyed by all dependencies?;
-- can cancel/error leave half-written state?;
-- is any pointer borrowed beyond callback lifetime?
+- read-only sequence data where possible;
+- Compute Cache for expensive shareable computed state;
+- frame-local scratch for transient mutation.
 
-## Step 3 — make scratch local
+The compatibility flag for mutable render sequence data is not a substitute for architecture review; it can carry a performance cost.
 
-Move temporary render data to:
+## Phase 4 — remove hidden serialization
 
-- stack/local objects;
-- frame-local allocation;
-- host-supported thread-local render data;
-- immutable shared tables.
+A single global mutex can make the effect technically race-free while destroying MFR scaling.
 
-Do not make scratch safe by placing one giant global mutex around the render.
+Check every lock:
 
-## Step 4 — caches
+- what state it protects;
+- maximum hold time;
+- whether independent instances contend;
+- whether a host suite/checkout is called while held.
 
-A cache needs:
+Do not hold blocking product locks across host calls; SDK MFR guidance warns this can deadlock.
 
-- complete key;
-- immutable or safely synchronized values;
-- bounded lifetime/size;
-- cancellation/error semantics;
-- no stale project/parameter dependency.
+## Phase 5 — make callbacks re-entrant
 
-If using host cache APIs, follow their documented ownership and receipt rules.
+Render-related callbacks must not depend on a global current frame/current instance.
 
-## Step 5 — third-party code
+Good pattern:
 
-Prove thread safety or isolate it.
+~~~text
+callback inputs
+→ acquire immutable/shared resources
+→ frame-local context
+→ render
+→ release/checkin
+~~~
 
-A library working in multiple applications does not prove concurrent calls are safe.
+Every failure path must still release/checkin resources.
 
-If it has hidden global state, consider:
+## Phase 6 — third-party dependencies
 
-- immutable precomputation;
-- per-instance context;
-- serialized adapter only around the unsafe library;
-- replacement library.
+For each library used during render, obtain evidence for concurrent use.
 
-Measure serialization cost.
+If thread safety is unknown:
 
-## Step 6 — host calls and locks
+- isolate calls behind a deliberately serialized boundary and measure the cost;
+- move work outside concurrent render if semantics permit;
+- replace the dependency;
+- keep MFR disabled.
 
-Never hold a product mutex across a host callback/suite call unless the API and lock ordering are explicitly proven safe.
+Do not infer thread safety from the fact that the library is popular.
 
-This is a deadlock risk.
+## Phase 7 — static/global analysis
 
-## Step 7 — create diagnostic stress fixture
+Use symbol/static analysis as a discovery aid, not as proof.
 
-Use several instances with intentionally different outputs/parameters.
+A scan can find suspicious globals but cannot prove:
 
-Run:
+- correct ownership;
+- no stale pointer;
+- no race inside a third-party library;
+- no deadlock;
+- correct render output.
 
-- long render;
-- 20+ instances;
-- multiple comps;
-- random seek;
+## Phase 8 — create diagnostic fixtures
+
+At minimum:
+
+- many instances with different parameter values;
+- long composition;
+- mixed frame complexity;
+- multiple compositions;
 - cancel/restart;
 - cache purge;
-- repeated 50-100+ loops;
-- GPU + MFR if both claimed.
+- MFR off/on comparison.
 
-Log lightweight instance/frame/thread identity.
+Use visually distinctive instance outputs so state bleed is obvious.
 
-## Step 8 — compare MFR off vs on
+## Phase 9 — repeated stress
 
-Correctness first.
+Run enough repeated renders to expose rare scheduling bugs.
 
-Expected:
+Record:
 
-- deterministic output;
-- no state bleed;
-- no crash;
-- no hang;
-- no unbounded memory growth.
+- output hash/diff;
+- crash/hang;
+- memory trend;
+- thread/instance/frame identity in diagnostic logs;
+- timeout/thread dump on hang.
 
-Pixel comparison must use the render-correctness tolerance defined before the migration.
+One successful render is not acceptance.
 
-## Step 9 — enable capability only in candidate
+## Phase 10 — enable the flag in the candidate
 
-After stress passes, enable the MFR declaration in a candidate build.
+Only after the review and stress harness exist, set the MFR support flag in the candidate build.
 
-Then repeat host tests because changing capability flags changes scheduling.
+Repeat:
 
-## Step 10 — performance
+~~~text
+MFR off reference
+→ MFR on
+→ repeated render
+→ cancel
+→ save/reopen
+→ CPU/GPU combinations if GPU is claimed
+~~~
 
-Measure:
+Output must remain within the predefined correctness tolerance.
 
-- wall time;
+## Phase 11 — performance
+
+After correctness:
+
+- measure wall time;
 - CPU utilization;
-- peak memory;
 - lock wait;
-- speedup vs MFR off.
+- peak memory;
+- cache behavior.
 
-A globally serialized MFR-safe effect may be correct but deliver no benefit. That is a performance decision, not a correctness PASS.
+MFR support that serializes on one global lock may be correct but not useful.
 
-## Step 11 — release gate
+## Acceptance gate
 
-Ship MFR only when:
+Ship MFR support only if:
 
-- correctness PASS;
-- repeated stress PASS;
-- cancellation PASS;
-- migration/persistence PASS;
-- memory bounded;
-- performance acceptable;
-- every claimed platform/architecture covered.
+- mutable state inventory has no unresolved item;
+- concurrency stress passes repeatedly;
+- MFR off/on pixels match expected tolerance;
+- cancellation and error cleanup pass;
+- no deadlock/hang;
+- memory is bounded;
+- third-party dependencies have a safe policy;
+- performance does not reveal accidental global serialization.
 
-Otherwise keep the feature flag off and document the limitation.
+If not, keep PF_OutFlag2_SUPPORTS_THREADED_RENDERING disabled.
+
+See [MFR stress tests](../10-TESTING/03-MFR-STRESS.md).

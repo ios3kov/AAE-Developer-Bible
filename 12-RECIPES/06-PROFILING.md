@@ -1,143 +1,190 @@
 # Recipe — profiling a slow effect
 
-## Rule
+## Goal
 
-Profile a fixed reproducible workload. Never optimize from a vague report that "the effect feels slow".
+Find the actual bottleneck of a reproducible user operation, change one cause, then prove both performance improvement and unchanged correctness.
 
-## 1 — freeze environment
+## 1. Freeze the workload
 
 Record:
 
-- product build/hash;
-- AE exact build;
+- project/fixture hash;
+- AE exact version/build;
 - OS;
-- CPU;
-- GPU/driver;
-- project fixture;
-- resolution/duration/BPC;
+- CPU/GPU/RAM;
+- driver;
+- plug-in hash;
+- bit depth;
+- resolution;
 - MFR state;
-- GPU state.
+- GPU state;
+- render path.
 
-Run the baseline more than once to estimate noise.
+Do not compare measurements from different environments without rerunning the baseline there.
 
-## 2 — measure whole operation
+## 2. Define the user-level metric
 
-Start from user-visible wall time:
+Choose the metric that matters:
 
-- first frame;
+- first preview frame;
 - warm frame;
-- full comp render;
-- panel command latency if relevant.
+- N-frame render;
+- render queue wall time;
+- panel command latency;
+- project-open operation;
+- memory peak.
 
-If the total problem is 200 ms, optimizing a 1 ms function cannot solve it.
+Start from end-to-end time, not a guessed function.
 
-## 3 — isolate feature switches
+## 3. Warmup policy
 
-Compare:
-
-- CPU vs GPU;
-- MFR off vs on;
-- cache cold vs warm;
-- preview vs render queue if relevant.
-
-Change one dimension at a time.
-
-## 4 — instrument high-level stages
-
-Example:
+Measure separately:
 
 ~~~text
-checkout/input prep
-→ conversion
-→ algorithm
-→ output conversion
-→ host checkin
+cold process/plugin startup
+first GPU/device setup
+first cache fill
+steady state
 ~~~
 
-For SmartFX include pre-render/checkouts.
+Do not average them together unless the product question actually concerns that combined experience.
 
-For GPU include upload/kernel/sync/download.
+## 4. Establish baseline distribution
 
-## 5 — allocations
+Run enough repetitions to see noise.
+
+Record at least:
+
+- sample count;
+- median;
+- p95 when meaningful;
+- min/max or raw samples;
+- thermal/power condition.
+
+A single stopwatch result is not a performance baseline.
+
+## 5. Split by execution path
+
+First toggles:
+
+~~~text
+GPU on vs CPU
+MFR on vs off
+cache cold vs warm
+small vs large frame
+~~~
+
+This identifies which subsystem deserves deeper profiling.
+
+## 6. Time major stages
+
+For a render effect:
+
+~~~text
+host checkout
+→ input conversion/preparation
+→ core algorithm
+→ cache work
+→ GPU upload
+→ kernel
+→ synchronization
+→ download/conversion
+→ checkin/return
+~~~
+
+Do not optimize a 1 ms kernel if 15 ms is spent waiting/copying.
+
+## 7. Inspect allocation pressure
 
 Measure:
 
 - allocations per frame;
-- large transient buffers;
-- reallocations caused by size changes;
-- memory peak;
-- retained cache.
+- transient buffer sizes;
+- peak memory;
+- retained cache;
+- memory after purge/project close.
 
-A fast algorithm can be dominated by allocation churn.
+Common improvement is reusing correctly owned scratch, but never reuse a buffer across concurrent renders without a safe ownership model.
 
-## 6 — locks
+## 8. Inspect locks
 
-Measure:
+For each hot lock:
 
-- lock wait;
-- hold duration;
-- contention across instances;
-- whether lock spans host calls.
+- wait time;
+- hold time;
+- contention count;
+- which instances contend;
+- whether host calls occur while held.
 
-MFR often exposes hidden global serialization.
+A global lock can erase MFR benefit.
 
-## 7 — host interaction
+## 9. Inspect host API frequency
 
-Count expensive host calls/checkouts.
+Repeated tiny suite/checkouts or evalScript calls can dominate interactive workflows.
 
-Ask whether the same immutable data is repeatedly requested or converted.
+Batch work only when semantics remain correct.
 
-Do not cache host-owned pointers beyond their valid lifetime to save a call.
+Do not hide necessary dependency declarations to make profiling numbers smaller.
 
-## 8 — GPU
+## 10. GPU-specific profiling
 
 Separate:
 
-~~~text
-world/buffer acquisition
-upload
-kernel
-synchronization
-download/conversion
-~~~
+- preparation/upload;
+- dispatch;
+- kernel;
+- synchronization;
+- download/readback.
 
-Profile small and large frames because crossover points differ.
+Test multiple resolutions because GPU crossover varies with workload size.
 
-## 9 — optimize one bottleneck
+## 11. Make one change
 
-Make one focused change.
+Examples:
 
-Then rerun:
+- remove redundant conversion;
+- change cache key/data structure;
+- batch host reads;
+- reduce allocations;
+- shorten lock;
+- optimize kernel;
+- avoid unnecessary readback.
 
-1. correctness;
-2. MFR stress if affected;
-3. memory;
-4. benchmark.
+One isolated change gives interpretable evidence.
 
-Do not combine five optimizations and lose the cause of a regression.
+## 12. Correctness gate before celebrating
 
-## 10 — report
+Immediately rerun:
 
-Store:
+- golden pixels;
+- alpha;
+- required bit depths;
+- ROI/origins if relevant;
+- MFR stress;
+- GPU equivalence if touched.
 
-| Metric | Baseline | Candidate | Delta |
-|---|---:|---:|---:|
-| first frame | | | |
-| warm median | | | |
-| p95 | | | |
-| full render | | | |
-| peak memory | | | |
-| lock wait | | | |
+A faster stale/wrong frame is not an optimization.
 
-Attach environment/artifact identity.
+## 13. Rerun the exact baseline
 
-## Reject an "optimization" when
+Compare candidate vs baseline in the same environment.
 
-- output leaves tolerance;
-- memory becomes unbounded;
-- cancellation worsens;
-- MFR races appear;
-- improvement is within measurement noise;
-- improvement only exists on an unsupported machine/project.
+Report both absolute and relative change.
 
-Performance evidence belongs beside correctness evidence, not instead of it.
+If improvement is within noise, do not market it as a performance win.
+
+## 14. Keep regression evidence
+
+Store the benchmark definition and machine-readable result beside the release/test evidence so later versions can detect regression.
+
+## Acceptance gate
+
+Keep the optimization only if:
+
+- end-user metric improves measurably;
+- correctness remains inside existing tolerances;
+- memory does not become unbounded;
+- MFR scaling is not harmed;
+- no unsupported environment-specific assumption was introduced.
+
+See [Performance testing](../10-TESTING/04-PERFORMANCE.md).

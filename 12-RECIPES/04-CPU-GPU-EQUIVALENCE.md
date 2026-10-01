@@ -2,155 +2,170 @@
 
 ## Goal
 
-Prove that every claimed GPU backend implements the same product semantics as the CPU reference within a predeclared numerical tolerance.
+Prove that each claimed GPU backend implements the same effect semantics as the CPU reference within a predefined numerical tolerance.
 
-Performance comes after correctness.
+GPU support is not accepted because the GPU selector runs or because output looks similar.
 
-## 1 — freeze the reference
+## 1. Freeze the semantic reference
 
-Choose a known CPU implementation and artifact version.
+Before GPU tuning, freeze a known-good CPU implementation and its fixtures.
 
 Record:
 
-- git SHA;
-- binary hash;
+- product commit/hash;
 - AE build;
-- project/fixture version.
+- pixel format;
+- parameter vector;
+- input fixture hash;
+- expected CPU output.
 
-Do not change CPU semantics while evaluating GPU differences without explicitly updating the reference.
+If CPU semantics are still changing, equivalence results are unstable.
 
-## 2 — define fixtures
+## 2. Define comparison metrics before looking at GPU output
+
+For integer/exact paths, exact equality may be appropriate.
+
+For float/GPU paths define:
+
+- max absolute channel error;
+- RMS/mean error;
+- alpha-specific threshold;
+- allowed count/percentage above threshold;
+- NaN/Inf policy.
+
+Tolerance chosen after the failure is not a test specification.
+
+## 3. Use diagnostic inputs
 
 Include:
 
-- gradients;
-- impulse pixels;
-- checkerboards;
-- transparency;
-- colored transparent edges;
-- min/max parameters;
-- odd dimensions;
-- nonzero origins/ROI;
-- HDR negative/positive float values for 32-bpc;
-- temporal cases if relevant.
+- black/white/mid-gray;
+- primary/secondary colors;
+- horizontal/vertical gradients;
+- one-pixel impulse;
+- checkerboard;
+- transparent colored edges;
+- partial alpha;
+- odd frame sizes;
+- HDR negative/positive values where 32-bpc semantics allow them.
 
-Natural images can supplement, not replace, diagnostic fixtures.
+Natural photographs alone hide edge/indexing bugs.
 
-## 3 — define tolerance before results
+## 4. Test parameter boundaries
 
-For each depth/backend define:
+For every important parameter:
 
-- max absolute RGB error;
-- alpha error;
-- RMS/mean error;
-- allowed count above threshold;
-- NaN/Inf policy.
+- default;
+- minimum;
+- maximum;
+- values around branch boundaries;
+- animated values;
+- combinations that change kernel/path.
 
-Exact copy-like effects may require exact output.
+Do not compare only defaults.
 
-## 4 — capture CPU output
+## 5. Match render context
 
-Render the same frame/settings to a comparison-friendly representation.
+CPU and GPU comparisons must use the same:
 
-Avoid lossy codecs.
+- frame/time;
+- project color settings;
+- input;
+- output bit depth;
+- parameters;
+- ROI/request;
+- host version.
 
-Store reference hash/metadata.
+Otherwise the diff mixes algorithm and environment.
 
-## 5 — capture GPU output
+## 6. Preserve raw comparison evidence
 
-For each backend/device class:
+For each failed frame save:
 
-- same project;
-- same frame/time;
-- same parameters;
-- same color settings;
-- same output representation.
+- CPU output;
+- GPU output;
+- absolute-difference image;
+- threshold mask;
+- worst pixel coordinates/values;
+- summary metrics.
 
-Record backend/device/driver.
+This turns a visual mismatch into actionable data.
 
-## 6 — compute differences
+## 7. Common mismatch classes
 
-Report:
+### Alpha/premultiplication
 
-~~~text
-max abs diff
-RMS diff
-alpha max diff
-pixels above tolerance
-worst pixel coordinates/values
-~~~
+RGB can look correct while alpha or transparent RGB is wrong.
 
-Generate a heatmap/threshold mask on failure.
+### Clamp/order
 
-## 7 — investigate semantic causes
+CPU may clamp before an operation while GPU clamps after.
 
-Typical differences:
+### Coordinate/origin
 
-- clamp order;
-- integer normalization;
-- premultiply/unpremultiply;
-- half/float precision;
-- coordinate origin;
-- edge sampling;
-- texture interpolation mode;
-- color transform applied in one path only;
-- different rounding.
+ROI, nonzero origin or odd sizes expose indexing assumptions.
 
-Do not raise tolerance until the cause is understood.
+### Precision
 
-## 8 — repeat across BPC
+Different instruction ordering can create acceptable low-bit float drift; it must remain inside the predefined tolerance.
 
-Test every mode claimed:
+### NaN/Inf
 
-- 8-bpc;
-- 16-bpc;
-- 32-bpc.
+Explicitly define how invalid floating values are handled. Do not allow backend-specific accidental behavior.
 
-Do not infer 16/32 correctness from an 8-bit result.
+## 8. Lifecycle/fallback
 
-## 9 — ROI and odd sizes
+GPU correctness also includes setup/setdown and fallback.
 
-For SmartFX/GPU paths test:
-
-- partial region;
-- empty region;
-- single pixel;
-- odd width/height;
-- cropped/nonzero origins.
-
-Many GPU indexing bugs hide on standard HD dimensions.
-
-## 10 — MFR
-
-If MFR and GPU are both claimed, repeat equivalence under concurrent rendering.
-
-GPU correctness in single-frame preview is not enough.
-
-## 11 — fallback
-
-Force or simulate:
-
-- unsupported device;
-- GPU initialization failure;
-- backend unavailable;
-- allocation failure where testable.
-
-Expected behavior must be defined:
+Test:
 
 ~~~text
-safe CPU fallback
-or
-clear supported failure
+GPU available
+→ GPU render
+→ device/setup failure injected or unavailable
+→ CPU fallback / supported error path
+→ subsequent render remains valid
 ~~~
 
-Never return an uninitialized/partial frame as success.
+No stale gpu_data or device resources after setdown.
 
-## 12 — performance only after PASS
+## 9. MFR + GPU
 
-Once equivalence passes, benchmark transfer, kernel and synchronization cost.
+If both features are claimed, test them together.
 
-A GPU backend that is correct but slower may still be useful for other reasons, but that decision must be explicit.
+Look for:
 
-## Release evidence
+- shared device state races;
+- frame/instance mix-up;
+- unsafe caches;
+- cancellation;
+- device teardown while work exists.
 
-Store CPU/GPU diff report with artifact/environment identity described in 10-TESTING/06-EVIDENCE-AND-ACCEPTANCE.md.
+Passing CPU MFR and single-frame GPU separately is not enough.
+
+## 10. Performance comes after correctness
+
+Only after equivalence passes:
+
+- kernel time;
+- upload/download;
+- synchronization;
+- setup;
+- total frame time;
+- crossover by resolution.
+
+A faster wrong result is a correctness failure.
+
+## Acceptance gate
+
+For every claimed GPU backend and pixel depth:
+
+- comparison fixtures pass predefined tolerance;
+- alpha passes independently;
+- odd/ROI cases pass where relevant;
+- no NaN/Inf regression;
+- setup/setdown pass;
+- CPU fallback/error path passes;
+- MFR combination passes if both are advertised.
+
+See [Render correctness](../10-TESTING/02-RENDER-CORRECTNESS.md) and [Performance](../10-TESTING/04-PERFORMANCE.md).
