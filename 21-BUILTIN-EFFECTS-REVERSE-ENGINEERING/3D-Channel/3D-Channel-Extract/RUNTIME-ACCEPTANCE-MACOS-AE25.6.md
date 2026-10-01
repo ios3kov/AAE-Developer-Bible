@@ -75,4 +75,4 @@ Public MFR configuration must be researched rather than declared impossible from
 
 First inventory fixture content and identify the unresolved indirect callbacks from existing evidence. Define expected results and tolerances per suite. A single delivery may orchestrate multiple source-specific suites, but not pretend one depth precomp exercises every channel. Implement the test bodies and run applicable portable safety regressions before delivery. Preserve the original Render Queue/project state, avoid overwriting the AEP, and distinguish collection completion from accepted test coverage.
 
-No repetition of already completed depth matrices is requested. **Full-effect acceptance and Gate 8 remain OPEN.**
+No repetition of already completed depth matrices is requested. **Full-effect research remains incomplete.** This is an ongoing atlas track, not a core Bible release blocker.
