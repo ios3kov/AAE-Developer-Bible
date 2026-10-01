@@ -187,7 +187,7 @@ stop new requests
 
 Owner переживает borrower.
 
-## 16. Acceptance checklist
+## 16. Product validation cases
 
 - acquire failure;
 - partial acquire then failure;
@@ -205,4 +205,6 @@ Owner переживает borrower.
 
 ## Verification boundary
 
-Это ownership model поверх public SDK contracts и product protocols. Конкретный lifetime определяется соответствующим API/header. Editorial pass не заменяет ASan/leak/stress/host validation.
+Это ownership model поверх public SDK contracts и product protocols. Конкретный lifetime определяется соответствующим API/header.
+
+ASan/leak/stress/host validation относится к concrete product evidence where relevant; отсутствие такого run не делает source-level Bible guidance незавершённой.
