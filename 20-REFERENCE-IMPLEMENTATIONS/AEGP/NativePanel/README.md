@@ -1,6 +1,6 @@
 # Native AEGP panel reference path
 
-Status: **SDK sample workspace: Panelator / host-test pending**.
+Status: **Panelator integration guide / runtime result not claimed**.
 
 Materialize the exact licensed SDK sample with scripts/materialize_sdk_examples.py and use it as the project/lifecycle shell.
 
