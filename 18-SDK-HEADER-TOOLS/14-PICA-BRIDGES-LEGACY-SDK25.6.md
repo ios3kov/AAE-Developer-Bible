@@ -6,7 +6,7 @@ Date: **2026-10-01**. Source: user-supplied `ae25.6_61.64bit.AfterEffectsSDK`.
 
 ## Place in the completion plan
 
-This review continues documentation/source-contract work. It does **not** close Gate 2, 3A, 4, 5, 6, 7 or 8. In particular, PICA provider/consumer and Effect↔AEGP remain host-pending integration families.
+This review is documentation/source-contract evidence. PICA provider/consumer and Effect↔AEGP runtime behavior is **not claimed** unless a separate runtime record exists; lack of such a run is not a Bible completion gate.
 
 The SDK TAR SHA-256 was recalculated as:
 
@@ -149,7 +149,7 @@ NOT RUN in this iteration:
 - missing/wrong-version behavior in AE;
 - refcount/unload behavior;
 - generic call to a Bible effect;
-- timebase host test;
+- layer-time conversion/runtime behavior, if a concrete product claims it;
 - provider/consumer concurrency;
 - restart/shutdown stress;
 - exact-SDK compilation of the two Bible bridge templates;
