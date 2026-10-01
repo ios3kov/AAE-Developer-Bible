@@ -42,7 +42,18 @@ class ValidationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "test.cpp"
             path.write_text('// s->AEGP_Fake();\n"s->AEGP_Fake()";\ns->AEGP_Known();\ns->AEGP_Unknown();')
-            data = {"tables": [{"functions": [{"name": "AEGP_Known"}]}]}
+            data = {
+                "schema_version": 1,
+                "unparsed_candidate_tables": {},
+                "partial_candidate_tables": {},
+                "tables": [{
+                    "name": "AEGP_TestSuite1",
+                    "functions": [{
+                        "name": "AEGP_Known",
+                        "signature": "A_Err (*AEGP_Known)(void);",
+                    }],
+                }],
+            }
             count, unknown = verify.verify(data, [path])
             self.assertEqual(count, 2)
             self.assertEqual(unknown[0][1:], (4, "AEGP_Unknown"))
@@ -59,11 +70,73 @@ class ValidationTests(unittest.TestCase):
     def test_conflicting_table_versions_fail(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "index.json"
-            path.write_text(json.dumps({"tables": [
-                {"name": "Suite", "functions": [{"name": "A"}]},
-                {"name": "Suite", "functions": [{"name": "B"}]}]}))
+            path.write_text(json.dumps({
+                "schema_version": 1,
+                "unparsed_candidate_tables": {},
+                "partial_candidate_tables": {},
+                "tables": [
+                    {"name": "Suite", "functions": [{"name": "A", "signature": "void (*A)(void);"}]},
+                    {"name": "Suite", "functions": [{"name": "B", "signature": "void (*B)(void);"}]},
+                ],
+            }))
             with self.assertRaises(ValueError):
                 diff.load(path)
+
+    def test_inventory_schema_version_is_enforced(self):
+        data = {
+            "schema_version": 999,
+            "tables": [{
+                "name": "AEGP_TestSuite1",
+                "functions": [{"name": "AEGP_Known", "signature": "A_Err (*AEGP_Known)(void);"}],
+            }],
+            "unparsed_candidate_tables": {},
+            "partial_candidate_tables": {},
+        }
+        with self.assertRaises(ValueError):
+            verify.validate_inventory(data)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "index.json"
+            path.write_text(json.dumps(data))
+            with self.assertRaises(ValueError):
+                diff.load(path)
+
+    def test_malformed_signature_inventory_is_rejected(self):
+        data = {
+            "schema_version": 1,
+            "tables": [{
+                "name": "AEGP_TestSuite1",
+                "functions": [{"name": "AEGP_Known"}],
+            }],
+            "unparsed_candidate_tables": {},
+            "partial_candidate_tables": {},
+        }
+        with self.assertRaises(ValueError):
+            verify.validate_inventory(data)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "index.json"
+            path.write_text(json.dumps(data))
+            with self.assertRaises(ValueError):
+                diff.load(path)
+
+    def test_signature_drift_is_reported(self):
+        old = {
+            "Suite": [{
+                "name": "AEGP_DoThing",
+                "signature": "A_Err (*AEGP_DoThing)(A_long);",
+            }]
+        }
+        new = {
+            "Suite": [{
+                "name": "AEGP_DoThing",
+                "signature": "A_Err (*AEGP_DoThing)(A_long, A_Boolean);",
+            }]
+        }
+        report = diff.compare(old, new)
+        self.assertIn("AEGP_DoThing", report)
+        self.assertIn("A_Boolean", report)
+        self.assertNotIn("No indexed", report)
 
     def test_large_unsupported_declaration_is_bounded(self):
         self.assertEqual(inventory.parse_functions("A_ " * 20000 + ";"), [])
