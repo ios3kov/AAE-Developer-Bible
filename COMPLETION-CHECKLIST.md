@@ -77,19 +77,19 @@ The current 3D Channel Extract index now states that the physical `Aux_Channel_E
 
 ## Gate 3A — Reuse audit: FSTR Line and AE Hot Loader
 
-**Required before creating new examples in Gates 5–6. Status: OPEN.**
+**Required before creating new examples in Gates 5–6. Status: CLOSED — 2026-10-01.**
 
 Primary extraction and pinned sources: [project case studies](22-PROJECT-CASE-STUDIES/README.md). This audit does not require completion of either product and does not automatically make any Bible example host-verified.
 
 - [x] Pin the reviewed document snapshots: FSTR Line `c69e3663de59dc44cbdef18042891f6dd1ce5ee6`, AE Hot Loader `cf338bcd861504d695c3181767c18bb423575814`.
 - [x] Preserve architecture lessons, negative experiments and reported host results with their limitations in section 22.
-- [ ] Map each candidate below to actual code files, source commits, related tests and build identity. A documentation snapshot is not necessarily the tested build.
-- [ ] Review original test records/artifacts; identify missing raw evidence and separate project-reported results from independently repeated tests.
-- [ ] Run applicable portable tests for the selected source snapshot and record commands/results without calling them AE host tests.
-- [ ] Record reuse / adapt / do not transfer decisions with reasons for every candidate.
-- [ ] Check provenance before copying code; keep licensed third-party headers/binaries outside Bible.
-- [ ] Specify Bible-side regression and host acceptance tests for every selected adaptation; actual acceptance remains in Gates 4–7.
-- [ ] Link accepted general lessons into their target chapters, keeping private-loader experiments separate from supported SDK recipes.
+- [x] Map each candidate below to actual code files, source commits, related tests and build identity.
+- [x] Review original test records/artifacts; identify missing raw evidence and separate project-reported results from independently repeated tests.
+- [x] Run applicable portable tests for the selected source snapshot: FSTR audit run `36841872858` passed from pinned snapshot plus workflow-only commit.
+- [x] Record reuse / adapt / do not transfer decisions with reasons for every candidate.
+- [x] Check provenance before copying code; no third-party project code was copied into Bible.
+- [x] Specify Bible-side regression and host acceptance tests for every selected adaptation; actual acceptance remains in Gates 4–7.
+- [x] Link accepted general lessons into target communication/testing/debugging/loading chapters; private loader remains research-only.
 
 ### Initial candidate register
 
@@ -252,8 +252,8 @@ For cross-project lessons also record the source repository, pinned document/cod
 
 1. **DONE — Gate 2:** safe transactional tooling + destructive/false-success tests.
 2. **DONE — Gate 3:** documentation consistency + section 21 navigation + superseded-claim cleanup.
-3. **CURRENT — Gate 3A:** audit FSTR Line / AE Hot Loader candidates before creating new examples; preserve accepted lessons and transfer decisions in section 22.
-4. Gate 4: strengthen exact-SDK verification.
+3. **DONE — Gate 3A:** code-level reuse audit + independent FSTR portable rerun + transfer decisions.
+4. **CURRENT — Gate 4:** strengthen exact-SDK verification.
 5. Gate 5: host-verify Minimal Gain, SmartFX Copy and MenuTool using audited reusable components where appropriate.
 6. Gates 6–7: complete families and correctness/stress coverage.
 7. Gate 8: finish 3D Channel Extract pilot, then catalog. **Current user-directed work is evidence audit and corrected fixture qualification; do not request another run before coverage and expected results are defined. Other gates are not implicitly complete.**
