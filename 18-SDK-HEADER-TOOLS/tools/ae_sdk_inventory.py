@@ -30,6 +30,15 @@ FUNC_PTR_RE = re.compile(
     r"\((?P<args>.*?)\)\s*;",
     re.S,
 )
+TYPEDEF_FUNC_PTR_RE = re.compile(
+    r"typedef\s+(?P<ret>[A-Za-z_][\w\s*]*?)"
+    r"\(\s*\*\s*(?P<name>[A-Za-z_][\w]*)\s*\)\s*"
+    r"\((?P<args>.*?)\)\s*;",
+    re.S,
+)
+CALLBACK_FIELD_RE = re.compile(
+    r"(?P<type>[A-Za-z_][\w]*)\s+(?P<name>[A-Za-z_][\w]*)\s*;"
+)
 NAMED_STRUCT_RE = re.compile(
     r"typedef\s+struct\s+(?P<tag>[A-Za-z_][\w]*)\s*\{(?P<body>.*?)\}\s*(?P<alias>[A-Za-z_][\w]*)\s*;",
     re.S,
@@ -104,22 +113,48 @@ def iter_headers(inputs: Sequence[str]) -> list[Path]:
     return sorted(out)
 
 
-def parse_functions(body: str) -> list[FunctionDecl]:
+def callback_typedefs(clean_text: str) -> dict[str, tuple[str, str]]:
+    out: dict[str, tuple[str, str]] = {}
+    for match in TYPEDEF_FUNC_PTR_RE.finditer(clean_text):
+        out[match.group("name")] = (
+            normalize_ws(match.group("ret")),
+            normalize_ws(match.group("args")),
+        )
+    return out
+
+
+def parse_functions(body: str, callback_types: dict[str, tuple[str, str]] | None = None) -> tuple[list[FunctionDecl], list[str]]:
     funcs: list[FunctionDecl] = []
+    unresolved: list[str] = []
+    callback_types = callback_types or {}
     # Adobe tables frequently prefix fields with SPAPI. Remove only the calling-convention token.
     body = re.sub(r"\bSPAPI\b", "", body)
     # Full-match individual declarations: bounded work on macro-heavy headers,
     # and no accidental match starting halfway through an unsupported field.
     for declaration in body.split(";"):
-        m = FUNC_PTR_RE.fullmatch(declaration.strip() + ";")
-        if not m:
+        declaration = declaration.strip()
+        if not declaration:
             continue
-        ret = normalize_ws(m.group("ret"))
-        name = m.group("name")
-        args = normalize_ws(m.group("args"))
-        sig = f"{ret} (*{name})({args});"
-        funcs.append(FunctionDecl(name=name, return_type=ret, arguments=args, signature=sig))
-    return funcs
+        text = declaration + ";"
+        m = FUNC_PTR_RE.fullmatch(text)
+        if m:
+            ret = normalize_ws(m.group("ret"))
+            name = m.group("name")
+            args = normalize_ws(m.group("args"))
+            sig = f"{ret} (*{name})({args});"
+            funcs.append(FunctionDecl(name=name, return_type=ret, arguments=args, signature=sig))
+            continue
+
+        field = CALLBACK_FIELD_RE.fullmatch(text)
+        if field and field.group("type") in callback_types:
+            ret, args = callback_types[field.group("type")]
+            name = field.group("name")
+            sig = f"{ret} (*{name})({args});"
+            funcs.append(FunctionDecl(name=name, return_type=ret, arguments=args, signature=sig))
+            continue
+
+        unresolved.append(declaration)
+    return funcs, unresolved
 
 
 def nearby_defines(raw_text: str, start: int, table_name: str) -> dict[str, str]:
@@ -146,6 +181,7 @@ def parse_header(path: Path, base: Path | None = None, partial: dict | None = No
     rel = str(path.relative_to(base)) if base and path.is_relative_to(base) else str(path)
     found: list[ContractTable] = []
     seen_spans: set[tuple[int, int]] = set()
+    callback_types = callback_typedefs(clean)
 
     for rx in (NAMED_STRUCT_RE, ANON_STRUCT_RE):
         for m in rx.finditer(clean):
@@ -157,12 +193,10 @@ def parse_header(path: Path, base: Path | None = None, partial: dict | None = No
             tag = m.groupdict().get("tag") or alias
             if not TABLE_NAME_RE.search(alias):
                 continue
-            funcs = parse_functions(m.group("body"))
-            # Any nonempty declaration we cannot fully consume is a diagnostic.
-            # A recognized table must not hide unsupported fields/macros.
-            body = re.sub(r"\bSPAPI\b", "", m.group("body"))
-            remainder = "; ".join(decl.strip() for decl in body.split(";")
-                                  if decl.strip() and not FUNC_PTR_RE.fullmatch(decl.strip() + ";"))
+            funcs, unresolved = parse_functions(m.group("body"), callback_types)
+            # Keep non-function/data fields as diagnostics. Required-contract verification
+            # decides whether a diagnostic blocks the acceptance lane.
+            remainder = "; ".join(unresolved)
             if remainder and partial is not None:
                 partial[f"{rel}:{alias}"] = normalize_ws(remainder)
             if not funcs:
