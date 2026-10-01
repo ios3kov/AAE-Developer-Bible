@@ -130,6 +130,17 @@ Completed as one ownership/import block:
 - Footage Suite versus AEIO responsibility boundary made explicit;
 - product validation wording aligned with `EDITORIAL-GUIDE.md`.
 
+### AEIO import / export lifecycle
+
+Completed as one SDK/source/reference block:
+
+- `AEIO_FunctionBlock4` lifecycle mapped to current `IOInSuite7` / `IOOutSuite6`;
+- spec/options ownership and flat/live persistence separated;
+- random/sparse frame, audio, metadata, auxiliary-channel and output-finalization guidance expanded;
+- cancellation, untrusted-media validation and partial-failure cleanup made explicit;
+- Footage Suite versus AEIO responsibility boundary reconciled;
+- reference/template evidence wording aligned with `EDITORIAL-GUIDE.md`.
+
 ## Current editorial TODO
 
 1. Sweep every main chapter for completeness against the editorial checklist.
