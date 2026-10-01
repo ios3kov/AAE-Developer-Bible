@@ -6,7 +6,7 @@ Header-derived validation is the first native preflight, not the final Mac valid
 
 ~~~bash
 cd 18-SDK-HEADER-TOOLS
-./run-macos.sh "/path/to/After Effects SDK/Examples/Headers"
+./run-macos.sh "/path/to/After Effects SDK/Examples"
 ~~~
 
 Use the exact SDK intended for the candidate build.
@@ -15,9 +15,11 @@ Use the exact SDK intended for the candidate build.
 
 A successful header-tool run means only the checks implemented by the tool passed, such as:
 
-- supported headers were parsed;
-- inventory was generated;
-- cookbook/reference suite symbols were found according to parser rules.
+- supported headers were parsed with no unresolved parser diagnostics;
+- inventory schema/version validation passed;
+- cookbook/reference suite symbols were found according to parser rules;
+- the current Bible native C++ translation units passed Clang C++17 syntax/type checks;
+- a machine-readable compiler report records SDK header-manifest identity, compiler identity, exact commands and per-source results.
 
 It does not prove complete header coverage.
 
@@ -27,7 +29,6 @@ The indexer fails closed on unsupported declaration shapes, and full exact-SDK i
 
 It does not prove:
 
-- C++ source compiles;
 - resources/PiPL compile;
 - link succeeds;
 - arm64/x86_64 slices exist;
@@ -43,8 +44,8 @@ Do not promote this preflight into host verification.
 ## Required next gates
 
 ~~~text
-header preflight
-→ Xcode compile
+header inventory + symbol check + Clang syntax/type report
+→ Xcode project/resource compile
 → resource/PiPL build
 → link
 → architecture/dependency inspection
