@@ -35641,6 +35641,18 @@ Completed as one SDK/source/reference block:
 - Footage Suite versus AEIO responsibility boundary reconciled;
 - reference/template evidence wording aligned with `EDITORIAL-GUIDE.md`.
 
+### Artisan renderer lifecycle
+
+Completed as one renderer-architecture/source-reference block:
+
+- current `PR_ArtisanEntryPoints + CanvasSuite8 + ArtisanUtilSuite1` baseline reconciled;
+- Global/Instance/Render state and versioned persistence separated;
+- scene extraction, context ownership, textures/worlds/receipts and cache identity documented;
+- bins/track mattes, camera/light/time, motion blur, ROI/downsample and unsupported-scene policy expanded;
+- interactive/final state, cancellation, failure cleanup and threading boundaries clarified;
+- Artie historical suite generations retained only as sample pattern evidence;
+- template/reference wording aligned with `EDITORIAL-GUIDE.md`.
+
 ## Current editorial TODO
 
 1. Sweep every main chapter for completeness against the editorial checklist.
