@@ -1,14 +1,163 @@
 # AEGP ownership / RAII
 
-Главная причина утечек в AEGP — не C++ heap, а host-owned handles/refs с отдельными dispose/checkin вызовами.
+The main native leak class is often not ordinary C++ heap memory. It is a host resource that requires a specific dispose, free or checkin call.
 
-## Типичные пары
+code/AegpOwners.h contains narrow move-only owners for four contracts from the current Bible baseline.
 
-- `GetNew...Stream` → `AEGP_DisposeStream`;
-- effect ref, который API требует dispose → `AEGP_DisposeEffect`;
-- `RenderAndCheckoutFrame` receipt → `AEGP_CheckinFrame`;
-- `AEGP_MemHandle` → `AEGP_FreeMemHandle`.
+## Included owners
 
-`code/AegpOwners.h` содержит move-only owners для этих четырёх случаев. Это уменьшает количество early-return leaks.
+| Owner | Stored resource | Cleanup |
+|---|---|---|
+| AegpStreamRefOwner | AEGP_StreamRefH | AEGP_DisposeStream |
+| AegpEffectRefOwner | AEGP_EffectRefH | AEGP_DisposeEffect |
+| AegpFrameReceiptOwner | AEGP_FrameReceiptH | AEGP_CheckinFrame |
+| AegpMemHandleOwner | AEGP_MemHandle | AEGP_FreeMemHandle |
 
-Не оборачивать borrowed handle в owner. Перед созданием owner всегда проверить ownership contract конкретной функции.
+Each owner also stores the suite function table required for cleanup.
+
+## Why separate classes
+
+A generic void-pointer owner hides the most important information: which host contract releases the resource.
+
+Explicit owners make the pair visible in code review.
+
+~~~text
+resource type
+↔ exact cleanup function
+~~~
+
+## Construction rule
+
+Construct an owner only after an API has successfully returned an owned resource.
+
+Conceptual:
+
+~~~cpp
+AEGP_StreamRefH raw = nullptr;
+A_Err err = /* host call creating owned stream ref */;
+
+if (!err && raw) {
+    AegpStreamRefOwner owner(stream_suite, raw);
+    // use owner.get()
+}
+~~~
+
+Do not create an owner for a borrowed handle simply because its type matches.
+
+## Move-only semantics
+
+Copy is disabled.
+
+Move transfers the raw host handle so there remains exactly one cleanup owner.
+
+~~~text
+owner A owns H
+→ move to B
+→ A empty
+→ B owns H
+→ B destructor disposes H
+~~~
+
+This is the intended protection against double release.
+
+## release
+
+release returns the raw handle and makes the owner empty.
+
+After release, responsibility moves back to the caller.
+
+Use it only for a deliberate ownership transfer.
+
+~~~text
+owner.release()
+→ caller now owns host cleanup obligation
+~~~
+
+The test explicitly releases one stream ref and manually disposes the returned raw handle to prove this transfer.
+
+## reset
+
+reset disposes/checks in the current handle and can optionally replace it with another raw handle while keeping the same suite pointer.
+
+Important: a default-constructed owner has no suite pointer. Do not call reset(newHandle) on such an object and assume it can later clean that handle.
+
+Prefer constructing with both the correct suite and owned handle.
+
+## Suite lifetime
+
+The stored suite pointer must remain valid until the owner has been reset/destroyed.
+
+This creates a strict order:
+
+~~~text
+resource owners destroyed
+→ acquired suites released
+→ host/module teardown
+~~~
+
+Not the reverse.
+
+## Error handling
+
+Current reset/destructors intentionally cast cleanup return values to void.
+
+That prevents cleanup from throwing, but it also means a failed checkin/dispose is not surfaced.
+
+For resources whose cleanup status affects correctness, add an explicit close/checkin operation that:
+
+1. performs cleanup;
+2. returns A_Err;
+3. clears ownership only according to the chosen failure policy;
+4. runs before destructor fallback.
+
+## Memory-handle locking is separate
+
+AegpMemHandleOwner owns the handle allocation. It does not model lock/unlock of the memory contents.
+
+Those are separate lifetimes:
+
+~~~text
+MemHandle owner
+  └─ lock
+      └─ temporary raw pointer
+      └─ unlock
+  └─ free handle
+~~~
+
+Never preserve the locked raw pointer after unlock or free.
+
+## Frame receipt semantics
+
+Frame receipt cleanup uses CheckinFrame. Do not treat the checked-out world/receipt as an ordinary heap object.
+
+A borrowed frame/world pointer obtained through the receipt cannot outlive the receipt contract.
+
+## Structural invalidation
+
+RAII prevents forgotten cleanup. It does not guarantee a host reference remains semantically valid after project structural mutation.
+
+Reacquire references when the relevant AEGP contract requires it.
+
+## Tests
+
+Current stub tests cover:
+
+- stream owner move assignment disposes the previous destination handle;
+- moved-from owner is empty;
+- release transfers cleanup;
+- effect ref cleanup;
+- frame receipt checkin;
+- memory handle free.
+
+Still required in product integration:
+
+- host error paths;
+- actual suite lifetime;
+- invalidation after project mutation;
+- async cancellation;
+- shutdown ordering;
+- leak diagnostics.
+
+## Verification boundary
+
+RAII proves deterministic local cleanup only when the ownership assumption and suite lifetime are correct.
