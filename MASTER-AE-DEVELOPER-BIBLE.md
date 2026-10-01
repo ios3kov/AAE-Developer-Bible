@@ -27366,6 +27366,10 @@ No source-project host result is promoted into Bible host verification. FSTR SYN
 
 ## Editorial progress — 2026-10-01
 
+- Closed Gate 3A reuse audit: exact FSTR/AE Hot Loader file+commit mapping, transfer decisions, provenance review and independent FSTR portable rerun.
+- Hardened Gate 4 tooling with inventory schema guards, required SDK 25.6 tables/functions, exact SuiteHandler-generation checks and compiler-report provenance.
+- Added cross-platform Gate 4 runners for Clang/MSVC, clean-Git evidence requirements, strict portable native protocol-header compilation and an exact-SDK acceptance runbook.
+
 - Expanded the full testing section with explicit build/host/release evidence layers, richer matrices, render/ROI correctness, MFR stress, performance and crash diagnostics.
 - Added an evidence/acceptance chapter with PASS/FAIL/BLOCKED/NOT_RUN vocabulary tied to exact artifact and environment identity.
 - Expanded practical recipes and bug/compatibility/performance/spec/release templates.
@@ -28384,7 +28388,7 @@ Earlier source findings remain in the linked records: ten-file memory/MFR review
 
 This work remains within the agreed subject matter of [the completion plan](COMPLETION-PLAN.md). Safe-tooling Gate 2 is now closed by portable regression evidence; stages 3–4, the reuse audit, native compiler expansion and AE host gates remain open. **Native readout-adapter development remains paused; the deliverable is the Bible, not a separate testing product.** No new user AE run is requested.
 
-**The scripting/panels communication → macOS/Windows build → distribution and testing/release-evidence blocks are written. Cross-checking reconciled the CEP command schema, corrected the render-queue enum recipe, strengthened the native generic-bridge ABI checks, and Gates 2–3 are closed with CI evidence. Gate 3A reuse audit is closed with an independent FSTR portable rerun. Gate 4 portable tooling now enforces inventory schema, parser diagnostics, required SDK 25.6 tables/functions, exact SuiteHandler generations, compiler-report identity and macOS/Windows runner syntax. Gate 4 remains open until the current revision is rerun against the licensed SDK 25.6 and MSVC/Windows evidence exists**, while preserving the exact-SDK baseline. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
+**The scripting/panels communication → macOS/Windows build → distribution and testing/release-evidence blocks are written. Cross-checking reconciled the CEP command schema, corrected the render-queue enum recipe, strengthened the native generic-bridge ABI checks, and Gates 2–3 are closed with CI evidence. Gate 3A reuse audit is closed with an independent FSTR portable rerun. Gate 4 portable tooling now enforces inventory schema, parser diagnostics, required SDK 25.6 tables/functions, exact SuiteHandler generations, compiler-report identity and macOS/Windows runner syntax. Gate 4 remains open until the current revision is rerun against the licensed SDK 25.6 and MSVC/Windows evidence exists. The Gate 4 acceptance runbook now defines the exact one-command macOS/Windows evidence flow and requires clean Git/source hashes**, while preserving the exact-SDK baseline. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
 
 ## Earlier baseline evidence
 
@@ -28677,3 +28681,20 @@ New fail-closed checks:
 Recent portable validation runs for these changes are green, including run `36843099891` for runner syntax and run `36843081166` for the full synthetic compiler-report path.
 
 **Boundary:** this does not close Gate 4. The previously recorded Adobe SDK 25.6 macOS compiler baseline predates current source changes. The exact SDK archive is not available in the current accessible file set, so no fresh licensed-SDK compile was performed here. A real MSVC + SDK 25.6 run also remains NOT RUN.
+
+
+### Portable native ABI/header compile
+
+The current validation lane also compiles the standalone Effect↔AEGP and PICA protocol headers with strict C++17 warnings. Validate run `36843562458` passed:
+
+- native compiler-driver portable tests;
+- macOS/Windows runner syntax parsing;
+- strict compile/run of `scripts/test_protocol_headers.cpp`;
+- SDK tooling regression tests;
+- C++ foundation tests;
+- generated documentation;
+- MkDocs strict build.
+
+Compiler reports now include Bible Git SHA/dirty state and SHA-256 for each translation unit. The acceptance platform runners use `--require-clean`; a dirty/unknown source tree cannot be promoted to Gate-4 compiler evidence.
+
+See [Gate 4 — exact SDK acceptance runbook](18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
