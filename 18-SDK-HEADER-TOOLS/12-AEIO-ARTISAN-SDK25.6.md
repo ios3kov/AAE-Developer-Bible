@@ -186,3 +186,36 @@ The later pass added/reconciled:
 The original hashes/sample observations above remain provenance for the SDK source review.
 
 **Evidence level after this pass:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new importer/exporter runtime result is asserted.
+
+
+## Later Artisan production-guidance update — 2026-10-01
+
+A later logical block completed the Artisan production-architecture layer without changing the SDK 25.6 contract baseline.
+
+Baseline remains:
+
+- `PR_ArtisanEntryPoints`;
+- `AEGP_RegisterArtisan` / `AEGP_RegisterInteractiveArtisan`;
+- `AEGP_CanvasSuite8`;
+- `AEGP_ArtisanUtilSuite1`;
+- current supporting camera/light/layer/world suites from the same SDK.
+
+The later pass added/reconciled:
+
+- explicit registration/global/instance/render/temp-resource state machine;
+- versioned platform-independent instance flatten/inflate guidance;
+- separation of borrowed render/query/layer contexts from product-owned normalized scene/cache;
+- track-matte/bin/compositing policy instead of assuming a simple linear layer list;
+- texture/world/render-receipt ownership as separate cleanup families;
+- host receipt validity versus product scene-cache/backend validity;
+- camera/light/time extraction from render context rather than UI current time;
+- motion-blur/shutter, ROI and downsample semantics;
+- interactive viewport state separated from persistent/final renderer state;
+- cancellation and partial-scene cleanup;
+- explicit unsupported-scene-feature policy;
+- threading/external-renderer guidance without importing Effect MFR assumptions;
+- product-validation wording consistent with `EDITORIAL-GUIDE.md`.
+
+The original hashes/sample findings above remain provenance for the SDK source review.
+
+**Evidence level after this pass:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new Artisan runtime result is asserted.
