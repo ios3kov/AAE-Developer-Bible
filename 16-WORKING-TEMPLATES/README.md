@@ -1,37 +1,40 @@
 # Source templates and integration guides
 
-v1.1: implementation and verification levels are listed in [the coverage matrix](../FINAL-COVERAGE-AUDIT.md). Historical directory names are retained for link compatibility.
+Цель раздела — дать **production-shaped source patterns**, которые связывают объяснение Bible с реальным SDK/sample architecture.
 
-Цель этого раздела — не псевдокод, а **минимальные production-shaped куски**, которые можно graft/вставлять в официальный SDK sample соответствующего типа.
+Это reference material, а не набор binaries, которые репозиторий обязан собрать.
 
-## Почему это не один «универсальный CMake проект»
+## Почему не один универсальный проект
 
-Adobe сама рекомендует стартовать от ближайшего SDK sample, потому что PiPL/resource build steps и platform project settings уже настроены. Поэтому шаблоны здесь делятся на:
+Adobe native samples already contain version/platform-specific project, PiPL and resource plumbing. Поэтому Bible хранит в основном:
 
-- **drop-in C++ source** — вставляется в конкретный official sample;
-- **protocol headers** — полностью наши, platform-neutral;
-- **JSX/CEP mini projects** — самостоятельные файлы;
-- **integration recipe** — какой Adobe sample копировать и какой файл заменить.
+- **drop-in/source-shaped C++ fragments**;
+- **protocol headers**;
+- **JSX/CEP mini projects**;
+- **integration recipes** — какой sample family использовать и что заменить.
 
 ## Templates
 
-| Template | Base | Что доказывает |
+| Template | Base | Что иллюстрирует |
 |---|---|---|
-| `effect-basic/` | SDK Skeleton | Effect registration, param, render, 8/16 bpc |
-| `aegp-menu-command/` | SDK Persisto/Projector-style AEGP | menu/update/death-hook lifecycle + harmless command callback |
-| `effect-aegp-generic-bridge/` | paired Effect + AEGP | `AEGP_EffectCallGeneric` ↔ `PF_Cmd_COMPLETELY_GENERAL` protocol |
-| `pica-shared-suite/` | SDK Sweetie-style provider | stable native service ABI |
-| `native-panel-registration/` | SDK Panelator | native Window-menu + dockable panel registration |
-| `keyframer-batch/` | SDK Easy Cheese | correct batch keyframe transaction |
-| `aeio-registration/` | SDK IO/FBIO | AEIO registration contract |
-| `artisan-registration/` | SDK Artie | Artisan registration contract |
-| `jsx-tool/` | Scripts folder | undo-safe ExtendScript tool |
+| `effect-basic/` | SDK Skeleton | registration, parameter, 8/16-bpc render shape |
+| `aegp-menu-command/` | Persisto/Projector-style AEGP | menu/update/death-hook lifecycle |
+| `effect-aegp-generic-bridge/` | paired Effect + AEGP | generic-call protocol |
+| `pica-shared-suite/` | Sweetie-style provider | native service ABI shape |
+| `native-panel-registration/` | Panelator | Window menu + dockable-panel registration |
+| `keyframer-batch/` | Easy Cheese | batch-keyframe transaction |
+| `aeio-registration/` | IO/FBIO | AEIO registration contract |
+| `artisan-registration/` | Artie | Artisan registration contract |
+| `jsx-tool/` | Scripts folder | undo-safe ExtendScript pattern |
 | `cep-panel-bridge/` | CEP extension | panel JS ↔ JSX JSON dispatcher |
 
-## Validation status labels
+## Evidence labels
 
-- **SDK syntax-checked** — compiler-checked against SDK 25.6 on macOS; not linked or host-tested.
-- **drop-in** — intended to replace logic inside named Adobe sample, retaining its PiPL/project files.
-- **standalone** — no Adobe SDK compile needed (JSX/HTML).
+- **SDK-CONTRACT-REVIEWED** — relevant names/generations/signatures were checked against selected SDK material.
+- **SOURCE EXAMPLE** — source illustrates the pattern; runtime behavior is not being claimed.
+- **STANDALONE SOURCE** — no Adobe SDK project is required to read/use the JS/HTML source shape.
+- **HISTORICAL COMPILE/RUNTIME EVIDENCE** — retained only when such evidence actually exists.
 
-Результаты проверок фиксируются в [VERIFICATION.md](../VERIFICATION.md). `drop-in` обозначает способ интеграции, а не доказанную готовность бинарного плагина.
+Older `host-test-required` / `host-test pending` labels mean “runtime not claimed”, not “Bible must now run this example”.
+
+If a reader turns a template into a product, use the platform/build/testing chapters for that product's own validation.
