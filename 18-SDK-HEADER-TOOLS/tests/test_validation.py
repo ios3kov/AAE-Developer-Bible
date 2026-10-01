@@ -246,8 +246,53 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual(count, 2)
         self.assertEqual(missing, [])
 
+    def test_required_contracts_ignore_unrelated_parser_diagnostics(self):
+        inventory_data = {
+            "schema_version": 1,
+            "unparsed_candidate_tables": {},
+            "partial_candidate_tables": {"x.h:PF_UnrelatedSuite1": "void *reserved"},
+            "tables": [{
+                "name": "AEGP_ProjSuite6",
+                "functions": [{"name": "AEGP_GetNumProjects", "signature": "A_Err (*AEGP_GetNumProjects)(A_long*);"}],
+            }],
+        }
+        manifest_data = {
+            "schema_version": 1,
+            "target_sdk": "fixture",
+            "required_tables": [{
+                "name": "AEGP_ProjSuite6",
+                "area": "projects",
+                "required_functions": ["AEGP_GetNumProjects"],
+            }],
+        }
+        count, missing = required.verify_required(inventory_data, manifest_data)
+        self.assertEqual(count, 1)
+        self.assertEqual(missing, [])
+
+    def test_required_contracts_block_required_parser_diagnostic(self):
+        inventory_data = {
+            "schema_version": 1,
+            "unparsed_candidate_tables": {},
+            "partial_candidate_tables": {"x.h:AEGP_ProjSuite6": "UnknownField field"},
+            "tables": [{
+                "name": "AEGP_ProjSuite6",
+                "functions": [{"name": "AEGP_GetNumProjects", "signature": "A_Err (*AEGP_GetNumProjects)(A_long*);"}],
+            }],
+        }
+        manifest_data = {
+            "schema_version": 1,
+            "target_sdk": "fixture",
+            "required_tables": [{"name": "AEGP_ProjSuite6", "area": "projects"}],
+        }
+        count, missing = required.verify_required(inventory_data, manifest_data)
+        self.assertEqual(count, 1)
+        self.assertEqual(len(missing), 1)
+        self.assertTrue(missing[0]["parser_diagnostic"])
+
     def test_large_unsupported_declaration_is_bounded(self):
-        self.assertEqual(inventory.parse_functions("A_ " * 20000 + ";"), [])
+        funcs, unresolved = inventory.parse_functions("A_ " * 20000 + ";")
+        self.assertEqual(funcs, [])
+        self.assertEqual(len(unresolved), 1)
 
 
 if __name__ == "__main__":
