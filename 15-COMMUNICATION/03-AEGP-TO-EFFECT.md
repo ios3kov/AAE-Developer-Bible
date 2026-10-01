@@ -6,7 +6,7 @@
 
 ## 1. Текущий контракт SDK 25.6
 
-В `AEGP_EffectSuite4` функция имеет смысловую форму:
+В current SDK 25.6 `AEGP_EffectCallGeneric` находится в `AEGP_EffectSuite5` и имеет смысловую форму:
 
 ```text
 AEGP_EffectCallGeneric(
@@ -33,7 +33,7 @@ EffectCallGeneric(plugin_id, effect_ref, time, extra)
 
 То есть без отдельного `PF_Cmd` аргумента.
 
-Это полезный исторический pattern, но **не сигнатура SDK 25.6 для нового кода**. В новой реализации нельзя копировать старую строку вызова буквально; нужно компилировать против текущего header.
+Это полезный исторический pattern, но **не current suite generation SDK 25.6 для нового кода**. В новой реализации нельзя копировать старую строку вызова буквально; нужно компилировать против текущего header.
 
 Источник: `AEGP/ProjDumper/ProjDumper.cpp:142–168`.
 
