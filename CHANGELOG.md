@@ -16,6 +16,7 @@
 - Added end-to-end macOS and Windows production build pipeline chapters.
 - Added release artifact identity, installer ownership, upgrade/rollback and staged update guidance.
 - Updated STATUS and VERIFICATION without claiming new host/build verification.
+- Added explicit host-verification evidence ladder, durable test-record format and clean-machine release acceptance chapters.
 
 ## v1.1 — 2026-09-30
 
