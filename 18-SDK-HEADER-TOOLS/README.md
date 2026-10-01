@@ -1,151 +1,69 @@
-# SDK Header Tools — declaration index and symbol-name checks
+# SDK Header Tools — exact contract audit helpers
 
-Это fail-closed preflight для локального SDK: declaration inventory + symbol-name checks + отдельный real-compiler syntax/type driver. Regex inventory сам по себе не является signature/ABI proof; типы проверяет `scripts/check_native.py`.
+These tools keep **version-sensitive Bible claims aligned with a real Adobe SDK**.
 
-Главное правило: точный контракт сборки задают headers целевого SDK. Regex parser поддерживает ограниченные формы объявлений. Он сохраняет все diagnostics; `--allow-incomplete` позволяет только записать полный inventory для следующего required-contract gate и сам по себе никогда не означает PASS. Реальный SDK 25.6 сейчас даёт четыре видимых non-required partial diagnostics, а обязательный Gate-4 baseline проходит полностью.
+They are not a requirement to compile the whole Bible.
 
-## Что генерируется
+## Editorial purpose
 
-`tools/ae_sdk_inventory.py` находит C ABI function tables:
+The useful editorial question is:
 
-- `AEGP_*SuiteN` — AEGP host-control API;
-- `PF_*SuiteN` — Effect plug-in suites;
-- `DRAWBOT_*SuiteN` — native custom UI/Drawbot;
-- `AEIO_*FunctionBlockN` — callbacks import/export plug-ins;
-- `PR_*EntryPoints` — Artisan/native renderer callbacks;
-- другие SDK function tables с типичными именами `Suite`, `FunctionBlock`, `EntryPoints`, `Callbacks`.
+> Does the SDK version we cite actually contain the suite generation/function/table the text and recipes say it contains?
 
-Для каждой таблицы сохраняются:
+For Adobe After Effects SDK **25.6 build 61**, the real-header audit records:
 
-- имя/семейство;
-- header-источник и SHA-256;
-- все function-pointer names;
-- normalized header signatures;
-- найденные рядом suite/version macros;
-- parser diagnostics для подозрительных таблиц, которые не удалось разобрать.
+- 35/35 required contract tables/functions present;
+- 39/39 cookbook call-sites resolving to expected SuiteHandler generations;
+- 0 required parser diagnostics;
+- four unrelated partial parser diagnostics retained explicitly.
 
-## Запуск
+That is the current contract-accuracy baseline for the Bible.
 
-macOS:
+## Inventory
 
-```bash
-python3 tools/ae_sdk_inventory.py \
-  "/path/to/After Effects SDK/Examples/Headers" \
-  --json generated/ae-sdk-inventory.json \
-  --markdown generated/ae-sdk-inventory.md
-```
+`tools/ae_sdk_inventory.py` indexes C ABI-style tables such as AEGP, PF, DRAWBOT, AEIO, PR and PICA/SP tables.
 
-Windows PowerShell:
+It records source file/hash, normalized declarations and parser diagnostics.
 
-```powershell
-py tools\ae_sdk_inventory.py `
-  "C:\path\to\After Effects SDK\Examples\Headers" `
-  --json generated\ae-sdk-inventory.json `
-  --markdown generated\ae-sdk-inventory.md
-```
+`--allow-incomplete` means only “emit the inventory including diagnostics”. It never means “everything is verified”.
 
-## Проверка наших recipes против SDK
+## Required-contract audit
 
-После генерации inventory:
+`sdk25.6-required-contracts.json` defines the minimum contract surface referenced by the current core native chapters/recipes.
 
-```bash
-python3 tools/verify_recipe_symbols.py \
-  generated/ae-sdk-inventory.json \
-  ../17-NATIVE-SUITE-COOKBOOK/code
-```
+`verify_required_contracts.py` fails when a required table/function is absent, a required table has a parser diagnostic, or the inventory schema is unsupported.
 
-Скрипт проверяет имена в call-sites вида `suite->AEGP_Foo(...)` / `suite->PF_Foo(...)`; suite generation, аргументы и типы не проверяются. Пустые/несуществующие входы, отсутствие вызовов и неполный inventory завершаются ошибкой. Комментарии и строки не считаются вызовами.
+Unrelated diagnostics remain visible without turning the Bible into a project to implement a complete C/C++ parser for every Adobe structure.
 
-## Сравнение двух SDK
+## Recipe audit
 
-Сгенерировать JSON для старого и нового SDK, затем:
+`verify_recipe_symbols.py` checks cookbook call-site names and, for SuiteHandler calls, the expected suite generation.
 
-```bash
-python3 tools/diff_sdk_inventory.py old.json new.json --markdown sdk-diff.md
-```
+This is a **documentation/source consistency check**. It does not need to prove a shipping binary.
 
-Получим added/removed tables/functions, textual signature changes и изменения порядка function fields. Typedef expansion, packing и platform ABI не проверяются. Конфликтующие или неполные inventory отклоняются.
+## SDK diff
 
-## Что уже протестировано здесь
+`diff_sdk_inventory.py` is useful when a future edition moves to another SDK baseline.
 
-В `tests/fixture_header.h` лежит маленький **синтетический** SDK header. Он не содержит Adobe SDK code, но повторяет ABI-форму function tables. Unit test проверяет named suite, anonymous suite и AEIO-style function block.
+## Optional compiler helper
 
-```bash
-python3 tests/test_inventory.py
-```
+`scripts/check_native.py` and the platform runners can produce additional syntax/type evidence for source snapshots.
 
-## Что нельзя честно заявить в песочнице
+They are useful to a developer who wants extra confidence in a source example, but **compiler evidence is not a completion criterion for AE Developer Bible**.
 
-В v1.1 выполнены syntax/type checks с локальным SDK 25.6; host validation не выполнялась. Критерий готовности на машине разработчика:
+Historical compiler results remain in [VERIFICATION.md](../VERIFICATION.md) because they are real evidence about those snapshots.
 
-1. inventory успешно строится из фактических headers;
-2. `verify_recipe_symbols.py` не показывает неизвестных calls;
-3. код компилируется внутри ближайшего официального Adobe sample;
-4. binary загружается в целевой AE;
-5. smoke tests проходят на заявленных macOS/Windows + architecture + AE versions.
+## Historical “Gate 4” filenames
 
+Files such as `16-GATE4-ACCEPTANCE-RUNBOOK.md` and `17-GATE4-SDK25.6-RUN-2026-10-01.md` retain filenames for stable links/history. The former build-gate completion model is superseded.
 
-## Полный локальный Gate-4 runner
+Read them as:
 
-Передавайте **SDK Examples root**, не только Headers:
+- SDK contract audit methodology;
+- exact SDK 25.6 evidence record.
 
-macOS:
+## Current real SDK evidence
 
-```bash
-cd 18-SDK-HEADER-TOOLS
-./run-macos.sh "/path/to/After Effects SDK/Examples"
-```
+See [SDK 25.6 contract audit record](17-GATE4-SDK25.6-RUN-2026-10-01.md).
 
-Windows, из Visual Studio Developer Command Prompt / VsDevCmd:
-
-```powershell
-cd 18-SDK-HEADER-TOOLS
-.\run-windows.ps1 "C:\path\to\After Effects SDK\Examples"
-```
-
-Оба runner'а выполняют:
-
-1. inventory exact headers с сохранением всех diagnostics;
-2. schema/version validation;
-3. required-contract gate: diagnostics в обязательных tables/functions блокируют run;
-4. cookbook symbol-name + exact SuiteHandler-generation preflight;
-5. C++17 compiler syntax/type checks;
-6. запись `generated/local-sdk/native-compile-report.json`.
-
-Compile report сохраняет aggregate SDK-header manifest SHA-256, compiler identity, exact commands и status каждой translation unit.
-
-Это **не** resource/PiPL build, link или AE host test.
-
-## Inventory compatibility guard
-
-`verify_recipe_symbols.py` и `diff_sdk_inventory.py` принимают только поддерживаемую `schema_version=1` и отклоняют malformed/empty function declarations. Signature/order drift покрыт portable regression tests. Старый/неполный JSON нельзя использовать как скрытый источник зелёной проверки.
-
-
-## Required SDK 25.6 contract manifest
-
-`sdk25.6-required-contracts.json` is a fail-closed minimum baseline for the current Bible edition.
-
-It pins contract-table generations used by the reviewed chapters and native examples, including AEGP project/item/comp/layer/effect/stream/keyframe/render families, AEIO, Artisan, panels, GPU, Custom UI/Drawbot and PICA. High-risk tables also list required functions.
-
-`verify_required_contracts.py` fails when:
-
-- a required table is absent;
-- a required function is absent from its pinned table;
-- the inventory schema is unsupported;
-- parser diagnostics affecting required contracts make the acceptance lane fail; unrelated diagnostics remain visible and non-silent.
-
-This prevents a parser run from becoming green merely because it returned *some* tables.
-
-The manifest is **necessary, not sufficient** evidence. Real compiler and host gates still follow.
-
-
-## Gate 4 acceptance
-
-The exact acceptance criteria and evidence-retention rules are in [Gate 4 — exact SDK acceptance runbook](16-GATE4-ACCEPTANCE-RUNBOOK.md).
-
-
-## Real SDK 25.6 preflight evidence
-
-See [Gate 4 — exact SDK 25.6 required-contract preflight — 2026-10-01](17-GATE4-SDK25.6-RUN-2026-10-01.md).
-
-Current exact-header result: **35/35 required contracts PASS, 39/39 cookbook call-sites resolved, 0 required parser diagnostics**. Four non-required partial diagnostics remain explicitly recorded.
+The result supports the Bible's current native contract claims. No additional macOS/Windows compilation is required to call the documentation editorially complete.
