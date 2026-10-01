@@ -103,7 +103,7 @@ For such a path, add an explicit close/checkin method that returns the host erro
 
 ## Suite-generation boundary
 
-The current code names concrete suite generations from the supplied SDK baseline, for example StreamSuite6 and EffectSuite4.
+The current code names concrete suite generations from the supplied SDK baseline, including StreamSuite6 and EffectSuite5.
 
 Do not copy those generation numbers into a different SDK blindly.
 
