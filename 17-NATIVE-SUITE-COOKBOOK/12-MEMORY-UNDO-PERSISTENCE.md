@@ -1,100 +1,304 @@
 # Memory / Undo / Persistent Data
 
+These three topics look unrelated, but they meet at one architectural rule:
+
+> **state must have explicit owner, lifetime and failure semantics.**
+
 ## Undo
 
-**Suite:** `AEGP_UtilitySuite6`
+**Suite:** `AEGP_UtilitySuite6`.
 
-Каждая пользовательская mutation-команда должна выглядеть как одна операция:
+For user-visible project mutation, group semantic operation into one undo group where appropriate.
+
+Conceptual RAII shape:
 
 ```cpp
 class ScopedUndo {
 public:
-    ScopedUndo(AEGP_SuiteHandler& s, const char* name)
-        : suites_(s), active_(false)
-    {
-        if (suites_.UtilitySuite6()->AEGP_StartUndoGroup(name) == A_Err_NONE) {
-            active_ = true;
-        }
-    }
-
-    ~ScopedUndo() {
-        if (active_) {
-            suites_.UtilitySuite6()->AEGP_EndUndoGroup();
-        }
-    }
-
-    ScopedUndo(const ScopedUndo&) = delete;
-    ScopedUndo& operator=(const ScopedUndo&) = delete;
-
-private:
-    AEGP_SuiteHandler& suites_;
-    bool active_;
+    ScopedUndo(AEGP_UtilitySuite6* suite, const char* name);
+    A_Err Close();
+    ~ScopedUndo() noexcept;
 };
 ```
 
-В реальном codebase лучше сохранить ошибку EndUndoGroup через явный `Close()`; destructor не должен бросать exception.
+Destructor should not throw. If `EndUndoGroup` error matters, expose explicit `Close()` and preserve its result.
 
----
+## Undo is not transaction rollback
 
-## Host memory
-
-**Suite:** `AEGP_MemorySuite1`
-
-Если suite возвращает `AEGP_MemHandle`:
+Important:
 
 ```text
-lock
-→ use pointer briefly
+StartUndoGroup
+→ mutation A succeeds
+→ mutation B succeeds
+→ mutation C fails
+→ EndUndoGroup
+```
+
+does not mean A/B were automatically rolled back at the moment C failed.
+
+Product must decide partial-failure policy.
+
+## Validate before mutate
+
+Reduce partial changes:
+
+1. resolve all targets;
+2. validate legality/capabilities;
+3. compute pure plan;
+4. open undo;
+5. mutate.
+
+Do not discover obvious invalid input halfway through destructive batch.
+
+## Nested undo
+
+Do not assume your tool owns global undo context.
+
+Keep groups at semantic command boundary and avoid opening/closing groups in low-level helper functions that can be composed unpredictably.
+
+## Host memory handles
+
+**Suite:** `AEGP_MemorySuite1`.
+
+Common pattern:
+
+```text
+receive AEGP_MemHandle
+→ lock
+→ use/copy pointer briefly
 → unlock
 → FreeMemHandle
 ```
 
-Не:
+Never:
+
 - `free()`;
 - `delete`;
-- сохранять locked pointer;
-- передавать pointer в другой thread после unlock.
+- keep pointer after unlock;
+- move locked pointer to worker after unlock;
+- double-free handle.
 
----
+## Copy before async work
 
-## Native allocations
+If worker needs returned string/data:
 
-Ваш `new/delete`, `std::vector` и т.д. допустимы внутри вашего модуля, но не передавайте STL object через plug-in ABI/PICA generic bridge. Межмодульный ABI: POD + explicit ownership callbacks.
+```text
+lock host memory
+→ copy into std::string/vector/owned buffer
+→ unlock
+→ free host handle
+→ worker uses owned copy
+```
 
----
+Host handle and copied data have separate ownership.
+
+## Host refs vs memory handles
+
+Do not create one generic `DisposeAnything()` abstraction.
+
+Examples of different cleanup families:
+
+- `AEGP_MemHandle` → Memory Suite;
+- StreamRefH → Stream Suite;
+- EffectRefH → Effect Suite;
+- FrameReceiptH → Render Suite checkin;
+- FootageH → Footage adoption/dispose rules;
+- MaskRefH → Mask Suite;
+- PICA suite → ReleaseSuite.
+
+Type determines cleanup contract.
+
+## Product-native allocations
+
+`new/delete`, `std::vector`, smart pointers etc. are fine inside your module.
+
+But do not expose C++ standard-library objects across long-lived module ABI unless both sides deliberately share exact toolchain/runtime/allocator contract.
+
+Prefer C-shaped/versioned POD interface for independently versioned components.
 
 ## Persistent Data
 
-**Suite:** `AEGP_PersistentDataSuite4`
+**Suite:** `AEGP_PersistentDataSuite4`.
 
-Подходит для:
+Useful for:
+
 - preferences;
-- feature flags;
 - last-used settings;
-- migration version.
+- feature toggles;
+- migration version;
+- small product configuration.
 
-Не подходит для:
-- pointer;
-- host handle;
-- live layer/effect/stream ref;
-- секреты в plaintext без threat model.
+Not appropriate for:
 
-Ключи должны быть namespaced вашим vendor/product ID.
+- raw pointers;
+- host handles;
+- live layer/effect/stream refs;
+- frame receipt/world;
+- secrets without threat model;
+- huge cache blobs that can be rebuilt.
 
----
+## Namespace keys
+
+Use vendor/product namespace.
+
+Bad:
+
+```text
+lastPath
+version
+enabled
+```
+
+Better conceptual namespace:
+
+```text
+com.vendor.product/settings/schema
+com.vendor.product/ui/lastPath
+```
+
+Avoid collision with other components/products.
+
+## Persistent schema version
+
+Version your own stored data.
+
+```text
+schema version
+→ parse known version
+→ migrate
+→ write current version
+```
+
+Do not reinterpret old bytes/string format as new struct without migration.
+
+## Project state vs preferences
+
+Do not store project-essential render state only in global preferences.
+
+Ask:
+
+- should this travel with project?
+- should it be per-user?
+- can it be regenerated?
+- does it affect render output?
+
+Render-affecting state needs a host/project-visible persistence/dependency strategy, not a hidden preference.
+
+## Secrets
+
+PersistentData is not automatically secure secret storage.
+
+License token/credential design needs a separate threat model and platform storage strategy.
+
+Do not document plaintext preference storage as secure merely because API persists it.
+
+## Quiet errors
+
+Utility quiet-error APIs can suppress/report UI noise for expected operations, but they do not make failed host calls successful.
+
+Always inspect returned `A_Err`.
+
+Suppressed error UI and operation result are separate concerns.
 
 ## Error reporting
 
-Для AEGP пользовательское сообщение — через host Utility/Report API. Не показывать native modal alert из render thread.
+Inside product core use structured errors:
 
-Ошибки внутри core лучше представлять:
-
-```cpp
-struct Error {
-    int32_t domain;
-    int32_t code;
-    char message[256];
-};
+```text
+domain
+code
+context
+message
+cause
 ```
 
-и конвертировать в AE-facing `A_Err` только на boundary.
+At AE boundary convert to `A_Err` and optionally report user-facing context through supported host/UI layer.
+
+## First-error preservation
+
+Pattern:
+
+```text
+operation fails
+→ cleanup also fails
+```
+
+Usually preserve primary operation failure as main result and record cleanup error separately.
+
+Do not lose root cause because destructor cleanup returned another code.
+
+## C++ exception boundary
+
+Never let exception escape `extern "C"` / host callback.
+
+Use boundary guard:
+
+```text
+try implementation
+catch known error
+catch std::exception
+catch ...
+→ A_Err
+```
+
+## Threading
+
+Memory ownership does not imply thread permission.
+
+A product-owned buffer may be thread-safe to move to worker; a host ref/handle may not be legal to use there.
+
+Separate:
+
+- lifetime;
+- ownership;
+- thread-affinity.
+
+## Shutdown
+
+On shutdown:
+
+- stop new requests;
+- release product-owned global state;
+- drain/drop work by policy;
+- avoid host calls after lifetime;
+- do not rely on exceptions for cleanup.
+
+## RAII design
+
+Good RAII wrappers:
+
+- are move-only for unique ownership;
+- have explicit `release()` when ownership transfers;
+- never throw in destructor;
+- expose cleanup error when it materially matters;
+- encode correct cleanup family in type.
+
+Bad RAII wrapper:
+
+```text
+void* + one generic free callback for all AEGP resources
+```
+
+because semantic lifetime differs.
+
+## Product workflow
+
+1. Classify state.
+2. Define owner.
+3. Define cleanup pair.
+4. Define thread use.
+5. Define persistence/reload behavior.
+6. Define partial failure.
+7. Add RAII only after contract is understood.
+
+## Related chapters
+
+- [Memory/threading/errors](../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md)
+- [Undo transactions](../19-NATIVE-CODE-FOUNDATION/03-UNDO-TRANSACTIONS.md)
+- [RAII ownership](../19-NATIVE-CODE-FOUNDATION/02-RAII-OWNERSHIP.md)
+- [Host call boundary](../19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md)
+
+## Evidence boundary
+
+Suite families/ownership patterns are source-reviewed. Security/persistence architecture recommendations are product guidance unless tied to a specific host contract.
