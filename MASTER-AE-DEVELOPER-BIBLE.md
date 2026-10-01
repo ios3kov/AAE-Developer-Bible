@@ -4962,7 +4962,7 @@ Streams/properties, keyframes, masks, text/markers и footage/import тепер�
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Core contracts:** `AEIO_ModuleInfo`, frozen `AEIO_FunctionBlock4`, current host suites `AEGP_IOInSuite7` and `AEGP_IOOutSuite6`, registration through `AEGP_RegisterIO`.
-**Verification level:** SDK source-reviewed; no new AEIO binary or host import/export run in this editorial iteration.
+**Evidence level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
 
 AEIO — native I/O module for media that After Effects imports and/or exports. Это не effect renderer и не универсальный кодек API: module должен сам корректно распознавать, декодировать, кодировать и обслуживать свой format.
 
@@ -5152,30 +5152,425 @@ Production module должен различать:
 
 ## 15. Architecture
 
-Рекомендуемый слой:
+Recommended decomposition:
 
 ```text
 AEIO callback adapter
    ↓
-validated module/spec state
+validated InSpec/OutSpec state
    ↓
-decoder / encoder core
+format/codec service
    ↓
-bounded I/O abstraction
+bounded file/stream I/O
    ↓
-unit tests outside AE + host integration tests
+pure parser/decoder/encoder components
 ```
 
-Codec core лучше держать независимым от `AEIO_InSpecH`/`OutSpecH`: это облегчает fuzz/corruption tests и позволяет проверять формат без запуска AE.
+Keep codec/core logic independent from `AEIO_InSpecH` / `AEIO_OutSpecH` wherever practical.
 
-## 16. Host acceptance matrix
+Benefits:
 
-- clean registration and no duplicate module;
+- malformed-file tests outside AE;
+- deterministic decoder/encoder fixtures;
+- fuzz/property tests for parser boundaries;
+- no host handles inside long-lived codec objects;
+- easier cancellation and file-handle ownership;
+- easier reuse in helper tools.
+
+The AEIO adapter should translate host lifecycle into domain operations; it should not contain the complete codec implementation.
+
+## 16. Input state machine
+
+A production importer should model its live spec state explicitly.
+
+Example:
+
+```text
+UNINITIALIZED
+→ HEADER_PARSED
+→ LIVE_SPEC_READY
+→ SOURCE_OPEN / LAZY_SOURCE
+→ DISPOSING
+→ DISPOSED
+```
+
+State may contain:
+
+- copied canonical path;
+- parsed immutable header/index;
+- decoder configuration;
+- cache/index;
+- audio format;
+- color/alpha interpretation data;
+- product-owned file handle/reader;
+- cancellation generation.
+
+Do not put raw callback-local pointers into spec state.
+
+## 17. Live options vs flat options
+
+Treat these as different representations.
+
+### Live options
+
+Optimized for current process/session:
+
+- handles to product-owned parsed state;
+- normalized paths;
+- decoded metadata;
+- runtime cache configuration.
+
+### Flat options
+
+Disk/project-safe representation:
+
+- versioned;
+- endian/size explicit where relevant;
+- no raw pointers;
+- no file descriptors;
+- no process addresses;
+- no C++ vtables/STL object layout.
+
+Pattern:
+
+```text
+live options
+→ FlattenOptions
+→ versioned flat bytes
+
+flat bytes
+→ validate version/size
+→ InflateOptions
+→ reconstruct fresh live state
+```
+
+Unknown/corrupt future versions need an explicit recovery policy.
+
+Do not memcpy a live C++ struct as persistence format unless its byte layout is deliberately specified as the persisted schema.
+
+## 18. Random access and sparse frame semantics
+
+A host importer should assume frame requests can be:
+
+- non-monotonic;
+- repeated;
+- skipped;
+- sparse-region;
+- at different quality/scale;
+- cancelled.
+
+Do not build a decoder architecture that only works for:
+
+```text
+frame 0 → frame 1 → frame 2 → ...
+```
+
+unless the format genuinely requires sequential decoding and your module implements an explicit seek/index/cache strategy around that constraint.
+
+For compressed inter-frame media, product state may need:
+
+- keyframe/index map;
+- bounded decode cache;
+- seek/reset path;
+- deterministic repeated-frame behavior.
+
+Sparse draw should separate **requested output region** from **codec decode dependency**: decoder may need more source data than the final requested rect, but must only write within the host output contract.
+
+## 19. Required-region and scale discipline
+
+`required_region`, scale and output world layout are independent inputs.
+
+Do not infer:
+
+- full-frame dimensions from output rect;
+- contiguous rows from width;
+- 1:1 scale;
+- origin zero.
+
+All writes must respect `rowbytes`, output pixel format and requested/scaled coordinates.
+
+## 20. Cancellation
+
+Cancellation is a normal lifecycle event, not exceptional corruption.
+
+For decode/write loops:
+
+```text
+bounded unit of work
+→ check interrupt/cancel
+→ stop promptly
+→ close/release product-owned resources
+→ return cancellation result
+```
+
+Do not wait until a multi-gigabyte decode/write finishes before checking host cancellation.
+
+Cleanup after cancel should be idempotent: normal DisposeInSpec/EndAdding may still follow depending on host flow.
+
+## 21. Source file lifetime
+
+Decide whether the importer:
+
+- opens/closes per frame;
+- keeps a lazy shared reader in spec state;
+- caches only metadata/index and reopens data;
+- supports removable/network paths.
+
+If keeping file handles open:
+
+- own them explicitly;
+- close on DisposeInSpec and error;
+- define behavior when source disappears;
+- honor CloseSourceFiles callback semantics where applicable;
+- do not rely on current working directory.
+
+## 22. Importer selection and file verification
+
+`VerifyFileImportable` should be cheap, bounded and safe on untrusted input.
+
+Prefer a small sniff:
+
+```text
+open bounded prefix
+→ validate magic/version/basic shape
+→ answer importable/not importable
+```
+
+Do not fully decode the file in the verifier unless the format genuinely requires it.
+
+Wrong extension and valid signature policy should be deliberate.
+
+Malformed and merely unsupported files are different outcomes.
+
+## 23. Audio input
+
+Input audio path needs its own validated format contract:
+
+- sample rate;
+- channels;
+- sample size/encoding;
+- requested time/sample range;
+- destination layout;
+- conversion policy.
+
+Do not reuse video frame timing math blindly for audio sample offsets.
+
+If audio is not supported, do not advertise the module flag/callback path as though it is.
+
+## 24. Output state machine
+
+For sequence/container output:
+
+```text
+UNINITIALIZED
+→ OPTIONS_READY
+→ FILE_SELECTED
+→ ADDING
+→ FINALIZING
+→ FINALIZED
+```
+
+On failure/cancel, transition through cleanup rather than pretending `EndAdding` completed normally.
+
+State should track independently:
+
+- file opened?;
+- header written?;
+- frames written?;
+- audio started?;
+- trailer/index pending?;
+- temporary path/rename pending?;
+- finalization complete?.
+
+## 25. Atomic output strategy
+
+When format permits, safer output can use:
+
+```text
+write temporary product-owned file
+→ finalize successfully
+→ flush/close
+→ atomic/controlled rename to destination
+```
+
+This reduces half-valid outputs after cancellation/crash.
+
+It is not universally possible for every container/filesystem, so document format/product policy.
+
+Never overwrite an existing destination before you know your overwrite/recovery semantics.
+
+## 26. AddFrame / frame order
+
+Do not assume frames always arrive in monotonically increasing order unless callback/format contract guarantees it.
+
+If format requires sequential output:
+
+- validate frame order;
+- reject unsupported order clearly;
+- or buffer/reorder within bounded policy.
+
+Do not silently write frame N into slot N+1.
+
+## 27. Output audio
+
+For audio output define:
+
+- expected sample format;
+- chunk ordering;
+- sample/time conversion;
+- interleaving;
+- buffering;
+- finalization.
+
+A product that advertises audio must handle audio cancellation/write failure independently from video success.
+
+## 28. Metadata and markers
+
+If the module claims metadata/marker support:
+
+- define mapping between AE data and file schema;
+- preserve unknown metadata intentionally or explicitly drop it;
+- version your own metadata payloads;
+- define string encoding;
+- define marker timebase conversion;
+- avoid hidden lossy transformations.
+
+Metadata support is not “copy arbitrary blobs”.
+
+## 29. Auxiliary channels
+
+Aux data flow is a separate contract:
+
+```text
+enumerate semantic channels
+→ describe PF_ChannelDesc
+→ draw requested chunk
+→ host consumes
+→ FreeAuxChannel
+```
+
+Every allocation returned by `DrawAuxChannel` needs paired release semantics.
+
+Do not expose a file plane as Z-depth/Object ID merely because its byte layout resembles one; semantic descriptor matters.
+
+## 30. Color management
+
+Importer should make an explicit color interpretation decision.
+
+Possible source information:
+
+- embedded ICC;
+- assigned profile;
+- CICP;
+- non-RGB/native color model;
+- alpha interpretation;
+- field/interlace metadata.
+
+Do not apply color transform twice: either return pixels in the contract expected by AE and declare metadata accordingly, or use the documented conversion path.
+
+Exporter likewise needs to distinguish:
+
+- pixels AE hands to module;
+- output encoding color space;
+- file metadata/profile written.
+
+## 31. Error taxonomy
+
+Keep domain errors meaningful:
+
+| Class | Example |
+|---|---|
+| unsupported | valid format/version feature not supported |
+| corrupt | malformed/truncated/inconsistent file |
+| I/O | read/write/permission/network failure |
+| resource | allocation/decoder init failure |
+| cancel | user/host requested stop |
+| destination | disk full/name/overwrite failure |
+| host | suite/callback/contract failure |
+| cleanup | close/finalize/release failure |
+
+Do not report a disk failure as unsupported media.
+
+## 32. Failure cleanup
+
+For every callback that acquires product resources:
+
+```text
+acquire
+→ mark owned
+→ operation
+→ failure possible
+→ cleanup owned resources
+→ preserve primary error
+```
+
+Examples:
+
+- options MemHandle;
+- file handle;
+- decoder instance;
+- temp output file;
+- aux channel buffer;
+- metadata handle.
+
+## 33. Threading
+
+Do not infer thread safety from callback table stability.
+
+Codec core may be thread-safe while host suites are not, or vice versa.
+
+Document separately:
+
+- AEIO callback thread assumptions from exact contract;
+- decoder internal thread safety;
+- shared cache synchronization;
+- file-handle concurrency;
+- cancellation synchronization.
+
+Avoid holding product locks while calling opaque host APIs.
+
+## 34. Performance
+
+Measure separately:
+
+- file I/O;
+- parse/index;
+- decode;
+- color conversion;
+- scale/region copy;
+- audio conversion;
+- cache hit/miss;
+- encode;
+- flush/finalize.
+
+Do not optimize full-frame decode if host mostly requests sparse previews until profiling proves it matters.
+
+## 35. Security / untrusted media
+
+Validate before allocation/read:
+
+- dimensions;
+- counts;
+- offsets;
+- multiplication/overflow;
+- compressed sizes;
+- recursion/decompression limits;
+- metadata/string lengths;
+- chunk boundaries.
+
+Never trust file-provided sizes to fit platform integer types.
+
+## 36. Product validation guidance
+
+If a concrete importer/exporter claims these capabilities, useful runtime cases include:
+
+- clean registration and no module conflict;
 - supported/unsupported/corrupt files;
 - still and sequence;
-- random seek/sparse region;
-- 8/16/float output where claimed;
-- alpha/interlace/color-profile/CICP;
+- random seek / repeated frame;
+- sparse region and scale;
+- claimed pixel depths;
+- alpha/interlace/color profile/CICP;
 - aux channels + paired free;
 - audio input/output;
 - markers/user metadata if claimed;
@@ -5183,10 +5578,51 @@ Codec core лучше держать независимым от `AEIO_InSpecH`/
 - flatten/inflate/save/reopen;
 - cancellation;
 - disk full / permission denied;
-- missing/removable/network path if claimed;
-- repeated open/close without leaked options/files.
+- removable/network path if claimed;
+- repeated open/close without leaked state;
+- exporter finalization/recovery after failure.
 
-До этого source-reviewed chapter не является host-verified importer/exporter.
+These cases establish product support evidence. Bible remains SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED unless a separate runtime record exists.
+
+## 37. Production workflow
+
+### Importer
+
+```text
+define format/capabilities
+→ implement bounded verifier
+→ build pure parser/index
+→ define InSpec live state
+→ implement one deterministic frame
+→ add random/sparse access
+→ add options flatten/inflate
+→ add audio/metadata/aux as claimed
+→ add cancel/error cleanup
+→ optimize/cache
+```
+
+### Exporter
+
+```text
+define output schema/options
+→ OutSpec state
+→ select destination
+→ open temp/final target
+→ write deterministic frame
+→ add sequence/audio/metadata
+→ implement cancel/write-failure cleanup
+→ finalize atomically where possible
+→ verify produced file independently
+```
+
+## Related chapters
+
+- [AEIO native integration](04-AEIO/../14-NATIVE-INTEGRATIONS/08-AEIO.md)
+- [Footage / import](04-AEIO/../17-NATIVE-SUITE-COOKBOOK/09-FOOTAGE-IMPORT.md)
+- [Auxiliary channels](04-AEIO/../02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md)
+- [Memory / Undo / Persistent Data](04-AEIO/../17-NATIVE-SUITE-COOKBOOK/12-MEMORY-UNDO-PERSISTENCE.md)
+- [Lifetime / threading](04-AEIO/../17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md)
+- [Release checklist](04-AEIO/../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
 
 ## Source record
 
@@ -16758,7 +17194,79 @@ Current IOInSuite7 has explicit CICP input color-space setup in addition to ICC 
 
 Bible should not teach old IOInSuite4 as complete color-management baseline for AE 25.6.
 
-## 13. Verification boundary
+## 13. Spec state ownership
+
+Treat host spec and module state separately:
+
+```text
+AEIO_InSpecH / AEIO_OutSpecH
+= host-owned identity/context
+
+module options/private state
+= module-owned resource attached through IO suites
+```
+
+Do not free the host spec itself.
+
+Do free/close product-owned state according to the callback/options contract.
+
+A useful private-state record tracks:
+
+- initialization phase;
+- options schema version;
+- file/decoder owner;
+- cache owner;
+- cancellation generation;
+- cleanup-completed flag.
+
+This makes repeated/error disposal idempotent.
+
+## 14. Flatten / inflate boundary
+
+Flat options are persistence/transport representation, not live-state alias.
+
+They must not contain:
+
+- raw pointers;
+- file descriptors;
+- mutex objects;
+- STL object layout;
+- process-specific handles.
+
+Inflate validates version/size before reconstructing live state.
+
+If a product changes options schema, migration belongs here.
+
+## 15. Random/sparse callback assumptions
+
+The importer adapter must not assume monotonic frame requests unless the exact format/contract forces that architecture and the module implements seeking/caching.
+
+Treat time, scale, region and quality as explicit request inputs.
+
+If decoder needs temporal dependencies, keep that logic in decoder/index/cache state rather than inventing hidden AE frame-order guarantees.
+
+## 16. Callback cancellation and idempotent cleanup
+
+Any long callback should poll the provided interrupt/cancel mechanism at bounded intervals.
+
+On cancel:
+
+- stop creating new work;
+- release callback-local resources;
+- leave InSpec/OutSpec in a state that later Dispose/End cleanup can safely handle;
+- return cancellation distinctly from corrupt/unsupported data.
+
+Cleanup callbacks should tolerate partial initialization.
+
+## 17. Registration/refcon lifetime
+
+`AEGP_RegisterIO` receives module refcon that can connect callbacks to module-global services.
+
+That refcon must outlive every callback that uses it and be invalidated before product-global teardown.
+
+Do not point refcon at stack/local initialization storage.
+
+## 18. Verification boundary
 
 Source review can prove callback names, signatures and documented ownership. It cannot prove:
 
@@ -19731,7 +20239,7 @@ The source has architecture and safety intent, but it is not a standalone build.
 
 # AEIO registration working guide
 
-Status: **registration contract guide / complete AEIO still requires the official IO/FBIO sample**.
+Status: **registration/source guide; SDK 25.6 contract-reviewed; runtime result not claimed**.
 
 ## Why this is not a standalone implementation
 
@@ -19836,9 +20344,9 @@ Validate:
 
 A malformed file must fail cleanly instead of corrupting AE memory.
 
-## Testing milestone
+## Product validation milestone
 
-Do not label the AEIO working until at least one meaningful format path passes:
+A concrete importer/exporter should not claim a capability until its relevant path has product evidence. Useful cases include:
 
 - fresh import/export;
 - deterministic frame data;
@@ -19848,9 +20356,29 @@ Do not label the AEIO working until at least one meaningful format path passes:
 - project save/reopen;
 - cleanup/leak checks.
 
+## Options/spec ownership
+
+The registration layer should make the state boundary visible:
+
+```text
+host-owned InSpec/OutSpec
+↕
+module-owned options/private state
+↕
+decoder/encoder core
+```
+
+Live options and flattened options are different representations. Do not persist raw pointers or process-specific handles.
+
+## Cancellation/failure rule
+
+Registration-only source must not hide the fact that callbacks can be entered after partial initialization.
+
+Every callback family needs a safe failure/cleanup path, and spec disposal must tolerate partially-created module state.
+
 ## Verification boundary
 
-This guide preserves the registration contract without fabricating a stale full callback table. The exact SDK sample remains the project/function-block source of truth.
+This guide preserves the registration and lifecycle contract without fabricating a stale full callback table. The exact target SDK IO/FBIO sample remains the project/function-block source reference. Bible does not claim runtime importer/exporter behavior for this guide.
 
 
 ---
@@ -28989,7 +29517,7 @@ This entry intentionally remains guide-only until the exact Panelator-derived wo
 
 # AEIO reference workspace
 
-Status: **SDK sample workspace: IO/FBIO / runtime result not claimed**.
+Status: **IO/FBIO sample-derived workspace plan / RUNTIME-NOT-CLAIMED**.
 
 Materialize the licensed SDK sample with scripts/materialize_sdk_examples.py. The Bible does not publish a fake registration-only AEIO and call it working.
 
@@ -29084,7 +29612,7 @@ Validate sizes, counts, offsets, allocation arithmetic and file bounds before re
 
 Do not let a corrupt file crash the host.
 
-## Tests
+## Product validation cases
 
 ### Import
 
@@ -29108,9 +29636,23 @@ Do not let a corrupt file crash the host.
 - overwrite policy;
 - close/finalize failure.
 
+## Spec/options state
+
+When adapting IO/FBIO, make the state machine explicit before replacing callbacks:
+
+```text
+host spec
+→ attached live options/private state
+→ parser/decoder or encoder state
+→ flat options for persistence
+→ disposal/finalization
+```
+
+Do not replace parser, options ownership and frame I/O simultaneously; preserve a known reference shell while changing one layer at a time.
+
 ## Verification boundary
 
-This reference remains a materialized SDK workspace plan until a complete callback subset is compiled and exercised inside After Effects. Registration alone is explicitly not counted as completion.
+This is a source/workspace plan based on the licensed SDK samples. Registration alone is not a complete product implementation, but Bible does not require compiling/running this workspace for editorial completion. Runtime support is claimed only when a product has separate evidence.
 
 
 ---
