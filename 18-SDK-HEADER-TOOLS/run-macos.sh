@@ -23,6 +23,10 @@ python3 "$HERE/tools/ae_sdk_inventory.py" "$SDK_HEADERS" \
   --json "$OUT/ae-sdk-inventory.json" \
   --markdown "$OUT/ae-sdk-inventory.md"
 
+python3 "$HERE/tools/verify_required_contracts.py" \
+  "$OUT/ae-sdk-inventory.json" \
+  "$HERE/sdk25.6-required-contracts.json"
+
 python3 "$HERE/tools/verify_recipe_symbols.py" \
   "$OUT/ae-sdk-inventory.json" \
   "$HERE/../17-NATIVE-SUITE-COOKBOOK/code"
