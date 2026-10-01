@@ -121,19 +121,61 @@ protocol/result error
 
 Это три разные категории.
 
-## Testing
+## Product validation guidance
 
-Минимум:
+If a concrete product claims these service behaviors, useful runtime cases include:
 
 - provider missing;
 - wrong version;
 - correct version;
+- version fallback where supported;
 - repeated acquire/release;
 - two consumers;
 - provider function error;
 - malformed sizes;
 - consumer early-return cleanup;
-- AE restart;
-- заявленный concurrency mode.
+- declared concurrency mode;
+- shutdown/restart behavior only where the product claims it.
+
+These are product evidence cases, not Bible completion requirements.
+
+## Provider shutdown contract
+
+A published table and the service object behind it must have compatible lifetimes.
+
+Do not do:
+
+~~~text
+consumer still holds acquired table
+→ provider destroys service object
+→ function pointer remains callable
+→ call enters freed state
+~~~
+
+Provider should stop product-owned asynchronous work and ensure its own consumers release/stop before destroying backing service state.
+
+PICA reference counting alone is not documented as a universal hot-unload protocol.
+
+## Suite-name ownership
+
+An acquire/release owner that stores the suite-name pointer requires stable name storage for the entire acquisition.
+
+Use a static literal or other stable product-owned storage.
+
+Do not pass a temporary string buffer to an owner that will call ReleaseSuite later.
+
+## Version adapter pattern
+
+If consumer supports multiple public versions:
+
+~~~text
+Acquire v2
+→ unavailable
+→ Acquire v1
+→ wrap v1 in internal adapter
+→ rest of product uses one internal interface
+~~~
+
+Never reinterpret/cast an older suite table as a newer struct.
 
 Шаблон: [pica-shared-suite](../16-WORKING-TEMPLATES/pica-shared-suite/README.md).
