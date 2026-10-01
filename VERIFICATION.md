@@ -1,5 +1,16 @@
 # Verification — v1.1
 
+## Masks, text/markers and footage/import chapter review (2026-10-01)
+
+Rewrote [Masks](17-NATIVE-SUITE-COOKBOOK/07-MASKS.md), [Text + markers](17-NATIVE-SUITE-COOKBOOK/08-TEXT-MARKERS.md) and [Footage / import](17-NATIVE-SUITE-COOKBOOK/09-FOOTAGE-IMPORT.md) against the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/11-MASK-TEXT-FOOTAGE-SDK25.6.md) records six SDK/source hashes, current suite generations, sample ranges and ownership findings.
+
+The review corrects later-SDK leakage from the previous Cookbook: mask/text chapters now use `StreamSuite6`, and the footage baseline uses `CompSuite12` rather than later `CompSuite13`. Current reviewed families include MaskSuite6/MaskOutlineSuite3, TextDocumentSuite1, MarkerSuite3 and FootageSuite5.
+
+Reviewed contracts include MaskRef disposal even after deleting a mask; outline StreamValue lifetime; closed-mask vertex/tangent semantics and variable feather points; UTF-16 TextDocument MemHandle ownership and character counts; marker strings/cue-point handles, duration/flags/labels and the distinction between standalone marker allocation and a marker carried by StreamValue; FootageH caller ownership before adoption, project ownership after Add/Proxy/Replace, path MemHandle cleanup, sequence/layer keys, interpretation enum and proxy/placeholder/solid workflows.
+
+Official samples remain pattern evidence, not production ownership proof. `Projector` creates a mask in the reviewed function without an explicit DisposeMask even though the current header gives MaskRef a dispose contract; this is a source-level finding, not a measured host leak. `Projector`/`ProjDumper` pass `FALSE` where FootageSuite5 declares `AEGP_InterpretationStyle`; numerically that selects `NO_DIALOG_GUESS=0`, but new code should use the enum. Reviewed import sample error paths do not constitute complete RAII rollback proof for every NewFootage/adoption failure.
+
+**Verification level: SDK source review and documentation.** No new exact-SDK compilation, linked native binary, mask/text/marker mutation, actual footage import/proxy/relink, leak test, failure rollback run or Windows host verification was performed. Any green documentation CI for the resulting commit remains documentation/portable evidence only.
 ## Streams/properties and keyframes chapter review (2026-10-01)
 
 Expanded [Streams / properties / expressions](17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md) and [Keyframes](17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md) from the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md) records seven SDK file hashes, exact header/sample ranges and the reviewed Cookbook recipe blobs.
