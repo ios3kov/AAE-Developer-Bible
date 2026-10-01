@@ -2547,8 +2547,11 @@ Effect plug-in — основной путь, если инструмент до
 5. [Дополнительные каналы](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md): глубина, ID, нормали, descriptors, типы и сырые buffers.
 6. [Память, lifetime и ошибки](02-EFFECT-PLUGINS/../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md): owned/borrowed/transferred ресурсы, state handles, различия flattening, обязательный cleanup и ограничения существующих RAII helpers.
 7. [MFR и потокобезопасность](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md): действующие flags, пересечение selectors, read-only sequence state, mutable render copies и Compute Cache с точными режимами ожидания. Глава расширена по SDK; MFR-тесты не объявляются выполненными.
+8. [GPU effects](02-EFFECT-PLUGINS/05-GPU.md): capability chain, per-device state, GPU worlds, allocation ownership, framework/device boundaries and CPU↔GPU acceptance.
+9. [Audio effects](02-EFFECT-PLUGINS/07-AUDIO.md): audio selectors, SoundWorld, checkout/checkin, format/history semantics and missing bundled sample boundary.
+10. [Custom UI / Drawbot](02-EFFECT-PLUGINS/09-CUSTOM-UI-DRAWBOT.md): event lifecycle, Drawbot ownership, invalidation and async custom-UI boundary.
 
-[Первая сверка поставки](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md), [сверка параметров/пикселей](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md) и [сверка памяти/MFR](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/07-MEMORY-MFR-SDK25.6.md) содержат SHA-256, точные диапазоны источников и границы проверки. Расхождения комментариев и образцов сохраняются явно. Учебные фрагменты не являются новыми эталонными плагинами; обновление текста не закрывает сборку, загрузку и рендер примеров.
+[Первая сверка поставки](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md), [сверка параметров/пикселей](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md), [сверка памяти/MFR](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/07-MEMORY-MFR-SDK25.6.md) и [GPU/audio/Custom UI review](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md) содержат SHA-256, диапазоны источников и границы проверки. Расхождения комментариев и образцов сохраняются явно. Учебные фрагменты не являются новыми эталонными плагинами; обновление текста не закрывает сборку, загрузку и рендер примеров.
 
 ## Порядок разработки
 
@@ -6017,82 +6020,153 @@ Published suite лучше, когда нужен повторяемый сер�
 
 <!-- SOURCE: 14-NATIVE-INTEGRATIONS/04-EFFECTS.md -->
 
-# Effect plug-ins — полный native map
+# Effect plug-ins — native capability map
+
+Baseline for source-backed statements: **After Effects SDK 25.6 build 61**. Later-SDK notes must stay version-gated.
 
 ## Host contract
 
-After Effects инициирует всё через `EffectMain` и `PF_Cmd` selectors. `PF_InData` — входной host context; `PF_OutData` — capabilities/state обратно в AE; `PF_ParamDef[]` — parameters; `PF_LayerDef` / `PF_EffectWorld` — image buffers.
+After Effects enters an Effect plug-in through `EffectMain` and `PF_Cmd` selectors. `PF_InData`, `PF_OutData`, params, worlds and selector-specific `extra` structures have command-scoped contracts.
 
-## Категории поведения
+The effect family includes pixel/video, audio, SmartFX, GPU, custom UI and parameter supervision. Those are capabilities/paths of the Effect API, not separate plug-in types.
 
-### Registration / metadata
-- PiPL / runtime registration
-- display name, match name, category, version
-- out flags / out flags 2
-- current SDK 26.5 adds effect search keywords/description support in the current registration/PiPL model; exact macro/version сверять с current SDK.
+## Registration / metadata
 
-### Parameters
-- sliders/fixed/float
-- checkbox
-- angle
-- point / 3D point
-- color
-- popup
-- layer
-- button
-- arbitrary data
-- groups/topics
+- PiPL and runtime registration;
+- display name, match name, category, product version;
+- out_flags / out_flags2;
+- platform architecture entries;
+- flags that must agree between PiPL/global setup unless the documented override mechanism is intentionally used.
 
-### Render
-- classic `PF_Cmd_RENDER`
-- SmartFX pre-render/render
-- output resizing
-- layer checkout at arbitrary time
-- ROI/extent hints
-- iteration suites
-- 8/16/32-bpc paths
-- premultiplication / color management
+Later SDK registration additions are not silently applied to the 25.6 baseline.
 
-### Lifecycle state
-- global data: module-wide
-- sequence data: effect-instance state
-- frame data: render-local
-- parameters: AE-owned persistent project state
+## Parameters
 
-### UI/events
-- Effect Controls custom control
-- Composition/Layer overlay controls
-- Drawbot drawing
-- parameter supervision
+Standard parameter families include slider/fixed/float, checkbox, angle, point/3D point, color, popup, layer, button, arbitrary data and topics/groups.
 
-### Performance
-- MFR
-- host iterate suites
-- GPU render
-- async frame acquisition for passive custom UI in newer SDKs
+Parameter IDs/order are project compatibility state. UI flags, animation/interpolation and dynamic UI changes are separate concerns; see [Parameters and UI](14-NATIVE-INTEGRATIONS/../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md).
+
+## Classic render
+
+Classic `PF_Cmd_RENDER` is the simple pixel path. Correct code still respects:
+
+- actual dimensions;
+- rowbytes;
+- origin/extent;
+- bit depth;
+- alpha/premultiplication;
+- cancellation/progress where applicable.
+
+## SmartFX
+
+SmartFX separates dependency declaration from rendering:
+
+```text
+SMART_PRE_RENDER
+  request inputs/regions
+  declare result/max-result
+  create pre-render data
+      ↓
+SMART_RENDER
+  checkout pixels
+  process
+  check in / cleanup
+```
+
+See [SmartFX](14-NATIVE-INTEGRATIONS/../02-EFFECT-PLUGINS/03-SMARTFX.md).
+
+## GPU render
+
+SDK 25.6 adds a specific GPU lifecycle:
+
+```text
+GPU_DEVICE_SETUP
+SMART_PRE_RENDER (+ GPU_RENDER_POSSIBLE for this frame)
+SMART_RENDER_GPU
+GPU_DEVICE_SETDOWN
+```
+
+`PF_OutFlag2_SUPPORTS_GPU_RENDER_F32` is global capability; it does not by itself guarantee a GPU render for every frame.
+
+Per-device state and GPU world/memory ownership are documented in [GPU effects](14-NATIVE-INTEGRATIONS/../02-EFFECT-PLUGINS/05-GPU.md).
+
+## Audio
+
+Audio uses separate selectors:
+
+- AUDIO_SETUP;
+- AUDIO_RENDER;
+- AUDIO_SETDOWN.
+
+Audio semantics have dedicated flags for audio-only/video+audio, float-only, IIR and synthesis. SoundWorld/sample ranges are separate from pixel worlds.
+
+The supplied 25.6 archive contains the declarations but no bundled effect source that dispatches AUDIO_RENDER; see [Audio effects](14-NATIVE-INTEGRATIONS/../02-EFFECT-PLUGINS/07-AUDIO.md).
+
+## Custom UI / events
+
+Custom effect UI combines:
+
+```text
+PF_OutFlag_CUSTOM_UI
++ register_ui(PF_CustomUIInfo)
++ PF_Cmd_EVENT
+```
+
+Event contexts include Effect Controls and, when registered, Layer/Comp UI. Drawbot supplies host drawing primitives.
+
+Created Drawbot objects and borrowed drawing/supplier/surface references have different ownership. Modern custom UI needing rendered frames must also account for the async-manager contract.
+
+See [Custom UI / Drawbot](14-NATIVE-INTEGRATIONS/../02-EFFECT-PLUGINS/09-CUSTOM-UI-DRAWBOT.md).
+
+## Lifecycle state
+
+- `global_data`: module/effect global state;
+- `sequence_data`: effect-instance state;
+- render-thread/flattening rules depend on flags;
+- pre-render data: render request state with its own deletion callback;
+- GPU data: per-device effect-owned state returned through GPU setup;
+- parameters: AE-owned persistent project state.
+
+See [Memory/lifetime/errors](14-NATIVE-INTEGRATIONS/../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md).
+
+## MFR
+
+MFR is an execution model, not a second effect API. Declaring support changes concurrency expectations around render and sequence state.
+
+See [MFR/thread safety](14-NATIVE-INTEGRATIONS/../02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md).
 
 ## Data ownership rule
 
-| Data | Owner | Safe lifetime |
+| Data | Typical owner | Safe lifetime |
 |---|---|---|
-| `PF_InData*` | AE | current selector only |
-| `PF_ParamDef*` passed in | AE | current selector only |
-| `PF_EffectWorld` | AE | callback scope unless documented otherwise |
-| global/sequence handles allocated through AE | plug-in + AE handle system | documented lifecycle |
-| raw pointer inside locked handle | temporary | only while handle locked |
+| `PF_InData*` | AE | current selector |
+| passed parameter defs | AE | current selector unless API says otherwise |
+| host input/output world | AE | command/checkout lifetime |
+| plug-in-created GPU world | plug-in | until matching DisposeGPUWorld |
+| created Drawbot objects | plug-in | until ReleaseObject |
+| Drawbot supplier/surface from DrawRef | host/borrowed | event/context contract |
+| locked handle pointer | temporary | while locked |
+
+Exact ownership always comes from the specific suite/selector contract.
 
 ## Render determinism
 
-Effect output must be a deterministic function of declared dependencies. If render depends on hidden project state queried via AEGP, AE cache invalidation may be wrong. Do not use AEGP queries as invisible render inputs.
+Final pixels/audio must be a deterministic function of declared dependencies. Hidden project state queried through AEGP or native globals can break AE cache invalidation.
 
-## Minimal production rule
+Generic native bridge calls are control/service mechanisms, not a license to create invisible render dependencies.
 
-1. parameter IDs stable forever after release;
-2. match name stable forever;
-3. catch all C++ exceptions before `extern "C"` return;
-4. CPU path correct before GPU optimization;
-5. MFR declared only after stress test;
-6. suite calls from render thread only when explicitly safe.
+## Minimal production rules
+
+1. match name and released parameter IDs stay stable;
+2. exceptions never cross the C ABI;
+3. CPU reference correctness precedes GPU optimization;
+4. GPU capability is enabled only with correct per-frame fallback;
+5. MFR capability follows concurrency testing;
+6. custom UI does not block on synchronous frame renders;
+7. audio state does not assume strictly forward timeline requests;
+8. host/suite calls are made only from contexts where the target API permits them.
+
+Source review for GPU/audio/Custom UI: [15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md](14-NATIVE-INTEGRATIONS/../18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md).
 
 
 ---
