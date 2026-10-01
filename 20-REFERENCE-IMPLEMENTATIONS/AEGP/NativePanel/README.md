@@ -40,6 +40,14 @@ Define stable product identity separately from visible localized title.
 
 Do not use transient window handles or display strings as persistent object identity.
 
+## Container and child-view ownership
+
+The host supplies the workspace container; the product creates its own child UI/controller.
+
+Treat them as separate owners.
+
+Do not use the host container pointer as durable identity, and do not destroy it as product-owned UI.
+
 ## Lifetime
 
 Document:
@@ -83,7 +91,9 @@ Test panel recreation/reopen:
 
 Panel widget state must not become the only source of project truth.
 
-## Required host tests
+## Product validation cases
+
+If a concrete native-panel product claims these behaviors, useful runtime cases include:
 
 - registration;
 - create/open;
@@ -93,9 +103,11 @@ Panel widget state must not become the only source of project truth.
 - project command;
 - workspace change;
 - repeated close/open;
+- panel recreation while background work completes;
 - shutdown;
-- crash-free restart.
+- HiDPI/Retina/scaling;
+- macOS/Windows behavior where claimed.
 
 ## Verification boundary
 
-This entry intentionally remains guide-only until the exact Panelator-derived workspace is compiled and tested. A registration snippet alone is not a working native panel.
+This entry intentionally remains guide-only. A registration snippet alone is not a complete product panel, but Bible does not require compiling/running this workspace for editorial completion. Runtime support belongs to the concrete product's evidence.
