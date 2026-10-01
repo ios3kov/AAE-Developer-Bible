@@ -132,7 +132,7 @@ Worker после teardown не должен обращаться к unloaded co
 
 В debug log полезны thread ID, selector/callback, requestId, generation, lock wait duration, shutdown state.
 
-## 14. Acceptance tests
+## 14. Product validation cases
 
 - MFR on/off;
 - repeated multi-frame stress;
@@ -146,4 +146,6 @@ Worker после teardown не должен обращаться к unloaded co
 
 ## Verification boundary
 
-Глава объединяет source-reviewed MFR/AEGP/CEP contracts. Явно thread-safe функция не расширяет thread safety на соседние calls. Нового host stress run в этом editorial pass не выполнялось.
+Глава объединяет source-reviewed MFR/AEGP/CEP contracts и conservative architecture guidance. Явно thread-safe функция не расширяет thread safety на соседние calls.
+
+Перечисленные runtime cases относятся к concrete product support claims. Bible не требует собственного host stress run, если не заявляет такой observed result.
