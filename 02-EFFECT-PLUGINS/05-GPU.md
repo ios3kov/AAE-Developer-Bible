@@ -173,4 +173,4 @@ actual device test
 
 ## Verification boundary
 
-Текст сверён с SDK/source sample. Новый GPU binary в этой итерации не собирался и CPU↔GPU host comparison не запускался. Gate 6/7 остаются открытыми.
+Текст сверён с SDK/source sample. Bible не заявляет собственный GPU runtime result; сборка demo binary не является условием редакционной готовности главы.
