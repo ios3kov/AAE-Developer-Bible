@@ -109,13 +109,15 @@ Do not infer absence of all AE notification mechanisms from one negative probe. 
 
 ## Gate 4 — SDK verification
 
-- [ ] Required SDK 25.6 contract families parse without unresolved required declarations.
-- [ ] Parser diagnostics cannot masquerade as ABI/signature validation.
-- [ ] Recipes are checked by real compilation against the declared SDK.
-- [ ] Native source set compiles with strict warnings.
-- [ ] Tests cover malformed/partial/version/signature drift cases.
-- [ ] CI distinguishes portable synthetic checks from licensed-SDK checks.
-- [ ] Windows SDK validation is reproducible.
+**Status: OPEN. Portable tooling is hardened; fresh licensed-SDK compiler evidence is still required after the current source changes.**
+
+- [ ] Required SDK 25.6 contract families parse without unresolved required declarations. A fail-closed required-table/function manifest now exists; fresh exact-SDK inventory run remains required.
+- [x] Parser diagnostics cannot masquerade as ABI/signature validation. Inventory diagnostics, unsupported schema and malformed declarations are rejected by downstream verification.
+- [ ] Recipes are checked by real compilation against the declared SDK. Historical macOS SDK 25.6 syntax evidence exists, but current recipe sources must be recompiled.
+- [ ] Native source set compiles with strict warnings on the current revision. Historical macOS baseline does not automatically transfer after source changes.
+- [x] Tests cover malformed/partial/version/signature/suite-generation/required-contract drift cases.
+- [x] CI distinguishes portable synthetic checks from licensed-SDK checks and labels host boundaries explicitly.
+- [ ] Windows SDK validation is reproducible end-to-end. The PowerShell/MSVC runner and syntax checks exist; a real licensed-SDK MSVC run is still required.
 
 ## Gate 5 — Three host-verified references
 
