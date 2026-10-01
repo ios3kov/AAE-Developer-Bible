@@ -1,6 +1,6 @@
 # Minimal Gain effect — working template
 
-Status: **source implementation / SDK 25.6 macOS syntax-checked / host-test pending**.
+Status: **source example / SDK 25.6 contract-aligned; runtime result not claimed by Bible**.
 
 Requires C++17, the SDK utility sources and the official sample project/PiPL build configuration.
 
@@ -142,4 +142,4 @@ Do not turn the minimal template into every feature at once.
 
 ## Verification boundary
 
-Syntax/type checking is not load/render evidence. Record actual build/install/host results in VERIFICATION/evidence before changing host-test pending to PASS.
+Syntax/type checking is not load/render evidence. Only claim a build/install/host result when such evidence actually exists; Bible does not require generating that evidence for editorial completion.
