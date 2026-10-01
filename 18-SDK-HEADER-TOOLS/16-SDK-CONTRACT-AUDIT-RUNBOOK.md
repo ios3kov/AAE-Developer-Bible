@@ -1,6 +1,6 @@
 # SDK contract audit runbook
 
-> Historical filename retained for link compatibility. The former “Gate 4 compiler acceptance” completion model is superseded.
+> Canonical SDK contract-audit methodology for the current Bible editorial model. The former mandatory compiler/build completion-gate model is superseded.
 
 Target baseline: **Adobe After Effects SDK 25.6 build 61**.
 
