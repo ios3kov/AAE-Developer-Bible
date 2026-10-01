@@ -69,6 +69,85 @@ class CheckNativeTests(unittest.TestCase):
             self.assertEqual(count3, 2)
             self.assertNotEqual(digest1, digest3)
 
+    def _make_fake_tree(self, root: Path):
+        sdk = root / "sdk" / "Examples"
+        (sdk / "Headers" / "SP").mkdir(parents=True)
+        (sdk / "Util").mkdir(parents=True)
+        (sdk / "Headers" / "AE_Effect.h").write_text("/* fixture */", encoding="utf-8")
+        (sdk / "Util" / "AEGP_SuiteHandler.h").write_text("/* fixture */", encoding="utf-8")
+
+        source_dir = root / "16-WORKING-TEMPLATES" / "fixture"
+        source_dir.mkdir(parents=True)
+        (source_dir / "Fixture.cpp").write_text("int fixture = 1;", encoding="utf-8")
+
+        (root / "19-NATIVE-CODE-FOUNDATION" / "code").mkdir(parents=True)
+        (root / "17-NATIVE-SUITE-COOKBOOK" / "code").mkdir(parents=True)
+
+        compiler = root / "fake-clang"
+        compiler.write_text(
+            "#!/usr/bin/env python3\n"
+            "import sys\n"
+            "if '--version' in sys.argv:\n"
+            "    print('fake clang version 1.0')\n"
+            "    raise SystemExit(0)\n"
+            "raise SystemExit(0)\n",
+            encoding="utf-8",
+        )
+        compiler.chmod(0o755)
+        return sdk, compiler
+
+    def test_run_checks_emits_machine_readable_identity(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            sdk, compiler = self._make_fake_tree(root)
+
+            report, failures = check_native.run_checks(
+                sdk,
+                str(compiler),
+                "clang",
+                root=root,
+            )
+
+            self.assertEqual(failures, 0)
+            self.assertEqual(report["summary"]["status"], "PASS")
+            self.assertEqual(report["summary"]["translation_units"], 2)
+            self.assertEqual(report["sdk"]["header_count"], 2)
+            self.assertEqual(len(report["sdk"]["header_manifest_sha256"]), 64)
+            self.assertIn("fake clang version 1.0", report["compiler"]["identity"])
+            self.assertTrue(all(item["status"] == "PASS" for item in report["results"]))
+
+    def test_run_checks_reports_translation_unit_failure(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            sdk, compiler = self._make_fake_tree(root)
+            compiler.write_text(
+                "#!/usr/bin/env python3\n"
+                "import sys\n"
+                "if '--version' in sys.argv:\n"
+                "    print('fake clang version 1.0')\n"
+                "    raise SystemExit(0)\n"
+                "if any(arg.endswith('Fixture.cpp') for arg in sys.argv):\n"
+                "    print('fixture failure', file=sys.stderr)\n"
+                "    raise SystemExit(9)\n"
+                "raise SystemExit(0)\n",
+                encoding="utf-8",
+            )
+            compiler.chmod(0o755)
+
+            report, failures = check_native.run_checks(
+                sdk,
+                str(compiler),
+                "clang",
+                root=root,
+            )
+
+            self.assertEqual(failures, 1)
+            self.assertEqual(report["summary"]["status"], "FAIL")
+            failed = [item for item in report["results"] if item["status"] == "FAIL"]
+            self.assertEqual(len(failed), 1)
+            self.assertEqual(failed[0]["returncode"], 9)
+            self.assertIn("fixture failure", failed[0]["stderr_tail"])
+
     def test_empty_source_tree_fails_closed(self):
         with tempfile.TemporaryDirectory() as td:
             with self.assertRaises(ValueError):
