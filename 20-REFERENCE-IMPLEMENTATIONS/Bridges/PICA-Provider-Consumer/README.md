@@ -1,6 +1,6 @@
 # PICA provider ↔ consumer reference
 
-Status: **sample-derived / host-test-required**.
+Status: **sample-derived / runtime result not claimed**.
 
 SharedSuite.h forwards to the canonical shared ABI in 16-WORKING-TEMPLATES/pica-shared-suite.
 
@@ -113,4 +113,4 @@ Consumer follows the most conservative contract if unspecified.
 
 ## Verification boundary
 
-Sweetie/Checkout prove a provider/consumer pattern in the SDK, not this product ABI in the host. The Bible shared suite remains host-test-required until provider and consumer are compiled and exercised together.
+Sweetie/Checkout prove a provider/consumer pattern in the SDK, not this product ABI in the host. The Bible shared suite remains runtime result not claimed until provider and consumer are compiled and exercised together.
