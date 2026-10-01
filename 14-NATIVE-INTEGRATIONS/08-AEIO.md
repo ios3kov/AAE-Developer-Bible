@@ -192,7 +192,79 @@ Current IOInSuite7 has explicit CICP input color-space setup in addition to ICC 
 
 Bible should not teach old IOInSuite4 as complete color-management baseline for AE 25.6.
 
-## 13. Verification boundary
+## 13. Spec state ownership
+
+Treat host spec and module state separately:
+
+```text
+AEIO_InSpecH / AEIO_OutSpecH
+= host-owned identity/context
+
+module options/private state
+= module-owned resource attached through IO suites
+```
+
+Do not free the host spec itself.
+
+Do free/close product-owned state according to the callback/options contract.
+
+A useful private-state record tracks:
+
+- initialization phase;
+- options schema version;
+- file/decoder owner;
+- cache owner;
+- cancellation generation;
+- cleanup-completed flag.
+
+This makes repeated/error disposal idempotent.
+
+## 14. Flatten / inflate boundary
+
+Flat options are persistence/transport representation, not live-state alias.
+
+They must not contain:
+
+- raw pointers;
+- file descriptors;
+- mutex objects;
+- STL object layout;
+- process-specific handles.
+
+Inflate validates version/size before reconstructing live state.
+
+If a product changes options schema, migration belongs here.
+
+## 15. Random/sparse callback assumptions
+
+The importer adapter must not assume monotonic frame requests unless the exact format/contract forces that architecture and the module implements seeking/caching.
+
+Treat time, scale, region and quality as explicit request inputs.
+
+If decoder needs temporal dependencies, keep that logic in decoder/index/cache state rather than inventing hidden AE frame-order guarantees.
+
+## 16. Callback cancellation and idempotent cleanup
+
+Any long callback should poll the provided interrupt/cancel mechanism at bounded intervals.
+
+On cancel:
+
+- stop creating new work;
+- release callback-local resources;
+- leave InSpec/OutSpec in a state that later Dispose/End cleanup can safely handle;
+- return cancellation distinctly from corrupt/unsupported data.
+
+Cleanup callbacks should tolerate partial initialization.
+
+## 17. Registration/refcon lifetime
+
+`AEGP_RegisterIO` receives module refcon that can connect callbacks to module-global services.
+
+That refcon must outlive every callback that uses it and be invalidated before product-global teardown.
+
+Do not point refcon at stack/local initialization storage.
+
+## 18. Verification boundary
 
 Source review can prove callback names, signatures and documented ownership. It cannot prove:
 
