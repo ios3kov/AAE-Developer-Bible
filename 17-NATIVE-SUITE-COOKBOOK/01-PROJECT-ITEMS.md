@@ -1,151 +1,287 @@
 # Project + Item recipes
 
-**Suites:** `AEGP_ProjSuite6`, `AEGP_ItemSuite9`  
-**Confidence:** SDK-verified + sample-derived (`Projector`)
+**Primary Bible baseline:** Adobe After Effects SDK **25.6 build 61**.
 
-## Получить текущий project и root folder
+**Suites:** `AEGP_ProjSuite6`, `AEGP_ItemSuite9`.
+
+Project/Item APIs look simple, but they sit above the whole project graph. Treat structural mutation and identity carefully.
+
+## Project count and project root
+
+Conceptual pattern:
 
 ```cpp
-A_Err GetProjectRoot(
-    SPBasicSuite* pica,
-    AEGP_ProjectH* projectPH,
-    AEGP_ItemH* rootPH)
-{
-    A_Err err = A_Err_NONE;
-    AEGP_SuiteHandler suites(pica);
+A_long project_count = 0;
+ERR(suites.ProjSuite6()->AEGP_GetNumProjects(&project_count));
 
-    A_long project_count = 0;
-    ERR(suites.ProjSuite6()->AEGP_GetNumProjects(&project_count));
-
-    if (project_count < 1) {
-        return A_Err_GENERIC;
-    }
-
-    ERR(suites.ProjSuite6()->AEGP_GetProjectByIndex(0, projectPH));
-    ERR(suites.ProjSuite6()->AEGP_GetProjectRootFolder(*projectPH, rootPH));
-    return err;
+if (!err && project_count > 0) {
+    AEGP_ProjectH projectH = nullptr;
+    AEGP_ItemH rootH = nullptr;
+    ERR(suites.ProjSuite6()->AEGP_GetProjectByIndex(0, &projectH));
+    ERR(suites.ProjSuite6()->AEGP_GetProjectRootFolder(projectH, &rootH));
 }
 ```
 
-### Важно
+Do not hardcode the assumption “exactly one project” as a permanent API truth just because a historical sample did.
 
-В публичной HTML-документации встречается typo `AEGP_GetProjectProjectByIndex`. Фактическое имя в SDK/header bindings — `AEGP_GetProjectByIndex`.
+## Project handle
 
----
+`AEGP_ProjectH` is a host-owned project reference.
 
-## Обойти project items
+Do not:
+
+- free/delete it;
+- serialize its numeric pointer value;
+- use it as cross-session identity.
+
+If feature needs persistent product state, store your own schema/identifiers and re-resolve current project context.
+
+## Iterate project items
+
+Current ItemSuite9 contract:
+
+```text
+GetFirstProjItem(project)
+→ ItemH or null
+→ GetNextProjItem(project, current)
+→ next ItemH
+→ null after last item
+```
+
+Example:
 
 ```cpp
-A_Err VisitItems(
-    SPBasicSuite* pica,
-    AEGP_ProjectH projectH,
-    void (*visit)(AEGP_ItemH))
-{
-    A_Err err = A_Err_NONE;
-    AEGP_SuiteHandler suites(pica);
+AEGP_ItemH itemH = nullptr;
+ERR(suites.ItemSuite9()->AEGP_GetFirstProjItem(projectH, &itemH));
 
-    AEGP_ItemH itemH = nullptr;
-    ERR(suites.ItemSuite9()->AEGP_GetFirstProjItem(projectH, &itemH));
-
-    while (!err && itemH) {
-        visit(itemH);
-
-        AEGP_ItemH nextH = nullptr;
-        ERR(suites.ItemSuite9()->AEGP_GetNextProjItem(projectH, itemH, &nextH));
-        itemH = nextH;
-    }
-    return err;
+while (!err && itemH) {
+    // inspect itemH
+    AEGP_ItemH nextH = nullptr;
+    ERR(suites.ItemSuite9()->AEGP_GetNextProjItem(projectH, itemH, &nextH));
+    itemH = nextH;
 }
 ```
 
-Не удалять текущий `itemH` и затем слепо использовать старый `nextH`. Для destructive iteration сначала собрать stable IDs либо повторно получить graph.
+## Do not destructively mutate through a traversal cursor
 
----
+Bad pattern:
 
-## Узнать тип item
-
-```cpp
-AEGP_ItemType type = AEGP_ItemType_NONE;
-ERR(suites.ItemSuite9()->AEGP_GetItemType(itemH, &type));
-
-if (type == AEGP_ItemType_COMP) {
-    // composition
-}
+```text
+GetNext(current)
+→ delete current
+→ assume stored next remains valid forever
 ```
 
----
+Structural changes can invalidate graph assumptions.
 
-## Получить имя item
+For destructive batch:
 
-`AEGP_GetItemName` возвращает host memory handle. Его надо освободить через Memory Suite.
-
-Паттерн:
-
-```cpp
-AEGP_MemHandle nameH = nullptr;
-ERR(suites.ItemSuite9()->AEGP_GetItemName(
-    plugin_id,
-    itemH,
-    &nameH));
-
-if (!err && nameH) {
-    // lock/read with MemorySuite according to SDK sample
-    // ...
-    ERR2(suites.MemorySuite1()->AEGP_FreeMemHandle(nameH));
-}
+```text
+first pass: collect stable product targets / item IDs
+→ end traversal
+→ second pass: re-resolve/validate current graph
+→ mutate
 ```
 
-Не сохранять указатель, полученный после lock, после unlock/free.
+## Item types
 
----
+`AEGP_GetItemType` distinguishes comp/folder/footage and other item categories.
 
-## Переименовать item
+Always inspect type before calling type-specific APIs.
 
-```cpp
-const A_UTF16Char new_name[] = { 'R','e','n','a','m','e','d',0 };
-ERR(suites.ItemSuite9()->AEGP_SetItemName(itemH, new_name));
+Do not infer type from:
+
+- display name;
+- extension;
+- Project panel icon;
+- parent folder.
+
+## Item name ownership
+
+`AEGP_GetItemName` returns an `AEGP_MemHandle` containing null-terminated UTF-16 text and the header explicitly says it must be freed through Memory Suite.
+
+Pattern:
+
+```text
+GetItemName
+→ MemHandle
+→ lock
+→ copy/use
+→ unlock
+→ FreeMemHandle
 ```
 
-На практике используйте собственный UTF-8→UTF-16 helper, а не ASCII initializer.
+Do not retain locked pointer after unlock/free.
 
----
+## Rename item
 
-## Создать folder
+`AEGP_SetItemName` takes null-terminated UTF-16 and is undoable.
 
-Фактический header contract для современных SDK:
+Convert product/user strings deliberately. Do not build real Unicode names with ASCII initializer shortcuts.
+
+## Item ID
+
+`AEGP_GetItemID` returns an `A_long` item ID.
+
+Useful role:
+
+```text
+current ItemH
+→ item ID
+→ product command/snapshot
+```
+
+Current ItemSuite9 does **not** provide a generic `GetItemFromID` lookup in the reviewed header.
+
+So to resolve a stored item ID later, a product may need to traverse current project items and compare IDs.
+
+Do not document Item ID as a magical cross-project/cross-session database key unless the API guarantees that boundary.
+
+## Create folder
+
+Current contract:
 
 ```cpp
 AEGP_ItemH folderH = nullptr;
 ERR(suites.ItemSuite9()->AEGP_CreateNewFolder(
     utf16_name,
-    parent_folderH,   // nullptr → root where API permits
+    parent_folderH0,
     &folderH));
 ```
 
-В части публичной HTML-документации исторически встречалась лишняя `projH`-позиция. Проверять установленный `AE_GeneralPlug.h`.
+Header marks returned folder as allocated/owned by AE.
 
----
+Do not free it as product memory.
 
-## Удалить item
+Historical public HTML has shown an extra project-handle argument in some renderings. Exact SDK header wins.
 
-```cpp
-ERR(suites.ItemSuite9()->AEGP_DeleteItem(itemH));
-itemH = nullptr; // не использовать после удаления
-```
+## Parent folder
 
-После structural mutation re-query graph.
+Use Item Suite to query/set item parent folder where the operation is supported.
 
----
+Before moving many items:
 
-## Практический pattern: найти comp по item ID
+- validate target folder;
+- avoid accidental self/descendant logic where relevant;
+- capture targets before structural mutation;
+- re-query graph after mutation.
 
-Лучше сохранять `AEGP_ItemID`, а не `AEGP_ItemH`.
+## Delete item
+
+`AEGP_DeleteItem` is undoable and header says it removes the item from all compositions.
+
+After successful delete:
 
 ```text
-iterate current project items
-→ GetItemID()
-→ compare stable stored ID
+ItemH is no longer a valid target
+→ drop it
+→ re-query project graph
+```
+
+Deletion can therefore have wider project impact than “remove one row from Project panel”.
+
+## Current time is not render time
+
+`AEGP_GetItemCurrentTime` returns item native time and header notes it is **not updated while rendering**.
+
+Do not use Project-panel current time as render-time truth.
+
+Render workflows should use explicit render context/options time.
+
+## Native timespaces
+
+`AEGP_GetItemDuration` uses the item's native time space:
+
+- comp → comp time;
+- footage → footage time;
+- folder → zero duration.
+
+Do not compare `A_Time` values from different domains without conversion.
+
+## Dimensions/PAR
+
+Item dimensions and pixel aspect are useful metadata, but not every item category has the same semantic meaning.
+
+Validate type before using dimensions as raster-source assumptions.
+
+## Selection
+
+`AEGP_GetActiveItem`, selection APIs and Project-panel selection are UI state.
+
+Use them to start a command, then normalize explicit target identity.
+
+Do not let background work depend on a borrowed “whatever is active now” handle.
+
+## New/Open project operations
+
+Project Suite has operations that can create/open projects and may affect currently opened project state.
+
+Treat them as high-impact commands:
+
+- explicit user intent;
+- dirty-project policy;
+- save/close implications;
+- UI state;
+- failure handling.
+
+Do not hide project replacement inside a helper named `EnsureProject()`.
+
+## Undo vs dangerous project operations
+
+Ordinary item rename/move/delete can be undoable.
+
+Opening/replacing project is a different class of lifecycle transition. Do not assume Undo group protects project-open semantics.
+
+## Batch graph workflow
+
+Recommended:
+
+```text
+resolve project
+→ traverse and normalize target IDs/types
+→ build pure plan
+→ validate current state
+→ StartUndoGroup
+→ re-resolve target ItemH
+→ mutate
+→ drop host refs
+→ return fresh project summary
+```
+
+## Failure modes
+
+Plan for:
+
+- no project;
+- item deleted/renamed meanwhile;
+- wrong item type;
+- invalid parent folder;
+- Unicode/path conversion failure;
+- partial batch mutation;
+- user changes active project/item during async work.
+
+## Product pattern: find item by stored ID
+
+Because current Item Suite exposes `GetItemID` but not a generic direct item-ID resolver in the reviewed table:
+
+```text
+stored item ID
+→ traverse current project
+→ GetItemID(each)
+→ compare
 → use fresh ItemH
 ```
 
-Это устойчивее к большинству изменений project graph.
+Cache an index only as an optimization, never as authoritative identity.
+
+## Related chapters
+
+- [Compositions](02-COMPOSITIONS.md)
+- [Layers](03-LAYERS.md)
+- [Footage/import](09-FOOTAGE-IMPORT.md)
+- [Memory/undo/persistence](12-MEMORY-UNDO-PERSISTENCE.md)
+- [Project/render automation](../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md)
+
+## Evidence boundary
+
+`ProjSuite6`/`ItemSuite9` declarations and ownership comments are SDK-contract-reviewed against SDK 25.6. Runtime behavior of a particular project-management product is not claimed by this recipe.
