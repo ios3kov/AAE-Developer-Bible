@@ -119,3 +119,21 @@ Compile report сохраняет aggregate SDK-header manifest SHA-256, compile
 ## Inventory compatibility guard
 
 `verify_recipe_symbols.py` и `diff_sdk_inventory.py` принимают только поддерживаемую `schema_version=1` и отклоняют malformed/empty function declarations. Signature/order drift покрыт portable regression tests. Старый/неполный JSON нельзя использовать как скрытый источник зелёной проверки.
+
+
+## Required SDK 25.6 contract manifest
+
+`sdk25.6-required-contracts.json` is a fail-closed minimum baseline for the current Bible edition.
+
+It pins contract-table generations used by the reviewed chapters and native examples, including AEGP project/item/comp/layer/effect/stream/keyframe/render families, AEIO, Artisan, panels, GPU, Custom UI/Drawbot and PICA. High-risk tables also list required functions.
+
+`verify_required_contracts.py` fails when:
+
+- a required table is absent;
+- a required function is absent from its pinned table;
+- the inventory schema is unsupported;
+- parser diagnostics make the inventory incomplete.
+
+This prevents a parser run from becoming green merely because it returned *some* tables.
+
+The manifest is **necessary, not sufficient** evidence. Real compiler and host gates still follow.
