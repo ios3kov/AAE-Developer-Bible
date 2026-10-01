@@ -114,6 +114,9 @@ class CheckNativeTests(unittest.TestCase):
             self.assertEqual(report["sdk"]["header_count"], 2)
             self.assertEqual(len(report["sdk"]["header_manifest_sha256"]), 64)
             self.assertIn("fake clang version 1.0", report["compiler"]["identity"])
+            self.assertEqual(report["source"]["git_sha"], None)
+            self.assertEqual(report["source"]["dirty"], None)
+            self.assertTrue(all(len(item["source_sha256"]) == 64 for item in report["results"]))
             self.assertTrue(all(item["status"] == "PASS" for item in report["results"]))
 
     def test_run_checks_reports_translation_unit_failure(self):
