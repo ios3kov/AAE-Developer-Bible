@@ -279,4 +279,4 @@ Bible itself does not need to build every combination listed in examples. When B
 - [macOS](../08-MACOS/README.md)
 - [Windows](../09-WINDOWS/README.md)
 - [Testing](../10-TESTING/README.md)
-- [Distribution](../11-DISTRIBUTION/README.md)
+- [Distribution](../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
