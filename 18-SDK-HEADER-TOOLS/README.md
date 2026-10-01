@@ -137,3 +137,8 @@ It pins contract-table generations used by the reviewed chapters and native exam
 This prevents a parser run from becoming green merely because it returned *some* tables.
 
 The manifest is **necessary, not sufficient** evidence. Real compiler and host gates still follow.
+
+
+## Gate 4 acceptance
+
+The exact acceptance criteria and evidence-retention rules are in [Gate 4 — exact SDK acceptance runbook](16-GATE4-ACCEPTANCE-RUNBOOK.md).
