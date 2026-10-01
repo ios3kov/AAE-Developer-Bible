@@ -135,19 +135,99 @@ AEGP сначала должен получить `AEGP_EffectRefH`, вызва�
 
 Не смешивайте их. Ошибка доставки/host call и «команда дошла, но provider отказал» — разные состояния.
 
-## 11. Приёмка собственного bridge
+## 11. Product validation guidance
 
-Проверять:
+If a concrete product claims bridge behavior, useful runtime cases include:
 
-- target effect отсутствует;
+- target effect missing;
 - wrong protocol version;
 - short payload;
 - unknown opcode;
 - valid request/response;
-- target effect disabled/reordered/removed;
-- правильное layer-time значение;
+- target disabled/reordered/removed;
+- correct layer-time conversion;
 - repeated calls;
-- save/reopen, если protocol влияет на persistent state;
-- отсутствие render-cache stale behavior.
+- save/reopen only when protocol affects persistent state;
+- no stale render cache when render-affecting state changes.
+
+These are product evidence cases, not Bible completion requirements.
+
+## 12. Target resolution and stale refs
+
+Resolve `AEGP_EffectRefH` as late as practical for each semantic command.
+
+Do not let panel/background work hold one EffectRef across arbitrary project edits.
+
+Recommended:
+
+~~~text
+stable product target identity
+→ host-safe command starts
+→ resolve current layer/effect
+→ acquire caller-owned EffectRef
+→ generic call
+→ dispose EffectRef
+~~~
+
+If the effect is removed/reordered while an async request is pending, reject/re-resolve rather than calling a stale ref.
+
+## 13. Protocol evolution
+
+Treat message version as product ABI.
+
+For a new incompatible message:
+
+- bump version;
+- validate `size` before optional fields;
+- keep reserved fields zero/defined;
+- define whether old caller/new effect combinations fail or degrade;
+- do not reinterpret shorter V1 storage as larger V2 without size checks.
+
+For additive tails:
+
+~~~text
+if size >= offset + field_size:
+    read optional field
+else:
+    use documented default
+~~~
+
+## 14. Reentrancy and callback work
+
+A generic call is synchronous, but effect code may still call host APIs or product services.
+
+Avoid holding a product mutex across `AEGP_EffectCallGeneric` if the effect-side command can re-enter another product path needing the same lock.
+
+Keep COMPLETELY_GENERAL handlers bounded; do not turn a synchronous control call into a hidden long-running worker join/network operation.
+
+## 15. Persistent vs transient commands
+
+Transient command examples:
+
+- ping;
+- invalidate runtime cache;
+- request diagnostics.
+
+Persistent state change:
+
+- must map to project/effect-visible persistent state if the result must survive save/reopen;
+- should not live only in a global service object changed by generic call.
+
+A generic call is a transport, not a persistence model.
+
+## 16. Anti-patterns
+
+Avoid:
+
+- saving `effect_extraPV` beyond return;
+- storing EffectRef forever;
+- passing comp time as layer time by assumption;
+- STL/C++ object ABI;
+- using generic call as a multi-consumer service bus;
+- hidden render-affecting mutable state;
+- treating host `A_Err` success as domain-command success;
+- blocking long-running work inside the synchronous call.
+
+## Related
 
 Связанный шаблон: [effect-aegp-generic-bridge](../16-WORKING-TEMPLATES/effect-aegp-generic-bridge/README.md).
