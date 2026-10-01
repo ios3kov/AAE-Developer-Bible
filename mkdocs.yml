@@ -171,8 +171,8 @@ nav:
       - "Workflow: от SDK headers до рабочего recipe": 18-SDK-HEADER-TOOLS/02-INVENTORY-WORKFLOW.md
       - "SDK diff policy": 18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md
       - "Header-first rules": 18-SDK-HEADER-TOOLS/04-HEADER-FIRST-RULES.md
-      - "SDK contract audit runbook": 18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md
-      - "SDK 25.6 real-header audit record": 18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md
+      - "SDK contract audit runbook": 18-SDK-HEADER-TOOLS/16-SDK-CONTRACT-AUDIT-RUNBOOK.md
+      - "SDK 25.6 real-header audit record": 18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md
       - "SDK Header Tools — полный native API без ручного копирования": 18-SDK-HEADER-TOOLS/README.md
   - 19-NATIVE-CODE-FOUNDATION:
       - "Suite acquisition": 19-NATIVE-CODE-FOUNDATION/01-SUITE-ACQUISITION.md
