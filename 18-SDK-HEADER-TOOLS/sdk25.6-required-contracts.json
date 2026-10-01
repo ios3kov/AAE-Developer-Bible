@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "target_sdk": "Adobe After Effects SDK 25.6 build 61",
+  "purpose": "Minimum contract tables required by the current Bible source-review and native examples. Presence is necessary, not sufficient for ABI/runtime acceptance.",
+  "required_tables": [
+    {
+      "name": "AEGP_RegisterSuite5",
+      "area": "AEGP registration/hooks"
+    },
+    {
+      "name": "AEGP_CommandSuite1",
+      "area": "AEGP menu commands"
+    },
+    {
+      "name": "AEGP_UtilitySuite6",
+      "area": "AEGP utility/undo"
+    },
+    {
+      "name": "AEGP_ProjSuite6",
+      "area": "projects"
+    },
+    {
+      "name": "AEGP_ItemSuite9",
+      "area": "project items"
+    },
+    {
+      "name": "AEGP_CompSuite12",
+      "area": "compositions"
+    },
+    {
+      "name": "AEGP_LayerSuite9",
+      "area": "layers"
+    },
+    {
+      "name": "AEGP_EffectSuite4",
+      "area": "effects/generic bridge"
+    },
+    {
+      "name": "AEGP_StreamSuite6",
+      "area": "streams"
+    },
+    {
+      "name": "AEGP_DynamicStreamSuite4",
+      "area": "dynamic streams"
+    },
+    {
+      "name": "AEGP_KeyframeSuite5",
+      "area": "keyframes"
+    },
+    {
+      "name": "AEGP_MaskSuite6",
+      "area": "masks"
+    },
+    {
+      "name": "AEGP_MaskOutlineSuite3",
+      "area": "mask outlines"
+    },
+    {
+      "name": "AEGP_TextDocumentSuite1",
+      "area": "text"
+    },
+    {
+      "name": "AEGP_MarkerSuite3",
+      "area": "markers"
+    },
+    {
+      "name": "AEGP_FootageSuite5",
+      "area": "footage/import"
+    },
+    {
+      "name": "AEGP_RenderQueueSuite1",
+      "area": "render queue"
+    },
+    {
+      "name": "AEGP_RQItemSuite3",
+      "area": "render queue items"
+    },
+    {
+      "name": "AEGP_OutputModuleSuite4",
+      "area": "output modules"
+    },
+    {
+      "name": "AEGP_RenderSuite4",
+      "area": "frame rendering"
+    },
+    {
+      "name": "AEGP_IOInSuite7",
+      "area": "AEIO input specs"
+    },
+    {
+      "name": "AEGP_IOOutSuite6",
+      "area": "AEIO output specs"
+    },
+    {
+      "name": "AEIO_FunctionBlock4",
+      "area": "AEIO callbacks"
+    },
+    {
+      "name": "PR_ArtisanEntryPoints",
+      "area": "Artisan callbacks"
+    },
+    {
+      "name": "AEGP_CanvasSuite8",
+      "area": "Artisan canvas"
+    },
+    {
+      "name": "AEGP_ArtisanUtilSuite1",
+      "area": "Artisan utility"
+    },
+    {
+      "name": "AEGP_PanelSuite1",
+      "area": "native panels"
+    },
+    {
+      "name": "PF_GPUDeviceSuite1",
+      "area": "GPU effects"
+    },
+    {
+      "name": "PF_EffectCustomUISuite1",
+      "area": "custom UI drawing reference"
+    },
+    {
+      "name": "DRAWBOT_DrawbotSuite1",
+      "area": "Drawbot root"
+    },
+    {
+      "name": "DRAWBOT_SupplierSuite1",
+      "area": "Drawbot resources"
+    },
+    {
+      "name": "DRAWBOT_SurfaceSuite1",
+      "area": "Drawbot surface"
+    },
+    {
+      "name": "DRAWBOT_PathSuite1",
+      "area": "Drawbot paths"
+    },
+    {
+      "name": "SPBasicSuite",
+      "area": "PICA acquire/release"
+    },
+    {
+      "name": "SPSuitesSuite",
+      "area": "PICA suite provider"
+    }
+  ]
+}
