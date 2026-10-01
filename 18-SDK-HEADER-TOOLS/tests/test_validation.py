@@ -82,6 +82,39 @@ class ValidationTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 diff.load(path)
 
+    def test_suite_handler_generation_must_match_inventory_table(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "test.cpp"
+            path.write_text("suites.TestSuite1()->AEGP_Known();")
+
+            good = {
+                "schema_version": 1,
+                "unparsed_candidate_tables": {},
+                "partial_candidate_tables": {},
+                "tables": [{
+                    "name": "AEGP_TestSuite1",
+                    "functions": [{
+                        "name": "AEGP_Known",
+                        "signature": "A_Err (*AEGP_Known)(void);",
+                    }],
+                }],
+            }
+            checked, unknown = verify.verify(good, [path])
+            self.assertEqual(checked, 1)
+            self.assertEqual(unknown, [])
+
+            wrong_generation = {
+                **good,
+                "tables": [{
+                    "name": "AEGP_TestSuite2",
+                    "functions": good["tables"][0]["functions"],
+                }],
+            }
+            checked, unknown = verify.verify(wrong_generation, [path])
+            self.assertEqual(checked, 1)
+            self.assertEqual(len(unknown), 1)
+            self.assertIn("expected AEGP_TestSuite1", unknown[0][2])
+
     def test_inventory_schema_version_is_enforced(self):
         data = {
             "schema_version": 999,
