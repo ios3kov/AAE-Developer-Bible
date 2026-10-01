@@ -1,3 +1,11 @@
+## Gate 3 post-close consistency correction — 3D Channel Extract (2026-10-01)
+
+A follow-up consistency scan after the recorded Gate 3 closure found two stale planning statements, not new runtime evidence. The master effect list still defaulted every entry to TO VERIFY, and the execution plan still placed 3D Channel Extract under the original HOST-BUILTIN-first pilot wording.
+
+Both were reconciled with the already-retained binary evidence: macOS AE 25.6 contains the physical `Aux_Channel_Extract.plugin` module, so the current pilot classification is SHIPPED-PLUGIN. The earlier absent/HOST-BUILTIN interpretation remains preserved only as a superseded historical hypothesis. FLT evidence remains host-dispatch/subsystem evidence.
+
+**Verification level: documentation consistency correction using existing evidence.** No new AE execution, binary capture or algorithm acceptance was performed.
+
 # Verification — v1.1
 
 ## Testing, recipes and templates editorial review (2026-10-01)

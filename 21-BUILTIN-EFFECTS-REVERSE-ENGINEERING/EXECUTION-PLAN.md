@@ -66,15 +66,15 @@ Display Name
 
 Первый результат должен быть полной таблицей всех эффектов, даже если часть строк остаётся `UNKNOWN`.
 
-## Phase 3 — HOST-BUILTIN first
+## Phase 3 — classify first, then follow the implementation class
 
-Первый приоритет — эффекты, доказанно встроенные в host.
+Изначальный план ставил первым приоритетом доказанные HOST-BUILTIN эффекты и использовал **3D Channel Extract** как первый pilot. Этот pilot уточнил саму методику: более широкий filesystem/binary review доказал отдельный Adobe module `Aux_Channel_Extract.plugin` на macOS AE 25.6.
 
-Начальная очередь следует `MASTER-EFFECT-LIST.md`.
+Поэтому ранняя рабочая гипотеза `3D Channel Extract = HOST-BUILTIN` **superseded**. Текущая macOS classification для этого pilot: **SHIPPED-PLUGIN**. FLT остаётся evidence host-side dispatch/subsystem, но не заменяет найденный physical module.
 
-Первый target: **3D Channel → 3D Channel Extract**.
+Для каждого следующего target сначала фиксировать classification, и только затем выбирать analysis path.
 
-Для HOST-BUILTIN анализировать:
+Для доказанного HOST-BUILTIN:
 
 ```text
 After Effects executable/framework
@@ -89,6 +89,8 @@ After Effects executable/framework
 → threading/memory
 → reconstructed render pipeline
 ```
+
+Для SHIPPED-PLUGIN начинать с фактического `.plugin` / `.aex` module, его identity/hash/entry points/resources и только затем связывать его с host dispatch infrastructure.
 
 ## Phase 4 — static analysis
 
@@ -220,4 +222,4 @@ Build the macOS installation scanner and generate the first:
 
 mapping.
 
-Then begin the first full analysis with **3D Channel Extract**.
+Continue the **3D Channel Extract** pilot as a **SHIPPED-PLUGIN** analysis from the proven `Aux_Channel_Extract.plugin` module, while keeping FLT findings as separate host-dispatch evidence.

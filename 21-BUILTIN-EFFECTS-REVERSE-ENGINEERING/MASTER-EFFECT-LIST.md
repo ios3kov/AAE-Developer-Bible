@@ -2,13 +2,13 @@
 
 Source baseline: Adobe After Effects Effect List, updated **2026-05-13**.
 
-**Binary mapping status for every entry below:** `TO VERIFY FROM INSTALLED AE` until a macOS/Windows installation is inspected.  
-**Match name status:** `TO VERIFY FROM INSTALLED AE`.
+**Default binary mapping status:** `TO VERIFY FROM INSTALLED AE` unless an entry is explicitly annotated below.  
+**Default match-name status:** `TO VERIFY FROM INSTALLED AE` unless an entry is explicitly annotated below.
 
-This is the queue for binary-first reverse engineering. Names and categories follow Adobe's current effect catalog.
+This is the queue for binary-first reverse engineering. Names and categories follow Adobe's current effect catalog. Proven pilot results are annotated in place so the master list does not contradict the evidence records.
 
 ## 3D Channel
-- 3D Channel Extract
+- **3D Channel Extract** — macOS AE 25.6: **PROVEN SHIPPED-PLUGIN**, module `Aux_Channel_Extract.plugin`, match name `ADBE AUX CHANNEL EXTRACT`. Full algorithm/runtime acceptance remains open; Windows mapping remains TO VERIFY.
 - Cryptomatte
 - Depth Matte
 - Depth of Field
