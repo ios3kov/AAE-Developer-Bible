@@ -11,7 +11,7 @@
     latestRequestId = requestId;
 
     var req = {
-      version: 1,
+      protocol: 1,
       requestId: requestId,
       command: command,
       payload: payload || {}
