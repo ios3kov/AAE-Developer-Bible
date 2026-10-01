@@ -173,3 +173,14 @@ This is a **syntax/type** check. It deliberately does not call it a plugin build
 3. MenuTool: successful command execution, menu updates, failed initialization and shutdown.
 4. Recipes: disposable project operations, undo, stream/keyframe ownership and render receipt cleanup. Correct and test the queue-status argument noted above; a syntax-only check is insufficient.
 5. Record AE build, SDK, OS/architecture, sample base and actual observed result before upgrading a status to host-verified.
+
+
+## Scripting/panels communication and platform distribution review (2026-10-01)
+
+Expanded the production bridge guidance in [CEP panel <-> ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md) and [Native <-> script/panel](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md). The bridge now has an explicit versioned request/response envelope, centralized dispatcher, undo ownership, batching guidance, stale-response handling, cancellation limits, large-payload transport boundaries, state ownership, IPC versioning, failure behavior and security checks.
+
+Added end-to-end release-flow chapters for [macOS](08-MACOS/09-PRODUCTION-BUILD-PIPELINE.md) and [Windows](09-WINDOWS/09-PRODUCTION-BUILD-PIPELINE.md). They connect clean checkout, pinned toolchains, architecture/resource checks, signing, packaging, clean-machine installation, AE load tests, symbols and artifact manifests without changing the verification level of existing examples.
+
+Added [release artifacts, installers and update strategy](11-DISTRIBUTION/05-RELEASE-ARTIFACTS-UPDATES.md), covering release-set identity, installer ownership, upgrade/rollback, staged auto-update, download integrity and compatibility/support metadata.
+
+**Verification level: documentation/architecture review only.** No new CEP panel was executed in AE, no ExtendScript dispatcher was host-tested, no macOS release binary was signed/notarized in this update, no Windows binary was Authenticode-signed, no installer was built, and no clean-machine AE load cycle was performed. These chapters define the required production process; they do not close completion-plan host/build gates.
