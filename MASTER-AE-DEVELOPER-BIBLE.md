@@ -15164,7 +15164,7 @@ Updated: **2026-10-01**. Previously recorded native compilation baseline: **Adob
 
 ## Current work — writing the Bible from the supplied SDK
 
-The supplied `ae25.6_61.64bit.AfterEffectsSDK` is the basis of five source-review records:
+The supplied `ae25.6_61.64bit.AfterEffectsSDK` is the basis of eight source-review records:
 
 1. [Effect anatomy, SmartFX and auxiliary channels](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md).
 2. [Parameters and pixels](18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md).
@@ -15173,6 +15173,7 @@ The supplied `ae25.6_61.64bit.AfterEffectsSDK` is the basis of five source-revie
 5. [AEGP project and render automation](18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md).
 6. [Streams and keyframes](18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md).
 7. [Masks, text/markers and footage/import](18-SDK-HEADER-TOOLS/11-MASK-TEXT-FOOTAGE-SDK25.6.md).
+8. [AEIO and Artisan](18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md).
 
 Completed editorial changes:
 
@@ -15186,6 +15187,7 @@ Completed editorial changes:
 - [AEGP project/render automation](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md): project/item/comp/layer handles, Undo, render queue, frame receipts, async lifetime and an open render-state recipe mismatch.
 - **Streams/properties and keyframes:** Cookbook chapters 05/06 are now aligned to SDK 25.6 `StreamSuite6` / `DynamicStreamSuite4` / `KeyframeSuite5`; expressions, dynamic hierarchy, separated dimensions, interpolation/ease and batch-keyframe ownership are documented with source limits.
 - **Masks, text/markers and footage/import:** Cookbook chapters 07–09 now use SDK 25.6 generations (`MaskSuite6`, `MaskOutlineSuite3`, `TextDocumentSuite1`, `MarkerSuite3`, `FootageSuite5`, `ItemSuite9`, `CompSuite12`, `LayerSuite9`) and document MaskRef cleanup, UTF-16 handle lifetimes, marker payload/cue-point ownership and FootageH adoption/failure cleanup.
+- **AEIO and Artisan:** import/export and custom-renderer chapters now document `AEIO_ModuleInfo`, frozen `AEIO_FunctionBlock4`, current IOIn7/IOOut6, aux-channel producer callbacks, output state, color metadata, `PR_ArtisanEntryPoints`, CanvasSuite8, PR global/instance/frame state and Artie sample-generation limits.
 - [Registration, PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md): separate registration/dispatcher/initializer contracts, resource Kind, symbols, architectures, version domains, outflags and platform resource pipelines.
 - [AEGP lifecycle, hooks and suites](03-AEGP/01-HOOKS-SUITES.md): IDs/refcons, suite macros, callbacks and partial initialization; the existing MenuTool is reviewed, not changed or host-verified.
 - [AEGP project and render automation](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md): project graph and time, Undo versus rollback, queue states and invalidation, output settings, frame receipts, borrowed worlds, sync/async cancellation and cache boundaries.
@@ -15201,7 +15203,7 @@ Earlier source findings remain in the linked records: ten-file memory/MFR review
 
 This is documentation and SDK source-review work within the agreed subject matter of [the completion plan](COMPLETION-PLAN.md). It does not complete stages 3–4 or bypass outstanding safety, reuse-audit, compiler and host gates. **Native readout-adapter development remains paused; the deliverable is the Bible, not a separate testing product.** No new user AE run is requested.
 
-**Next editorial block: AEIO and Artisan**, against supplied headers and official samples. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
+**Next editorial block: native panels / BlitHook / remaining integration families**, after the AEIO/Artisan source pass. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
 
 ## Earlier baseline evidence
 
