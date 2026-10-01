@@ -1,5 +1,17 @@
 # Verification — v1.1
 
+## GPU, audio and Custom UI / Drawbot chapter review (2026-10-01)
+
+Expanded [GPU effects](02-EFFECT-PLUGINS/05-GPU.md), [Audio effects](02-EFFECT-PLUGINS/07-AUDIO.md), added [Custom UI / Drawbot](02-EFFECT-PLUGINS/09-CUSTOM-UI-DRAWBOT.md), and aligned the Effect capability map to the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md) records relevant header/sample hashes and line ranges.
+
+GPU review distinguishes global capability from per-frame GPU_RENDER_POSSIBLE, per-device setup/setdown state, GPU framework/device identity, GPUDeviceSuite allocation/world ownership and the bundled SDK_Invert_ProcAmp lifecycle. Source presence is not treated as proof every CUDA/OpenCL/DirectX/Metal branch is buildable or available on every target.
+
+Audio review records AUDIO_SETUP/RENDER/SETDOWN, audio capability flags, PF_SoundWorld, sample formats and checkout/checkin. A source search of the supplied Examples tree found no bundled C/C++ effect implementation dispatching PF_Cmd_AUDIO_RENDER; therefore the chapter does not invent a sample-backed DSP lifecycle or scheduling guarantee.
+
+Custom UI review records PF_Cmd_EVENT, event contexts, PF_CustomUIInfo, PF_EffectCustomUISuite, Drawbot supplier/surface borrowed ownership versus created-object ReleaseObject, Custom_ECW_UI/CCU patterns and the documented async-manager requirement for rendered UI frames after the UI/render-thread split.
+
+**Verification level: SDK source review and documentation.** No new GPU binary, device setup/render, CPU↔GPU comparison, audio processing host run, custom UI interaction, async-manager lifecycle, Drawbot leak test, HiDPI/theme test or Windows host run was performed. Gate 4/6/7 remain open.
+
 ## PICA providers, Effect↔AEGP and legacy-boundary chapter review (2026-10-01)
 
 Expanded [PICA suites](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md), [AEGP → Effect](15-COMMUNICATION/03-AEGP-TO-EFFECT.md), [Plug-in → Plug-in PICA](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md), [legacy/native boundaries](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) and the two existing bridge-template READMEs from the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md) records 13 SDK/source hashes and exact ranges.
