@@ -33132,6 +33132,21 @@ Checked and reconciled as one logical block:
 - worker/main-thread split, MFR shared-state rules, mutex/host-call deadlock risk and shutdown order are documented;
 - Native C++ foundation docs now state exactly what stub tests prove and no longer imply Bible needs host QA to be editorially complete.
 
+### Effects / streams / keyframes block — completed 2026-10-01
+
+Checked and reconciled as one logical block:
+
+- current SDK 25.6 effect baseline is `AEGP_EffectSuite5`;
+- canonical `EffectStreamRecipes.cpp` now uses `EffectSuite5`, while historical Suite4 references remain explicitly compatibility-only;
+- `AegpEffectRefOwner` and portable foundation stub/test now use `AEGP_EffectSuite5`;
+- streams remain aligned to `AEGP_StreamSuite6` + `AEGP_DynamicStreamSuite4`;
+- keyframes remain aligned to `AEGP_KeyframeSuite5`;
+- stream/property chapter now includes recommended mutation workflow and explicit failure modes;
+- keyframe chapter now includes recommended keyframer workflow, failure modes and product-validation guidance;
+- Effect↔AEGP bridge template/reference corrected from stale “current EffectSuite4” wording to current `EffectSuite5`;
+- Keyframer template/reference no longer treats host tests as a Bible completion requirement;
+- source-review records preserve old blob provenance and add a later consistency note instead of rewriting history.
+
 ## E. Recipes and reference source
 
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
@@ -34380,6 +34395,15 @@ Completed as a single cookbook/foundation block:
 - Native C++ foundation suite acquisition / RAII / undo / host callback boundary docs.
 
 The block now uses one consistent model for ownership, cleanup, invalidation, thread permission, persistence, partial failure and shutdown.
+
+### Effects / streams / keyframes
+
+Completed as one source/cookbook/reference block:
+
+- `EffectSuite5` current baseline reconciled across cookbook, canonical recipe, ownership helper and Effect↔AEGP bridge docs;
+- `StreamSuite6` / `DynamicStreamSuite4` retained as SDK 25.6 stream baseline;
+- `KeyframeSuite5` retained as SDK 25.6 keyframe baseline;
+- source examples, Keyframer references and product-validation language aligned with `EDITORIAL-GUIDE.md`.
 
 ## Current editorial TODO
 
