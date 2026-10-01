@@ -21757,7 +21757,7 @@ This template documents the transaction/source shape. Exact KeyframeSuite signat
 
 # Native dockable panel registration — Panelator-shaped template
 
-Status: **registration drop-in**. Platform painting/view implementation remains macOS/Windows-specific.
+Status: **registration/source template; SDK 25.6 contract-reviewed; runtime result not claimed**. Platform painting/view implementation remains macOS/Windows-specific.
 
 Use the official SDK `Panelator` sample as the base. The reusable registration sequence is:
 
@@ -21787,6 +21787,73 @@ panel_suite->AEGP_RegisterCreatePanelHook(
 `CreatePanelHook` receives the host container view, panel handle and function table to fill. Keep `stable_match_name` unlocalized and unchanged across releases because AE uses it to identify the panel/workspace state.
 
 The actual native view class is deliberately not faked here: Cocoa/AppKit and Win32/platform view code differs, so clone the matching current Panelator platform implementation and replace only your UI logic.
+
+
+## Ownership model
+
+Treat the objects separately:
+
+~~~text
+stable match name          product/global identity
+AEGP_PanelH                host panel context
+AEGP_PlatformViewRef       borrowed host container
+panel refcon               product-owned per-panel controller/state
+child NSView/HWND widgets  product-owned according to platform UI contract
+~~~
+
+Do not destroy the host workspace container from product code.
+
+Do not use the platform pointer or localized title as persistent panel identity.
+
+## Create hook rollback
+
+CreatePanelHook should publish the output function table/refcon only after the product-owned panel state is coherent.
+
+If child UI/controller creation fails:
+
+- destroy only product-owned partial state;
+- do not destroy host-owned panel/container objects;
+- do not return a dangling refcon;
+- keep global registration state valid for a later create attempt.
+
+## Close / recreate
+
+Design the panel so close/reopen constructs a fresh view/controller projection.
+
+Persistent state belongs in:
+
+- AE project data when it is project truth;
+- product settings when it is a user/product preference;
+- a long-lived product service when explicitly designed.
+
+It should not live only in widget pointers.
+
+## Unregister / shutdown
+
+A conservative order:
+
+~~~text
+stop new product work
+→ invalidate per-panel async generations
+→ destroy product-owned child UI/controller state
+→ stop workers/helpers that can target the panel
+→ UnRegisterCreatePanelHook when appropriate
+→ release global panel services
+~~~
+
+The existence of UnRegisterCreatePanelHook does not prove it destroys already-created child UI for the product.
+
+## Threading
+
+Platform UI events should hand semantic commands to a controller/service.
+
+Heavy compute can run on workers using product-owned data, but AEGP project mutation should return through the documented host-safe path.
+
+Do not retain borrowed NSView/HWND/AEGP refs in worker jobs without an explicit contract.
+
+## Evidence boundary
+
+This template captures the current registration/identity/lifecycle contract. Bible does not claim a runtime panel result for the template; a concrete product supplies runtime evidence for the behavior it promises.
 
 
 ---
@@ -28357,7 +28424,7 @@ Panelator integrates Window menu command with ToggleVisibility/IsShown and popul
 
 ### Panelator lifetime finding
 
-Reviewed `Panelator.cpp` allocates global `Panelator` with `new` and registers command/update/create hooks, but does not show a destructor/unregister/death-hook teardown path in that source. This is a source limitation, **not a measured leak/crash**. Production native-panel example still needs explicit create/destroy/unregister/shutdown acceptance.
+Reviewed `Panelator.cpp` allocates global `Panelator` with `new` and registers command/update/create hooks, but does not show a destructor/unregister/death-hook teardown path in that source. This is a source limitation, **not a measured leak/crash**. A concrete native-panel product should define create/destroy/unregister/shutdown behavior explicitly. The source review itself does not claim those runtime results.
 
 ### Identity recommendation
 
@@ -28394,6 +28461,45 @@ EMP sample MyBlit returns success with no pixel work; death is a cleanup comment
 | macOS/Windows host matrix | NOT RUN |
 
 Next editorial work can cover shared PICA suite providers and legacy/native boundaries; runtime/product evidence remains separate from Bible editorial readiness.
+
+## Later Panels / BlitHook production-guidance update — 2026-10-01
+
+A later logical block completed the production-architecture layer without changing the SDK 25.6 source baseline.
+
+### Native Panels
+
+The later pass adds/reconciles:
+
+- global registration state versus per-panel controller/model versus platform child-view state;
+- host-owned `AEGP_PanelH` / `AEGP_PlatformViewRef` versus product-owned child UI;
+- create-hook partial-failure rollback;
+- conservative child-destroy → worker-stop → unregister → global-teardown order;
+- stable match-name identity separated from localized title and transient NSView/HWND;
+- panel recreation/state recovery;
+- worker → host/UI-safe handoff with generation rejection;
+- resize/dock/workspace/HiDPI state as transient view state;
+- product-validation wording consistent with `EDITORIAL-GUIDE.md`.
+
+No Panelator source evidence was found that proves a complete teardown/unregister sequence; that limitation remains preserved.
+
+### BlitHook
+
+The later pass adds/reconciles:
+
+- callback pixel pointer treated as borrowed unless a stronger verified lifetime contract exists;
+- safe synchronous-copy/staging architecture for post-callback consumers;
+- row-aware copy and overflow/size validation;
+- explicit blank-frame handling;
+- bounded queue/backpressure/drop policy;
+- copied view-coordinate metadata;
+- display/color boundary versus effect/render/export pixels;
+- async flag/receipt/completion preserved as an under-qualified protocol path rather than inventing pointer lifetime;
+- worker/IPC ownership and death-hook shutdown order;
+- product-validation wording rather than mandatory Bible host testing.
+
+The staging/backpressure design is a conservative product architecture recommendation. It is **not** presented as an Adobe-documented asynchronous BlitHook contract.
+
+**Evidence level after this pass:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
 
 
 ---
@@ -30259,6 +30365,14 @@ Define stable product identity separately from visible localized title.
 
 Do not use transient window handles or display strings as persistent object identity.
 
+## Container and child-view ownership
+
+The host supplies the workspace container; the product creates its own child UI/controller.
+
+Treat them as separate owners.
+
+Do not use the host container pointer as durable identity, and do not destroy it as product-owned UI.
+
 ## Lifetime
 
 Document:
@@ -30302,7 +30416,9 @@ Test panel recreation/reopen:
 
 Panel widget state must not become the only source of project truth.
 
-## Required host tests
+## Product validation cases
+
+If a concrete native-panel product claims these behaviors, useful runtime cases include:
 
 - registration;
 - create/open;
@@ -30312,12 +30428,14 @@ Panel widget state must not become the only source of project truth.
 - project command;
 - workspace change;
 - repeated close/open;
+- panel recreation while background work completes;
 - shutdown;
-- crash-free restart.
+- HiDPI/Retina/scaling;
+- macOS/Windows behavior where claimed.
 
 ## Verification boundary
 
-This entry intentionally remains guide-only until the exact Panelator-derived workspace is compiled and tested. A registration snippet alone is not a working native panel.
+This entry intentionally remains guide-only. A registration snippet alone is not a complete product panel, but Bible does not require compiling/running this workspace for editorial completion. Runtime support belongs to the concrete product's evidence.
 
 
 ---
