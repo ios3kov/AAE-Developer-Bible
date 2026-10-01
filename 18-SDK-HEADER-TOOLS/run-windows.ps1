@@ -30,6 +30,11 @@ py (Join-Path $Here "tools\ae_sdk_inventory.py") `
   --markdown $Markdown
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+py (Join-Path $Here "tools\verify_required_contracts.py") `
+  $Inventory `
+  (Join-Path $Here "sdk25.6-required-contracts.json")
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
 py (Join-Path $Here "tools\verify_recipe_symbols.py") `
   $Inventory `
   (Join-Path $Here "..\17-NATIVE-SUITE-COOKBOOK\code")
