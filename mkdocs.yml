@@ -172,6 +172,7 @@ nav:
       - "SDK diff policy": 18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md
       - "Header-first rules": 18-SDK-HEADER-TOOLS/04-HEADER-FIRST-RULES.md
       - "Gate 4 — exact SDK acceptance runbook": 18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md
+      - "Gate 4 — SDK 25.6 real-header run": 18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md
       - "SDK Header Tools — полный native API без ручного копирования": 18-SDK-HEADER-TOOLS/README.md
   - 19-NATIVE-CODE-FOUNDATION:
       - "Suite acquisition": 19-NATIVE-CODE-FOUNDATION/01-SUITE-ACQUISITION.md
