@@ -25123,7 +25123,7 @@ Current source is **SDK 25.6 syntax/type-checked**; linking, host execution and 
 - `BibleAegpCommon.h` — no-throw undo guard.
 - `ProjectItemRecipes.cpp` — project/root/item traversal.
 - `CompLayerRecipes.cpp` — create comp, enumerate layers, LayerID lookup; lifetime must follow the applicable SDK contract.
-- `EffectStreamRecipes.cpp` — find/apply effect, read/write scalar stream.
+- `EffectStreamRecipes.cpp` — find/apply effect through current SDK 25.6 `EffectSuite5`, read/write scalar stream through `StreamSuite6`.
 - `KeyframeRecipes.cpp` — batch keyframe transaction pattern.
 - `RenderRecipes.cpp` — checkout/get-world/checkin pattern.
 - `RenderQueueRecipes.cpp` — add comp, re-query queue, set output path, queue the item with the named enum and verify state by readback.
@@ -25144,7 +25144,7 @@ This closes the **source-level argument-selection defect**. It does **not** prov
 
 ## Verification label
 
-**Historical SDK 25.6 macOS syntax/type baseline; linking and host tests pending.** The enum-selection source defect has been corrected, but this revised source has not yet been promoted to host-verified queue behavior.
+**Evidence boundary:** historical SDK 25.6 syntax/type evidence exists for an earlier source snapshot. Current recipes are SOURCE EXAMPLES / SDK-CONTRACT-REVIEWED where noted; Bible does not claim runtime results unless a separate runtime record exists. The render-queue enum defect is corrected at source level.
 
 Команда и результаты: [VERIFICATION.md](17-NATIVE-SUITE-COOKBOOK/code/../../VERIFICATION.md). Сохраните relative includes к `19-NATIVE-CODE-FOUNDATION` или перенесите helpers вместе с recipes. Host callbacks, вызывающие recipes, должны иметь exception boundary.
 
@@ -26393,6 +26393,22 @@ GitHub Validate проверяет итоговый committed documentation tree
 
 После streams/keyframes логично сверить masks, text/markers и footage/import ownership и продолжить редакционный coverage sweep. Compiler/host evidence для отдельных examples остаётся optional evidence, а не completion gate.
 
+## Later cookbook consistency update — 2026-10-01
+
+A later editorial block reconciled the canonical Effect/Stream/Keyframe source material with the already-established SDK 25.6 baseline.
+
+Changes after the original source review:
+
+- `EffectStreamRecipes.cpp` was updated from the compatibility `EffectSuite4()` accessor to current `EffectSuite5()`;
+- `AegpEffectRefOwner` and its portable stub/test were updated from `AEGP_EffectSuite4` to `AEGP_EffectSuite5`;
+- Streams remain on `StreamSuite6` / `DynamicStreamSuite4`;
+- Keyframes remain on `KeyframeSuite5`;
+- Keyframer/bridge documentation now uses product-validation guidance instead of mandatory Bible host-test language.
+
+The original blob hashes above remain provenance for the earlier review snapshot. They are not rewritten retroactively.
+
+This update is source/editorial consistency work. No runtime result is claimed.
+
 
 ---
 
@@ -26793,7 +26809,7 @@ Date: **2026-10-01**. Source: user-supplied `ae25.6_61.64bit.AfterEffectsSDK`.
 
 ## Place in the completion plan
 
-This review continues documentation/source-contract work. It does **not** close Gate 2, 3A, 4, 5, 6, 7 or 8. In particular, PICA provider/consumer and Effect↔AEGP remain host-pending integration families.
+This review is documentation/source-contract evidence. PICA provider/consumer and Effect↔AEGP runtime behavior is **not claimed** unless a separate runtime record exists; lack of such a run is not a Bible completion gate.
 
 The SDK TAR SHA-256 was recalculated as:
 
@@ -26936,7 +26952,7 @@ NOT RUN in this iteration:
 - missing/wrong-version behavior in AE;
 - refcount/unload behavior;
 - generic call to a Bible effect;
-- timebase host test;
+- layer-time conversion/runtime behavior, if a concrete product claims it;
 - provider/consumer concurrency;
 - restart/shutdown stress;
 - exact-SDK compilation of the two Bible bridge templates;
@@ -34727,3 +34743,27 @@ A Linux-container compiler experiment against the exact headers was also run onl
 **Editorial consequence:** required-contract parsing is PASS for the current SDK baseline. macOS/Xcode or Windows/MSVC compilation may be performed as optional evidence for specific source examples, but is not required for Bible completion.
 
 Full record: [18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md](18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md).
+
+
+## Effects / streams / keyframes consistency block (2026-10-01)
+
+The canonical AEGP operation chain was reconciled as one block:
+
+```text
+Layer
+→ EffectSuite5
+→ StreamSuite6 / DynamicStreamSuite4
+→ KeyframeSuite5
+```
+
+Current-source corrections:
+
+- `17-NATIVE-SUITE-COOKBOOK/code/EffectStreamRecipes.cpp` now uses current SDK 25.6 `EffectSuite5` instead of the older compatibility `EffectSuite4`;
+- `AegpEffectRefOwner` and its foundation stub/test now use `AEGP_EffectSuite5`;
+- the Effect↔AEGP working/reference docs were corrected from stale “current EffectSuite4” wording to `EffectSuite5`;
+- stream/keyframe chapters retain `StreamSuite6`, `DynamicStreamSuite4`, and `KeyframeSuite5`;
+- “required host tests / host acceptance matrix” wording was replaced with product-validation guidance consistent with `EDITORIAL-GUIDE.md`.
+
+The earlier source-review blob hashes remain historical provenance for the earlier snapshots. They are not retroactively relabeled.
+
+**Verification level:** source/editorial consistency plus existing portable source tests. No new AE runtime result is claimed.
