@@ -355,3 +355,34 @@ Current-source corrections:
 The earlier source-review blob hashes remain historical provenance for the earlier snapshots. They are not retroactively relabeled.
 
 **Verification level:** source/editorial consistency plus existing portable source tests. No new AE runtime result is claimed.
+
+
+## Masks / text / markers / footage ownership block (2026-10-01)
+
+The cookbook ownership block was reconciled around the already-reviewed SDK 25.6 contracts.
+
+Current baseline:
+
+```text
+MaskSuite6 + MaskOutlineSuite3
+TextDocumentSuite1
+MarkerSuite3
+FootageSuite5
+ItemSuite9 + CompSuite12 + LayerSuite9
+```
+
+Editorial/source conclusions:
+
+- `MaskRefH` returned by layer/create operations remains caller-disposable; deleting a mask does not replace `DisposeMask`;
+- mask outline payload inside `AEGP_StreamValue2` does not outlive the stream-value cleanup;
+- text document payload and UTF-16 MemorySuite handles have separate lifetimes;
+- marker timing belongs to the stream/keyframe model while marker payload belongs to Marker Suite;
+- standalone marker ownership is kept distinct from marker payload obtained inside a stream value;
+- `AEGP_NewFootage` creates caller-owned footage until successful adoption by project/proxy/replace operations;
+- project-owned footage returned from Item APIs must not be disposed as caller-owned footage;
+- failed footage adoption keeps cleanup responsibility with the caller;
+- Footage Suite imports media the host already supports; new file-format decoding belongs to AEIO.
+
+Old “host acceptance matrix/pending” wording was replaced with product-validation guidance consistent with `EDITORIAL-GUIDE.md`.
+
+**Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new AE runtime import/mask/text/marker result is claimed.
