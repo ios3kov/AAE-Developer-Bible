@@ -17111,7 +17111,7 @@ Bible policy:
 - preserve this as historical sample evidence;
 - do not generalize it to every custom AEIO state replacement;
 - do not silently free it in a copied sample without understanding sync behavior;
-- for new production code, create a documented options ownership state machine and host-test save/sync/reload paths.
+- for new production code, create a documented options ownership state machine; if the product claims save/sync/reload behavior, validate those paths as product evidence.
 
 ## 7. Default callback result is semantic
 
