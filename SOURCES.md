@@ -1,6 +1,6 @@
 # Sources registry
 
-Research snapshot: 2026-09-30.
+Research snapshot: 2026-10-01.
 
 ## Tier A — Adobe / platform vendor
 
@@ -10,8 +10,12 @@ Research snapshot: 2026-09-30.
   https://blog.developer.adobe.com/en/publish/2026/09/investing-in-the-future-of-creative-cloud-extensibility-uxp-comes-to-our-flagship-applications
 - Adobe CEP Resources  
   https://github.com/Adobe-CEP/CEP-Resources
+- Adobe CEP 12 HTML Extension Cookbook  
+  https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_12.x/Documentation/CEP%2012%20HTML%20Extension%20Cookbook.md
 - Adobe CEP Samples  
   https://github.com/Adobe-CEP/Samples
+- Apple — Developer ID  
+  https://developer.apple.com/developer-id/
 - Apple — Creating distribution-signed code for macOS  
   https://developer.apple.com/documentation/xcode/creating-distribution-signed-code-for-the-mac/
 - Apple — Notarizing macOS software  
