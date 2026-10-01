@@ -140,4 +140,4 @@ Do not log secrets or license tokens.
 
 ## Verification boundary
 
-The paths follow current AE SDK installer guidance. A correct path alone does not prove a safe installer. Full clean-machine install/upgrade/uninstall verification remains an open completion gate.
+The paths follow current AE SDK installer guidance. A correct path alone does not prove a safe installer. Clean-machine install/upgrade/uninstall verification belongs to a concrete product's release evidence, not to Bible editorial completion.
