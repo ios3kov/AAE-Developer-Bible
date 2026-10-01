@@ -1,6 +1,6 @@
 # AEIO registration working guide
 
-Status: **registration contract guide / complete AEIO still requires the official IO/FBIO sample**.
+Status: **registration/source guide; SDK 25.6 contract-reviewed; runtime result not claimed**.
 
 ## Why this is not a standalone implementation
 
@@ -105,9 +105,9 @@ Validate:
 
 A malformed file must fail cleanly instead of corrupting AE memory.
 
-## Testing milestone
+## Product validation milestone
 
-Do not label the AEIO working until at least one meaningful format path passes:
+A concrete importer/exporter should not claim a capability until its relevant path has product evidence. Useful cases include:
 
 - fresh import/export;
 - deterministic frame data;
@@ -117,6 +117,26 @@ Do not label the AEIO working until at least one meaningful format path passes:
 - project save/reopen;
 - cleanup/leak checks.
 
+## Options/spec ownership
+
+The registration layer should make the state boundary visible:
+
+```text
+host-owned InSpec/OutSpec
+↕
+module-owned options/private state
+↕
+decoder/encoder core
+```
+
+Live options and flattened options are different representations. Do not persist raw pointers or process-specific handles.
+
+## Cancellation/failure rule
+
+Registration-only source must not hide the fact that callbacks can be entered after partial initialization.
+
+Every callback family needs a safe failure/cleanup path, and spec disposal must tolerate partially-created module state.
+
 ## Verification boundary
 
-This guide preserves the registration contract without fabricating a stale full callback table. The exact SDK sample remains the project/function-block source of truth.
+This guide preserves the registration and lifecycle contract without fabricating a stale full callback table. The exact target SDK IO/FBIO sample remains the project/function-block source reference. Bible does not claim runtime importer/exporter behavior for this guide.
