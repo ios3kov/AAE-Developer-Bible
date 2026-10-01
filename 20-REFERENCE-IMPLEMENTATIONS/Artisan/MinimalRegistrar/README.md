@@ -1,6 +1,6 @@
 # Artisan reference workspace
 
-Status: **SDK sample workspace: Artie / host-test pending**.
+Status: **SDK sample workspace: Artie / runtime result not claimed**.
 
 Artisan replaces/customizes parts of After Effects 3D rendering and carries a substantially larger host contract than a normal effect.
 
