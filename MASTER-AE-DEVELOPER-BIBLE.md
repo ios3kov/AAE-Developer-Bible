@@ -9966,259 +9966,287 @@ protocol/result error
 
 <!-- SOURCE: 15-COMMUNICATION/05-SCRIPT-TO-AE.md -->
 
-# ExtendScript -> After Effects
+# ExtendScript → After Effects
 
-ExtendScript executes inside the After Effects scripting environment and accesses the host through the scripting DOM: app, project, items, compositions, layers, properties/keyframes, import and render queue.
+Обновлено **2026-10-01**. ExtendScript работает внутри scripting engine After Effects и управляет host через high-level scripting DOM. Это control/automation API, а не render API и не low-level native ABI.
 
-It is a control and automation API, not a per-pixel render API.
+Связанные главы:
 
-## Typical command flow
+- [After Effects scripting object model](15-COMMUNICATION/../06-SCRIPTING/01-OBJECT-MODEL.md)
+- [CEP ↔ ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md)
+- [Threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
+
+## 1. Execution path
+
+~~~text
+script / JSX command
+        ↓
+After Effects ExtendScript engine
+        ↓
+app → project → items/comps → layers → properties
+        ↓
+host-owned project state
+~~~
+
+Script получает host objects, а не копию проекта. Structural mutation, selection changes и удаление объектов могут менять валидность ранее сохранённых ссылок.
+
+## 2. Validate before mutate
+
+~~~jsx
+function renameFirstLayer(newName) {
+    if (!app.project) {
+        throw new Error("NO_PROJECT");
+    }
+
+    var comp = app.project.activeItem;
+    if (!(comp instanceof CompItem)) {
+        throw new Error("NO_ACTIVE_COMP");
+    }
+
+    if (comp.numLayers < 1) {
+        throw new Error("NO_LAYER");
+    }
+
+    comp.layer(1).name = newName;
+}
+~~~
+
+До первого изменения проверяйте:
+
+- тип active item;
+- существование слоя/property/effect;
+- диапазоны 1-based индексов;
+- наличие файла/папки;
+- capability flags вроде canAddProperty/canSetExpression;
+- support/version gate.
+
+## 3. Undo group — история, не transaction
 
 ~~~jsx
 app.beginUndoGroup("My Tool");
 
 try {
-    var comp = app.project.activeItem;
-
-    if (!(comp instanceof CompItem)) {
-        throw new Error("No active composition.");
-    }
-
-    if (comp.numLayers < 1) {
-        throw new Error("Composition has no layers.");
-    }
-
-    comp.layer(1).name = "Renamed by Tool";
+    // validate and mutate
 } finally {
     app.endUndoGroup();
 }
 ~~~
 
-Validate prerequisites before mutation. beginUndoGroup/endUndoGroup creates coherent user undo history; it does not promise automatic rollback after an exception.
+Undo group объединяет изменения в историю Undo, но exception сам по себе не откатывает уже выполненную половину команды.
 
-## Main-thread implication
+Если partial mutation недопустим:
 
-Host-side scripting is synchronous from the point of view of the AE operation. In CEP, Adobe explicitly documents that evalScript executes in the host ExtendScript engine on the host main thread.
+1. проверить prerequisites до первого edit;
+2. только потом менять проект;
+3. явно чистить product-owned temporary objects на failure path;
+4. держать undo ownership на command boundary.
 
-Design consequences:
+## 4. Reacquire after structural mutation
 
-- prefer short commands to one giant script;
-- do not poll AE state continuously from a panel;
-- keep binary/heavy compute out of JSON/string bridge traffic;
-- validate and batch project mutations;
-- return a compact result instead of hundreds of UI-side follow-up queries.
+Indexed property groups могут перестраиваться после add/remove/move.
 
-## Stable identifiers
+~~~jsx
+var effects = layer.property("ADBE Effect Parade");
+var slider = effects.addProperty("ADBE Slider Control");
+var sliderIndex = slider.propertyIndex;
 
-For effects/properties, prefer match names where available. User-visible layer/effect names are presentation data and can be localized or renamed.
+effects.addProperty("ADBE Color Control");
+slider = effects.property(sliderIndex);
+~~~
 
-If the script creates product-owned objects, store a deliberate stable identifier instead of depending only on layer.name.
+Не считать host object reference бессрочной.
 
-## Structural mutation invalidates references
+## 5. Stable identity
 
-Adding, moving or removing properties in indexed groups can invalidate saved ExtendScript references.
+Display name — UI label, не всегда machine identity.
 
-A protocol handler that performs a structural edit should reacquire the affected objects before the next operation.
+Для effects/properties предпочитайте match names там, где API их предоставляет. Для product-owned объектов храните собственный stable ID, а не полагайтесь только на имя слоя.
 
-Do not expose a fake pointer-identity model to a panel. A panel should request objects by stable product ID or by a deliberately resolved path each time.
-
-## Script -> effect/property
-
-A script or panel can control a native effect through normal project state:
+## 6. Command layer
 
 ~~~text
-script
-→ layer
-→ Effects property group
-→ target effect by match name
-→ parameter property
-→ setValue / setValueAtTime
+UI / panel / test harness
+        ↓
+plain command + validated payload
+        ↓
+scripting service
+        ↓
+AE scripting DOM
+        ↓
+plain result
 ~~~
 
-This is often the safest bridge when the operation can naturally be expressed as effect parameters or project data.
+Одна операция должна быть вызываема из ScriptUI, CEP, JSX harness, native AEGP через ExecuteScript и будущего panel adapter без переписывания business logic.
 
-Advantages:
+## 7. Native → script через AEGP Utility Suite
 
-- AE owns project persistence;
-- undo/keyframes use normal host concepts;
-- parameter dependencies remain visible to the host;
-- no custom IPC is needed.
+Public AEGP Utility Suite предоставляет AEGP_IsScriptingAvailable и AEGP_ExecuteScript.
 
-Do not abuse effect parameters as an unbounded binary transport.
+AEGP_ExecuteScript принимает script string и может вернуть result последней строки и error string как AEGP_MemHandle.
 
-## Script -> menu command
-
-app.executeCommand(id) can invoke a host command, but numeric command IDs are not a strong public compatibility contract across versions/localizations.
-
-Use only when:
-
-- no better public scripting API exists;
-- the dependency is isolated;
-- supported host versions were actually tested;
-- failure has a safe fallback;
-- the command ID dependency is documented in the support matrix.
-
-Do not build a large product around undocumented menu-ID archaeology.
-
-## Native -> script
-
-AEGP Utility Suite exposes AEGP_ExecuteScript, allowing native AEGP code to execute ExtendScript for a capability better exposed through the scripting DOM.
-
-Treat this as a synchronous host bridge:
-
-- keep the called script small;
-- obey the actual suite ownership contract for returned data;
-- do not call from arbitrary worker threads;
-- avoid circular designs where JSX calls native and native immediately invokes a large JSX workflow back.
-
-One layer should own the command lifecycle.
-
-## Request and response contract
-
-A script command should accept plain data and return plain data.
-
-Request:
-
-~~~json
-{
-  "protocol": 1,
-  "requestId": "7",
-  "command": "renameSelected",
-  "payload": {"name": "Hero"}
-}
+~~~text
+check scripting available
+→ ExecuteScript
+→ inspect returned result/error handles
+→ release owned memory handles with matching Memory Suite API
 ~~~
 
-Failure:
+Не теряйте result/error handles на early return.
+
+Bridge подходит для редких host automation calls, но не для high-frequency IPC и больших данных.
+
+Источник публичного контракта: AEGP_UtilitySuite6 в After Effects C++ SDK Guide. Shipping code всё равно сверяется с headers целевого SDK.
+
+## 8. app.executeCommand boundary
+
+app.executeCommand(id) может вызвать host menu command, но numeric command ID не является хорошим стабильным product protocol.
+
+Использовать только если:
+
+- нет лучшего public DOM/API;
+- ID подтверждён на поддерживаемых версиях;
+- behavior покрыт host test;
+- есть clear failure/fallback.
+
+## 9. Error contract
 
 ~~~json
 {
   "ok": false,
-  "requestId": "7",
+  "requestId": "42",
   "error": {
     "code": "NO_ACTIVE_COMP",
-    "message": "No active composition"
+    "message": "Open a composition first"
   }
 }
 ~~~
 
-The UI can localize a stable error code while logs retain the source message.
+Разделяйте:
 
-## Cancellation
+1. script parse/runtime failure;
+2. command validation failure;
+3. AE operation failure;
+4. transport failure, если script вызван через CEP/native bridge.
 
-ExtendScript does not make every long host mutation safely cancellable automatically.
+Machine code должен быть стабильнее human text.
 
-If a workflow supports cancel:
+## 10. Long work
 
-1. define checkpoints between atomic chunks;
-2. decide what partial result is valid;
-3. close undo groups and files in finally blocks;
-4. never interrupt a product-owned file halfway through an unsafe write;
-5. return CANCELLED as a normal protocol result where appropriate.
-
-## Recommended boundary
+ExtendScript — плохое место для heavy CPU, больших binary transforms и tight polling.
 
 ~~~text
-plain request
-→ validate
-→ resolve AE host objects
-→ perform short query/mutation
-→ normalize plain response
+external/pure compute
+→ compact result
+→ short host mutation
+→ normalized response
 ~~~
 
-Never leak raw host object references into CEP, helper-process or native IPC protocols.
+Для длинной операции добавляйте осмысленные chunks и cancellation/progress boundary.
+
+## 11. Project persistence
+
+Runtime JavaScript object не является надёжным persistent storage.
+
+Если state должен пережить reopen/restart, заранее выберите owner:
+
+- project objects/properties;
+- deliberate serialized metadata;
+- external product state, если он не обязан ехать вместе с project.
+
+## 12. Acceptance checklist
+
+Проверить:
+
+- no project;
+- wrong active item;
+- empty comp;
+- missing effect/property;
+- localized UI;
+- cancel path;
+- partial failure;
+- save/reopen;
+- repeated invocation;
+- supported AE versions;
+- ExecuteScript result/error cleanup, если bridge используется.
 
 ## Verification boundary
 
-This chapter describes the scripting communication contract. It does not upgrade the current JSX examples to host-verified status; AE execution remains pending in the completion matrix.
+Глава описывает public scripting model и production architecture pattern. Текущий editorial pass не является новым host run. Native AEGP_ExecuteScript и scripting workflows проверяются отдельно на заявленной версии SDK/AE.
 
 
 ---
 
 <!-- SOURCE: 15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md -->
 
-# CEP panel <-> ExtendScript
+# CEP panel ↔ ExtendScript
 
-CEP has two separate JavaScript environments:
+Обновлено **2026-10-01**. CEP panel и ExtendScript — два разных JavaScript runtime. Panel не получает scripting DOM напрямую: доступ к AE идёт через host bridge.
+
+Связанные главы:
+
+- [CEP development](15-COMMUNICATION/../07-PANELS/01-CEP.md)
+- [UXP transition](15-COMMUNICATION/../07-PANELS/02-UXP-TRANSITION.md)
+- [Script → AE](15-COMMUNICATION/05-SCRIPT-TO-AE.md)
+
+## 1. Runtime model
 
 ~~~text
 CEP HTML/JS runtime
-        |
-        | CSInterface.evalScript(script, callback)
-        v
+      |
+      | CSInterface.evalScript(...)
+      v
 After Effects ExtendScript engine
-        |
-        v
+      |
+      v
 AE scripting DOM
 ~~~
 
-The panel cannot directly use app.project, and ExtendScript cannot directly manipulate the panel's HTML DOM.
+Официальный CEP cookbook разделяет HTML DOM и host Application/ExtendScript DOM.
 
-## Panel -> AE
+evalScript запускает script в host ExtendScript engine. Cookbook также указывает, что host script и CEP event dispatch зависят от host main-thread scheduling.
 
-The fundamental bridge is CSInterface.evalScript.
+Asynchronous callback в panel API не делает host-side script background worker.
 
-Simple form:
+## 2. One bridge, not evalScript everywhere
 
-~~~js
-var cs = new CSInterface();
+Плохо:
 
-cs.evalScript('$._myTool.ping()', function (result) {
-    console.log(result);
-});
+~~~text
+ButtonA -> evalScript
+ButtonB -> evalScript
+component -> evalScript
+timer -> evalScript
 ~~~
 
-A production product should not create different executable script strings throughout the UI.
+Хорошо:
 
-Bad:
-
-~~~js
-cs.evalScript('doThing("' + userText + '")');
+~~~text
+UI
+ ↓
+Bridge.request(command, payload)
+ ↓
+one evalScript dispatcher
+ ↓
+$._myTool.dispatch(...)
+ ↓
+AE scripting service
 ~~~
 
-Quotes, backslashes and attacker-controlled text can turn data into source code.
+Так protocol можно тестировать отдельно от UI.
 
-## One dispatcher
-
-Centralize bridge calls:
-
-~~~js
-function callAe(message, done) {
-    var json = JSON.stringify(message);
-    var arg = JSON.stringify(json);
-
-    cs.evalScript('$._myTool.dispatch(' + arg + ')', function (raw) {
-        done(raw);
-    });
-}
-~~~
-
-ExtendScript side:
+## 3. Namespace and bootstrap
 
 ~~~jsx
 $._myTool = $._myTool || {};
 
-$._myTool.dispatch = function (raw) {
-    var request = null;
-
-    try {
-        request = JSON.parse(raw);
-        return JSON.stringify(Dispatcher.handle(request));
-    } catch (e) {
-        return JSON.stringify({
-            ok: false,
-            requestId: request && request.requestId,
-            error: {
-                code: "UNHANDLED",
-                message: e.toString()
-            }
-        });
-    }
+$._myTool.dispatch = function(jsonText) {
+    // parse → validate → route → stringify response
 };
 ~~~
 
-Keep dispatch separate from actual command implementations.
+Не полагайтесь на то, что много JSX-файлов безопасно определяют одинаковые globals: последняя загрузка может перезаписать предыдущую.
 
-## Request contract
+## 4. Request protocol
 
 ~~~json
 {
@@ -10231,18 +10259,40 @@ Keep dispatch separate from actual command implementations.
 }
 ~~~
 
-Validate:
+Dispatcher:
 
-- protocol version;
-- command allowlist;
-- required payload fields;
-- string/number ranges;
-- file path policy;
-- maximum payload size where appropriate.
+1. parse JSON;
+2. validate protocol;
+3. allowlist command;
+4. validate payload shape/range;
+5. execute;
+6. return normalized JSON envelope.
 
-Unknown commands must fail closed.
+## 5. User data is data, not script source
 
-## Response envelope
+Нельзя:
+
+~~~js
+cs.evalScript('rename("' + userText + '")');
+~~~
+
+Один практический pattern:
+
+~~~js
+const wire = JSON.stringify(message);
+const jsxArg = JSON.stringify(wire);
+cs.evalScript('$._myTool.dispatch(' + jsxArg + ')', onResult);
+~~~
+
+В ExtendScript:
+
+~~~jsx
+var message = JSON.parse(jsonText);
+~~~
+
+Quoting/escaping централизуется на transport layer.
+
+## 6. Response envelope
 
 Success:
 
@@ -10250,9 +10300,7 @@ Success:
 {
   "ok": true,
   "requestId": "42",
-  "result": {
-    "changed": 3
-  }
+  "result": {"changed": 3}
 }
 ~~~
 
@@ -10269,289 +10317,591 @@ Failure:
 }
 ~~~
 
-An empty, malformed or non-JSON callback result is a transport/protocol failure, not a successful command that returned "nothing".
+Human-readable строка не должна быть единственным machine contract.
 
-## Main-thread scheduling
+## 7. Transport error ≠ application error
 
-Adobe's CEP 12 cookbook states that evalScript and manifest ScriptPath JSX execute in the host application's ExtendScript engine on the host main thread. It also notes that CEP events depend on host main-thread scheduling.
-
-Therefore:
-
-- avoid long single evalScript calls;
-- do not call evalScript on every UI repaint;
-- batch related reads and writes;
-- split long jobs into explicit chunks;
-- keep pure CPU work in the panel/helper where appropriate;
-- keep large binary data out of the JSX string bridge.
-
-The callback is asynchronous from the CEP JavaScript API perspective. The host-side work is still a synchronous script operation.
-
-## AE / ExtendScript -> panel
-
-ExtendScript cannot access the CEP browser DOM directly. Use CEP/CSXS events when host-side code needs to notify the panel.
-
-Conceptual flow:
+Различайте:
 
 ~~~text
-ExtendScript/native source
-→ CSXS / PlugPlug event
-→ CEP event bus
-→ CSInterface.addEventListener(...)
-→ panel reducer/state update
+CEP/evalScript transport failed
+script failed before envelope
+protocol rejected
+domain command failed
+command succeeded
 ~~~
 
-Prefer events as invalidation signals.
+Panel должен показывать diagnostic, не превращая всё в Unknown error.
 
-Good:
+## 8. Request IDs and stale responses
 
-~~~json
-{
-  "protocol": 1,
-  "type": "selectionChanged",
-  "revision": 183
-}
+Каждый запрос имеет requestId. Для snapshots полезен generation/revision.
+
+~~~text
+request generation 12
+→ UI moved to 13
+→ old response arrives
+→ ignore as stale
 ~~~
 
-The panel then requests one normalized state snapshot.
+Старый callback не должен перетирать новое состояние.
 
-Avoid sending hundreds of tiny mutation events whose correctness depends on timing/order.
+## 9. Backpressure
 
-## Request IDs and stale replies
+Не запускать десятки evalScript calls на каждый mousemove.
 
-Rapid UI interaction can create overlapping requests.
+Для high-frequency UI:
 
-Track:
+- debounce/coalesce reads;
+- batch related writes;
+- latest-wins для transient preview, если semantic допускает;
+- serial queue для order-sensitive mutations;
+- explicit Apply для дорогой операции.
 
-- request ID;
-- project/context revision;
-- panel instance lifetime;
-- expected protocol version.
+## 10. AE/ExtendScript → panel
 
-If the user changes context before a late callback returns, ignore the stale response instead of painting old state into the new UI.
+ExtendScript не может напрямую менять CEP HTML DOM. Для notification используется CEP/CSXS event path.
 
-## File paths
+~~~text
+host state changed
+→ small state-invalidated event
+→ panel receives event
+→ panel requests fresh normalized snapshot
+~~~
 
-CEP JavaScript, ExtendScript and the OS may represent paths differently.
+Для большого state лучше invalidation + pull, чем сотни mutation events.
 
-At the boundary:
+## 11. Event payload
 
-- define whether the protocol carries native paths or file URIs;
-- normalize in one adapter;
-- validate before touching disk;
-- reject traversal when a command should remain inside a product-owned directory;
-- test Unicode and long paths.
+Event payload должен быть versioned, small, serializable, без raw pointers/handles и не единственным source of truth.
 
-Do not scatter path conversion through every command.
+## 12. Idempotency and retry
 
-## Large data
+Не retry автоматически destructive command, если неизвестно, выполнился ли первый вызов.
 
-Do not send frames, large binary caches or megabytes of analysis through repeated evalScript strings.
+Для reconnect/reload:
 
-For large payloads use a deliberate data plane:
+- request/operation IDs;
+- idempotent commands где возможно;
+- duplicate detection, если это важно.
 
-- product-owned file plus atomic completion/rename;
-- external helper protocol;
-- native storage/cache;
-- another supported IPC path.
+## 13. Reload / extension restart
 
-CEP/JSX should remain the control plane.
+~~~text
+panel boot
+→ protocol handshake
+→ query host snapshot
+→ reconstruct UI state
+→ resume interaction
+~~~
 
-## Timeouts and lifecycle
+DOM state после reload не authoritative.
 
-evalScript does not provide a complete request timeout/cancellation model by itself.
+## 14. Payload size
 
-A bridge layer should track:
+String bridge подходит для control data и small snapshots.
 
-- request start time;
-- whether the panel is still alive;
-- whether a late callback may be ignored;
-- protocol version;
-- expected response schema.
+Не гоняйте через evalScript:
 
-Timeout in the UI does not mean the host-side operation was magically cancelled. Design cancellation separately.
+- pixel buffers;
+- audio blocks;
+- large binary models;
+- huge Base64 blobs;
+- frequent telemetry streams.
 
-## Security
+## 15. Security boundary
 
-Treat every bridge message as untrusted input.
+- allowlist commands;
+- validate paths/enums/ranges;
+- never eval downloaded code;
+- не вставлять remote/user text в script source;
+- не хранить secrets в panel bundle;
+- downloaded code и downloaded data — разные trust classes.
 
-Never:
+## 16. Acceptance checklist
 
-- concatenate user/remote strings into executable JSX;
-- expose "run arbitrary JSX" as a production API;
-- dispatch command names without an allowlist;
-- accept arbitrary helper executable paths;
-- write secrets into bridge logs.
+Проверить:
 
-## Debugging order
+- malformed JSON;
+- unknown protocol/command;
+- quotes/newlines/unicode;
+- long allowed string;
+- rapid requests;
+- stale callback;
+- panel reload;
+- project change while panel open;
+- script exception;
+- event during long host call;
+- missing JSX bootstrap;
+- clean AE restart.
 
-When a command fails:
+## Verification boundary
 
-1. confirm the panel handler ran;
-2. log request ID and command without secrets;
-3. confirm the evalScript callback fired;
-4. validate returned JSON;
-5. inspect the ExtendScript error code/message;
-6. reproduce the dispatcher command in a tiny JSX harness;
-7. only then debug the larger UI.
-
-This separates browser, bridge and AE failures.
-
-## Reference implementation
-
-See 16-WORKING-TEMPLATES/cep-panel-bridge/.
-
-Its existence is implementation evidence, not host verification. Release-quality acceptance still needs installation, panel open/reload, success/failure commands, host restart and clean uninstall on the supported matrix.
+CEP bridge rules сверены с Adobe CEP cookbook/CEP resources, включая разделение HTML и host DOM и main-thread scheduling evalScript/events. Этот editorial pass не является новым AE host test.
 
 
 ---
 
 <!-- SOURCE: 15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md -->
 
-# Native <-> script/panel: hybrid product architecture
+# Native ↔ script/panel: архитектура гибридного продукта
 
-A hybrid After Effects product can contain:
+Обновлено **2026-10-01**. UI, host automation и heavy native compute — разные слои. Связь между ними должна быть явной, versioned и малой по объёму.
 
-- CEP, UXP or ScriptUI interface;
-- ExtendScript automation;
-- native Effect plug-in;
-- AEGP service;
-- external helper process.
-
-The architectural failure mode is allowing every layer to call every other layer ad hoc.
-
-## Recommended layers
+## 1. Recommended layers
 
 ~~~text
 UI shell
-  CEP now / UXP later / ScriptUI for small tools
-       |
-       | typed commands + plain data
-       v
-Automation / command layer
-  ExtendScript dispatcher or future host adapter
-       |
-       +---- project edits ----------> AE scripting DOM
-       |
-       +---- native control ---------> effect params / documented bridge
-       |
-       +---- external service -------> explicit IPC adapter
-
+  CEP now / UXP later
+        |
+        | versioned commands + JSON
+        v
+Automation layer
+  ExtendScript dispatcher
+        |
+        +---- project edits ------> AE scripting DOM
+        |
+        +---- control request ----> native rendezvous
+                                   |
+                                   v
 Native layer
-  Effect plug-in / AEGP
-       |
-       +---- PF/AEGP suites ---------> After Effects
-       +---- PICA/shared suite ------> another native module
+  Effect / AEGP / helper
+        |
+        +---- PICA suites -------> AE C++ APIs
+        +---- shared suite ------> sibling native module
+        +---- external IPC ------> helper/service
 ~~~
 
-Keep the UI unaware of raw AE handles and keep native code unaware of DOM widgets.
+Business logic не должна знать concrete panel runtime.
 
-## Control plane vs data plane
+## 2. Control plane vs data plane
 
-Use panel/script messaging for control:
+**Control:** commands, IDs, paths, small settings, progress, status/error, invalidation.
 
-- start analysis;
-- choose mode;
-- set parameters;
-- request status;
-- receive small result summaries.
+**Data:** frames, pixel buffers, audio, ML tensors, large caches/assets.
 
-Do not push heavy data through it:
+CEP/ExtendScript JSON bridge подходит для control plane. Heavy data должен оставаться native/external.
 
-- pixel frames;
-- large ML tensors;
-- multi-megabyte caches;
-- thousands of messages per frame.
+## 3. Выбор bridge
 
-Large data should stay native or in a helper, while UI sends commands/references.
+### Panel → AE project
 
-## Simplest bridge first: project state
+ExtendScript/host-supported panel API для layers/items, properties/keyframes, import/render queue и project automation.
 
-If a native effect can be configured using normal AE parameters, let script/panel modify those parameters through the scripting DOM.
+### AEGP → конкретный Effect
 
-~~~text
-panel
-→ dispatcher.jsx
-→ layer/effect/parameter
-→ native effect receives normal parameter state during render
-~~~
+AEGP_EffectCallGeneric — маленький synchronous request/response к конкретному effect instance, если это лучший documented bridge. Не скрытая render dependency.
 
-Benefits:
+### Native → native
 
-- AE owns project persistence;
-- undo and keyframes use normal host concepts;
-- render dependencies are visible to the host;
-- no private transport is required.
+Published PICA suite — in-process versioned service между native modules.
 
-Use a custom bridge only when the normal project model cannot express the operation.
+### Native → scripting DOM
 
-## AEGP / PICA bridge
+AEGP_ExecuteScript — редкий bridge к scripting-only capability.
 
-For native-to-native communication use documented AEGP/PICA mechanisms described elsewhere in this section.
+### Process → process
 
-If a shared suite is used, define:
+Использовать явный IPC:
 
-- suite name;
-- suite version;
-- POD/C-compatible function table boundary where practical;
-- ownership of every pointer and returned object;
-- thread constraints;
-- acquire/release lifetime;
-- behavior when the provider is absent;
-- behavior when the requested version is unsupported.
-
-Do not invent a raw global pointer bridge between separately loaded modules.
-
-## Native -> script
-
-AEGP_ExecuteScript can bridge from native AEGP code into ExtendScript when the scripting DOM exposes a useful capability not available in the native route.
-
-Use it deliberately, not as high-frequency IPC.
-
-Avoid:
-
-~~~text
-CEP
-→ huge JSX command
-→ native call
-→ huge ExecuteScript call back
-→ CEP event storm
-~~~
-
-One layer must own the request lifecycle.
-
-## CEP event bridge
-
-For CEP products, native/ExtendScript code can use supported CSXS/PlugPlug event mechanisms for notifications.
-
-Treat the event bus as messages:
-
-~~~text
-producer
-→ event type + small payload
-→ panel listener
-→ state invalidation / reload
-~~~
-
-Do not make undocumented Adobe internal events or internal IPC a production contract.
-
-## External helper IPC
-
-When UI/native/service are separate processes, choose explicit versioned IPC.
-
-Reasonable transports:
-
-- localhost socket;
-- Windows named pipe;
-- macOS Unix domain socket;
+- named pipe / Unix domain socket;
+- localhost socket с security model;
 - child-process stdin/stdout;
-- product-owned temporary files with atomic rename;
-- shared memory only after profiling and with explicit synchronization/ownership.
+- temp file + atomic rename для large batch;
+- shared memory только после profiling и с explicit ownership.
 
-The transport is secondary. The protocol contract is primary.
+Undocumented AE internal IPC не считать product API.
 
-## Protocol header
+## 4. Heavy binary не через JSX
 
-For a native binary protocol, validate compatibility before parsing payload:
+Плохо:
+
+~~~text
+native pixels
+→ Base64
+→ ExtendScript string
+→ evalScript
+→ CEP JS
+~~~
+
+Цена: copying, encoding, temporary memory, main-thread pressure.
+
+UI должен отправлять control request и получать compact metadata/progress.
+
+## 5. Version handshake
+
+~~~json
+{
+  "protocol": 3,
+  "uiVersion": "2.4.1",
+  "nativeApi": 5,
+  "capabilities": [
+    "preview-v2",
+    "cancel-v1"
+  ]
+}
+~~~
+
+Panel, native plug-in и helper могут оказаться разных версий после partial update/rollback, поэтому package version недостаточно.
+
+## 6. Compatibility rule
+
+~~~text
+same protocol major
++ larger message size
++ unknown optional field
+→ old peer may ignore extension
+~~~
+
+Если изменился meaning поля, ownership или required call order — новая protocol/API version.
+
+## 7. Native → panel notification
+
+Не хранить direct pointer на UI.
+
+~~~text
+native state changes
+→ small notification/invalidation
+→ scripting/panel bridge
+→ panel requests fresh state
+~~~
+
+UI должен уметь восстановиться explicit refresh.
+
+## 8. Persistent state
+
+| State | Typical owner |
+|---|---|
+| effect render parameters | AE project/effect params |
+| panel layout/preferences | panel/product preferences |
+| large transient cache | native/helper runtime |
+| external asset index | product database/cache |
+| current selected AE object | AE host; query/revalidate |
+
+Render-affecting state не хранить только в panel DOM или global singleton.
+
+## 9. Liveness
+
+Panel reload, helper crash, missing plug-in/provider, closed project, removed effect и AE shutdown — нормальные failure states.
+
+~~~text
+starting
+ready
+busy
+canceling
+failed
+stopped
+~~~
+
+Молчание peer не равно infinite busy.
+
+## 10. Cancellation
+
+~~~text
+start(requestId)
+→ progress(requestId)
+→ cancel(requestId)
+→ canceled(requestId) / completed(requestId)
+~~~
+
+Late completion старой generation не должен менять новый UI state.
+
+## 11. Security
+
+- identify peer where needed;
+- do not expose external interface without need;
+- validate message size before allocation;
+- allowlist opcodes;
+- normalize paths;
+- never execute arbitrary command strings from panel/network;
+- не передавать secrets через visible command line/logs.
+
+## 12. Failure taxonomy
+
+Различайте UI validation, panel transport, scripting, native bridge, native operation, helper transport, protocol mismatch, cancellation и stale result.
+
+## 13. Observability
+
+Логируйте timestamp, requestId, protocol, component, operation, state transition, duration и result/error code. Не логируйте secrets и huge payloads.
+
+## 14. Acceptance checklist
+
+- panel without native;
+- native without panel;
+- wrong protocol;
+- helper killed mid-request;
+- project closed;
+- effect removed/reordered;
+- panel reload;
+- repeated start/stop;
+- cancel + late completion;
+- partial update;
+- rollback;
+- clean shutdown;
+- crash restart.
+
+## Verification boundary
+
+Глава задаёт production architecture pattern поверх public bridges. Generic call/PICA exact-SDK boundaries описаны в source review 25.6; end-to-end hybrid проверки остаются отдельными acceptance tests.
+
+
+---
+
+<!-- SOURCE: 15-COMMUNICATION/08-THREADING-BOUNDARIES.md -->
+
+# Threading boundaries
+
+Обновлено **2026-10-01**. В After Effects нельзя делать вывод C++ = можно с любого thread. Thread safety определяется конкретным callback/suite contract.
+
+## 1. Conservative matrix
+
+| Context | Assume |
+|---|---|
+| Effect render under MFR | may run concurrently |
+| host iteration pixel callback | may be parallel depending on suite/path |
+| AEGP project/UI manipulation | main-thread-only unless explicitly documented otherwise |
+| CEP evalScript host script | host main thread |
+| CEP event dispatch involving host | host main-thread scheduling |
+| external worker/helper | no AE handles/suites without supported handoff |
+
+~~~text
+if documentation does not explicitly promise thread safety,
+do not invent it.
+~~~
+
+## 2. Effect render
+
+MFR means multiple frames/instances may be processed concurrently.
+
+Избегайте mutable process globals вроде shared scratch/current frame unless synchronization/lifetime deliberately designed.
+
+Prefer callback-local state, immutable tables, host-supported compute cache patterns и explicit per-frame/thread scratch.
+
+## 3. Pixel iteration
+
+Если iteration suite распараллеливает pixels, callback не зависит от order.
+
+~~~text
+pixel N writes state
+pixel N+1 expects it
+~~~
+
+так делать нельзя. Pixel callback должен быть re-entrant.
+
+## 4. AEGP host calls
+
+AEGP API в целом не считать generic thread-safe API.
+
+Project graph, UI, menus, handles, suites и mutations вызывайте из documented host/main-thread path.
+
+## 5. Explicit cross-thread exception example
+
+Public AEGP Utility Suite docs отдельно отмечают AEGP_CauseIdleRoutinesToBeCalled как safe для вызова не с main thread; вызов asynchronous.
+
+При этом получение function pointer через suite API не thread-safe, поэтому pointer нужно acquire/cache на main thread.
+
+~~~text
+one function explicitly thread-safe
+≠ whole suite thread-safe
+~~~
+
+## 6. CEP / ExtendScript
+
+Adobe CEP cookbook указывает:
+
+- evalScript script выполняется в host ExtendScript engine на host main thread;
+- CEP event dispatch зависит от host main-thread scheduling;
+- long script стоит делить, чтобы event получил шанс быть scheduled.
+
+Поэтому не poll host tight loop, не делайте heavy compute в JSX и batch related mutations.
+
+## 7. Worker → host handoff
+
+~~~text
+worker
+  pure compute / IO
+  produces immutable result
+        ↓
+thread-safe queue
+        ↓
+host/main-thread callback
+  validates generation
+  touches AE APIs
+~~~
+
+Worker не сохраняет callback-scoped AE pointer для позднего использования.
+
+## 8. No product mutex across host call
+
+~~~text
+lock(product_mutex)
+→ call AE suite
+→ host re-enters product
+→ second path wants mutex
+→ deadlock
+~~~
+
+Лучше snapshot under lock, unlock, call host, затем отдельно publish result.
+
+## 9. Reentrancy
+
+Защитите:
+
+- shutdown while work pending;
+- nested notifications;
+- callback after generation changed;
+- cancellation while worker finishing;
+- render while UI changes non-render product state.
+
+## 10. Generation tokens
+
+~~~text
+generation 17 starts compute
+user change → generation 18
+generation 17 finishes
+→ discard stale result
+~~~
+
+## 11. Lock ordering
+
+Если locks несколько, задайте единый order и не нарушайте его. Лучше уменьшать число одновременно удерживаемых locks.
+
+## 12. Shutdown
+
+~~~text
+stop accepting new work
+→ signal cancellation
+→ stop transport
+→ finish required product workers
+→ release product resources
+→ release host acquisitions on allowed thread
+~~~
+
+Worker после teardown не должен обращаться к unloaded code/host handle.
+
+## 13. Diagnostics
+
+В debug log полезны thread ID, selector/callback, requestId, generation, lock wait duration, shutdown state.
+
+## 14. Acceptance tests
+
+- MFR on/off;
+- repeated multi-frame stress;
+- concurrent UI changes;
+- cancel while worker active;
+- project close during work;
+- AE shutdown during work;
+- panel reload;
+- long CEP call + event;
+- race tooling where applicable.
+
+## Verification boundary
+
+Глава объединяет source-reviewed MFR/AEGP/CEP contracts. Явно thread-safe функция не расширяет thread safety на соседние calls. Нового host stress run в этом editorial pass не выполнялось.
+
+
+---
+
+<!-- SOURCE: 15-COMMUNICATION/09-DATA-OWNERSHIP.md -->
+
+# Data ownership and lifetime
+
+Обновлено **2026-10-01**. Для каждого pointer/handle/table/buffer нужен ответ: кто владеет, как долго валиден и кто освобождает.
+
+## 1. Ownership classes
+
+### Borrowed callback-scoped pointer
+
+~~~text
+use during allowed callback
+→ do not retain after return
+~~~
+
+### Host opaque handle/reference
+
+Не предполагать stable address, eternal lifetime, survival after structural mutation или cross-thread safety.
+
+### Acquired suite
+
+~~~text
+AcquireSuite
+→ use
+→ ReleaseSuite
+~~~
+
+### Checkout/checkin resource
+
+~~~text
+checkout
+→ use
+→ checkin even on failure
+~~~
+
+### Product-owned allocation
+
+Product memory не продлевает lifetime borrowed host pointer, который в неё записан.
+
+## 2. Pair table
+
+| Acquire/create | Release |
+|---|---|
+| AcquireSuite | ReleaseSuite |
+| checkout | checkin |
+| lock host memory | unlock |
+| owned AEGP memory handle | matching free |
+| product worker | explicit stop/join policy |
+| IPC/file handle | close |
+
+Если cleanup API возвращает meaningful error, не теряйте его автоматически в destructor.
+
+## 3. Early-return safety
+
+~~~text
+acquire A
+acquire B
+operation fails
+return
+B/A leak
+~~~
+
+Нужен RAII, scope guard, single cleanup section или explicit result-preserving cleanup.
+
+## 4. Structural invalidation
+
+После project/property structural mutation reacquire references, которые могут быть invalidated.
+
+Cached host ref не permanent object ID.
+
+## 5. Generic call payload
+
+AEGP_EffectCallGeneric передаёт void pointer синхронному effect call.
+
+Без documented ownership transfer:
+
+~~~text
+caller owns payload
+→ effect reads/writes during call
+→ return
+→ effect does not retain pointer
+~~~
+
+Для long-lived object передавайте stable service ID/handle, не stack pointer.
+
+## 6. Published suite lifetime
+
+Provider function table живёт достаточно долго для valid acquisitions. Sweetie использует static table, но это не доказательство generic hot replacement/unload protocol.
+
+## 7. ExecuteScript memory handles
+
+Если AEGP_ExecuteScript возвращает result/error AEGP_MemHandle:
+
+1. check call;
+2. lock/read по Memory Suite rules;
+3. unlock;
+4. free owned handle matching API;
+5. не сохранять raw pointer после unlock/free.
+
+## 8. Message ABI
 
 ~~~cpp
 struct MsgHeader {
@@ -10563,163 +10913,105 @@ struct MsgHeader {
 };
 ~~~
 
-Validate size, version, opcode, offsets and element counts before use.
-
-A JSON protocol should carry the same concepts explicitly.
-
-## Request lifecycle
-
-Every asynchronous operation needs a state model:
+Validation order:
 
 ~~~text
-created
-→ accepted
-→ running
-→ completed | failed | cancelled
+non-null
+→ minimum header
+→ supported version
+→ total size bounds
+→ opcode
+→ payload lengths/counts
+→ payload access
 ~~~
 
-Define:
+Optional tail нельзя читать до size check.
 
-- who owns cancellation;
-- whether cancellation is best-effort;
-- whether a result may arrive after UI disposal;
-- how duplicate request IDs are handled;
-- what helper/native restart does to outstanding requests;
-- whether partial output is valid after cancel.
+## 9. No C++ object ABI across boundary
 
-A progress bar is not a lifecycle protocol.
+Не передавать как public ABI:
 
-## Host object ownership
+- std::string/std::vector;
+- exceptions;
+- RTTI-dependent graph;
+- allocator-owned object без shared allocator contract;
+- raw lambda/function object;
+- platform UI object.
 
-Never pass across process/module boundaries:
+Cross-process raw pointer бессмысленен.
 
-- PF_InData pointers;
-- selector-specific extra pointers;
-- borrowed PF_EffectWorld pointers;
-- AEGP handles with callback/project-dependent lifetime;
-- pointers to temporary C++ objects;
-- STL container objects as a cross-module ABI.
+## 10. Strings
 
-Copy or serialize the minimum plain data needed at the boundary.
+Определите encoding, length unit, null termination, allocator/free owner и embedded-zero policy.
 
-## Threading
+## 11. Large buffers
 
-A worker thread may own pure compute and product-owned buffers.
-
-Host callbacks/handles/suites should remain on documented host-safe threads. Do not assume that because your helper is asynchronous, AE project APIs become thread-safe.
-
-For UI commands that eventually touch AE:
+Protocol должен определять:
 
 ~~~text
-worker/helper
-→ finish pure work
-→ enqueue/return result
-→ host-side command
-→ mutate/read AE
+owner
+capacity
+valid bytes
+mutability
+alignment
+lifetime
+thread
+release API
 ~~~
 
-## Backpressure
+## 12. Persistent vs runtime
 
-If the UI can produce commands faster than native work completes, define policy:
+Persistent state должен иметь version/migration и выбранный persistent owner.
 
-- reject while busy;
-- coalesce latest state;
-- queue with a fixed maximum;
-- cancel previous request and replace.
+Runtime cache должен быть rebuildable и не быть единственным source of render-affecting truth.
 
-Never allow an unbounded queue of stale analysis jobs.
+## 13. Render dependency ownership
 
-## Failure isolation
+~~~text
+global singleton changed
+→ output depends on it
+→ AE graph does not know
+→ stale cached frame
+~~~
 
-The panel should survive a helper/native failure and show a structured status rather than becoming permanently stuck.
+Render-affecting state должен участвовать в поддержанном parameter/dependency/cache identity mechanism.
 
-The native/helper side should reject malformed messages without crashing AE.
+## 14. Cross-process ownership
 
-Log enough to correlate:
+Передавайте values, IDs, paths, offsets, lengths, protocol version. Не передавайте AE handles/C++ addresses/process-local pointers.
 
-- request ID;
-- protocol version;
-- component version;
-- command/opcode;
-- terminal result.
+## 15. Shutdown order
 
-Do not log secrets or full private user content by default.
+~~~text
+stop new requests
+→ cancel/drain borrowers
+→ release host/provider acquisitions
+→ destroy transports
+→ destroy backing data
+→ unload code
+~~~
 
-## Migration rule
+Owner переживает borrower.
 
-A hybrid product is migration-ready when replacing CEP with UXP does not require changing the native protocol or core business model.
+## 16. Acceptance checklist
 
-The shell changes; the stable command contract remains.
+- acquire failure;
+- partial acquire then failure;
+- early return;
+- exception boundary;
+- wrong message size/version;
+- oversized length/count;
+- stale host reference;
+- structural mutation;
+- provider shutdown;
+- panel/helper disconnect;
+- cancel during buffer use;
+- AE shutdown;
+- leak/double-release checks.
 
 ## Verification boundary
 
-These are architecture rules derived from the documented AE/CEP/PICA boundaries. They do not claim that the current Bible hybrid templates have completed end-to-end host tests.
-
-
----
-
-<!-- SOURCE: 15-COMMUNICATION/08-THREADING-BOUNDARIES.md -->
-
-# Threading boundaries
-
-## Effect render
-
-Effect render callbacks могут выполняться concurrent при MFR. Render code должен быть re-entrant; immutable shared resources preferable.
-
-## Pixel iteration
-
-Host iteration suites могут сами распараллеливать pixel callback. Pixel callback не должен зависеть от iteration order и должен быть re-entrant.
-
-## AEGP
-
-Считать AEGP project manipulation main-thread-only. Документация прямо предупреждает, что AEGP в целом не предоставляет обычную threading model; единственные thread-safe исключения должны быть явно документированы.
-
-## CEP / ExtendScript
-
-`evalScript` исполняет ExtendScript на host side; длинные script calls блокируют host scheduling. Разбивать работу.
-
-## Golden rule
-
-```text
-worker thread:
-  pure math / decode / encode / ML / filesystem / network
-
-host callback thread:
-  touch AE handles / project model / UI / suites unless specifically documented safe
-```
-
-
----
-
-<!-- SOURCE: 15-COMMUNICATION/09-DATA-OWNERSHIP.md -->
-
-# Data ownership and lifetime
-
-Большая часть тяжёлых AE plug-in bugs — не «неправильная формула», а неправильный lifetime.
-
-## Rules
-
-1. Opaque AE handles не считать вечными.
-2. После structural project mutation заново получать references, которые API считает invalidated.
-3. `PF_InData`, params, worlds и selector-specific `extra` — callback-scoped, если docs не обещают больше.
-4. Передавать через module boundary POD/versioned messages, а не pointers на temporary C++ objects.
-5. Большой buffer — owner должен быть указан в protocol.
-6. Любой acquire должен иметь парный release; checkout — checkin; lock — unlock.
-7. Render cache dependency должна быть видна AE, а не прятаться в global singleton.
-
-## Recommended message header
-
-```cpp
-struct MsgHeader {
-    uint32_t size;
-    uint32_t version;
-    uint32_t opcode;
-    uint32_t flags;
-    uint64_t request_id;
-};
-```
-
-Сначала валидировать `size/version`, затем читать payload.
+Это ownership model поверх public SDK contracts и product protocols. Конкретный lifetime определяется соответствующим API/header. Editorial pass не заменяет ASan/leak/stress/host validation.
 
 
 ---
@@ -10728,11 +11020,18 @@ struct MsgHeader {
 
 # Как компоненты общаются друг с другом и с After Effects
 
-Это центральный раздел архитектуры AE Developer Bible.
+Это центральный архитектурный раздел AE Developer Bible. Он отвечает не только чем вызвать API, но и:
+
+- кто инициирует вызов;
+- на каком thread он допустим;
+- кто владеет данными;
+- что считается transport/application error;
+- какой state persistent;
+- какой bridge подходит для control plane, а какой — для heavy data.
 
 ## Карта
 
-```text
+~~~text
                            +-----------------------+
                            |     After Effects     |
                            | project + render host |
@@ -10757,23 +11056,67 @@ struct MsgHeader {
                                                      |
                                                      v
                                               AE scripting DOM
-```
+~~~
+
+## Выбор канала
+
+| Need | Preferred direction |
+|---|---|
+| panel changes project | panel → ExtendScript/host panel API |
+| AEGP calls one effect instance | AEGP_EffectCallGeneric when appropriate |
+| native modules share service | published PICA suite |
+| native needs scripting-only capability | AEGP Utility ExecuteScript |
+| UI controls heavy native compute | small control protocol; heavy data stays native/helper |
+| cross-process helper | explicit versioned IPC |
+
+Ни один bridge не должен превращаться в скрытую render dependency.
+
+## Control plane vs data plane
+
+~~~text
+control:
+commands / IDs / state / progress / errors
+
+data:
+pixels / audio / large binary buffers / ML tensors
+~~~
+
+JSON/evalScript подходит в основном для control plane. Heavy binary data нельзя без причины гонять через string-based bridge.
+
+## Главные инварианты
+
+1. size/version проверяются до payload.
+2. Raw host pointers не переживают documented lifetime.
+3. Acquire имеет matching release; checkout — checkin; lock — unlock.
+4. Host API не считается thread-safe без явного обещания.
+5. Transport error и domain error — разные вещи.
+6. Async result имеет request/generation ID и может стать stale.
+7. Render-affecting state видим dependency/cache model After Effects.
+8. Panel DOM не persistent source of truth.
+9. Independently shipped components делают version handshake.
+10. Undocumented AE internal IPC не stable API.
 
 ## Разделы
 
-- [`01-AE-TO-EFFECT.md`](15-COMMUNICATION/01-AE-TO-EFFECT.md)
-- [`02-AE-TO-AEGP.md`](15-COMMUNICATION/02-AE-TO-AEGP.md)
-- [`03-AEGP-TO-EFFECT.md`](15-COMMUNICATION/03-AEGP-TO-EFFECT.md)
-- [`04-PLUGIN-TO-PLUGIN-PICA.md`](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md)
-- [`05-SCRIPT-TO-AE.md`](15-COMMUNICATION/05-SCRIPT-TO-AE.md)
-- [`06-CEP-TO-EXTENDSCRIPT.md`](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md)
-- [`07-NATIVE-TO-SCRIPT-PANEL.md`](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md)
-- [`08-THREADING-BOUNDARIES.md`](15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
-- [`09-DATA-OWNERSHIP.md`](15-COMMUNICATION/09-DATA-OWNERSHIP.md)
+1. [01-AE-TO-EFFECT.md](15-COMMUNICATION/01-AE-TO-EFFECT.md)
+2. [02-AE-TO-AEGP.md](15-COMMUNICATION/02-AE-TO-AEGP.md)
+3. [03-AEGP-TO-EFFECT.md](15-COMMUNICATION/03-AEGP-TO-EFFECT.md)
+4. [04-PLUGIN-TO-PLUGIN-PICA.md](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md)
+5. [05-SCRIPT-TO-AE.md](15-COMMUNICATION/05-SCRIPT-TO-AE.md)
+6. [06-CEP-TO-EXTENDSCRIPT.md](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md)
+7. [07-NATIVE-TO-SCRIPT-PANEL.md](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md)
+8. [08-THREADING-BOUNDARIES.md](15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
+9. [09-DATA-OWNERSHIP.md](15-COMMUNICATION/09-DATA-OWNERSHIP.md)
 
-## SDK 25.6 bridge review
+## Source/verification status
 
-The native bridge chapters 03/04 were rechecked against `AEGP_EffectSuite4`, `SPBasicSuite`, `SPSuitesSuite`, Sweetie, Checkout, ProjDumper and Shifter. See [the source-review record](15-COMMUNICATION/../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md). Source review does not equal host verification.
+Native bridge chapters 03/04 были rechecked against SDK 25.6 AEGP_EffectSuite4, SPBasicSuite, SPSuitesSuite, Sweetie, Checkout, ProjDumper and Shifter.
+
+См. [source-review record](15-COMMUNICATION/../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md).
+
+Chapters 05–09 дополнены architecture/lifetime/thread rules. CEP main-thread behavior опирается на Adobe CEP cookbook; AEGP ExecuteScript/idle wake-up details должны всё равно сверяться с headers target SDK перед shipping.
+
+Source review и documentation review не равны host verification.
 
 
 ---
