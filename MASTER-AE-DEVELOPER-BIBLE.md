@@ -21188,6 +21188,7 @@ The master list includes bundled entries that Adobe itself lists (for example Mo
 - Added end-to-end macOS and Windows production build pipeline chapters.
 - Added release artifact identity, installer ownership, upgrade/rollback and staged update guidance.
 - Updated STATUS and VERIFICATION without claiming new host/build verification.
+- Added explicit host-verification evidence ladder, durable test-record format and clean-machine release acceptance chapters.
 
 ## v1.1 — 2026-09-30
 
@@ -22169,7 +22170,7 @@ Earlier source findings remain in the linked records: ten-file memory/MFR review
 
 This is documentation and SDK source-review work within the agreed subject matter of [the completion plan](COMPLETION-PLAN.md). It does not complete stages 3–4 or bypass outstanding safety, reuse-audit, compiler and host gates. **Native readout-adapter development remains paused; the deliverable is the Bible, not a separate testing product.** No new user AE run is requested.
 
-**The scripting/panels communication → macOS/Windows build → distribution editorial block is now written. Next editorial block: testing/release-evidence chapters and cross-checking recipes/templates against the expanded contracts**, while preserving the exact-SDK baseline. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
+**The scripting/panels communication → macOS/Windows build → distribution block and the testing/release-evidence block are now written. Next editorial block: cross-checking recipes/templates against the expanded contracts and removing contradictions between guidance and executable examples**, while preserving the exact-SDK baseline. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
 
 ## Earlier baseline evidence
 
@@ -22378,3 +22379,12 @@ Added end-to-end release-flow chapters for [macOS](08-MACOS/09-PRODUCTION-BUILD-
 Added [release artifacts, installers and update strategy](11-DISTRIBUTION/05-RELEASE-ARTIFACTS-UPDATES.md), covering release-set identity, installer ownership, upgrade/rollback, staged auto-update, download integrity and compatibility/support metadata.
 
 **Verification level: documentation/architecture review only.** No new CEP panel was executed in AE, no ExtendScript dispatcher was host-tested, no macOS release binary was signed/notarized in this update, no Windows binary was Authenticode-signed, no installer was built, and no clean-machine AE load cycle was performed. These chapters define the required production process; they do not close completion-plan host/build gates.
+
+
+## Host-verification and release-evidence guidance (2026-10-01)
+
+Added [After Effects host verification](10-TESTING/06-HOST-VERIFICATION.md), [test evidence and acceptance records](10-TESTING/07-TEST-EVIDENCE.md), and [clean-machine release acceptance](10-TESTING/08-CLEAN-MACHINE-ACCEPTANCE.md). The chapters establish a strict evidence ladder from documented/compiled/linked through load-, behavior-, stress- and release-verified states, require exact artifact/environment identity, define PASS/FAIL/BLOCKED/NOT RUN semantics, and make package-level clean-machine installation the final release boundary.
+
+These chapters deliberately prevent compiler checks, screenshots, manual developer-folder installs or one-platform results from being promoted into broader compatibility claims.
+
+**Verification level: documentation/process definition only.** No new AE host run, release-candidate install, upgrade/uninstall, signing/notarization, Authenticode verification, MFR stress or cross-platform execution was performed by this editorial update. Existing completion-plan gates remain open until the named evidence is actually collected.
