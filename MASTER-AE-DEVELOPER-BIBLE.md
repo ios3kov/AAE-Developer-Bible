@@ -20041,13 +20041,13 @@ See [CEP panel <-> ExtendScript](16-WORKING-TEMPLATES/cep-panel-bridge/../../15-
 
 # Effect ↔ AEGP generic bridge
 
-Status: **protocol template; source-reviewed against SDK 25.6, not host-verified**.
+Status: **protocol/source template; SDK 25.6 contract-reviewed; runtime result not claimed**.
 
 Use this only for a pair of plug-ins you control. See [AEGP → Effect](16-WORKING-TEMPLATES/effect-aegp-generic-bridge/../../15-COMMUNICATION/03-AEGP-TO-EFFECT.md).
 
 ## Current AEGP call shape
 
-In SDK 25.6 `AEGP_EffectSuite4::AEGP_EffectCallGeneric` takes:
+In SDK 25.6 current `AEGP_EffectSuite5::AEGP_EffectCallGeneric` takes:
 
 ```text
 plugin id
@@ -20102,10 +20102,10 @@ This example assumes the effect command is already on the correct SDK callback p
 - send a temporary pointer that the effect stores for later use;
 - assume struct packing/layout without explicit compile-time checks on every binary that participates;
 - use hidden mutable state as a render dependency;
-- treat old EffectSuite2 sample syntax as current EffectSuite4 syntax;
+- treat old EffectSuite2/legacy syntax as current EffectSuite5 syntax;
 - swallow host-call error because the protocol field looks successful.
 
-## Required acceptance
+## Product validation cases
 
 - missing target;
 - short/wrong-version payload;
@@ -20444,7 +20444,7 @@ Do not let the behavior emerge accidentally from host duplicate-time semantics.
 
 ## Interpolation/ease
 
-If the product promises interpolation/easing, add explicit host tests for:
+If a concrete product promises interpolation/easing behavior, useful runtime checks include:
 
 - linear;
 - hold;
@@ -20461,7 +20461,7 @@ The complete user operation should generally be one undo group.
 
 Test Undo and Redo in AE, not only function return codes.
 
-## Stress fixture
+## Product stress fixture
 
 Generate a known number of keys, for example hundreds or thousands, then verify:
 
@@ -20475,7 +20475,7 @@ Generate a known number of keys, for example hundreds or thousands, then verify:
 
 ## Verification boundary
 
-This template documents the transaction shape. Exact KeyframeSuite signatures, value ownership and stream generations must come from the SDK compiled by the product, and host behavior remains pending until tested.
+This template documents the transaction/source shape. Exact KeyframeSuite signatures, value ownership and stream generations come from the target SDK contract. Bible does not claim runtime behavior for this template; a concrete product adds runtime evidence only for the support claims it makes.
 
 
 ---
@@ -28316,7 +28316,7 @@ For such a path, add an explicit close/checkin method that returns the host erro
 
 ## Suite-generation boundary
 
-The current code names concrete suite generations from the supplied SDK baseline, for example StreamSuite6 and EffectSuite4.
+The current code names concrete suite generations from the supplied SDK baseline, including StreamSuite6 and EffectSuite5.
 
 Do not copy those generation numbers into a different SDK blindly.
 
@@ -28452,7 +28452,9 @@ Test failure after:
 
 Every owned stream/batch/resource still needs its matching cleanup path.
 
-## Required host tests
+## Product validation cases
+
+If a concrete product claims these operations, useful cases include:
 
 - empty project/no target;
 - valid scalar property;
@@ -28963,7 +28965,7 @@ AEGP finds target effect instance
 → caller releases target references
 ~~~
 
-For the supplied SDK 25.6, current EffectSuite4 includes an explicit PF_Cmd argument. Historical ProjDumper syntax is older and must not be copied as the current signature.
+For the supplied SDK 25.6, current EffectSuite5 includes the explicit PF_Cmd argument. Historical ProjDumper/older-suite syntax is pattern evidence and must not be copied as the current signature.
 
 ## Protocol rules
 
@@ -29040,7 +29042,7 @@ This makes diagnostics distinguish target missing from command rejected.
 
 ## Verification boundary
 
-The contract is source-reviewed against SDK 25.6 and sample history, but the Bible bridge remains runtime result not claimed until the actual caller/effect pair is compiled and run.
+The contract is source-reviewed against SDK 25.6 and sample history. Bible labels the reference RUNTIME-NOT-CLAIMED unless a separate runtime record exists; compilation/host execution is product evidence, not a documentation-completion requirement.
 
 
 ---
