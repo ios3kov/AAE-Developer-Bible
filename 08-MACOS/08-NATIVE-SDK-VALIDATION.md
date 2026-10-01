@@ -1,6 +1,6 @@
 # macOS — native SDK validation
 
-Header-derived validation is the first native preflight, not the final Mac validation.
+This chapter describes SDK/source validation a Mac developer can use when implementing a native product. It is not a completion requirement for AE Developer Bible.
 
 ## Run
 
@@ -39,9 +39,9 @@ It does not prove:
 - code signing is valid;
 - notarization passes.
 
-Do not promote this preflight into host verification.
+Do not promote a header/source audit into a runtime claim.
 
-## Required next gates
+## If you are implementing a product
 
 ~~~text
 header inventory + symbol check + Clang syntax/type report
@@ -88,4 +88,4 @@ If header tool fails:
 The Bible has historical macOS arm64 syntax/type evidence for parts of the repository. This file does not upgrade any reference implementation to linked/signed/host-verified status.
 
 
-For the exact PASS/FAIL evidence contract, see [Gate 4 — exact SDK acceptance runbook](../18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
+For the SDK contract-audit method, see [SDK contract audit runbook](../18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
