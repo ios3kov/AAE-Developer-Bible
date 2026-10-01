@@ -1,39 +1,136 @@
 # Windows — Visual Studio setup
 
-## Start from Adobe sample
+## Start from an Adobe sample
 
-Adobe SDK Guide прямо советует не реконструировать Windows effect project с нуля: custom PiPL resource generation step легко потерять.
+Do not reconstruct an After Effects effect project from an empty Visual Studio project unless you have a specific reason and understand every host-specific build step.
 
-Для effect plug-in:
-1. скопировать Skeleton/closest sample;
-2. открыть solution в поддерживаемой Visual Studio;
-3. собрать untouched sample;
-4. убедиться, что `.aex` реально загружается AE;
-5. только потом переименовывать и менять код.
+The SDK guide explicitly recommends starting from Skeleton or the nearest sample because Windows effect projects contain PiPL resource-generation steps that are easy to lose.
+
+Safe bootstrap:
+
+~~~text
+copy closest SDK sample
+→ build untouched x64 sample
+→ load untouched sample in AE
+→ preserve resource/custom build steps
+→ rename identifiers
+→ replace implementation incrementally
+~~~
+
+If the untouched sample does not load, stop there. Do not continue layering product code onto a broken project baseline.
+
+## BuildAll and individual projects
+
+The SDK includes BuildAll.sln for the examples, but product development should still make the individual target reproducible on its own.
+
+Record:
+
+- Visual Studio version;
+- MSVC toolset;
+- Windows SDK version;
+- AE SDK version/build;
+- configuration;
+- target architecture.
+
+## PiPL generation is part of the build
+
+Windows uses the cross-platform .r resource source and a conversion/custom build step to generate Windows resource input.
+
+The important contract is not the exact historical tool name. It is:
+
+~~~text
+.r source
+→ Adobe PiPL conversion step
+→ Windows resource
+→ linked into final .aex
+~~~
+
+Do not copy only the C++ files out of a sample and forget the resource step.
+
+PiPL/global setup capability declarations must remain consistent.
+
+## Development output
+
+The SDK sample guidance supports a development output path such as:
+
+    C:\Program Files\Adobe\Common\Plug-ins\7.0\MediaCore\
+
+The sample projects also support AE_PLUGIN_BUILD_DIR for a common development output directory.
+
+This is a development convenience. Production installers should obtain Adobe install paths through the documented registry values instead of hardcoding the development path.
+
+## Privileges
+
+Writing directly under Program Files may require elevation.
+
+Do not solve every build problem by permanently running Visual Studio as Administrator. A cleaner product workflow is:
+
+~~~text
+normal build directory
+→ post-build/dev install step with explicit privilege if needed
+→ AE load
+~~~
+
+Keep compile output and privileged installation conceptually separate.
 
 ## Configurations
 
-Минимум:
+Minimum practical set:
+
 - Debug x64;
 - Release x64;
-- ARM64 equivalents, если поддерживаются.
+- ARM64 equivalents only when the product intentionally supports a native Windows-on-Arm host.
 
-Сохранять PDB каждого released build в symbol archive.
+For release builds:
 
-## Output during development
+- optimization enabled deliberately;
+- symbols generated;
+- runtime library settings consistent across your code/dependencies;
+- no accidental Debug CRT dependency;
+- warnings reviewed.
 
-SDK Guide показывает common dev path вида:
+Archive the PDB for every shipped binary.
 
-```text
-C:\Program Files\Adobe\Common\Plug-ins\7.0\MediaCore\
-```
+## Runtime library and ABI discipline
 
-Но для installer path использовать Adobe registry guidance, а не предполагать, что одна строка подходит всегда.
+All native components loaded into the same product should have deliberate runtime/ABI choices.
 
-## Build hygiene
+Check:
 
-- warning level высокий для собственного кода;
-- `/permissive-`/conformance changes вводить осознанно;
-- runtime library setting единообразно по зависимостям;
-- no accidental Debug CRT dependency in Release;
-- dependency audit before packaging.
+- /MD vs /MDd;
+- iterator/debug ABI mismatches;
+- third-party library toolset;
+- exception/RTTI choices if shared headers cross boundaries;
+- exported symbol surface.
+
+Do not expose STL objects as a long-lived binary ABI between independently versioned modules.
+
+## Export surface
+
+A native AE plug-in should export only what the host/product needs.
+
+Avoid leaking third-party library symbols from the .aex. Symbol collisions inside the host process can produce failures far away from the component that caused them.
+
+Treat exported-symbol review as a release check for products linking large C++ libraries.
+
+## Warning policy
+
+Use a high warning level for product code and move warning suppressions to the smallest possible scope.
+
+Do not disable a useful warning globally because a legacy SDK header emits it.
+
+## Reproducibility
+
+A release record should make it possible to answer:
+
+- which compiler built this exact binary?;
+- which AE SDK was used?;
+- which architecture?;
+- which resource/PiPL source?;
+- which git SHA?;
+- which PDB matches it?;
+- what is the SHA-256 of the shipped .aex?
+
+## Verification boundary
+
+The Bible currently records a macOS exact-SDK syntax/type baseline; Windows native compilation remains a separate pending verification gate. This chapter defines the build workflow and does not mark Windows examples host-verified.
