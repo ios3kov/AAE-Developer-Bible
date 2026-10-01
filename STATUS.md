@@ -96,6 +96,16 @@ Wave 1 covered:
 
 Strict-link failures introduced during expansion were corrected; the documentation tree returned to green strict validation.
 
+### Memory / lifetime / threading
+
+Completed as a single cookbook/foundation block:
+
+- `12-MEMORY-UNDO-PERSISTENCE.md`;
+- `14-LIFETIME-THREADING.md`;
+- Native C++ foundation suite acquisition / RAII / undo / host callback boundary docs.
+
+The block now uses one consistent model for ownership, cleanup, invalidation, thread permission, persistence, partial failure and shutdown.
+
 ## Current editorial TODO
 
 1. Sweep every main chapter for completeness against the editorial checklist.
