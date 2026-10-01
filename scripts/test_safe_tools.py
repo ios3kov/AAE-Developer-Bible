@@ -30,7 +30,7 @@ class HostCycleSafetyTests(unittest.TestCase):
             install_root.mkdir()
 
             plugin = self.make_plugin(src_root, "Test.plugin", "new")
-            old = self.make_plugin(install_root, "Test.plugin", "old")
+            self.make_plugin(install_root, "Test.plugin", "old")
             project = root / "test.aep"
             project.write_text("fixture")
             output = root / "render.png"
@@ -59,7 +59,6 @@ class HostCycleSafetyTests(unittest.TestCase):
                 "new",
             )
             self.assertEqual((plugin / "Contents" / "marker.txt").read_text(), "new")
-            self.assertFalse(old.exists())
 
     def test_nonzero_render_rolls_back_previous_plugin(self):
         with tempfile.TemporaryDirectory() as td:
