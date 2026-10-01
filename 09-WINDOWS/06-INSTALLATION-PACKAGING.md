@@ -168,4 +168,4 @@ Do not log license secrets.
 
 ## Verification boundary
 
-Registry path guidance is documented by the AE SDK guide. The current Bible has not yet executed the full Windows installer matrix; this remains a completion gate.
+Registry path guidance is documented by the AE SDK guide. Bible documents the Windows installer matrix; executing that matrix is product release evidence, not a completion requirement for the documentation.
