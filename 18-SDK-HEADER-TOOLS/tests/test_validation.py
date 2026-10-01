@@ -197,6 +197,33 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual(count, 2)
         self.assertEqual([entry["name"] for entry in missing], ["AEGP_StreamSuite6"])
 
+    def test_required_contract_manifest_detects_missing_function(self):
+        inventory_data = {
+            "schema_version": 1,
+            "unparsed_candidate_tables": {},
+            "partial_candidate_tables": {},
+            "tables": [{
+                "name": "AEGP_EffectSuite4",
+                "functions": [{
+                    "name": "AEGP_ApplyEffect",
+                    "signature": "A_Err (*AEGP_ApplyEffect)(void);",
+                }],
+            }],
+        }
+        manifest_data = {
+            "schema_version": 1,
+            "target_sdk": "fixture",
+            "required_tables": [{
+                "name": "AEGP_EffectSuite4",
+                "area": "effects",
+                "required_functions": ["AEGP_ApplyEffect", "AEGP_EffectCallGeneric"],
+            }],
+        }
+        count, missing = required.verify_required(inventory_data, manifest_data)
+        self.assertEqual(count, 1)
+        self.assertEqual(len(missing), 1)
+        self.assertEqual(missing[0]["missing_functions"], ["AEGP_EffectCallGeneric"])
+
     def test_required_contract_manifest_passes_when_all_present(self):
         inventory_data = {
             "schema_version": 1,
