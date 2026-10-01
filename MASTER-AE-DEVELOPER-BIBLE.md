@@ -823,33 +823,214 @@ Effect plug-in может ориентироваться на host/API version �
 
 # Performance architecture
 
-## Оптимизировать по слоям
+Performance is an architecture property before it is a compiler flag.
 
-1. **Algorithm** — убрать лишнюю работу до SIMD/GPU.
-2. **Region/extent** — не считать пиксели, которые не нужны.
-3. **Memory** — cache locality, reuse, no per-pixel allocation.
-4. **Threading/MFR** — concurrent frames без lock bottleneck.
-5. **Compute Cache** — повторно использовать дорогие расчёты, если корректно.
-6. **GPU** — только там, где transfer/dispatch overhead окупается.
-7. **Host interaction** — минимизировать checkouts/suite calls внутри hot loops.
+The order matters: remove unnecessary work before trying to execute unnecessary work faster.
 
-## Golden benchmark
+## Optimization ladder
 
-Хранить 3 класса проектов:
-- tiny: overhead-sensitive;
-- typical: real production comp;
-- stress: 4K/8K, long effect stack, extreme params.
+1. **Semantics/algorithm** — calculate only what the effect actually needs.
+2. **Region/extent** — avoid work outside requested/meaningful pixels.
+3. **Data layout/memory** — remove per-pixel allocation and improve locality.
+4. **Host interaction** — reduce unnecessary checkout/suite traffic.
+5. **Reuse/cache** — reuse expensive results only with correct dependency identity.
+6. **MFR/threading** — allow useful concurrent work without global serialization.
+7. **GPU** — move workloads only when transfer/sync overhead is justified.
+8. **Micro-optimization** — SIMD/intrinsics after profiling proves the hotspot.
 
-Снимать:
+Do not start at step 8.
+
+## Algorithm budget
+
+For every expensive operation ask:
+
+~~~text
+does output really depend on this?
+can it be precomputed?
+can it be shared safely?
+can requested ROI reduce it?
+can a cheaper representation preserve semantics?
+~~~
+
+An O(N²) algorithm does not become a good architecture because it runs on a GPU.
+
+## Region of interest
+
+SmartFX/pre-render capable effects should express only the input region needed for the requested output where the algorithm permits it.
+
+Wrong dependency rectangles can cause two opposite defects:
+
+- too large: correct but slower;
+- too small: fast but incorrect/missing pixels.
+
+ROI optimization therefore needs golden edge/origin fixtures, not only timing.
+
+## Memory architecture
+
+Hot render paths should avoid:
+
+- allocation per pixel;
+- allocation per scanline when reusable scratch is possible;
+- repeated format conversion;
+- giant temporary full-frame buffers for local algorithms;
+- unbounded caches;
+- false sharing on mutable cross-thread state.
+
+Define scratch ownership explicitly:
+
+~~~text
+frame-local
+thread-local
+instance-owned immutable/read-only
+host compute-cache owned
+~~~
+
+Never reuse one mutable buffer across concurrent MFR frames without a safe ownership model.
+
+## Host calls
+
+Suite calls/checkouts may be cheap enough individually and still dominate when placed inside a pixel loop.
+
+Prefer:
+
+~~~text
+acquire/checkout once at the required scope
+→ normalize inputs
+→ pure inner compute
+→ checkin/release
+~~~
+
+Do not cache host-owned pointers beyond their legal lifetime merely to remove a call.
+
+Correct ownership beats a speculative micro-optimization.
+
+## Cache architecture
+
+A cache key must include every input that can change the cached result.
+
+Typical identity dimensions:
+
+- algorithm/schema version;
+- parameter values;
+- time/frame dependency;
+- source identity/revision;
+- pixel format;
+- dimensions/ROI where relevant;
+- backend/device capability where output differs.
+
+A fast stale cache is a correctness bug.
+
+Separate:
+
+- persistent project truth;
+- rebuildable runtime cache.
+
+Never make a volatile singleton cache the only source of render-affecting state.
+
+## MFR scaling
+
+Thread safety is gate zero.
+
+Then measure scaling.
+
+Look for:
+
+- one global mutex;
+- serialized third-party library;
+- mutable singleton;
+- shared scratch;
+- cache lock held during expensive compute;
+- lock held across AE host calls.
+
+More threads with the same wall time and higher memory use is not automatically a win.
+
+## GPU decision
+
+GPU is useful when:
+
+~~~text
+compute saved
+> upload/preparation + dispatch + synchronization + download/conversion
+~~~
+
+Measure small, typical and large frames.
+
+A GPU path can lose on tiny frames and win on 4K/8K. Define the target workload.
+
+Keep a CPU oracle for correctness.
+
+## Interactive tools
+
+For scripts/panels/AEGP tools, performance can be dominated by host interaction rather than pixels.
+
+Measure:
+
+- panel startup;
+- selection/state refresh;
+- command → host response;
+- project traversal;
+- evalScript calls;
+- file/network/helper latency.
+
+Avoid dozens of tiny evalScript/project reads per UI frame. Batch semantically related work.
+
+## Golden benchmark set
+
+Maintain at least:
+
+### tiny
+
+Overhead-sensitive. Finds startup/dispatch/bridge costs.
+
+### typical
+
+Representative production project. Primary regression gate.
+
+### stress
+
+Large/long composition, many instances, high resolution and extreme parameter values.
+
+Record:
+
 - render wall time;
-- per-frame median/p95;
+- frame median/p95;
 - CPU utilization;
-- peak memory;
-- GPU time if measurable;
-- cache hit rate;
-- MFR scaling 1→N concurrent frames.
+- peak/retained memory;
+- MFR scaling;
+- lock wait;
+- GPU stage timings;
+- cache hit/miss;
+- correctness result.
 
-Нельзя принимать optimization, если она ломает determinism, color precision или stability.
+## Benchmark identity
+
+Every result needs:
+
+- plug-in hash;
+- baseline hash;
+- AE build;
+- OS;
+- CPU/GPU/driver;
+- fixture hash;
+- MFR/GPU state;
+- sample count;
+- warmup policy.
+
+Otherwise a percentage cannot be reproduced.
+
+## Optimization acceptance
+
+An optimization is accepted only if:
+
+1. the target user metric measurably improves;
+2. golden output remains within tolerance;
+3. MFR/stability tests still pass;
+4. memory remains bounded;
+5. no unsupported platform assumption was introduced.
+
+Performance never overrides correctness, deterministic state or host stability.
+
+See [performance testing](01-ARCHITECTURE/../10-TESTING/04-PERFORMANCE.md) and [profiling recipe](01-ARCHITECTURE/../12-RECIPES/06-PROFILING.md).
 
 
 ---
@@ -858,44 +1039,211 @@ Effect plug-in может ориентироваться на host/API version �
 
 # Build system strategy
 
-## Baseline first
+The first build-system goal is not elegance. It is preserving the exact host integration machinery required to produce a loadable After Effects component.
 
-For the first working native plug-in, prefer the build system shipped in Adobe's SDK samples:
+## Phase 1 — prove Adobe sample projects
 
-- Xcode project on macOS;
-- Visual Studio solution/project on Windows.
+For the first native plug-in, use the project shipped with the exact target SDK:
 
-This preserves PiPL/resource steps and host-specific settings.
+- Xcode on macOS;
+- Visual Studio on Windows.
 
-## CMake later, not first
+Adobe's SDK guidance recommends starting from the closest sample/Skeleton rather than reconstructing the project because host-specific PiPL/resource build steps are easy to miss.
 
-CMake can be valuable for a shared core library and cross-platform tests, but don't migrate the host plug-in target until you understand every sample build step.
+Baseline:
 
-Good split:
+~~~text
+exact SDK sample
+→ untouched build
+→ development install
+→ AE load
+→ record evidence
+~~~
 
-```text
-/core          C++ library, platform-neutral, CMake-friendly
-/tests         unit/golden tests
-/plugin-mac    thin AE adapter/Xcode target
-/plugin-win    thin AE adapter/VS target
-```
+Do this before introducing a meta-build system.
 
-or a carefully engineered unified CMake target once the native builds are proven equivalent.
+## Phase 2 — separate portable core
+
+A healthy architecture usually looks like:
+
+~~~text
+core/
+  algorithms
+  data model
+  protocol
+  serialization
+  pure tests
+
+adapters/
+  effect
+  AEGP
+  AEIO
+  panel/helper
+
+platform build shells/
+  Xcode
+  Visual Studio
+~~~
+
+The portable core can use CMake or another cross-platform system early because it does not need PiPL/host loading.
+
+The thin host target can remain in the official sample project until equivalence is understood.
+
+## Phase 3 — enumerate every hidden build responsibility
+
+Before replacing Xcode/Visual Studio project plumbing, inventory:
+
+- C/C++ sources;
+- exported entry points;
+- PiPL/resource source;
+- Windows PiPL conversion/custom build step;
+- bundle/aex output layout;
+- include paths;
+- SDK utilities;
+- platform frameworks/libs;
+- architecture declarations;
+- deployment target;
+- compiler defines;
+- asset/kernel generation;
+- signing hooks;
+- post-build development install.
+
+If one item is omitted, a clean compile may still produce a non-loadable plug-in.
+
+## CMake migration gate
+
+A unified CMake/native target is accepted only after it produces an artifact equivalent in all relevant host-visible ways.
+
+Compare sample-project build vs new build:
+
+- exported symbols;
+- architectures;
+- PiPL/resource contents;
+- bundle/file layout;
+- linked dependencies;
+- version metadata;
+- load behavior in AE;
+- render/operation fixture.
+
+Do not delete the known-good project until this comparison passes.
+
+## Project layout options
+
+### Official host shells + shared core
+
+~~~text
+/core
+/tests
+/plugin-mac   Xcode
+/plugin-win   Visual Studio
+~~~
+
+Lowest migration risk.
+
+### Generated native projects
+
+CMake generates Xcode/VS while custom commands recreate resources and packaging.
+
+Useful after the build contract is understood.
+
+### Fully scripted toolchain
+
+Appropriate for mature CI, but every host-specific resource/signing/install step must remain explicit.
 
 ## Dependencies
 
-Every dependency gets a record:
+Every dependency record should include:
+
+- name/version;
+- source and hash;
 - license;
-- version;
-- source/hash;
-- mac architectures;
+- redistribution rights;
+- macOS architectures;
 - Windows architectures;
 - static/dynamic;
-- redistribution requirement;
-- thread-safety notes;
-- GPU/runtime requirement.
+- minimum OS/runtime;
+- exception/RTTI/runtime-library assumptions;
+- thread-safety/MFR implications;
+- GPU/runtime requirements;
+- signing/notarization implications.
 
-Never discover a missing DLL/dylib only on the customer's machine.
+Do not discover an x64-only or debug-only dependency on the customer's machine.
+
+## ABI boundaries
+
+Keep third-party C++ ABI from leaking into long-lived interfaces between independently versioned components.
+
+Prefer C-shaped/versioned protocol structures across module boundaries.
+
+Standard-library ABI, allocator, runtime and compiler mode can differ across components/builds.
+
+## Reproducibility
+
+Every release records:
+
+- git SHA/tag;
+- SDK version/build/hash identity;
+- compiler/toolchain;
+- OS SDK;
+- target architectures;
+- dependency lock;
+- configuration;
+- product/schema/protocol versions;
+- unsigned/staged artifact hash;
+- signed/package artifact hashes.
+
+Latest is not a reproducible version.
+
+## Generated files
+
+Generated resource/protocol/version files need one authoritative source.
+
+CI should fail if:
+
+~~~text
+source inputs
+→ regeneration
+→ working tree differs
+~~~
+
+Do not commit generated data that silently drifts from its source without a verification rule.
+
+## CI lanes
+
+Separate:
+
+~~~text
+portable tests
+→ native compile/resources
+→ package
+→ host test
+→ release signing
+~~~
+
+A documentation or unit-test runner does not substitute for a native platform/host lane.
+
+Release credentials must not be exposed to untrusted pull requests.
+
+## Development install is not release package
+
+Keep distinct:
+
+~~~text
+compiler output
+→ dev install copy
+→ immutable release candidate
+→ signed/notarized installer/package
+~~~
+
+QA should test the same candidate that release publishes.
+
+## Stop rule
+
+Do not migrate the plug-in build system merely because a new system is more fashionable.
+
+Migrate when it provides a concrete benefit and the new output has proven host equivalence.
+
+See [macOS](01-ARCHITECTURE/../08-MACOS/README.md), [Windows](01-ARCHITECTURE/../09-WINDOWS/README.md) and [distribution](01-ARCHITECTURE/../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md).
 
 
 ---
@@ -3925,23 +4273,176 @@ This chapter documents architecture and common ScriptUI patterns. Exact layout a
 
 # Expressions vs scripts
 
-**Script** говорит After Effects выполнить действия над проектом.  
-**Expression** вычисляет значение property во время evaluation.
+Scripts and expressions both use JavaScript-like syntax, but they occupy different semantic roles in After Effects.
 
-Не использовать expression как замену batch automation и не использовать script как per-frame expression engine.
+## Core distinction
 
-## Expression constraints
+**Script**
 
-- может вычисляться очень часто;
-- должна быть максимально pure/deterministic;
-- expensive project traversal быстро становится bottleneck;
-- side effects — неправильная модель.
+~~~text
+user/tool command
+→ reads project
+→ may mutate project structure/state
+→ finishes
+~~~
 
-## Script constraints
+**Expression**
 
-- запускается как операция/tool;
-- может создавать/менять project structure;
-- не является частью render callback для каждого pixel/frame.
+~~~text
+property evaluation
+→ reads allowed context
+→ computes property value
+→ may be evaluated repeatedly/out of intuitive order
+~~~
+
+Do not use an expression as a project-automation engine and do not use a script as a per-frame expression evaluator.
+
+## Scripts are orchestration
+
+Typical script responsibilities:
+
+- create/remove items/layers;
+- add effects/properties;
+- set keyframes;
+- import footage;
+- configure render queue;
+- rename/restructure project;
+- run a user command;
+- build rigs/templates.
+
+Scripts can create coherent Undo history and return command success/error.
+
+A script should validate before mutation and reacquire host references after structural changes where required.
+
+## Expressions are evaluation
+
+Typical expression responsibilities:
+
+- calculate one property from time;
+- link properties;
+- procedural animation;
+- derive values from controls/layers;
+- small deterministic math.
+
+An expression may be evaluated many times, including during preview/render and cache/dependency work.
+
+Therefore expression code should not depend on hidden call order.
+
+## No side-effect architecture
+
+Treat expressions as value functions.
+
+Do not design an expression to:
+
+- write files;
+- mutate the project;
+- update UI;
+- manage network state;
+- keep a reliable mutable global counter;
+- perform a one-time project migration.
+
+Those belong in scripts/panels/native tools.
+
+## Performance
+
+An expression can run on many properties across many frames.
+
+Common expensive patterns:
+
+- repeated broad layer/property searches;
+- repeated string/path logic;
+- deep cross-comp dependency chains;
+- duplicated heavy math on many properties;
+- unnecessary sample loops.
+
+Move one-time setup into a script when the resulting project can express the dependency directly.
+
+Do not precompute dynamic values in a script if that changes required semantics.
+
+## Identity and naming
+
+Expressions that reference layers/effects by visible name can break after rename/localization/user edits.
+
+Where the expression API provides stable approaches, prefer them; for product-generated rigs, define a naming/metadata policy and migration behavior.
+
+A script generating the rig should validate that the references it creates actually resolve.
+
+## Error handling
+
+Script error:
+
+~~~text
+command fails
+→ report structured/user-visible error
+→ mutation may need cleanup
+~~~
+
+Expression error:
+
+~~~text
+property evaluation fails
+→ AE reports expression error
+→ rendered/evaluated value may fall back according to host behavior
+~~~
+
+Do not hide a script failure by injecting a broken expression and hoping AE reports it later.
+
+## Version compatibility
+
+Expression engines and available functions can change between AE generations.
+
+For a product shipping expression rigs:
+
+- record oldest/newest tested AE;
+- keep old-project fixtures;
+- test save/reopen;
+- test expressions after project migration;
+- avoid relying on a function merely because another Adobe host/browser supports it.
+
+## Script-generated expressions
+
+This is a valid hybrid pattern:
+
+~~~text
+script validates rig
+→ creates controls/layers
+→ assigns known expression source
+→ verifies expression enabled/resolves
+→ user animates controls
+~~~
+
+Treat the expression text as versioned product data.
+
+If its semantics change, consider migration of existing projects rather than silently overwriting user-edited expressions.
+
+## When to choose which
+
+Use a script when the question is:
+
+> What should the project/tool do now?
+
+Use an expression when the question is:
+
+> What value should this property have when AE evaluates it?
+
+Use both when a script creates a stable project structure and expressions provide ongoing value relationships.
+
+## Testing
+
+For script + expression products test:
+
+- fresh rig creation;
+- duplicate rig;
+- renamed user layers;
+- missing target;
+- old project;
+- save/reopen;
+- random frame seeks;
+- render queue;
+- expression disabled/error state;
+- performance on many instances.
+
+See [object model](06-SCRIPTING/01-OBJECT-MODEL.md).
 
 
 ---
@@ -13238,13 +13739,15 @@ Sources: supplied Adobe After Effects SDK 25.6 build 61 headers/samples plus the
 
 <!-- SOURCE: 15-COMMUNICATION/01-AE-TO-EFFECT.md -->
 
-# After Effects -> Effect
+# After Effects → Effect plug-in
 
-## Единственная точка входа поведения
+An Effect plug-in is primarily reactive: After Effects calls the exported effect dispatcher with selector commands and selector-specific data.
 
-After Effects посылает Effect selector-команды в `EffectMain`:
+## Dispatcher boundary
 
-```cpp
+Conceptual current shape:
+
+~~~cpp
 PF_Err EffectMain(
     PF_Cmd cmd,
     PF_InData* in_data,
@@ -13252,70 +13755,326 @@ PF_Err EffectMain(
     PF_ParamDef* params[],
     PF_LayerDef* output,
     void* extra);
-```
+~~~
 
-`cmd` определяет meaning остальных arguments.
+The exact declaration/export macros come from the target SDK.
 
-## Входящий канал
+The meaning and validity of every other argument depends on cmd.
 
-- `PF_InData` — host/time/context/callbacks/suite access.
-- `PF_ParamDef[]` — текущее значение parameter streams.
-- `output` — destination world, когда selector подразумевает render.
-- `extra` — selector-specific payload: events, SmartFX structures, parameter supervision и т.п.
+Do not assume params, output or extra carry the same data for every selector.
 
-## Исходящий канал
+## Input channels
 
-- return `PF_Err`;
-- `PF_OutData` flags/state/version/messages;
-- заполненный output world;
-- host callback calls / suite calls.
+### PF_InData
 
-## Важная мысль
+Host/context data such as:
 
-Effect — **reactive component**. Он не должен иметь произвольный background loop, меняющий AE. Если нужна host/project automation — вынести её в AEGP/panel/script layer.
+- current time/time scale;
+- effect reference;
+- project/render context;
+- quality/field information;
+- PICA suite access;
+- callbacks.
+
+Fields are selector/version-sensitive.
+
+### Parameter array
+
+Current parameter values for selectors where parameter data is supplied.
+
+The parameter index contract must agree with ParamsSetup and persistent parameter IDs.
+
+### Output world
+
+Only meaningful for selectors/render paths that provide it.
+
+SmartFX uses its own checkout/output callback flow rather than treating the classic output argument as universal.
+
+### extra
+
+Selector-specific payload.
+
+Examples include:
+
+- Smart pre-render/render structures;
+- custom UI events;
+- parameter supervision data;
+- generic Effect/AEGP communication payload.
+
+Always cast extra according to the current selector only after null/contract validation.
+
+## Output channels
+
+The effect communicates back through:
+
+- returned PF_Err;
+- PF_OutData flags/version/message/state;
+- rendered output;
+- selector-specific structures;
+- suite/callback calls to the host.
+
+Return errors should preserve the primary failure while still performing mandatory cleanup/checkin.
+
+## Lifecycle classes
+
+A useful mental map:
+
+~~~text
+registration/export
+→ GLOBAL_SETUP
+→ PARAMS_SETUP
+→ sequence/instance selectors
+→ render/pre-render/events many times
+→ sequence teardown
+→ GLOBAL_SETDOWN
+~~~
+
+Do not infer one fixed call order for every selector beyond documented guarantees.
+
+Render/event calls can occur many times and under concurrency rules such as MFR.
+
+## State layers
+
+Separate:
+
+- process/global immutable configuration;
+- host-owned global_data;
+- per-effect sequence/instance state;
+- per-render/frame scratch;
+- GPU device state;
+- external cache/service state.
+
+Render-affecting state must be visible to the host dependency/cache model.
+
+A hidden mutable singleton is dangerous both for MFR and caching.
+
+## Threading
+
+When an effect declares threaded rendering, relevant render/sequence selectors can execute concurrently according to the SDK MFR contract.
+
+Do not set the flag until every render dependency is thread-safe.
+
+UI selectors remain a different threading class; do not solve a render-to-UI communication problem with arbitrary cross-thread host calls.
+
+## Ownership
+
+Callback pointers/worlds/structures are host-owned unless the API explicitly transfers ownership.
+
+Never retain a callback-scoped raw pointer because it appears stable in one run.
+
+Every checkout has its matching checkin; every created host resource follows its exact release API.
+
+## Effect should not become project automation
+
+A render effect is not the right layer for arbitrary ongoing project mutation.
+
+If the product needs:
+
+- menus;
+- project graph edits;
+- import/render automation;
+- persistent panel controller;
+
+use AEGP, scripting/panel or another documented host integration.
+
+Keep the Effect responsible for effect-instance semantics/render/UI selectors.
+
+## Generic calls
+
+An AEGP can synchronously call a specific effect instance through the documented generic-call path.
+
+That is a control bridge, not a hidden render dependency system.
+
+See [AEGP → Effect](15-COMMUNICATION/03-AEGP-TO-EFFECT.md).
+
+## Failure tests
+
+For every implemented selector test:
+
+- null/invalid optional input where contract permits;
+- host call failure;
+- allocation failure policy;
+- checkout then later failure;
+- cancellation;
+- repeated invocation;
+- project save/reopen for persistent state;
+- MFR concurrency if claimed;
+- shutdown.
+
+## Verification boundary
+
+The dispatcher model is defined by the target Effect SDK. Illustrative selector flows in this Bible do not replace exact header signatures or host execution.
 
 
 ---
 
 <!-- SOURCE: 15-COMMUNICATION/02-AE-TO-AEGP.md -->
 
-# After Effects -> AEGP
+# After Effects → AEGP
 
-AEGP имеет два этапа.
+AEGP modules register capabilities/hooks during initialization, then After Effects calls those registered callbacks as host events occur.
 
-## 1. Registration
+## Initialization
 
-AE вызывает entry point один раз при launch:
+The supplied SDK 25.6 current header defines the AEGP plug-in initializer in the shape:
 
-```cpp
+~~~cpp
 A_Err EntryPointFunc(
     SPBasicSuite* pica_basicP,
-    A_long major_versionL,
-    A_long minor_versionL,
-    AEGP_PluginID aegp_plugin_id,
-    AEGP_GlobalRefcon* global_refconP);
-```
+    A_long major_version,
+    A_long minor_version,
+    AEGP_PluginID plugin_id,
+    AEGP_GlobalRefcon* global_refcon);
+~~~
 
-Здесь регистрируются hooks/специализации.
+Use the exact typedef/header from the SDK being compiled.
 
-## 2. Host callbacks
+The supplied archive also contains historical sample code with an older initializer shape. Sample workflow is useful evidence; the current header remains the ABI signature source of truth.
 
-После entry point AE вызывает зарегистрированные функции:
+## Initialization responsibilities
+
+Typical work:
+
+- validate required input pointers;
+- store plug-in ID;
+- resolve required suites;
+- register hooks/specializations;
+- allocate product global state;
+- publish global refcon only when its lifetime is safe;
+- establish shutdown/death cleanup.
+
+Avoid unrelated heavy work such as network login or expensive project scans during initialization.
+
+## Host callbacks
+
+Depending on registered capability, AE can later call:
 
 - command hook;
 - update-menu hook;
 - idle hook;
 - death hook;
+- notification hooks;
+- panel callbacks;
 - AEIO callbacks;
 - Artisan callbacks;
-- panel callbacks;
-- другие documented hooks.
+- other documented specialization callbacks.
 
-Внутри callback plug-in обращается к AE через PICA suites.
+Each callback has its own parameter, ownership and threading contract.
 
-## Load-order rule
+Do not write one generic callback assumption for all AEGP APIs.
 
-AEGP modules не гарантируют порядок загрузки. Не acquire чужой third-party suite в entry point, если его provider мог ещё не загрузиться. Делать acquire в момент фактического использования и поддерживать отсутствие dependency.
+## Global refcon
+
+The global refcon is a convenient pointer-sized product state connection between initialization and callbacks.
+
+Its safety rules:
+
+- state must exist before callbacks use it;
+- partially registered callbacks must not point at freed state;
+- shutdown must stop users before deleting state;
+- no worker may retain it after teardown;
+- C++ exception must not cross the callback ABI.
+
+## Partial registration is a real state
+
+Consider:
+
+~~~text
+death hook registered
+→ menu command inserted
+→ command hook registration fails
+~~~
+
+If there is no documented unregister path for earlier steps, deleting state immediately can create a use-after-free later.
+
+Design initialization as a state machine with explicit partial-failure policy.
+
+The Bible MenuTool keeps valid state for already-registered callbacks and disables the command when later registration fails.
+
+## Suite use
+
+AEGP callbacks usually access host services through PICA suites.
+
+Rules:
+
+- exact suite name/version;
+- check acquisition/access result;
+- release where the acquisition contract requires it;
+- do not keep pointers beyond host/suite lifetime;
+- do not assume all suite functions are thread-safe.
+
+Use the supplied SDK header for suite generation.
+
+## Load-order rule for third-party providers
+
+AE does not promise a convenient load order for independently shipped plug-ins.
+
+If another module publishes a PICA suite:
+
+~~~text
+consumer initialization
+→ provider may not yet be available
+~~~
+
+For optional dependencies, acquire on use and degrade gracefully.
+
+For required dependencies, detect absence explicitly and show a precise diagnostic/recovery path.
+
+Do not dereference a cached null provider table.
+
+## Thread boundary
+
+Project/UI mutations should be treated as host/main-thread work unless a specific API explicitly documents otherwise.
+
+One documented Utility Suite function may be safe from another thread; that does not make the whole suite safe.
+
+See [threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md).
+
+## Error boundary
+
+Each callback should:
+
+1. validate refcon/inputs;
+2. acquire resources;
+3. perform operation;
+4. cleanup;
+5. return A_Err.
+
+C++ exceptions stay inside the module.
+
+Use a consistent callback guard/error mapping where appropriate.
+
+## Shutdown
+
+Death/shutdown path should:
+
+~~~text
+stop accepting new work
+→ signal/cancel product workers
+→ release product-owned host resources
+→ release provider acquisitions
+→ destroy state
+~~~
+
+No static destructor should call AE after host suite teardown.
+
+## Testing
+
+- initialization success;
+- missing required suite;
+- optional suite absent;
+- hook-registration failure at each step;
+- callback with missing/invalid state;
+- repeated command/idle callback;
+- project close/open;
+- provider missing;
+- AE shutdown;
+- worker active during shutdown;
+- restart.
+
+## Verification boundary
+
+This chapter describes the reviewed AEGP lifecycle, including a known legacy/current initializer version boundary. Exact callbacks and suite versions must still be compiled and tested against the declared target SDK/AE host.
 
 
 ---
