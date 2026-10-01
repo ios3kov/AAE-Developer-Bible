@@ -1,6 +1,6 @@
 # Artisan registration working guide
 
-Status: **registration contract guide / full renderer requires the target SDK Artie sample**.
+Status: **registration/source guide; SDK 25.6 contract-reviewed; runtime result not claimed**.
 
 ## Registration shape
 
@@ -84,9 +84,9 @@ For unsupported features define:
 
 Do not silently render a materially wrong scene and call it success.
 
-## Test milestone
+## Product validation milestone
 
-A meaningful first Artisan acceptance fixture should include:
+If a concrete product claims renderer behavior, useful runtime cases include:
 
 - renderer appears/selects;
 - one simple scene renders;
@@ -99,6 +99,24 @@ A meaningful first Artisan acceptance fixture should include:
 
 Expand fixtures as supported scene features grow.
 
+## Persistence/state boundary
+
+Registration source should make the state model visible:
+
+~~~text
+GlobalData
+→ InstanceData
+→ RenderData
+~~~
+
+If instance settings persist, define a versioned flat representation separately from live runtime resources.
+
+Do not store Canvas/RenderContext pointers in persistent instance data.
+
+## Resource cleanup boundary
+
+A render path may acquire textures, worlds and receipts from different APIs. Track each cleanup obligation independently; a generic renderer-resource deleter is not enough.
+
 ## Verification boundary
 
-This file documents the safe registration/startup boundary. It deliberately does not pretend a registrar stub is a complete Artisan.
+This file documents the registration/startup/source boundary. It deliberately does not pretend a registrar stub is a complete Artisan, and Bible does not require host execution of this guide for editorial completion.
