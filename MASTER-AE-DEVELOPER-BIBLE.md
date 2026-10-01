@@ -23234,10 +23234,16 @@ The dedicated `ACX input qualification` workflow publishes only after reference 
 
 # 3D Channel Extract — macOS binary investigation
 
-Status: **active / evidence captured**  
+Status: **historical evidence record with later corrections**  
 Host: Adobe After Effects **25.6.0 (25.6.0.101)**  
 Platform: macOS, arm64  
 Target: **3D Channel Extract**
+
+> **Current correction — supersedes the early absence hypothesis below.** A later, wider filesystem/binary investigation found the physical module at:
+>
+> `/Applications/Adobe After Effects 2025/Plug-Ins/Effects/Aux_Channel_Extract.plugin/Contents/MacOS/Aux_Channel_Extract`
+>
+> and recorded its native `FilterMain` entry-point region in [the current function map](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/FILTERMAIN-FUNCTION-MAP-MACOS-AE25.6.md). The original search interpreted the PiPL virtual path too narrowly relative to the application bundle. Therefore the early conclusions “standalone plug-in absent” and “HOST-BUILTIN implementation class” are **superseded** and must not be used as current classification. FLT remains relevant as host-side effect dispatch infrastructure, not proof that this effect's executable code lives only inside `FLT.dylib`.
 
 ## Confirmed registration evidence
 
@@ -23259,7 +23265,7 @@ Virtual full path: Plug-Ins/Effects/Aux_Channel_Extract
 GPUEntry: ""
 ```
 
-The virtual path does **not** exist as a physical plug-in directory in the inspected AE 25.6 installation. Therefore `mFullPath` must not be treated as evidence of a standalone file.
+**Historical initial observation — superseded:** the first search did not find a physical directory at the narrowly interpreted virtual path, so this document initially treated `mFullPath` as non-evidence for a standalone file. A later broader search found the physical `Aux_Channel_Extract.plugin` module at the path recorded above. The initial absence result was a search-scope error, not evidence that the module did not exist.
 
 ## Internal effect subsystem evidence
 
@@ -23430,28 +23436,19 @@ Do not interpret the absence of a simple xref as absence of an implementation.
 | Display name | **PROVEN:** 3D Channel Extract |
 | Match name | **PROVEN:** ADBE AUX CHANNEL EXTRACT |
 | PiPL registration | **PROVEN:** hardcoded registry |
-| Standalone plugin path | **PROVEN absent** at recorded virtual path |
-| Implementation class | **HOST-BUILTIN: strong evidence; final exact code-path mapping pending** |
-| Internal subsystem | **PROVEN:** FLT is a native effect subsystem; target-family identifiers present |
-| Exact implementation function | **UNKNOWN** |
+| Standalone plugin path | **PROVEN present:** `/Applications/Adobe After Effects 2025/Plug-Ins/Effects/Aux_Channel_Extract.plugin/Contents/MacOS/Aux_Channel_Extract` |
+| Implementation class | **PROVEN physical native effect module**; AE routes execution through FLT/generic host-dispatch infrastructure |
+| Internal subsystem | **PROVEN:** FLT is a native effect/dispatch subsystem; this does not make FLT the sole storage location of the target effect code |
+| Exact implementation function | **PROVEN entry point:** `FilterMain` region is mapped in the current function-map document; deeper selector/algorithm branches remain under reconstruction |
 | GPU entry in hardcoded PiPL | **PROVEN empty** |
 | Actual runtime GPU behavior | **UNKNOWN / runtime test required** |
 | Algorithm | **UNKNOWN** |
 
-## Next investigation step
+## Historical next step — superseded by later work
 
-Disassemble and trace `FLTp_DispatchFilters` and its associated native effect lookup/index structures.
+The original next step was to derive the target solely from FLT dispatch internals. Later evidence found and mapped the physical `Aux_Channel_Extract.plugin` module, so the current investigation target is the concrete module's `FilterMain` and render branches together with the host dispatch path.
 
-Goal:
-
-```text
-AUX CHANNEL identifier
-→ FLT native effect record/index
-→ dispatch branch/function pointer
-→ concrete implementation
-```
-
-Only after that mapping is proven should algorithm reconstruction begin.
+See [FILTERMAIN-FUNCTION-MAP-MACOS-AE25.6.md](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/FILTERMAIN-FUNCTION-MAP-MACOS-AE25.6.md) for the current code-path map and [EVIDENCE-AUDIT-2026-09-30.md](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/EVIDENCE-AUDIT-2026-09-30.md) for the current acceptance boundary.
 
 
 ## Dispatch path evidence — FLTHost / GenericPluginDispatch
