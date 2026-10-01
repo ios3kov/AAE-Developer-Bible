@@ -7699,6 +7699,505 @@ When it says source-reviewed, that must not be read as host-verified.
 
 ---
 
+<!-- SOURCE: 10-TESTING/06-HOST-VERIFICATION.md -->
+
+# Host verification in After Effects
+
+A plug-in is not verified because it compiles, links or passes unit tests. Host verification means the exact built artifact was installed into a named After Effects build and the required behavior was observed.
+
+## Evidence ladder
+
+Use distinct labels:
+
+```text
+DOCUMENTED
+ -> source/API contract reviewed
+
+COMPILED
+ -> compiler accepted the source
+
+LINKED
+ -> native binary/resource bundle produced
+
+LOAD-VERIFIED
+ -> AE discovered and loaded the exact artifact
+
+BEHAVIOR-VERIFIED
+ -> declared scenario produced the expected result
+
+STRESS-VERIFIED
+ -> repeated/concurrent/error scenarios passed
+
+RELEASE-VERIFIED
+ -> packaged/signed installer artifact passed clean-machine acceptance
+```
+
+Never collapse these into one "works" status.
+
+## Test identity
+
+Every host result must record:
+
+- Bible/source commit;
+- product/example version;
+- binary/package SHA-256;
+- Adobe SDK version/build;
+- AE exact version/build;
+- OS exact version;
+- architecture;
+- CPU/GPU where relevant;
+- MFR state;
+- test fixture/project identity;
+- timestamp;
+- observed result.
+
+If the artifact hash is missing, later investigators cannot prove what was actually tested.
+
+## Load verification
+
+Minimum load check:
+
+1. install exact artifact using intended install path;
+2. launch AE from a clean state;
+3. confirm module appears/loads;
+4. confirm no startup error;
+5. create/open the intended fixture;
+6. invoke the feature once;
+7. quit AE cleanly.
+
+For effects, record whether the effect appears in the expected menu/category and whether an instance can be added.
+
+For AEGP/panel tools, record menu/panel registration and command execution.
+
+## Functional verification
+
+Functional tests must check observable output, not just "no crash".
+
+Examples:
+
+### Effect
+
+- parameter defaults;
+- parameter change;
+- animated values;
+- 8/16/32 bpc where claimed;
+- alpha;
+- odd dimensions;
+- ROI/partial render where applicable;
+- save/reopen;
+- duplicate/copy/paste instance;
+- render queue output.
+
+### AEGP
+
+- command registration;
+- update/enable state;
+- operation on valid project;
+- behavior with no project/selection;
+- undo behavior;
+- shutdown/unload path.
+
+### Script/panel
+
+- panel launch;
+- command dispatch;
+- malformed request;
+- reload;
+- stale response;
+- project switch;
+- AE shutdown/restart.
+
+## Negative verification
+
+A required feature is not accepted until important failure cases are observed.
+
+Test:
+
+- missing input;
+- invalid project state;
+- unsupported format/depth;
+- permission error;
+- helper process absent;
+- protocol mismatch;
+- user cancellation;
+- resource exhaustion where safely reproducible.
+
+The expected result should be defined before running the test.
+
+## Save/reopen
+
+Many integration bugs only appear after serialization.
+
+For project-visible state:
+
+```text
+create state
+ -> save
+ -> quit AE
+ -> relaunch
+ -> reopen
+ -> verify state
+ -> render/operate again
+```
+
+Do not treat an in-session result as persistence verification.
+
+## Repeated runs
+
+At least one scenario should be repeated enough to expose lifetime bugs:
+
+- add/remove effect repeatedly;
+- open/close projects;
+- render repeatedly;
+- enable/disable MFR where applicable;
+- panel reload;
+- helper restart;
+- AE quit/relaunch.
+
+Record iteration count.
+
+## Evidence artifact
+
+Each host run should produce a compact report, for example:
+
+```yaml
+artifact_sha256: ...
+source_commit: ...
+ae_version: ...
+os: ...
+arch: ...
+sdk: ...
+fixture: ...
+scenario: minimal_gain_16bpc
+result: PASS
+observed: "Gain 0 produced black with preserved alpha"
+attachments:
+  - output.png
+  - ae-log.txt
+```
+
+Screenshots are supporting evidence, not a substitute for exact binary identity and written observations.
+
+## Failure reporting
+
+A failure report should contain:
+
+- first failing step;
+- expected behavior;
+- actual behavior;
+- crash/hang/error text;
+- minimal reproducer;
+- whether issue reproduces after clean restart;
+- whether previous known-good artifact passes.
+
+Do not overwrite a failed result with a later success. Preserve both and link the fix commit.
+
+## Release implication
+
+Only behavior verified against the exact packaged release candidate can be promoted to release evidence.
+
+A developer build copied manually into MediaCore is useful engineering evidence, but it is not installer/release verification.
+
+
+---
+
+<!-- SOURCE: 10-TESTING/07-TEST-EVIDENCE.md -->
+
+# Test evidence and acceptance records
+
+Tests that leave no durable evidence are hard to trust later. This chapter defines the record format used to decide whether a capability may be called verified.
+
+## Directory model
+
+A project may keep reports outside the public Bible repository when they contain proprietary SDK/build material, but the structure should be stable:
+
+```text
+evidence/
+  <product>/
+    <version>/
+      <platform>-<arch>/
+        manifest.json
+        host-report.md
+        logs/
+        outputs/
+        screenshots/
+```
+
+The Bible can reference hashes and conclusions without redistributing proprietary binaries or Adobe SDK files.
+
+## Manifest
+
+Recommended fields:
+
+```json
+{
+  "schema": 1,
+  "product": "MinimalGain",
+  "version": "1.0.0-test",
+  "sourceCommit": "...",
+  "artifactSha256": "...",
+  "sdk": "25.6 build 61",
+  "ae": "25.6 ...",
+  "os": "...",
+  "arch": "arm64",
+  "compiler": "...",
+  "mfr": false,
+  "gpuBackend": null
+}
+```
+
+## Scenario record
+
+Each scenario has:
+
+- ID;
+- requirement;
+- setup;
+- steps;
+- expected result;
+- observed result;
+- PASS/FAIL/BLOCKED;
+- attachments;
+- notes/limits.
+
+Use `BLOCKED` when the test cannot actually be run. Do not convert missing infrastructure into PASS.
+
+## Status semantics
+
+### PASS
+
+The named scenario ran on the named artifact/environment and matched the acceptance criterion.
+
+### FAIL
+
+The scenario ran and did not meet the criterion.
+
+### BLOCKED
+
+The scenario is required but could not run because of missing platform, SDK, AE version, hardware or other prerequisite.
+
+### NOT RUN
+
+No execution was attempted.
+
+### NOT APPLICABLE
+
+The scenario genuinely does not apply to the product. State why.
+
+## Evidence immutability
+
+After a release decision, preserve the evidence bundle.
+
+If a test is rerun:
+
+- create a new record;
+- do not edit history to make old failures disappear;
+- link the superseding run.
+
+## Golden outputs
+
+For deterministic visual tests, retain:
+
+- source fixture;
+- output image/frame sequence;
+- comparison script/tool version;
+- tolerance;
+- diff image or numerical metrics.
+
+A golden image without the generation conditions is insufficient.
+
+## Logs
+
+Capture only useful diagnostics:
+
+- module version/path;
+- host version;
+- error/crash details;
+- render timing if relevant;
+- helper/service diagnostics.
+
+Avoid collecting unrelated user information.
+
+## Automated versus manual
+
+Automation is preferred for repeatable checks, but some AE interactions may remain manual.
+
+Manual evidence is acceptable when it records:
+
+- exact artifact;
+- exact environment;
+- explicit steps;
+- observed result;
+- reviewer/operator.
+
+"Opened it and it looked fine" is not an acceptance record.
+
+## Promotion rule
+
+A capability table may be upgraded only when the evidence level matches the claim.
+
+Examples:
+
+```text
+compiler-only evidence
+  != host verified
+
+one successful 8-bpc render
+  != 8/16/32 verified
+
+macOS arm64 pass
+  != Windows x64 pass
+
+developer build pass
+  != installer/release candidate pass
+```
+
+## Review
+
+Before release, a second pass should verify:
+
+- artifact hash matches the candidate;
+- environment metadata is complete;
+- scenario requirement matches the claim;
+- attachments/logs belong to the run;
+- failures/blockers are not hidden by summary wording.
+
+
+---
+
+<!-- SOURCE: 10-TESTING/08-CLEAN-MACHINE-ACCEPTANCE.md -->
+
+# Clean-machine release acceptance
+
+The final product must be tested as a customer receives it, not from the developer build directory.
+
+## What "clean" means
+
+A clean-machine test should avoid hidden dependencies from development:
+
+- no source tree dependency;
+- no locally built libraries on PATH/DYLD paths;
+- no manually copied debug plug-in;
+- no dev signing exception required;
+- no stale previous version unless testing upgrade;
+- no environment variables that customers do not have.
+
+A fresh VM snapshot or dedicated test machine is ideal.
+
+## Fresh install
+
+Test:
+
+1. obtain the exact release candidate package;
+2. verify package hash/signature;
+3. install with documented permissions;
+4. confirm installed files/path;
+5. launch supported AE version;
+6. verify load;
+7. run smoke scenario;
+8. quit/relaunch and repeat critical operation.
+
+## Upgrade
+
+Test at least one supported previous version:
+
+```text
+install N-1
+ -> create/save representative state
+ -> install N
+ -> launch AE
+ -> verify migration/state
+ -> verify feature
+ -> uninstall/repair if supported
+```
+
+Upgrade must not silently delete user presets, license state or projects unless explicitly designed.
+
+## Multiple AE versions
+
+When installer policy targets shared MediaCore locations, verify behavior with more than one installed AE version.
+
+Record which hosts discover the plug-in and whether that matches the published compatibility matrix.
+
+## Uninstall
+
+Verify:
+
+- owned binaries removed;
+- unrelated Adobe plug-ins untouched;
+- user data policy respected;
+- restart/relaunch state is clean;
+- reinstall succeeds.
+
+## macOS acceptance
+
+Check:
+
+- package signature;
+- Developer ID signature;
+- notarization/Gatekeeper path;
+- architecture slices;
+- no quarantine/signature error in normal install path;
+- load in supported native architecture mode.
+
+## Windows acceptance
+
+Check:
+
+- installer signature;
+- plug-in/helper Authenticode signatures;
+- expected runtime dependencies;
+- SmartScreen/trust behavior as applicable;
+- registry/path resolution;
+- load in supported architecture.
+
+## Offline behavior
+
+If the product includes account/licensing/update logic, test:
+
+- first launch offline if supported;
+- normal offline grace behavior;
+- server unavailable;
+- DNS/network timeout;
+- license server error;
+- update server unavailable.
+
+Render behavior should not become nondeterministic because an update/licensing endpoint is temporarily unreachable.
+
+## Permissions
+
+Test expected non-admin/admin paths.
+
+The installer should fail clearly when privileges are insufficient; the plug-in should not attempt privileged writes during ordinary AE rendering.
+
+## Release-candidate identity
+
+The artifact that passes clean-machine acceptance becomes the release candidate identity.
+
+Any change after that — even a tiny binary patch — creates a new candidate and invalidates the previous package-level acceptance.
+
+## Acceptance report
+
+Record:
+
+```text
+package hash
+signature/notarization verification
+install result
+installed paths
+AE load result
+smoke-test result
+upgrade result
+uninstall result
+rollback result
+known limitations
+```
+
+Only after these checks should the release checklist mark clean-machine installation as passed.
+
+
+---
+
 <!-- SOURCE: 10-TESTING/README.md -->
 
 # Testing strategy
@@ -7828,6 +8327,20 @@ See:
 - 04-PERFORMANCE.md
 - 05-CRASH-DIAGNOSTICS.md
 - 06-EVIDENCE-AND-ACCEPTANCE.md
+
+
+## Read order
+
+1. `01-TEST-MATRIX.md`
+2. `02-RENDER-CORRECTNESS.md`
+3. `03-MFR-STRESS.md`
+4. `04-PERFORMANCE.md`
+5. `05-CRASH-DIAGNOSTICS.md`
+6. `06-HOST-VERIFICATION.md`
+7. `07-TEST-EVIDENCE.md`
+8. `08-CLEAN-MACHINE-ACCEPTANCE.md`
+
+The final three chapters define the evidence boundary between "compiled", "loaded", "behavior verified" and "release verified".
 
 
 ---
