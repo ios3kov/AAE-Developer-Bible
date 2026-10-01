@@ -156,3 +156,36 @@ NOT RUN in this iteration:
 - Windows host behavior.
 
 These are optional future implementation/runtime evidence areas, not Bible completion requirements.
+
+
+## Later PICA / Effect bridge / legacy consistency update — 2026-10-01
+
+A later logical block completed the production/editorial layer around the already-reviewed SDK 25.6 contracts.
+
+The baseline remains:
+
+- `SPBasicSuite::AcquireSuite / ReleaseSuite`;
+- `SPSuitesSuite` low-level provider registry;
+- Sweetie as provider pattern;
+- Checkout as optional consumer pattern;
+- current `AEGP_EffectSuite5::AEGP_EffectCallGeneric`;
+- `PF_Cmd_COMPLETELY_GENERAL`;
+- current AEGP initializer prototype from SDK 25.6.
+
+The later pass added/reconciled:
+
+- provider function-table lifetime versus backing service-state lifetime;
+- stable suite-name storage requirements for acquire/release owners;
+- explicit multi-version negotiation via adapters instead of table casting;
+- conservative provider shutdown without inventing generic hot-unpublish/hot-reload;
+- acquisition/service/domain/cleanup error separation;
+- product-validation wording rather than mandatory Bible host testing;
+- EffectRef freshness and late target resolution;
+- message size/version evolution and additive-tail rules;
+- generic-call reentrancy/mutex guidance and persistent-vs-transient command distinction;
+- legacy migration classification and product source-modernization versus behavior/project-compatibility split;
+- stale legacy text corrected from current EffectSuite4 to current EffectSuite5.
+
+The original hashes/sample findings above remain provenance for the source review.
+
+**Evidence level after this pass:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No provider/consumer or generic-call runtime result is newly asserted.
