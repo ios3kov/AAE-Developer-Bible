@@ -1,62 +1,162 @@
 # macOS — signing and notarization
 
+macOS has two different concerns:
+
+1. code signing establishes identity/integrity;
+2. notarization submits the distributable software to Apple's notary service and produces a ticket recognized by Gatekeeper.
+
+For a commercial external release, treat both as release gates.
+
 ## Development signing
 
-Ad-hoc sign (`-`) подходит для local development/load testing. Это **не** release trust model.
+Ad-hoc signing is suitable for local development and load testing:
 
-## Release signing
+~~~bash
+codesign --force --deep --sign - "/path/to/MyPlugin.plugin"
+~~~
 
-Для внешней дистрибуции Apple рекомендует Developer ID signing. Plug-in bundle должен быть подписан после завершения всех изменений содержимого.
+The AE SDK guide currently notes that macOS 15+ prevents loading unsigned plug-ins, making a development signing step important.
 
-Typical verification:
+Ad-hoc signing is not the release trust model.
 
-```bash
-codesign -vvv --deep --strict "/path/to/MyPlugin.plugin"
-```
+## Release identity
 
-Дополнительно проверять identity/entitlements по вашему release script.
+Apple's distribution documentation uses Developer ID for software distributed outside the Mac App Store.
 
-## Hardened Runtime / nested code
+Depending on what you ship, release artifacts can include:
 
-Если package содержит helpers, dylibs, executables:
-- каждый nested code object должен быть корректно signed;
-- signing order: внутри → наружу;
-- release entitlements минимальны;
-- `get-task-allow` не должен случайно попасть в production artifact.
+- Developer ID Application-signed plug-in/helper binaries;
+- Developer ID Installer-signed installer packages;
+- a notarized ZIP, DMG or PKG delivery artifact.
+
+Choose the exact certificate type for the artifact being signed.
+
+## Sign only final contents
+
+Signing establishes integrity. Any later content mutation can invalidate the signature.
+
+Correct order:
+
+~~~text
+compile
+→ copy runtime resources
+→ embed final dependencies
+→ strip only if intended
+→ finalize Info.plist/resources
+→ sign nested code
+→ sign outer plug-in bundle
+→ verify
+~~~
+
+Do not sign and then patch the binary/version/resource.
+
+## Nested code
+
+If the product contains helpers, dylibs or executables:
+
+- sign inner code first;
+- sign the containing bundle afterward;
+- use the intended identity consistently;
+- keep entitlements minimal;
+- verify nested signatures.
+
+Avoid using --deep as a substitute for understanding nested code in a release script. It is useful for verification and some workflows, but explicit signing order is easier to audit.
+
+## Hardened Runtime and entitlements
+
+Apple's notarization guidance requires modern Developer ID distribution software to meet signing/notarization requirements including Hardened Runtime where applicable.
+
+Important release rules:
+
+- no accidental get-task-allow entitlement in production;
+- no broad entitlement copied from a debug build without review;
+- use secure timestamps for release signatures;
+- document every non-default entitlement.
+
+A successful local load does not prove correct release entitlements.
+
+## Verify code signature
+
+Example verification:
+
+~~~bash
+codesign -vvv --strict "/path/to/MyPlugin.plugin"
+codesign -d --entitlements :- "/path/to/MyPlugin.plugin"
+~~~
+
+Inspect the actual shipping copy.
 
 ## Notarization
 
-Apple больше не принимает старый `altool` workflow. Использовать `notarytool`/актуальный Apple workflow.
+Apple no longer accepts the old altool notarization workflow. Use notarytool or the Notary API.
 
-Conceptual pipeline:
+Typical command-line pipeline:
 
-```text
-build
-→ sign nested binaries
-→ sign plug-in bundle
-→ package (zip/pkg/dmg as chosen)
-→ submit with notarytool
-→ wait/check result
-→ staple ticket where applicable
-→ verify Gatekeeper/signature
-```
+~~~text
+signed plug-in
+→ create supported submission archive/container
+→ notarytool submit
+→ inspect result/log
+→ staple where applicable
+→ verify Gatekeeper/signatures
+~~~
 
-Example submit shape:
+Example shape:
 
-```bash
-xcrun notarytool submit MyPlugin.zip \
-  --keychain-profile "notary-profile" \
-  --wait
-```
+~~~bash
+xcrun notarytool submit "MyPlugin.zip"   --keychain-profile "notary-profile"   --wait
+~~~
 
-Credentials не хранить в repository или shell history.
+Credentials belong in Keychain/CI secret storage, not the repository or shell history.
+
+## Read the notarization log
+
+"Accepted" should not end the investigation automatically.
+
+For release automation:
+
+- capture the submission ID;
+- store the final status;
+- fetch the log on rejection;
+- fail on rejection;
+- archive enough metadata to reproduce the exact submitted artifact.
+
+Do not resubmit a silently modified build under the same internal build identity.
+
+## Stapling
+
+Apple can publish the ticket online, and supported distributable containers can be stapled where applicable.
+
+Whether the plug-in bundle itself, PKG or DMG is the stapled object depends on the delivery format. Test the exact offline/online installation path your users receive.
+
+## Gatekeeper testing
+
+A release should include a clean-machine test with an artifact that carries normal download quarantine behavior.
+
+Do not prove only:
+
+~~~text
+local build directory
+→ copied manually by developer
+→ AE loaded it
+~~~
+
+That bypasses important distribution conditions.
 
 ## Release gate
 
-Release job падает, если:
-- signature invalid;
-- wrong identity;
-- missing required architecture;
+The macOS release job fails if any required condition is false:
+
+- wrong signing identity;
+- missing architecture;
+- invalid nested code signature;
+- unexpected entitlement;
 - notarization rejected;
-- package differs after notarization/signing;
-- clean machine cannot load plug-in.
+- package changed after signing/notarization;
+- clean install fails;
+- AE cannot load the installed plug-in;
+- release symbols/manifest are missing.
+
+## Verification boundary
+
+This chapter follows current Apple Developer ID/notarization guidance and AE SDK development-signing guidance. The Bible has not yet performed the complete Developer ID + notarization + quarantined clean-machine host cycle for every reference artifact.
