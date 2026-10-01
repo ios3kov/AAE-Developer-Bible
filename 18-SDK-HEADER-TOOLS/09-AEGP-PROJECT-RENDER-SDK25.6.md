@@ -27,6 +27,15 @@ SHA-256 приложенного TAR повторно рассчитан: `eee39
 | QueueBert | `Examples/AEGP/Queuebert/QueueBert.cpp:110–165` | Старые нулевые/числовые refs, демонстрационные изменения очереди, фиксированный путь и TRUE в SetRenderState. Это не безопасная готовая команда для рабочего проекта. |
 | Projector | `Examples/AEGP/Projector/Projector.cpp:670–703` | Добавление шести элементов; старт очереди находится в закомментированном блоке, не в исполняемой части рассматриваемого фрагмента. |
 
+## Current suite generations relevant to this chapter
+
+Current SDK 25.6 header exposes:
+
+- `AEGP_RQItemSuite4` for render-queue items;
+- `AEGP_RenderSuite5` for frame rendering.
+
+Existing Bible recipes use older compatible `RQItemSuite3` / `RenderSuite4` subsets. They are source-example dependencies, not the current-generation baseline, and suite tables must never be cast between generations.
+
 ## Важная находка в существующем рецепте Bible
 
 Проверены исходники `17-NATIVE-SUITE-COOKBOOK/code/` с содержимым, доступным после коммита `4cd4515e605783f9255edb59cf734d0cabe0f1fd`:
