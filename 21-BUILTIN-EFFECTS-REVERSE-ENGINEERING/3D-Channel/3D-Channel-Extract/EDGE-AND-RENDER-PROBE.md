@@ -1,6 +1,6 @@
 # 3D Channel Extract — edge sampling and frame export
 
-Date: **2026-09-30**. **Collection reviewed; full-effect acceptance and Gate 8 OPEN. No new run requested.**
+Date: **2026-09-30**. **Collection reviewed; full-effect research remains incomplete; this is an ongoing atlas track and does not block core Bible editorial readiness. No new run requested.**
 
 This page supersedes stale v01 NOT RUN statements, the failed half-frame proposal and the exactly-one-file assertion in [the historical version](https://github.com/ios3kov/AAE-Developer-Bible/blob/b9db3cd30fabb0c164a6dacf28674af304d5d403/21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/EDGE-AND-RENDER-PROBE.md). Full methodology, hashes and corrections are in [the evidence audit](EVIDENCE-AUDIT-2026-09-30.md).
 
