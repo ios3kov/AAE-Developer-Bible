@@ -188,7 +188,7 @@ Async-вариант рассматриваемого suite относится �
 
 ### Ошибка, которая компилируется: TRUE вместо статуса
 
-В существующем [RenderQueueRecipes.cpp](../17-NATIVE-SUITE-COOKBOOK/code/RenderQueueRecipes.cpp) последний вызов выглядит как `AEGP_SetRenderState(rq_itemH, TRUE)`. Но аргумент — `AEGP_RenderItemStatusType`, не `A_Boolean`. При обычном TRUE=1 это **UNQUEUED**, тогда как QUEUED равен 2. Источники: H:3210–3225; Old:206–208; `SPTypes.h:60–61`.
+В более ранней версии [RenderQueueRecipes.cpp](../17-NATIVE-SUITE-COOKBOOK/code/RenderQueueRecipes.cpp) последний вызов передавал `TRUE` в `AEGP_SetRenderState`. Но аргумент — `AEGP_RenderItemStatusType`, не `A_Boolean`. При обычном TRUE=1 это **UNQUEUED**, тогда как QUEUED равен 2. Источники: H:3210–3225; Old:206–208; `SPTypes.h:60–61`. Текущий рецепт исправлен на именованный `AEGP_RenderItemStatus_QUEUED` и проверяет результат через `AEGP_GetRenderState`.
 
 Иллюстрация нужного выбора enum для уже проверенных suite/ref:
 
@@ -203,7 +203,7 @@ if (!err) {
 // Успех операции постановки требует также actual == AEGP_RenderItemStatus_QUEUED.
 ```
 
-Это фрагмент контракта, не законченный плагин; получение suites, preflight и обработка несоответствия в него не включены. **Исходный рецепт пока не исправлен и не должен считаться рабочим образцом постановки в очередь.** В этом редакционном обновлении ошибка отмечена, а не скрыта зелёной сборкой документации.
+Это фрагмент контракта, не законченный плагин. Текущий cookbook-рецепт теперь применяет тот же named-enum + readback pattern. Это закрывает исходную ошибку выбора аргумента, но не заменяет host test: состояние общей очереди, output configuration, invalidation и реальный запуск должны проверяться внутри AE.
 
 Запись с TRUE встречается и в QueueBert:131. Рядом sample использует нулевые/числовые refs и фиксированный путь, а Projector:670–703 добавляет несколько элементов и содержит старт рендера в закомментированном блоке. Читайте samples как конкретный исходник с историческими особенностями, а не как готовый безопасный installer/automation pipeline.
 
