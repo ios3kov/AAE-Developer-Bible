@@ -27495,7 +27495,7 @@ Bible готова как редакция, когда читатель може
 - [x] Старый completion model с обязательными build/host Gates 4–9 отменён.
 - [x] Compile/host evidence сохранён как evidence, а не как условие готовности Bible.
 - [x] Research atlas больше не блокирует core edition.
-- [ ] Финально сверить README / STATUS / coverage / VERIFICATION / chapter indexes.
+- [x] Сверить README / STATUS / coverage / VERIFICATION и удалить старую mandatory build/host gate model.
 - [ ] Проверить cross-links и navigation.
 
 ## G. Research appendices
@@ -27509,10 +27509,10 @@ Bible готова как редакция, когда читатель може
 
 - [ ] Проверить public links и датированные факты.
 - [ ] Проверить third-party/provenance notices.
-- [ ] Пересобрать MASTER и manifest.
-- [ ] Прогнать strict documentation build.
-- [ ] Проверить generated navigation.
-- [ ] Обновить STATUS / coverage / changelog.
+- [x] Пересобрать MASTER и manifest после editorial-model correction.
+- [x] Прогнать strict documentation build после editorial-model correction.
+- [x] Проверить generated navigation / MkDocs strict validation.
+- [x] Обновить STATUS / coverage / changelog под documentation mission.
 - [ ] Зафиксировать edition date/version.
 
 ## Не требуется для закрытия этого чеклиста
@@ -28254,11 +28254,10 @@ Historical compiler/runtime results remain useful evidence about their snapshots
 
 1. Sweep every main chapter for completeness against the editorial checklist.
 2. Find underdeveloped/too-short sections and expand them.
-3. Remove stale gate/QA language left from the superseded completion model.
-4. Reconcile recipes/source examples with the latest explanatory chapters.
-5. Review dated public facts before edition freeze.
-6. Complete navigation/cross-link/provenance audit.
-7. Freeze and publish the next coherent documentation edition.
+3. Reconcile recipes/source examples with the latest explanatory chapters.
+4. Review dated public facts before edition freeze.
+5. Complete cross-link/provenance audit.
+6. Freeze and publish the next coherent documentation edition.
 
 ## Research tracks
 
