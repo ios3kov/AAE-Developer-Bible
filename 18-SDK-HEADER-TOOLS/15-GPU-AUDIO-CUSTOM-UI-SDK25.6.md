@@ -138,7 +138,7 @@ This is a source contract, not evidence that the current Bible has an async-mana
 | `Examples/Headers/AE_Effect.h` | `5432df9bb447cefce2f96c1477d6beccd4686b7236d460c803beab76dae1d537` |
 | `Examples/Headers/AE_EffectGPUSuites.h` | `55fb5dddbb0c33dfc218f9cb9ff77589803f6a6c3080fe889d87bccef242a321` |
 | `Examples/Headers/AE_EffectUI.h` | `ffec9e25ac13a278f3ef0889bb33968fb338f41942ad16d13b3b53f03a235075` |
-| `Examples/Headers/AE_EffectSuites.h` | reviewed current custom-UI suite declaration; hash retained in local source audit |
+| `Examples/Headers/AE_EffectSuites.h` | `718fc38aa700dc0af0372f6a54cbfcfe3cfec770bfa7463f2e24dd73b204cdba` |
 | `Examples/Headers/adobesdk/DrawbotSuite.h` | `c5c4f294b6c7f4628654172bca75c7b256ddfe302ce5f0dbaf08a0cd2156f2ad` |
 | `Examples/Effect/SDK_Invert_ProcAmp/SDK_Invert_ProcAmp.cpp` | `d345bd2923f0c3c88907b1164de1c9096145f7a7f58ab7425ba5bd20cf85702a` |
 | `Examples/Effect/SDK_Invert_ProcAmp/SDK_Invert_ProcAmp.h` | `0f6a6d909187b271c047d64be994696db067966e6fcdc525475d07464c98b77b` |
