@@ -42,3 +42,7 @@
 - [`07-NATIVE-TO-SCRIPT-PANEL.md`](07-NATIVE-TO-SCRIPT-PANEL.md)
 - [`08-THREADING-BOUNDARIES.md`](08-THREADING-BOUNDARIES.md)
 - [`09-DATA-OWNERSHIP.md`](09-DATA-OWNERSHIP.md)
+
+## SDK 25.6 bridge review
+
+The native bridge chapters 03/04 were rechecked against `AEGP_EffectSuite4`, `SPBasicSuite`, `SPSuitesSuite`, Sweetie, Checkout, ProjDumper and Shifter. See [the source-review record](../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md). Source review does not equal host verification.
