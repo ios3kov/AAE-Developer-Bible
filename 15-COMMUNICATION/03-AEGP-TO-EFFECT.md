@@ -150,4 +150,4 @@ AEGP сначала должен получить `AEGP_EffectRefH`, вызва�
 - save/reopen, если protocol влияет на persistent state;
 - отсутствие render-cache stale behavior.
 
-Связанный шаблон: [effect-aegp-generic-bridge](../16-WORKING-TEMPLATES/effect-aegp-generic-bridge/).
+Связанный шаблон: [effect-aegp-generic-bridge](../16-WORKING-TEMPLATES/effect-aegp-generic-bridge/README.md).
