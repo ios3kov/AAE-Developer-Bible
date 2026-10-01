@@ -27508,7 +27508,7 @@ The foundation test verifies:
 - exactly one release;
 - acquisition failure leaves owner empty.
 
-Add product integration tests for:
+For a concrete product, useful runtime cases include:
 
 - provider missing;
 - wrong version;
@@ -27517,9 +27517,13 @@ Add product integration tests for:
 - repeated acquire/release;
 - any declared concurrency mode.
 
+Those tests support product runtime/support claims; they are not editorial prerequisites for Bible.
+
 ## Verification boundary
 
-Stub tests prove local ownership mechanics only. Real suite discovery/refcount/provider lifetime must still be tested inside the target AE host.
+Stub tests prove local ownership mechanics only.
+
+They do not prove real suite discovery, provider lifetime or thread legality. Bible records that boundary instead of treating missing host execution as unfinished documentation.
 
 
 ---
@@ -27677,7 +27681,7 @@ Current stub tests cover:
 - frame receipt checkin;
 - memory handle free.
 
-Still required in product integration:
+For a concrete product, additional runtime evidence may cover:
 
 - host error paths;
 - actual suite lifetime;
@@ -27686,9 +27690,13 @@ Still required in product integration:
 - shutdown ordering;
 - leak diagnostics.
 
+These are product-evidence concerns, not conditions for Bible editorial completion.
+
 ## Verification boundary
 
 RAII proves deterministic local cleanup only when the ownership assumption and suite lifetime are correct.
+
+It does not prove that a host ref remains valid or that cleanup is legal from the current thread/context.
 
 
 ---
@@ -27826,23 +27834,24 @@ Current tests prove:
 - failed start does not call end;
 - null suite produces inactive scope.
 
-Product host tests still need to verify:
+For a concrete product, useful runtime checks include:
 
 - actual Undo menu behavior;
-- multiple host mutations appear as intended;
+- multiple mutations appear as intended;
 - command failure behavior;
 - project state after undo/redo;
 - nested command policy if used.
 
-## Acceptance rule
+## Product acceptance guidance
 
-A user-facing multi-step command is not accepted until:
+A product should not claim reliable multi-step undo semantics until it has:
 
-- prerequisites are validated;
-- undo start failure is handled;
-- one meaningful undo entry is observed when expected;
-- undo/redo restores expected project state;
-- partial-failure behavior is documented/tested.
+- validated prerequisites;
+- handled undo-start failure;
+- defined partial-failure behavior;
+- observed the intended undo/redo behavior in its supported host environment.
+
+Bible's helper/source guidance does not require creating a separate host-test plug-in to be editorially complete.
 
 
 ---
@@ -27986,16 +27995,18 @@ tests/test_foundation.cpp verifies:
 - thrown nonzero A_Err is preserved;
 - thrown zero A_Err maps to fallback.
 
-Add product tests for:
+For a concrete product, useful tests include:
 
 - allocation failure policy where feasible;
 - third-party exception;
 - callback cleanup after exception;
-- host behavior for chosen fallback.
+- host behavior for the chosen fallback error.
 
-## Acceptance rule
+## Product rule
 
-Every exported/native host callback used by product C++ must have a documented exception boundary, and no test should observe a C++ exception escaping into After Effects.
+Every exported/native host callback in product C++ should have a documented exception boundary.
+
+Bible's local guard tests demonstrate the containment pattern; they do not claim that every possible product callback/third-party failure has been executed inside After Effects.
 
 
 ---
@@ -28131,22 +28142,32 @@ tests/test_foundation.cpp currently checks:
 
 These are pure foundation tests with stubs. They do not prove real AE host lifetime, suite generation compatibility or thread legality.
 
-## Production checklist
+## Product-use checklist
 
-Before using this layer in a product:
+Before using this layer in a concrete product:
 
-- [ ] exact SDK suite generations checked;
+- [ ] exact target SDK suite generations checked;
 - [ ] every wrapped resource confirmed owned, not borrowed;
-- [ ] suite owners destroyed before host teardown;
+- [ ] resource owners destroyed before their suite/host lifetime ends;
 - [ ] suite-name lifetime is stable;
-- [ ] release errors reviewed for whether silent cleanup is acceptable;
+- [ ] release errors reviewed for whether silent destructor cleanup is acceptable;
 - [ ] callback fallback errors chosen deliberately;
 - [ ] product logging wraps failures without throwing;
-- [ ] real host integration test exists for each used resource family.
+- [ ] product-specific runtime evidence is added for any runtime/support claims the product makes.
 
 ## Verification boundary
 
-The foundation tests prove local move/cleanup mechanics against stubs. Host correctness still requires compile/link plus After Effects execution on the declared platform matrix.
+The foundation stub tests prove local move/cleanup mechanics and exception containment only.
+
+They do not prove:
+
+- target-host suite availability;
+- semantic validity after project mutation;
+- thread legality;
+- real host cleanup success;
+- product support on a platform/AE version.
+
+For Bible this is a complete evidence boundary, not an open requirement to build a demo plug-in.
 
 
 ---
