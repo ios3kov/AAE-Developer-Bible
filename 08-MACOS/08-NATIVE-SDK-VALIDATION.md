@@ -86,3 +86,6 @@ If header tool fails:
 ## Verification boundary
 
 The Bible has historical macOS arm64 syntax/type evidence for parts of the repository. This file does not upgrade any reference implementation to linked/signed/host-verified status.
+
+
+For the exact PASS/FAIL evidence contract, see [Gate 4 — exact SDK acceptance runbook](../18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
