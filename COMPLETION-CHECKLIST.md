@@ -171,6 +171,25 @@ Checked and reconciled as one logical block:
 - Artisan template/reference evidence wording aligned with `EDITORIAL-GUIDE.md`;
 - SDK source-review provenance preserved with a later consistency note.
 
+### Native Panels / BlitHook block — completed 2026-10-01
+
+Checked and reconciled as one logical block:
+
+- Native Panel baseline: `AEGP_PanelSuite1`, `AEGP_PanelFunctions1`, Panelator;
+- stable match-name identity separated from localized title and transient platform view handles;
+- host-owned panel/container objects separated from product-owned child UI/controller state;
+- create-hook partial-failure rollback, panel recreation and conservative destroy/unregister/shutdown order documented;
+- worker → UI/host-safe handoff and stale-generation rejection documented;
+- dock/resize/workspace/HiDPI state treated as transient view state;
+- Native Panel template/reference now use product-validation / RUNTIME-NOT-CLAIMED evidence wording;
+- BlitHook baseline: `AE_Hook` protocol 3.0 + EMP sample;
+- borrowed pixel buffer, rowbytes/depth/format/view metadata, blank-frame behavior and display-color boundary documented;
+- product-owned staging, bounded backpressure/drop policy and worker/IPC ownership documented without inventing Adobe async lifetime guarantees;
+- death-hook shutdown and pending-frame cleanup documented;
+- async receipt/completion remains explicitly under-qualified because the bundled sample does not exercise it;
+- related threading/data-ownership validation wording aligned with `EDITORIAL-GUIDE.md`;
+- SDK source-review provenance preserved with a later consistency note.
+
 ## E. Recipes and reference source
 
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
