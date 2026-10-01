@@ -76,6 +76,26 @@ The Bible uses runtime evidence when it exists, but **runtime evidence is not ma
 
 Historical compiler/runtime results remain useful evidence about their snapshots, not release requirements for the documentation.
 
+## Editorial completeness sweep — wave 1
+
+Expanded entry/architecture/platform/native chapters now include consistent coverage of selection criteria, lifecycle, ownership, threading, failure modes, production workflow, related chapters and evidence boundaries.
+
+Wave 1 covered:
+
+- extension selection and environment matrix;
+- native lifecycle, version compatibility and communication architecture;
+- scripting and panel entry architecture;
+- macOS/Windows platform entry pages;
+- macOS/Windows GPU guidance;
+- Windows debugging;
+- native taxonomy, host-call flows and AEGP tools;
+- Keyframers;
+- guides/views/selection;
+- documentation errata;
+- header-first and SDK-diff methodology.
+
+Strict-link failures introduced during expansion were corrected; the documentation tree returned to green strict validation.
+
 ## Current editorial TODO
 
 1. Sweep every main chapter for completeness against the editorial checklist.
