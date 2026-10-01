@@ -92,4 +92,4 @@ After extending the inventory parser to resolve callback typedef fields, the exa
 
 The previous 230/3,537 counts were parser-coverage counts, not a different SDK snapshot.
 
-The required-contract manifest passes all 35 required contract tables/functions, and the current cookbook passes 39/39 call-site suite-generation checks. See [the SDK 25.6 audit record](17-GATE4-SDK25.6-RUN-2026-10-01.md).
+The required-contract manifest passes all 35 required contract tables/functions, and the current cookbook passes 39/39 call-site suite-generation checks. See [the SDK 25.6 audit record](17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md).
