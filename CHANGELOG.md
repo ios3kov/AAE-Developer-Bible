@@ -2,6 +2,10 @@
 
 ## Editorial progress — 2026-10-01
 
+- Closed Gate 3A reuse audit: exact FSTR/AE Hot Loader file+commit mapping, transfer decisions, provenance review and independent FSTR portable rerun.
+- Hardened Gate 4 tooling with inventory schema guards, required SDK 25.6 tables/functions, exact SuiteHandler-generation checks and compiler-report provenance.
+- Added cross-platform Gate 4 runners for Clang/MSVC, clean-Git evidence requirements, strict portable native protocol-header compilation and an exact-SDK acceptance runbook.
+
 - Expanded the full testing section with explicit build/host/release evidence layers, richer matrices, render/ROI correctness, MFR stress, performance and crash diagnostics.
 - Added an evidence/acceptance chapter with PASS/FAIL/BLOCKED/NOT_RUN vocabulary tied to exact artifact and environment identity.
 - Expanded practical recipes and bug/compatibility/performance/spec/release templates.
