@@ -18,7 +18,7 @@ Adobe сама рекомендует стартовать от ближайше
 | Template | Base | Что доказывает |
 |---|---|---|
 | `effect-basic/` | SDK Skeleton | Effect registration, param, render, 8/16 bpc |
-| `aegp-menu-command/` | SDK Persisto/Projector-style AEGP | menu + command hook + undo-safe mutation |
+| `aegp-menu-command/` | SDK Persisto/Projector-style AEGP | menu/update/death-hook lifecycle + harmless command callback |
 | `effect-aegp-generic-bridge/` | paired Effect + AEGP | `AEGP_EffectCallGeneric` ↔ `PF_Cmd_COMPLETELY_GENERAL` protocol |
 | `pica-shared-suite/` | SDK Sweetie-style provider | stable native service ABI |
 | `native-panel-registration/` | SDK Panelator | native Window-menu + dockable panel registration |
