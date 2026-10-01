@@ -21713,7 +21713,239 @@ For the current edition, this closes the **SDK contract-accuracy editorial requi
 
 ---
 
+<!-- SOURCE: 18-SDK-HEADER-TOOLS/16-SDK-CONTRACT-AUDIT-RUNBOOK.md -->
+
+# SDK contract audit runbook
+
+> Historical filename retained for link compatibility. The former “Gate 4 compiler acceptance” completion model is superseded.
+
+Target baseline: **Adobe After Effects SDK 25.6 build 61**.
+
+## Purpose
+
+Use this runbook when editing version-sensitive native chapters.
+
+The goal is to answer:
+
+- does the cited SDK expose the expected suite/table generation;
+- do critical functions exist in that table;
+- do cookbook SuiteHandler calls point to the same generation;
+- are parser limitations visible rather than silently ignored.
+
+This is an **editorial contract audit**, not a requirement to build every Bible example.
+
+## Recommended flow
+
+~~~text
+exact SDK headers
+→ inventory with diagnostics preserved
+→ required SDK table/function manifest
+→ required-diagnostic check
+→ cookbook name + suite-generation check
+→ record findings in source-review docs
+~~~
+
+For the current SDK 25.6 baseline this flow has already been run successfully.
+
+## Required-contract manifest
+
+`sdk25.6-required-contracts.json` pins the minimum version-sensitive contract surface used by the current edition.
+
+If a required table/function is missing, reconcile:
+
+1. SDK identity/version;
+2. parser limitation;
+3. actual SDK change;
+4. Bible text/recipe;
+5. manifest mistake.
+
+Do not fix prose by guessing.
+
+## Parser diagnostics
+
+All diagnostics remain visible.
+
+A diagnostic is editorially blocking when it affects a contract the Bible currently relies on.
+
+A diagnostic in an unrelated table is still recorded, but the Bible does not need a complete C/C++ parser for every Adobe structure before publishing documentation.
+
+## Cookbook suite-generation check
+
+For calls such as:
+
+~~~cpp
+suites.StreamSuite6()->AEGP_GetStreamType(...)
+~~~
+
+the audit checks that the function belongs to the expected `AEGP_StreamSuite6` table in the selected SDK baseline.
+
+## Optional compiler evidence
+
+A developer may additionally run platform compiler helpers.
+
+That can catch C++/toolchain issues in a source snapshot, but it is **optional evidence**, not an editorial completion gate.
+
+Compilation becomes relevant to a Bible claim only when the Bible says that a particular artifact was actually compiled or run.
+
+## Evidence retention
+
+Keep SDK identity, inventory summary, required-contract result, cookbook result, diagnostics, Bible snapshot and date. Do not publish licensed Adobe headers.
+
+## Current result — 2026-10-01
+
+Real SDK 25.6 audit:
+
+- 140 headers scanned;
+- 233 contract tables indexed;
+- 3,560 function entries;
+- 35 required contracts: **0 missing**;
+- 39 cookbook call-sites: **0 unknown**;
+- 0 required parser diagnostics;
+- 4 non-required partial diagnostics retained.
+
+See [the exact SDK record](18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md).
+
+For the current edition, this closes the **SDK contract-accuracy editorial requirement**. No whole-repository macOS/Windows build is required.
+
+
+---
+
 <!-- SOURCE: 18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md -->
+
+# SDK 25.6 required-contract audit — 2026-10-01
+
+## Scope
+
+This record is a **real-header SDK contract audit** against the user-supplied Adobe After Effects SDK 25.6 build 61.
+
+It establishes required contract-table/function coverage and cookbook suite-generation symbol coverage. It does **not** establish macOS/Windows compilation, linking, PiPL/resource build, After Effects host execution or runtime semantics.
+
+## SDK input identity
+
+Two supplied representations were checked:
+
+| File | Actual format | Size | SHA-256 |
+|---|---|---:|---|
+| `ae25.6_61.64bit.AfterEffectsSDK.tar.zstd` | POSIX TAR | 7,182,336 | `eee39a787ab09226a5a08c27496335faf79cbe52dd96f19cf795e48af09e2df6` |
+| `ae25.6_61.64bit.AfterEffectsSDK.tar.zstd.zip` | Zstandard stream | 1,540,471 | `e02fa2b488c3cceb238866b648eb9a2526d308a260744367915a2f173663c36c` |
+
+The Zstandard stream was decompressed with the system `zstd`; its output SHA-256 was exactly:
+
+`eee39a787ab09226a5a08c27496335faf79cbe52dd96f19cf795e48af09e2df6`
+
+and it was byte-identical to the supplied TAR.
+
+The TAR contains 1,202 members. A traversal check found no absolute paths or `..` path components.
+
+## Bible source identity
+
+The exact committed source was exported through a one-purpose audit branch:
+
+- main/base: `0e7630574729dfe9e99eebc7be2e89e70fe44b0e`;
+- audit commit: `81dd429ef22ab6912f095768f9a15e61a9b5c941`;
+- source-export workflow run: `36846188734`;
+- source artifact SHA-256: `349fb87dd4e93068f25f331f872838d337e668f41f8ecd50eb5de58c08aeec68`.
+
+Git compare shows the audit commit is exactly one commit ahead of base and adds only:
+
+`.github/workflows/gate4-exact-source-export.yml`
+
+No product/source/test file differs from the base main snapshot. The exported checkout reported a clean working tree.
+
+## Inventory result
+
+Command shape:
+
+~~~bash
+python3 18-SDK-HEADER-TOOLS/tools/ae_sdk_inventory.py   "<SDK>/Examples/Headers"   --json ae-sdk-inventory.json   --markdown ae-sdk-inventory.md   --allow-incomplete
+~~~
+
+Result:
+
+- headers scanned: **140**;
+- contract tables: **233**;
+- function entries: **3,560**;
+- unparsed candidate tables: **0**;
+- partial candidate tables: **4**.
+
+The four retained partial diagnostics are:
+
+- `PF_InteractCallbacks`;
+- `PF_UtilCallbacks`;
+- `AE_FIM_ImportCallbacks`;
+- `SPPluginsSuite`.
+
+They contain non-function/data or parser-boundary material and are **not in the required-contract manifest used by the Bible**.
+
+The runner intentionally preserves these diagnostics instead of hiding them. `--allow-incomplete` only allows the inventory file to be emitted so the required-contract gate can classify the diagnostics; inventory alone is not acceptance.
+
+## Required SDK 25.6 contract result
+
+`verify_required_contracts.py` was run against `sdk25.6-required-contracts.json`.
+
+Result:
+
+~~~text
+required_tables=35
+missing=0
+target=Adobe After Effects SDK 25.6 build 61
+~~~
+
+This includes the current SDK 25.6 Drawbot surface generation:
+
+`DRAWBOT_SurfaceSuite2`
+
+The SDK header declares Surface Suite version 2 as current and typedef-aliases the historical version-1 name to the version-2 table. The previous Bible manifest entry `DRAWBOT_SurfaceSuite1` was therefore corrected.
+
+The required `PR_ArtisanEntryPoints` table is now parsed through its callback typedef fields. This parser improvement is why the same SDK archive now inventories **233 tables / 3,560 function entries**, compared with the historical exploratory count of **230 / 3,537**. The SDK bytes did not change.
+
+## Cookbook suite-generation result
+
+`verify_recipe_symbols.py` checked the current cookbook source.
+
+Result:
+
+~~~text
+call_sites=39
+unknown=0
+diagnostics=4
+~~~
+
+The 39 calls all resolved to the exact expected SuiteHandler generations. The four diagnostics are the same retained non-required inventory diagnostics above.
+
+## Exact-header compiler experiment on this container
+
+For boundary testing only, `scripts/check_native.py` was also invoked with the exact SDK headers using the Linux container's `clang++`.
+
+Result:
+
+- translation units: 13;
+- failed: 13;
+- SDK header manifest: 162 headers;
+- SDK header-manifest SHA-256: `add21213213aed63cb1b2f3cc78a50dace3f2cc9aab2691cb349aa280f2f23a1`.
+
+Every translation unit reaches the SDK platform gate and fails at:
+
+`AEConfig.h: "unrecognized AE platform"`
+
+with related platform typedef/calling-convention errors.
+
+This is expected because the Adobe SDK target is macOS/Windows, while this execution environment is Linux. It is **not** a Bible source compile failure and is **not** macOS compiler evidence.
+
+## Editorial consequence
+
+The following editorial SDK-accuracy criterion is satisfied:
+
+- required SDK 25.6 contract families/functions parse without unresolved **required** declarations.
+
+Optional future implementation evidence may include compiler or host runs for specific examples, but those are not required to complete the Bible.
+
+The four non-required parser diagnostics remain visible and may be improved later, but they do not silently weaken the required-contract acceptance surface.
+
+
+---
+
+<!-- SOURCE: 18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md -->
 
 # SDK 25.6 required-contract audit — 2026-10-01
 
