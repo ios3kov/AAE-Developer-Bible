@@ -5285,6 +5285,175 @@ PASS означает только:
 
 ---
 
+<!-- SOURCE: 08-MACOS/09-PRODUCTION-BUILD-PIPELINE.md -->
+
+# macOS — production build pipeline
+
+This chapter connects the individual macOS topics into one reproducible release flow.
+
+It does **not** mean the Bible examples are host-verified. A production pipeline is only accepted after an actual plug-in bundle is built, installed and loaded in the declared AE/OS matrix.
+
+## Inputs
+
+Pin:
+
+- source commit;
+- Adobe AE SDK version/build used for compilation;
+- Xcode version;
+- macOS runner/build image;
+- deployment target;
+- architectures;
+- dependency versions;
+- product version/build number.
+
+Do not let the release job silently pick "latest" toolchains.
+
+## Recommended stages
+
+```text
+clean checkout
+ -> dependency validation
+ -> compile resources
+ -> build arm64
+ -> build x86_64 if supported
+ -> merge/produce universal bundle
+ -> inspect architectures
+ -> verify PiPL/resources/exports
+ -> run native/unit tests
+ -> sign nested code
+ -> sign plug-in bundle
+ -> package
+ -> notarize
+ -> staple where applicable
+ -> verify package
+ -> install on clean test machine
+ -> launch/load in AE
+ -> archive symbols + manifest + checksums
+```
+
+## Build configuration
+
+Release builds should normally have:
+
+- `NDEBUG`/release assertions policy explicitly chosen;
+- no debug-only host backdoors;
+- warnings reviewed;
+- deterministic version macros;
+- symbols produced even if stripped from the shipping binary;
+- consistent C++ language level;
+- dependency search paths that do not depend on one developer's home directory.
+
+## Architecture verification
+
+After building, inspect the Mach-O binary:
+
+```bash
+lipo -info "/path/to/MyPlugin.plugin/Contents/MacOS/MyPlugin"
+```
+
+If universal support is claimed, both required slices must be present.
+
+Also verify dependent dylibs have compatible architecture slices. A universal main binary with arm64-only nested code is not a universal product.
+
+## Bundle verification
+
+Before signing, verify:
+
+- expected executable path;
+- bundle identifier/version;
+- PiPL/resource output exists;
+- only intended helper/dylib files are present;
+- no local build cache or secrets were copied into the bundle.
+
+## Signing order
+
+Sign from the inside out:
+
+```text
+nested dylib/helper
+ -> framework if any
+ -> plug-in bundle
+ -> installer/package/container
+```
+
+Do not mutate signed code afterwards.
+
+Development ad-hoc signing and release Developer ID signing are different trust models.
+
+See [signing and notarization](08-MACOS/05-SIGNING-NOTARIZATION.md).
+
+## Notarization
+
+Treat notarization as a release gate, not as an optional upload step.
+
+The pipeline should retain:
+
+- submission ID;
+- notarization result/log;
+- exact artifact hash submitted;
+- final stapled package hash where stapling applies.
+
+A rebuilt package is a different artifact and needs to go through the gate again.
+
+## Installation test
+
+Do not validate only from the build tree.
+
+Install the exact packaged artifact using the same path/policy as customers, then verify:
+
+1. file ownership/permissions;
+2. plug-in appears in expected host;
+3. AE loads it without quarantine/signature errors;
+4. basic operation succeeds;
+5. uninstall removes only product-owned files.
+
+## AE host matrix
+
+For every supported AE/macOS/architecture combination, record:
+
+- AE exact version/build;
+- macOS version;
+- architecture;
+- native/Rosetta path if applicable;
+- load result;
+- required functional smoke test.
+
+Intel support is not proved merely because an x86_64 slice exists.
+
+## Symbols
+
+Archive:
+
+- dSYM;
+- exact release binary;
+- source commit;
+- compiler/toolchain version;
+- build manifest.
+
+Symbols must be tied to the exact binary UUIDs shipped.
+
+## Failure gates
+
+Release must fail on:
+
+- compile/resource error;
+- unexpected architecture;
+- missing nested dependency;
+- signing failure;
+- notarization rejection;
+- package checksum mismatch;
+- clean install failure;
+- AE load/smoke-test failure.
+
+A warning-only release pipeline is not sufficient for these cases.
+
+## Reproducibility
+
+The goal is not necessarily byte-for-byte reproducibility across Apple's signing/notarization systems. The goal is a fully reconstructable build recipe with traceable source, inputs and final artifact identity.
+
+
+---
+
 <!-- SOURCE: 08-MACOS/README.md -->
 
 # macOS developer bible
@@ -6203,6 +6372,189 @@ PASS означает только:
 - suite symbols в наших cookbook C++ recipes существуют в указанном SDK.
 
 После этого обязательны MSVC compile/link и запуск plug-in внутри целевого After Effects. Code signing проверяется отдельным release pipeline.
+
+
+---
+
+<!-- SOURCE: 09-WINDOWS/09-PRODUCTION-BUILD-PIPELINE.md -->
+
+# Windows — production build pipeline
+
+This chapter connects the Windows build, signing and installer topics into one release flow.
+
+It is a process definition, not proof that the Bible examples already compile or load on Windows.
+
+## Inputs
+
+Pin:
+
+- source commit;
+- Adobe AE SDK version/build;
+- Visual Studio version;
+- MSVC toolset;
+- Windows SDK version;
+- target architectures;
+- dependency versions;
+- product version/build number.
+
+Do not let CI silently change compiler or SDK generation for a release branch.
+
+## Recommended stages
+
+```text
+clean checkout
+ -> restore/validate dependencies
+ -> compile PiPL/resources
+ -> build x64
+ -> build ARM64 if supported
+ -> run native/unit tests
+ -> inspect imports/dependencies
+ -> sign .aex/.dll/.exe
+ -> build installer
+ -> sign installer
+ -> verify signatures
+ -> install on clean test VM/machine
+ -> launch/load in AE
+ -> archive PDB + manifest + checksums
+```
+
+## Visual Studio configuration
+
+Keep Release configuration explicit:
+
+- correct PlatformToolset;
+- correct WindowsTargetPlatformVersion;
+- C++ language level;
+- Runtime Library choice;
+- warnings policy;
+- exception/RTTI policy;
+- preprocessor version macros;
+- resource build step;
+- output directory.
+
+Do not depend on environment variables that exist only on one developer workstation unless CI defines and validates them.
+
+## Architecture
+
+x64 remains the normal baseline for supported desktop AE releases unless your compatibility matrix says otherwise.
+
+If ARM64 is shipped:
+
+- build it as a real target;
+- verify every static/dynamic dependency;
+- test on a native ARM64 host path;
+- do not present x64 emulation as native ARM64 verification.
+
+Keep architecture artifacts separate until packaging.
+
+## Dependency inspection
+
+Before signing, inspect the final binary for accidental dependencies on:
+
+- Debug CRT;
+- developer-local DLLs;
+- absolute build paths;
+- unshipped helper libraries.
+
+A successful link does not prove the customer's machine has the same runtime environment.
+
+## Signing
+
+Sign final binaries after all mutation:
+
+```text
+.aex
+.dll
+.exe/helper
+ -> installer
+```
+
+Use SHA-256 and a trusted timestamping workflow appropriate to the organization's signing infrastructure.
+
+Then verify signatures independently.
+
+See [code signing](09-WINDOWS/05-CODE-SIGNING.md).
+
+## Installer
+
+Installer logic should:
+
+- resolve official Adobe plug-in install locations;
+- handle supported multi-version AE installations intentionally;
+- keep user data/presets/license state according to documented policy;
+- support clean upgrade/uninstall semantics;
+- log actionable failure details.
+
+Do not hardcode only one After Effects version path.
+
+## Clean-machine test
+
+Install the exact signed release artifact on a machine/VM that does not contain the developer build tree.
+
+Verify:
+
+1. install succeeds with expected privileges;
+2. expected files are present;
+3. no missing runtime dependency appears;
+4. AE discovers and loads the plug-in;
+5. smoke test succeeds;
+6. uninstall removes only product-owned files.
+
+## AE host matrix
+
+Record per supported combination:
+
+- Windows version;
+- AE version/build;
+- architecture;
+- install path selected;
+- load result;
+- smoke-test result.
+
+A signed installer is not proof of AE compatibility.
+
+## Symbols
+
+Archive:
+
+- PDB files;
+- exact signed binaries;
+- source commit;
+- compiler/toolset versions;
+- build manifest.
+
+Never rely on regenerating PDBs later from "same source". The shipped binary and symbols are one release identity.
+
+## Failure gates
+
+Fail the release on:
+
+- resource compilation error;
+- binary build error;
+- wrong architecture;
+- unexpected dependency;
+- signature failure;
+- installer build/signature failure;
+- clean install failure;
+- AE load/smoke-test failure.
+
+## Release artifact identity
+
+Create a manifest containing at least:
+
+```text
+product version
+git commit
+SDK version/build
+compiler/toolset
+target architecture
+binary hashes
+installer hash
+signing timestamp metadata
+supported AE range
+```
+
+This makes support and rollback possible without guessing what was shipped.
 
 
 ---
@@ -7360,6 +7712,167 @@ NOT RUN in this editorial pass:
 - Windows x64/ARM64 AE host matrix.
 
 No release/test status is upgraded from this source review alone.
+
+
+---
+
+<!-- SOURCE: 11-DISTRIBUTION/05-RELEASE-ARTIFACTS-UPDATES.md -->
+
+# Release artifacts, installers and update strategy
+
+Distribution is the point where a technically correct plug-in becomes a supportable product.
+
+## Release set
+
+A release should have a defined artifact set, for example:
+
+```text
+macOS installer/container
+Windows installer
+checksums
+build manifest
+support matrix
+changelog
+known issues
+rollback artifact
+symbols stored privately
+```
+
+Do not treat the binary copied from a developer plug-ins folder as the release artifact.
+
+## Build manifest
+
+Record at least:
+
+- product version/build;
+- Git commit/tag;
+- Adobe SDK version/build;
+- compiler/toolchain versions;
+- target OS/architectures;
+- exact binary hashes;
+- installer/package hashes;
+- signing/notarization status;
+- supported AE versions;
+- schema/protocol versions where relevant.
+
+The manifest belongs to the release, not only to CI logs that may expire.
+
+## Installer ownership
+
+Maintain an explicit inventory of files the installer owns.
+
+Uninstall must remove only those files plus documented product-created caches/config where policy allows.
+
+Never recursively delete a broad Adobe/Common/Plug-ins directory.
+
+## Upgrade
+
+Define upgrade semantics before shipping v1:
+
+- in-place replace;
+- side-by-side versions;
+- migration of settings;
+- migration of licenses/account tokens;
+- preservation/removal of caches;
+- downgrade policy.
+
+A version comparison bug in an installer can be more destructive than a rendering bug.
+
+## Rollback
+
+Retain at least one known-good previous release and its manifest.
+
+Rollback procedure should answer:
+
+1. which files are replaced;
+2. whether settings/schema downgrade safely;
+3. whether old AE projects remain compatible;
+4. whether user data needs backup;
+5. how to verify the rollback loaded correctly.
+
+## Auto-update
+
+A native AE plug-in should not self-update its loaded binary in place while After Effects is using it.
+
+Safer model:
+
+```text
+check metadata
+ -> download to staging
+ -> verify signature/hash
+ -> ask for/coordinate AE shutdown
+ -> installer performs atomic upgrade
+ -> next AE launch loads new build
+```
+
+If a helper performs updates, authenticate and version that helper separately.
+
+## Download integrity
+
+At minimum:
+
+- HTTPS delivery;
+- platform code signing;
+- published/recorded cryptographic hashes;
+- signed update metadata if building an auto-updater;
+- strict artifact/version matching.
+
+Do not trust only a filename such as `MyPlugin-latest.zip`.
+
+## Compatibility statement
+
+Every release should publish a support matrix with explicit status:
+
+```text
+AE version
+OS version
+architecture
+GPU/backend if relevant
+tested/not tested
+known limitations
+```
+
+"Works with Creative Cloud" is not a compatibility matrix.
+
+## Beta/pre-release
+
+Pre-release packages should be unmistakably identified:
+
+- distinct version/build;
+- separate update channel if used;
+- expiration only if intentional and documented;
+- explicit project/file compatibility warning when schemas may change.
+
+Do not accidentally allow beta builds to overwrite production settings without migration policy.
+
+## Customer diagnostics
+
+A supportable release should expose enough information to identify:
+
+- product version/build;
+- architecture;
+- loaded module path;
+- protocol/schema version;
+- relevant GPU/backend;
+- helper/service version if any.
+
+Avoid collecting unrelated personal data.
+
+## Final release gate
+
+Before publishing:
+
+1. build from clean source;
+2. run platform signing gates;
+3. install the exact packaged artifact;
+4. run host smoke tests on the supported matrix;
+5. verify upgrade from previous release;
+6. verify uninstall;
+7. verify rollback;
+8. archive artifacts/manifests/symbols;
+9. publish changelog/support matrix/checksums.
+
+See [release checklist](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md).
 
 
 ---
@@ -10178,471 +10691,549 @@ Runtime JavaScript object не является надёжным persistent stor
 
 <!-- SOURCE: 15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md -->
 
-# CEP panel ↔ ExtendScript
+# CEP panel <-> ExtendScript
 
-Обновлено **2026-10-01**. CEP panel и ExtendScript — два разных JavaScript runtime. Panel не получает scripting DOM напрямую: доступ к AE идёт через host bridge.
+CEP panel code and ExtendScript live in different runtimes. Treat the bridge as an explicit RPC boundary, not as a convenient string-eval shortcut.
 
-Связанные главы:
+## HTML/JS -> AE
 
-- [CEP development](15-COMMUNICATION/../07-PANELS/01-CEP.md)
-- [UXP transition](15-COMMUNICATION/../07-PANELS/02-UXP-TRANSITION.md)
-- [Script → AE](15-COMMUNICATION/05-SCRIPT-TO-AE.md)
+The normal CEP bridge is `CSInterface.evalScript()`:
 
-## 1. Runtime model
+```js
+const cs = new CSInterface();
 
-~~~text
-CEP HTML/JS runtime
-      |
-      | CSInterface.evalScript(...)
-      v
-After Effects ExtendScript engine
-      |
-      v
-AE scripting DOM
-~~~
+cs.evalScript(
+  '$._myTool.dispatch(' + JSON.stringify(JSON.stringify(message)) + ')',
+  function (raw) {
+    // parse the response envelope here
+  }
+);
+```
 
-Официальный CEP cookbook разделяет HTML DOM и host Application/ExtendScript DOM.
+The evaluated code runs in the host application's ExtendScript engine and therefore shares the normal scripting limitations of After Effects.
 
-evalScript запускает script в host ExtendScript engine. Cookbook также указывает, что host script и CEP event dispatch зависят от host main-thread scheduling.
+## One dispatcher, not many string-built calls
 
-Asynchronous callback в panel API не делает host-side script background worker.
+Avoid spreading calls such as this throughout the UI:
 
-## 2. One bridge, not evalScript everywhere
+```js
+cs.evalScript('renameLayer("' + userText + '")');
+```
 
-Плохо:
+Problems:
 
-~~~text
-ButtonA -> evalScript
-ButtonB -> evalScript
-component -> evalScript
-timer -> evalScript
-~~~
+- quoting/escaping bugs;
+- accidental code injection;
+- no stable request schema;
+- inconsistent error handling;
+- impossible-to-centralize logging and compatibility gates.
 
-Хорошо:
+Prefer a single dispatcher:
 
-~~~text
-UI
- ↓
-Bridge.request(command, payload)
- ↓
-one evalScript dispatcher
- ↓
-$._myTool.dispatch(...)
- ↓
-AE scripting service
-~~~
+```text
+CEP UI
+  -> JSON request
+  -> one evalScript dispatcher
+  -> command router
+  -> AE scripting DOM
+  -> JSON response
+  -> UI
+```
 
-Так protocol можно тестировать отдельно от UI.
+Recommended request shape:
 
-## 3. Namespace and bootstrap
-
-~~~jsx
-$._myTool = $._myTool || {};
-
-$._myTool.dispatch = function(jsonText) {
-    // parse → validate → route → stringify response
-};
-~~~
-
-Не полагайтесь на то, что много JSX-файлов безопасно определяют одинаковые globals: последняя загрузка может перезаписать предыдущую.
-
-## 4. Request protocol
-
-~~~json
+```json
 {
-  "protocol": 1,
+  "version": 1,
   "requestId": "42",
-  "command": "renameSelected",
+  "command": "renameSelectedLayer",
   "payload": {
-    "name": "Hero"
+    "name": "Title"
   }
 }
-~~~
+```
 
-Dispatcher:
+Recommended response envelope:
 
-1. parse JSON;
-2. validate protocol;
-3. allowlist command;
-4. validate payload shape/range;
-5. execute;
-6. return normalized JSON envelope.
-
-## 5. User data is data, not script source
-
-Нельзя:
-
-~~~js
-cs.evalScript('rename("' + userText + '")');
-~~~
-
-Один практический pattern:
-
-~~~js
-const wire = JSON.stringify(message);
-const jsxArg = JSON.stringify(wire);
-cs.evalScript('$._myTool.dispatch(' + jsxArg + ')', onResult);
-~~~
-
-В ExtendScript:
-
-~~~jsx
-var message = JSON.parse(jsonText);
-~~~
-
-Quoting/escaping централизуется на transport layer.
-
-## 6. Response envelope
-
-Success:
-
-~~~json
+```json
 {
   "ok": true,
   "requestId": "42",
-  "result": {"changed": 3}
+  "result": {
+    "changed": 1
+  }
 }
-~~~
+```
 
 Failure:
 
-~~~json
+```json
 {
   "ok": false,
   "requestId": "42",
   "error": {
-    "code": "NO_COMP",
+    "code": "NO_ACTIVE_COMP",
     "message": "No active composition"
   }
 }
-~~~
+```
 
-Human-readable строка не должна быть единственным machine contract.
+## ExtendScript dispatcher shape
 
-## 7. Transport error ≠ application error
+Keep host-side dispatch small and deterministic:
 
-Различайте:
+```jsx
+$._myTool = $._myTool || {};
 
-~~~text
-CEP/evalScript transport failed
-script failed before envelope
-protocol rejected
-domain command failed
-command succeeded
-~~~
+$._myTool.dispatch = function (raw) {
+    var req = JSON.parse(raw);
 
-Panel должен показывать diagnostic, не превращая всё в Unknown error.
+    try {
+        var result;
 
-## 8. Request IDs and stale responses
+        switch (req.command) {
+            case "renameSelectedLayer":
+                result = $._myTool.renameSelectedLayer(req.payload);
+                break;
 
-Каждый запрос имеет requestId. Для snapshots полезен generation/revision.
+            default:
+                throw new Error("UNKNOWN_COMMAND");
+        }
 
-~~~text
-request generation 12
-→ UI moved to 13
-→ old response arrives
-→ ignore as stale
-~~~
+        return JSON.stringify({
+            ok: true,
+            requestId: req.requestId,
+            result: result
+        });
+    } catch (err) {
+        return JSON.stringify({
+            ok: false,
+            requestId: req.requestId,
+            error: {
+                code: err && err.message ? err.message : "HOST_ERROR"
+            }
+        });
+    }
+};
+```
 
-Старый callback не должен перетирать новое состояние.
+The exact JSON implementation must match the ExtendScript version/runtime available in the supported AE releases.
 
-## 9. Backpressure
+## Command design
 
-Не запускать десятки evalScript calls на каждый mousemove.
+A command should be:
 
-Для high-frequency UI:
+- small enough to understand and test;
+- idempotent when possible;
+- explicit about whether it mutates the project;
+- explicit about whether it requires an active project/comp/layer;
+- versioned when its payload changes;
+- free of UI-only assumptions unless the command is intentionally interactive.
 
-- debounce/coalesce reads;
-- batch related writes;
-- latest-wins для transient preview, если semantic допускает;
-- serial queue для order-sensitive mutations;
-- explicit Apply для дорогой операции.
+Do not send individual property mutations across the bridge if one host command can perform the complete operation safely. Bridge latency and host scheduling make chatty protocols fragile.
 
-## 10. AE/ExtendScript → panel
+Bad:
 
-ExtendScript не может напрямую менять CEP HTML DOM. Для notification используется CEP/CSXS event path.
+```text
+set layer
+set property
+set property
+set key
+set key
+set key
+```
 
-~~~text
-host state changed
-→ small state-invalidated event
-→ panel receives event
-→ panel requests fresh normalized snapshot
-~~~
+Better:
 
-Для большого state лучше invalidation + pull, чем сотни mutation events.
+```text
+applyAnimationPreset(payload)
+```
 
-## 11. Event payload
+with one validated payload and one undo group.
 
-Event payload должен быть versioned, small, serializable, без raw pointers/handles и не единственным source of truth.
+## Undo boundaries
 
-## 12. Idempotency and retry
+Commands that mutate the AE project should own their undo scope:
 
-Не retry автоматически destructive command, если неизвестно, выполнился ли первый вызов.
+```jsx
+app.beginUndoGroup("My Tool");
 
-Для reconnect/reload:
+try {
+    // mutations
+} finally {
+    app.endUndoGroup();
+}
+```
 
-- request/operation IDs;
-- idempotent commands где возможно;
-- duplicate detection, если это важно.
+A panel button click should normally create one understandable undo step, not dozens of low-level ones.
 
-## 13. Reload / extension restart
+## Large data
 
-~~~text
-panel boot
-→ protocol handshake
-→ query host snapshot
-→ reconstruct UI state
-→ resume interaction
-~~~
+`evalScript()` is a control channel, not a high-throughput binary transport.
 
-DOM state после reload не authoritative.
+Do not push:
 
-## 14. Payload size
+- full-resolution pixel buffers;
+- large model weights;
+- huge encoded media;
+- megabytes of per-frame telemetry;
 
-String bridge подходит для control data и small snapshots.
+through string serialization unless measurements prove it is acceptable.
 
-Не гоняйте через evalScript:
+For large payloads, use a deliberate secondary transport such as:
 
-- pixel buffers;
-- audio blocks;
-- large binary models;
-- huge Base64 blobs;
-- frequent telemetry streams.
+- temporary file + atomic rename;
+- localhost service;
+- named pipe / Unix domain socket;
+- child-process stdin/stdout;
+- native shared memory only after profiling and with explicit ownership.
 
-## 15. Security boundary
+The CEP/ExtendScript message should carry control metadata and a path/token, not the entire heavy payload.
 
-- allowlist commands;
-- validate paths/enums/ranges;
-- never eval downloaded code;
-- не вставлять remote/user text в script source;
-- не хранить secrets в panel bundle;
-- downloaded code и downloaded data — разные trust classes.
+## AE/ExtendScript -> panel
 
-## 16. Acceptance checklist
+CEP/CSXS events can be used for host-to-panel notification.
 
-Проверить:
+A useful pattern is:
 
+```text
+host mutation
+ -> dispatch small event
+ -> panel invalidates local snapshot
+ -> panel requests fresh state
+```
+
+Prefer invalidation events over trying to mirror every host object mutation in the UI.
+
+## Request ordering
+
+Do not assume callbacks return in the same logical order as user actions once you introduce async work around the bridge.
+
+Include:
+
+- `requestId`;
+- optional `document/project generation`;
+- optional `command sequence`;
+- stale-response rejection on the UI side.
+
+If a newer request supersedes an older one, the UI should ignore the stale result.
+
+## Cancellation
+
+ExtendScript itself is not a general preemptible task system.
+
+For long operations:
+
+1. split work into bounded chunks where possible;
+2. expose progress/cancel state through your own command protocol;
+3. avoid leaving the project half-mutated;
+4. define rollback or safe partial-completion behavior.
+
+If true asynchronous heavy work is required, move that work outside the scripting engine and keep AE mutations on the documented host boundary.
+
+## Security
+
+Treat every message as untrusted input even when the panel is local.
+
+Validate:
+
+- command name;
+- protocol version;
+- payload type/size;
+- paths;
+- numeric ranges;
+- requested file operations.
+
+Never evaluate user-provided JavaScript/ExtendScript source as a protocol feature.
+
+## Testing
+
+At minimum test:
+
+- valid command;
+- unknown command;
 - malformed JSON;
-- unknown protocol/command;
-- quotes/newlines/unicode;
-- long allowed string;
-- rapid requests;
-- stale callback;
-- panel reload;
-- project change while panel open;
-- script exception;
-- event during long host call;
-- missing JSX bootstrap;
-- clean AE restart.
+- missing required field;
+- Unicode;
+- quotes/backslashes/newlines;
+- very long strings;
+- stale request rejection;
+- host command error;
+- no active project/comp;
+- repeated command;
+- panel reload during an outstanding request.
 
-## Verification boundary
+Bridge unit tests should run without AE by testing serialization, validation and routing separately. Host verification is still required for actual AE DOM behavior.
 
-CEP bridge rules сверены с Adobe CEP cookbook/CEP resources, включая разделение HTML и host DOM и main-thread scheduling evalScript/events. Этот editorial pass не является новым AE host test.
+See also:
+
+- [ExtendScript -> After Effects](15-COMMUNICATION/05-SCRIPT-TO-AE.md)
+- [Native <-> script/panel](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md)
+- [Threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
+- [Data ownership](15-COMMUNICATION/09-DATA-OWNERSHIP.md)
+- `16-WORKING-TEMPLATES/cep-panel-bridge/`
 
 
 ---
 
 <!-- SOURCE: 15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md -->
 
-# Native ↔ script/panel: архитектура гибридного продукта
+# Native <-> script/panel: как собирать гибридный продукт
 
-Обновлено **2026-10-01**. UI, host automation и heavy native compute — разные слои. Связь между ними должна быть явной, versioned и малой по объёму.
+A hybrid AE product usually has three different jobs:
 
-## 1. Recommended layers
+1. UI and user interaction.
+2. Project automation.
+3. Native high-performance work.
 
-~~~text
-UI shell
+Do not force all three into one runtime.
+
+## Recommended architecture
+
+```text
+UI layer
   CEP now / UXP later
-        |
-        | versioned commands + JSON
-        v
+       |
+       | versioned commands + JSON
+       v
 Automation layer
   ExtendScript dispatcher
-        |
-        +---- project edits ------> AE scripting DOM
-        |
-        +---- control request ----> native rendezvous
-                                   |
-                                   v
+       |
+       +---- project edits ----------> AE scripting DOM
+       |
+       +---- control native feature -> parameter/menu/file/IPC bridge
+
 Native layer
-  Effect / AEGP / helper
-        |
-        +---- PICA suites -------> AE C++ APIs
-        +---- shared suite ------> sibling native module
-        +---- external IPC ------> helper/service
-~~~
+  Effect plug-in / AEGP service
+       |
+       +---- PICA suites ---> AE native APIs
+       +---- shared suite --> other native modules
+       +---- external IPC --> helper/service when justified
+```
 
-Business logic не должна знать concrete panel runtime.
+The layer boundary is more important than the UI technology. A future CEP -> UXP migration should not require rewriting the domain model or native engine.
 
-## 2. Control plane vs data plane
+## Which bridge should you use?
 
-**Control:** commands, IDs, paths, small settings, progress, status/error, invalidation.
-
-**Data:** frames, pixel buffers, audio, ML tensors, large caches/assets.
-
-CEP/ExtendScript JSON bridge подходит для control plane. Heavy data должен оставаться native/external.
-
-## 3. Выбор bridge
-
-### Panel → AE project
-
-ExtendScript/host-supported panel API для layers/items, properties/keyframes, import/render queue и project automation.
-
-### AEGP → конкретный Effect
-
-AEGP_EffectCallGeneric — маленький synchronous request/response к конкретному effect instance, если это лучший documented bridge. Не скрытая render dependency.
-
-### Native → native
-
-Published PICA suite — in-process versioned service между native modules.
-
-### Native → scripting DOM
-
-AEGP_ExecuteScript — редкий bridge к scripting-only capability.
-
-### Process → process
-
-Использовать явный IPC:
-
-- named pipe / Unix domain socket;
-- localhost socket с security model;
-- child-process stdin/stdout;
-- temp file + atomic rename для large batch;
-- shared memory только после profiling и с explicit ownership.
-
-Undocumented AE internal IPC не считать product API.
-
-## 4. Heavy binary не через JSX
-
-Плохо:
-
-~~~text
-native pixels
-→ Base64
-→ ExtendScript string
-→ evalScript
-→ CEP JS
-~~~
-
-Цена: copying, encoding, temporary memory, main-thread pressure.
-
-UI должен отправлять control request и получать compact metadata/progress.
-
-## 5. Version handshake
-
-~~~json
-{
-  "protocol": 3,
-  "uiVersion": "2.4.1",
-  "nativeApi": 5,
-  "capabilities": [
-    "preview-v2",
-    "cancel-v1"
-  ]
-}
-~~~
-
-Panel, native plug-in и helper могут оказаться разных версий после partial update/rollback, поэтому package version недостаточно.
-
-## 6. Compatibility rule
-
-~~~text
-same protocol major
-+ larger message size
-+ unknown optional field
-→ old peer may ignore extension
-~~~
-
-Если изменился meaning поля, ownership или required call order — новая protocol/API version.
-
-## 7. Native → panel notification
-
-Не хранить direct pointer на UI.
-
-~~~text
-native state changes
-→ small notification/invalidation
-→ scripting/panel bridge
-→ panel requests fresh state
-~~~
-
-UI должен уметь восстановиться explicit refresh.
-
-## 8. Persistent state
-
-| State | Typical owner |
+| Need | Preferred path |
 |---|---|
-| effect render parameters | AE project/effect params |
-| panel layout/preferences | panel/product preferences |
-| large transient cache | native/helper runtime |
-| external asset index | product database/cache |
-| current selected AE object | AE host; query/revalidate |
+| Rename layers, create comps, set properties | Scripting DOM |
+| Add a small native command reachable from AE | AEGP command/menu/service |
+| Effect parameter or render behavior | Effect API |
+| Native module to native module | PICA/shared suite |
+| Panel calling project automation | CEP/UXP -> scripting bridge |
+| Heavy external compute | Helper/service + explicit IPC |
+| High-volume pixels | Native effect/GPU path, not JSON |
 
-Render-affecting state не хранить только в panel DOM или global singleton.
+## Native -> scripting
 
-## 9. Liveness
+AEGP Utility Suite exposes script execution capabilities such as `AEGP_ExecuteScript`.
 
-Panel reload, helper crash, missing plug-in/provider, closed project, removed effect и AE shutdown — нормальные failure states.
+Use this when:
 
-~~~text
-starting
-ready
-busy
-canceling
-failed
-stopped
-~~~
+- the scripting DOM exposes a capability not convenient in the native API;
+- the call is infrequent;
+- synchronous execution is acceptable;
+- the script is controlled by the product.
 
-Молчание peer не равно infinite busy.
+Do not turn native-to-script execution into a high-frequency RPC bus.
 
-## 10. Cancellation
+## Panel -> native
 
-~~~text
-start(requestId)
-→ progress(requestId)
-→ cancel(requestId)
-→ canceled(requestId) / completed(requestId)
-~~~
+There is no reason to invent an undocumented direct pointer bridge from HTML to an AE plug-in.
 
-Late completion старой generation не должен менять новый UI state.
+Common patterns are:
 
-## 11. Security
+### 1. Project state as the bridge
 
-- identify peer where needed;
-- do not expose external interface without need;
-- validate message size before allocation;
-- allowlist opcodes;
-- normalize paths;
-- never execute arbitrary command strings from panel/network;
-- не передавать secrets через visible command line/logs.
+The panel writes normal AE state that the effect/native plug-in already reads:
 
-## 12. Failure taxonomy
+- effect parameters;
+- layer markers;
+- footage/project data;
+- controlled files.
 
-Различайте UI validation, panel transport, scripting, native bridge, native operation, helper transport, protocol mismatch, cancellation и stale result.
+Simple and robust when the native behavior naturally depends on project state.
 
-## 13. Observability
+### 2. Script/AEGP command bridge
 
-Логируйте timestamp, requestId, protocol, component, operation, state transition, duration и result/error code. Не логируйте secrets и huge payloads.
+Panel command:
 
-## 14. Acceptance checklist
+```text
+panel
+ -> ExtendScript
+ -> host-visible command/state
+ -> AEGP/effect action
+```
 
-- panel without native;
-- native without panel;
-- wrong protocol;
-- helper killed mid-request;
-- project closed;
-- effect removed/reordered;
+Good for low-rate control operations.
+
+### 3. External IPC
+
+For a helper process or service:
+
+```text
+panel/native module
+ -> versioned IPC
+ -> helper/service
+ -> response/progress
+```
+
+Possible transports:
+
+- localhost socket;
+- named pipe;
+- Unix domain socket;
+- child process stdin/stdout;
+- temporary file + atomic rename;
+- shared memory only when necessary.
+
+Undocumented AE internal IPC is not a product API.
+
+## IPC contract
+
+Every nontrivial native IPC should define:
+
+- protocol version;
+- message type/opcode;
+- request ID;
+- payload size;
+- timeout;
+- cancellation behavior;
+- ownership of buffers/files;
+- process shutdown behavior;
+- compatibility policy.
+
+Example header:
+
+```cpp
+struct MsgHeader {
+    uint32_t size;
+    uint32_t version;
+    uint32_t opcode;
+    uint32_t flags;
+    uint64_t request_id;
+};
+```
+
+Validate the header before reading the payload.
+
+## State ownership
+
+Choose one source of truth for each piece of data.
+
+Examples:
+
+```text
+project-visible setting -> AE project/effect parameter
+panel-only transient UI -> panel state
+render cache -> native render/cache layer
+account/session -> service/auth layer
+large derived asset -> file/cache store
+```
+
+Do not keep the same authoritative mutable state independently in CEP, ExtendScript and native code.
+
+## Snapshot model
+
+For complex panels, prefer:
+
+```text
+AE state
+ -> read/normalize
+ -> immutable UI snapshot
+ -> UI renders snapshot
+ -> user command
+ -> host mutation
+ -> invalidate
+ -> read new snapshot
+```
+
+This avoids fragile incremental mirroring of host internals.
+
+## Threading
+
+The UI, scripting engine, AEGP callbacks, render callbacks and helper processes do not share one threading contract.
+
+Rules:
+
+- AE project mutations stay on the documented host-safe boundary;
+- render callbacks must obey MFR/re-entrancy rules;
+- worker threads may do pure compute/files/network;
+- never hold your own mutex while calling arbitrary host APIs unless the API contract explicitly permits it;
+- never pass callback-scoped AE pointers to a worker for later use.
+
+## Failure model
+
+Design for each component disappearing independently:
+
+- panel reloads;
+- AE project changes;
+- effect instance is deleted;
+- helper process crashes;
+- helper is upgraded;
+- socket closes;
+- stale reply arrives;
+- AE shuts down.
+
+A robust protocol returns to a known state instead of assuming all components have identical lifetime.
+
+## Versioning
+
+Protocol compatibility should be explicit.
+
+Example:
+
+```text
+major mismatch -> refuse with clear error
+minor mismatch -> negotiate supported features
+unknown optional field -> ignore if schema permits
+unknown required feature -> fail closed
+```
+
+Do not infer compatibility from product marketing version alone.
+
+## Security
+
+For localhost/helper IPC:
+
+- authenticate the peer when privileged operations are possible;
+- use unguessable session tokens where appropriate;
+- do not expose an unauthenticated arbitrary-file or command API;
+- validate paths and payload sizes;
+- never allow "run arbitrary shell command" as a convenience protocol.
+
+## Performance rule
+
+Only cross a runtime boundary when there is a clear reason.
+
+A good architecture minimizes:
+
+```text
+UI <-> script <-> native <-> helper
+```
+
+round-trips while keeping ownership and responsibilities clear.
+
+## Verification checklist
+
+For a hybrid product, record tests for:
+
 - panel reload;
-- repeated start/stop;
-- cancel + late completion;
-- partial update;
-- rollback;
-- clean shutdown;
-- crash restart.
+- AE project close/open;
+- native plug-in missing;
+- version mismatch;
+- helper missing/crashed;
+- malformed message;
+- timeout;
+- cancellation;
+- Unicode/path handling;
+- repeated request;
+- stale response;
+- AE shutdown;
+- clean reinstall/upgrade.
 
-## Verification boundary
-
-Глава задаёт production architecture pattern поверх public bridges. Generic call/PICA exact-SDK boundaries описаны в source review 25.6; end-to-end hybrid проверки остаются отдельными acceptance tests.
+Source-level architecture is not host verification. The actual bridge must still be exercised inside supported AE builds.
 
 
 ---
