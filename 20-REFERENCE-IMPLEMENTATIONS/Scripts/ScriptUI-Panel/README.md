@@ -23,4 +23,4 @@ ScriptUI event
 → plain command result/status
 ~~~
 
-The file is intentionally small. It does not establish host verification until the actual target AE/OS run is recorded in VERIFICATION/evidence.
+The file is intentionally small. Bible does not claim a host-observed result for this source example; a reader may validate it in the target product/environment if needed.
