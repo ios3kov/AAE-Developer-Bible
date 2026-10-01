@@ -17356,6 +17356,8 @@ Do not encode “suite version 7 exists everywhere” into product logic. Acquir
 
 # Public SDK docs errata / verification notes
 
+> Supporting errata/conflict record. Canonical editorial policy: [EDITORIAL-GUIDE.md](14-NATIVE-INTEGRATIONS/../EDITORIAL-GUIDE.md).
+
 Research baseline: **SDK 25.6 source review + dated public documentation review**.
 
 Purpose of this file: preserve places where public guide, bundled sample, historical code and exact SDK headers can disagree.
