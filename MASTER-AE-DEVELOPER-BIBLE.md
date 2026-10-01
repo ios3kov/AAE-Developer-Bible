@@ -25025,7 +25025,7 @@ Never make code compile by weakening a native contract you have not understood.
 
 ## Место в согласованном плане
 
-Работа относится к этапу 3 (согласование и содержательная доработка документации) и источниковой части этапа 4 (точный SDK-контракт) из [плана](18-SDK-HEADER-TOOLS/../COMPLETION-PLAN.md). Полные gates 3/4 не закрываются одной редакционной итерацией. Этапы 2, 3A, 5–9 сохраняют свои критерии в [чеклисте](18-SDK-HEADER-TOOLS/../COMPLETION-CHECKLIST.md).
+Эта запись — источниковая опора текущей редакции Bible. Она фиксирует exact SDK baseline и source-review findings. Старый completion-gate model superseded: compiler/host evidence остаётся отдельным evidence class и не определяет готовность документации.
 
 По уточнению пользователя основной результат этой итерации — **главы Библии**, не новый вспомогательный продукт. Разработка native-считывателя auxiliary-каналов приостановлена; ранее написанные tools и отчёты не удалены. Следующий редакционный блок: параметры/UI и пиксельные форматы, затем согласование с разделами памяти и MFR. Новые эталонные реализации не обходят предварительный аудит этапа 3A.
 
@@ -25120,7 +25120,7 @@ The required-contract manifest passes all 35 required contract tables/functions,
 
 # SDK 25.6: параметры, UI и пиксельные данные
 
-Дата: **2026-09-30**. Редакционный блок продолжает [первую сверку поставки](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md) и этапы 3–4 [согласованного плана](18-SDK-HEADER-TOOLS/../COMPLETION-PLAN.md).
+Дата: **2026-09-30**. Редакционный блок продолжает [первую сверку поставки](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md) и source-contract review текущего SDK baseline.
 
 **Объём: две главы Библии, а не новый тестовый плагин.** Основа — исходные headers и образцы из приложенного `ae25.6_61.64bit.AfterEffectsSDK`. Здесь фиксируются источники и границы утверждений для [параметров/UI](18-SDK-HEADER-TOOLS/../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md) и [цвета/пикселей](18-SDK-HEADER-TOOLS/../02-EFFECT-PLUGINS/06-COLOR-PIXELS.md). Этапы приёмки native-примеров остаются открытыми.
 
@@ -25285,7 +25285,7 @@ The required-contract manifest passes all 35 required contract tables/functions,
 
 Документацию проверяет существующий `Validate`, включая генерацию и `mkdocs build --strict`. Итог CI нужно читать для последнего commit итерации; сама эта запись не предсказывает успешность ещё не завершившегося workflow.
 
-Следующая редакционная тема: **регистрация/PiPL и жизненный цикл AEGP**, с привязкой к supplied SDK и существующему MenuTool. Это подготовка понятного материала, а не преждевременное закрытие сборки, установки и host-gates из [плана](18-SDK-HEADER-TOOLS/../COMPLETION-PLAN.md).
+Следующая редакционная тема: **регистрация/PiPL и жизненный цикл AEGP**, с привязкой к supplied SDK и существующему MenuTool. Это source-review/documentation milestone; product build/host evidence остаётся отдельным и не является условием готовности Bible.
 
 
 ---
