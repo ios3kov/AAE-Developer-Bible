@@ -119,34 +119,39 @@ Do not cast const away before understanding why the API changed.
 
 MFR-era sequence-data changes are an example of lifetime/thread semantics becoming stricter.
 
-## Rule 10 — compiler success is not host proof
+## Rule 10 — compiler success is not runtime proof
 
-Headers/compiler establish type compatibility.
+Headers/compiler establish source/type compatibility for a particular toolchain/SDK snapshot.
 
 They do not prove:
 
-- suite is available in target AE;
+- suite is available in a particular target AE build;
 - PiPL loads;
 - output pixels are correct;
 - callback order assumption is valid;
-- ownership is correct;
+- ownership logic is correct at runtime;
 - thread safety;
-- installer/signing.
+- installer/signing behavior.
 
-Every public capability still needs host evidence.
+For **Bible**, this means: do not claim runtime behavior unless runtime evidence exists.
 
-## Rule 11 — missing evidence stays unknown
+For a **product**, this means: support/release claims may require compiler/host/product evidence appropriate to that claim.
+
+It does **not** mean every Bible source example must be compiled or host-tested before the documentation can be complete.
+
+## Rule 11 — missing evidence stays at the correct evidence level
 
 If:
 
-- parser cannot understand declaration;
+- parser cannot understand a required declaration;
 - sample is absent;
 - documentation is ambiguous;
-- host run is not available;
 
-label the fact unresolved/NOT RUN.
+label that contract fact unresolved and do not fill the gap from memory.
 
-Do not fill the gap from memory and present it as verified.
+If host run is not available, do not claim a host-observed result. The source/documented contract may still be described when its own evidence is sufficient.
+
+Use precise labels rather than turning every missing runtime result into an editorial TODO.
 
 ## Rule 12 — preserve provenance
 
@@ -169,7 +174,7 @@ This is what makes future SDK diffs possible.
 | ownership/lifetime | header comments + sample + guide |
 | introduction/deprecation | release notes/guide + runtime check |
 | how Adobe wires a project | exact SDK sample |
-| whether product supports it | product compile + host evidence |
+| whether a concrete product supports it | product-specific compile/host evidence appropriate to the claim |
 | current platform signing/install policy | current platform documentation |
 
 ## Stop rule
