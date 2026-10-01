@@ -20584,142 +20584,1142 @@ The foundation tests prove local move/cleanup mechanics against stubs. Host corr
 
 Status: **sample-derived / host-test-required**.
 
-`KeyframeRecipes.cpp` is the verified-shape recipe layer used by the native suite cookbook. The surrounding AEGP registration/menu shell is the same as `../MenuTool`. Combine them rather than creating a second lifecycle implementation.
+KeyframeRecipes.cpp forwards to the canonical cookbook implementation in 17-NATIVE-SUITE-COOKBOOK/code. Compile the forwarding file or canonical implementation, not both.
 
-Key idea: obtain a stream, start an undo group, use the keyframe suite's add/insert/set calls, dispose temporary stream refs, then end undo. Never retain host-owned refs beyond their documented lifetime.
+## Purpose
+
+This reference demonstrates the operation layer for changing a property stream and its keyframes without duplicating a second AEGP registration lifecycle.
+
+Recommended composition:
+
+~~~text
+MenuTool lifecycle
+→ validate target item/layer/property
+→ acquire stream ref
+→ start undo group
+→ keyframe batch operation
+→ dispose stream
+→ end undo group
+~~~
+
+Use the MenuTool reference for initialization/hooks and KeyframeRecipes for property/keyframe work.
+
+## Stream identity
+
+A display name is not a stable property API contract.
+
+Prefer the documented stream/property identity path appropriate to the operation and reacquire references after structural mutation when the API can invalidate them.
+
+Never cache a stream ref as an eternal project-object ID.
+
+## Keyframe batch lifecycle
+
+The current SDK review covers StreamSuite6, DynamicStreamSuite4 and KeyframeSuite5 in the supplied 25.6 baseline.
+
+A batch operation should make ownership visible:
+
+~~~text
+new stream ref
+→ begin batch/add keyframes
+→ write keyframe values/interpolation/ease
+→ finalize batch
+→ dispose temporary refs
+~~~
+
+Use the exact suite generation and call signatures from the target SDK headers.
+
+## Time/value rules
+
+Before writing a keyframe define:
+
+- stream timebase;
+- target time;
+- property value type;
+- dimensionality;
+- separated-dimension behavior;
+- interpolation;
+- temporal/spatial ease where supported.
+
+Do not reinterpret raw property values without checking the stream type.
+
+## Undo
+
+A user action that creates or edits multiple keyframes should normally appear as one coherent undo operation.
+
+Undo does not repair a partially completed algorithm by itself. Validate target stream and value shapes first.
+
+## Error cleanup
+
+Test failure after:
+
+- stream acquisition;
+- first keyframe insertion;
+- batch creation;
+- value write;
+- interpolation write.
+
+Every owned stream/batch/resource still needs its matching cleanup path.
+
+## Required host tests
+
+- empty project/no target;
+- valid scalar property;
+- multidimensional property;
+- animated property with existing keys;
+- insert before/between/after existing keys;
+- separated dimensions if claimed;
+- undo/redo;
+- save/reopen;
+- repeated operation;
+- malformed/unsupported target type.
+
+## Verification boundary
+
+The recipe shape has been checked against the supplied SDK source contracts. It remains host-test-required until a real project operation is compiled and exercised in the declared After Effects versions.
 
 
 ---
 
 <!-- SOURCE: 20-REFERENCE-IMPLEMENTATIONS/AEGP/MenuTool/README.md -->
 
-# AEGP menu command template
+# AEGP menu command reference
 
-Status: **drop-in pattern** for current AEGP sample project.
+Status: **drop-in pattern / host verification remains separate**.
 
-Start from an official AEGP sample such as Persisto/Projector. Keep its PiPL/project/export plumbing; use this file as the architecture for entry registration + command/update hooks.
+MenuTool.cpp forwards to the canonical implementation in 16-WORKING-TEMPLATES/aegp-menu-command. Compile this forwarding file or the canonical source, not both.
 
-The example intentionally performs a harmless operation: reports info to the user. Replace `DoWork()` with project mutation inside an undo group.
+## Purpose
+
+This reference isolates the minimum AEGP lifecycle needed for a user-facing menu command:
+
+~~~text
+AEGP initialization
+→ obtain plug-in ID/refcon
+→ register command
+→ install command hook
+→ install update-menu hook
+→ command callback
+→ host operation
+→ shutdown/death lifecycle
+~~~
+
+The default action is deliberately harmless: report information to the user. Replace the work function only after the registration lifecycle itself is proven.
+
+## Start from an official AEGP sample
+
+Use the closest AEGP sample project from the exact SDK as the binary/project shell.
+
+Preserve:
+
+- project settings;
+- PiPL/resource plumbing;
+- exported initializer contract;
+- SDK utility sources;
+- platform architecture settings.
+
+Do not recreate the AEGP initializer from memory or copy a historical sample signature over a newer header.
+
+The supplied SDK review already found legacy/current initializer-shape differences, so the target header is the ABI source of truth.
+
+## Command ID lifetime
+
+Treat the command ID returned by the host as host-owned identity for the current plug-in lifecycle.
+
+Do not hardcode an arbitrary numeric command ID.
+
+Store product state/refcon only for the documented lifecycle and release it before host teardown.
+
+## Hook behavior
+
+Command hook should:
+
+1. identify whether the command belongs to this plug-in;
+2. return quickly for unrelated commands;
+3. validate project state;
+4. perform the user operation;
+5. preserve host error semantics.
+
+Update-menu hook should only compute enabled/checked/display state. Do not perform expensive project mutations from a menu update callback.
+
+## Project mutation
+
+For a real operation:
+
+~~~text
+validate prerequisites
+→ start undo group
+→ mutate project
+→ end undo group
+→ report structured result/log
+~~~
+
+Undo grouping is not automatic rollback. Prevalidate as much as possible before the first mutation.
+
+See 19-NATIVE-CODE-FOUNDATION/03-UNDO-TRANSACTIONS.md.
+
+## Error boundary
+
+Do not allow C++ exceptions to escape AEGP callbacks.
+
+Use a deliberate A_Err mapping and cleanup owners for every acquired resource.
+
+## Test sequence
+
+### Registration
+
+- plug-in loads;
+- menu item appears once;
+- restart does not duplicate it;
+- update hook enables/disables as intended.
+
+### Command
+
+- command with no project;
+- command with valid project;
+- cancellation/failure path;
+- repeated execution;
+- undo/redo for mutations.
+
+### Lifecycle
+
+- project close/open;
+- AE restart;
+- plug-in shutdown/death hook;
+- no callback touches state after teardown.
+
+## Evidence record
+
+Record:
+
+- AE version/build;
+- SDK version/build;
+- platform/architecture;
+- binary hash;
+- menu location/command behavior;
+- mutation/undo result;
+- restart result.
+
+## Verification boundary
+
+The source shape follows the reviewed AEGP contracts, but documentation/source shape is not host PASS. The exact target SDK project must compile/link and the command must run inside the claimed AE matrix.
 
 
 ---
 
 <!-- SOURCE: 20-REFERENCE-IMPLEMENTATIONS/AEGP/NativePanel/README.md -->
 
-# Native AEGP panel path
+# Native AEGP panel reference path
 
-Status: **SDK sample workspace: `Panelator`; host-test pending**. Materialize with `scripts/materialize_sdk_examples.py`.
+Status: **SDK sample workspace: Panelator / host-test pending**.
 
-Native panel integration is version-sensitive and sample-dependent. Use `14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md` as the contract and graft registration into the closest AEGP UI sample shipped with the exact SDK version.
+Materialize the exact licensed SDK sample with scripts/materialize_sdk_examples.py and use it as the project/lifecycle shell.
 
-The Bible intentionally does not publish invented project glue here. The host registration callback, panel lifetime, drawing/event backend and platform windowing code must match the SDK sample for that release.
+## Why this is guide-only
+
+A native workspace panel is not only a callback function. It depends on host registration, panel identity, creation callbacks, visibility/flyout handling and platform/window integration that are version-sensitive.
+
+The Bible therefore does not invent a standalone project wrapper here.
+
+## Source of truth
+
+Use:
+
+- 14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md for architecture;
+- 18-SDK-HEADER-TOOLS/13-PANELS-BLITHOOK-SDK25.6.md for the supplied SDK review;
+- the exact SDK Panelator sample for project/plumbing.
+
+For SDK 25.6, the reviewed panel contract centers on AEGP_PanelSuite1 and the Panelator sample. A later SDK may differ.
+
+## Integration sequence
+
+~~~text
+materialize exact Panelator sample
+→ build/load untouched sample
+→ record host behavior
+→ rename product identity only
+→ build/load again
+→ replace panel content incrementally
+→ add product state/commands
+~~~
+
+If untouched Panelator fails, stop before adding product code.
+
+## Panel identity
+
+Define stable product identity separately from visible localized title.
+
+Do not use transient window handles or display strings as persistent object identity.
+
+## Lifetime
+
+Document:
+
+- who owns product panel state;
+- creation/destruction order;
+- what is borrowed from host;
+- what may be retained;
+- how callbacks stop during shutdown.
+
+Do not keep panel/window pointers beyond their documented lifetime.
+
+## Threading
+
+Treat panel/project manipulation as host/UI-thread work unless a specific API explicitly allows another thread.
+
+Heavy computation belongs in a worker/service with a controlled handoff back to the host thread.
+
+## UI → host operations
+
+Keep panel callbacks thin:
+
+~~~text
+UI event
+→ validated command
+→ AEGP/project service
+→ normalized result
+→ UI update
+~~~
+
+Do not bury project mutation directly in platform event plumbing.
+
+## State recovery
+
+Test panel recreation/reopen:
+
+- close/reopen workspace panel;
+- switch workspace;
+- close/open project;
+- restart AE.
+
+Panel widget state must not become the only source of project truth.
+
+## Required host tests
+
+- registration;
+- create/open;
+- resize;
+- visibility;
+- flyout/menu if used;
+- project command;
+- workspace change;
+- repeated close/open;
+- shutdown;
+- crash-free restart.
+
+## Verification boundary
+
+This entry intentionally remains guide-only until the exact Panelator-derived workspace is compiled and tested. A registration snippet alone is not a working native panel.
 
 
 ---
 
 <!-- SOURCE: 20-REFERENCE-IMPLEMENTATIONS/AEIO/MinimalRegistrar/README.md -->
 
-# Minimal AEIO registrar
+# AEIO reference workspace
 
-Status: **SDK sample workspace: `IO`/`FBIO`; host-test pending**. Materialize with `scripts/materialize_sdk_examples.py`.
+Status: **SDK sample workspace: IO/FBIO / host-test pending**.
 
-AEIO is not just a single entry function: After Effects asks the module to register an `AEIO_FunctionBlock` whose callbacks implement file sniffing, spec creation/disposal, metadata, frame/audio retrieval and (for output modules) writing.
+Materialize the licensed SDK sample with scripts/materialize_sdk_examples.py. The Bible does not publish a fake registration-only AEIO and call it working.
 
-Use the closest AEIO SDK sample as the binary/project shell, then implement one callback group at a time. The complete lifecycle and callback categories are in `04-AEIO/README.md` and `14-NATIVE-INTEGRATIONS/08-AEIO.md`.
+## Why AEIO is larger than a registrar
 
-A "registration-only" source file is intentionally not labelled working because a host-loadable AEIO that cannot satisfy its function block is not useful.
+After Effects registers an AEIO function block whose callbacks implement the actual importer/exporter lifecycle.
+
+Depending on direction/capability this can include:
+
+- file sniffing/verification;
+- input/output spec creation;
+- spec disposal;
+- metadata;
+- frame retrieval;
+- audio retrieval;
+- output state;
+- frame/audio writing;
+- auxiliary channels;
+- color information.
+
+A module that registers but cannot satisfy its callback block is not a useful reference implementation.
+
+## Source of truth
+
+Read:
+
+- 04-AEIO/README.md;
+- 14-NATIVE-INTEGRATIONS/08-AEIO.md;
+- 18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md;
+- exact IO/FBIO sample from the target SDK.
+
+The supplied 25.6 review records AEIO_ModuleInfo, AEIO_FunctionBlock4 and the current reviewed IO suite generations. Recheck target headers before shipping.
+
+## Build sequence
+
+~~~text
+materialize exact sample
+→ build/load untouched
+→ exercise sample format
+→ freeze baseline evidence
+→ replace one callback family
+→ retest
+→ repeat
+~~~
+
+Do not replace registration, file parser, frame decode and output writing all in one step.
+
+## Input implementation order
+
+A practical importer order:
+
+1. identify/sniff supported file;
+2. create input spec;
+3. expose dimensions/time/metadata;
+4. retrieve one deterministic frame;
+5. add seeking/random frame order;
+6. add audio if required;
+7. add color/auxiliary metadata;
+8. error/corruption handling;
+9. performance/cache.
+
+## Output implementation order
+
+1. create output spec;
+2. validate settings;
+3. open target;
+4. write deterministic frame;
+5. close/finalize safely;
+6. add audio/metadata;
+7. cancellation/failure rollback;
+8. multiple frames/long render.
+
+## Ownership
+
+Every AEIO-created spec/private object needs explicit owner/dispose behavior.
+
+Never keep callback-scoped buffers or host handles after their documented lifetime.
+
+For file handles/resources, define who closes them on:
+
+- success;
+- cancellation;
+- parse error;
+- output write error;
+- AE shutdown.
+
+## Error handling
+
+Malformed media is untrusted input.
+
+Validate sizes, counts, offsets, allocation arithmetic and file bounds before reading/allocating.
+
+Do not let a corrupt file crash the host.
+
+## Tests
+
+### Import
+
+- valid minimal file;
+- wrong extension but valid signature if sniffing supports it;
+- truncated header;
+- impossible dimensions/count;
+- missing payload;
+- random seek order;
+- repeated frame;
+- save/reopen project;
+- missing source file.
+
+### Export
+
+- one frame;
+- long sequence;
+- cancel;
+- disk full/write failure simulation where practical;
+- invalid destination;
+- overwrite policy;
+- close/finalize failure.
+
+## Verification boundary
+
+This reference remains a materialized SDK workspace plan until a complete callback subset is compiled and exercised inside After Effects. Registration alone is explicitly not counted as completion.
 
 
 ---
 
 <!-- SOURCE: 20-REFERENCE-IMPLEMENTATIONS/Artisan/MinimalRegistrar/README.md -->
 
-# Minimal Artisan registrar
+# Artisan reference workspace
 
-Status: **SDK sample workspace: `Artie`; host-test pending**. Materialize with `scripts/materialize_sdk_examples.py`.
+Status: **SDK sample workspace: Artie / host-test pending**.
 
-Artisan replaces parts of AE's 3D rendering path and has a much larger host contract than a normal Effect. Start from the SDK Artisan sample, preserve its registration/function-table plumbing, then replace scene/render code incrementally.
+Artisan replaces/customizes parts of After Effects 3D rendering and carries a substantially larger host contract than a normal effect.
 
-See `05-ARTISAN/README.md` and `14-NATIVE-INTEGRATIONS/09-ARTISAN.md` for lifecycle, callbacks and ownership. The Bible does not pretend that a registrar stub alone is a "working renderer".
+Use the exact Artie sample from the target SDK as the project and registration shell.
+
+## Source of truth
+
+Read:
+
+- 05-ARTISAN/README.md;
+- 14-NATIVE-INTEGRATIONS/09-ARTISAN.md;
+- 18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md;
+- target SDK Artie sample and headers.
+
+The supplied 25.6 review covers PR_ArtisanEntryPoints, CanvasSuite8 and the global/instance/frame state model. Recheck generations in the shipping SDK.
+
+## Development sequence
+
+~~~text
+materialize Artie
+→ build/load untouched
+→ reproduce one sample render
+→ preserve baseline
+→ replace one scene/render subsystem
+→ compare output
+→ repeat
+~~~
+
+Do not delete sample lifecycle code before understanding which callbacks own which state.
+
+## State layers
+
+Document separately:
+
+- global renderer state;
+- renderer instance state;
+- per-frame/per-render state;
+- host-borrowed scene/canvas data;
+- product caches.
+
+A frame object must not accidentally outlive the host frame lifecycle.
+
+## Scene handling
+
+Before custom rendering define which host scene features are supported:
+
+- cameras;
+- lights;
+- transforms;
+- 3D layers;
+- materials;
+- transparency;
+- motion blur;
+- depth/intersections;
+- text/vector layers;
+- effects/precomps as exposed through the Artisan contract.
+
+Unsupported scene features need explicit fallback/diagnostic behavior.
+
+## Render correctness
+
+Build small deterministic scenes:
+
+- one camera/one object;
+- depth ordering;
+- transparency;
+- moving camera/object;
+- light variation;
+- edge/crop cases.
+
+Compare with the intended semantic reference. If the renderer intentionally differs from AE default rendering, document the expected difference rather than using visual similarity as the test.
+
+## Threading/GPU
+
+Do not infer renderer thread safety from Effect MFR rules; Artisan has its own callback/lifetime contract.
+
+If external GPU/renderer work is used, keep host object access on documented paths and define cancellation/device teardown explicitly.
+
+## Failure behavior
+
+Test:
+
+- unsupported scene feature;
+- resource allocation failure;
+- cancellation;
+- project close;
+- renderer switch;
+- repeated frames;
+- shutdown.
+
+A renderer failure must not corrupt the AE project.
+
+## Verification boundary
+
+The Bible deliberately does not provide a registrar stub and label it a renderer. This entry becomes an implementation only when a meaningful Artie-derived render path is compiled, loaded and validated with scene fixtures.
 
 
 ---
 
 <!-- SOURCE: 20-REFERENCE-IMPLEMENTATIONS/Bridges/Effect-AEGP/README.md -->
 
-# Effect ↔ AEGP bridge
+# Effect ↔ AEGP bridge reference
 
 Status: **sample-derived / host-test-required**.
 
-The supported direct native path is `AEGP_EffectCallGeneric`: the AEGP finds an installed effect instance and sends a versioned POD message through the Effect's generic selector. Keep the ABI in `Protocol.h` C-compatible, fixed-width and versioned.
+Protocol.h forwards to the canonical protocol in 16-WORKING-TEMPLATES/effect-aegp-generic-bridge.
 
-See `15-COMMUNICATION/03-AEGP-TO-EFFECT.md` for the complete call flow and ownership rules. Do not pass STL objects, C++ exceptions or process-local pointers across a persisted/shared ABI.
+## Supported native path
+
+The reviewed direct path is AEGP_EffectCallGeneric:
+
+~~~text
+AEGP finds target effect instance
+→ owns/holds EffectRef according to host contract
+→ constructs versioned message
+→ converts target time to layer timebase
+→ calls current EffectSuite generic API
+→ Effect receives generic selector/command
+→ reads/writes message synchronously
+→ call returns
+→ caller releases target references
+~~~
+
+For the supplied SDK 25.6, current EffectSuite4 includes an explicit PF_Cmd argument. Historical ProjDumper syntax is older and must not be copied as the current signature.
+
+## Protocol rules
+
+Message ABI must be self-describing:
+
+- fixed-width integer fields;
+- total size;
+- protocol version;
+- opcode;
+- request ID;
+- result/status;
+- optional payload length.
+
+Validate size/version before reading the extended payload.
+
+Do not expose:
+
+- STL containers;
+- C++ exceptions;
+- allocator-specific objects;
+- temporary pointers;
+- AE host handles as persistent external identity.
+
+## Synchronous pointer lifetime
+
+The void pointer payload is treated as valid for the call unless a stronger ownership transfer is explicitly documented by your own protocol/API.
+
+~~~text
+caller owns storage
+→ effect reads/writes during call
+→ return
+→ effect does not retain pointer
+~~~
+
+For long-lived work, pass an ID into a separate product-owned service, not a pointer to stack memory.
+
+## Timebase
+
+The current SDK contract uses target layer time.
+
+Do not pass composition time by assumption. Convert using documented host APIs when needed.
+
+## Render dependency warning
+
+Do not hide render-affecting state behind generic messages.
+
+If rendering depends on state changed by AEGP but AE cannot see that dependency, cached frames can become stale.
+
+Render truth should remain visible through supported parameters/dependency/cache identity.
+
+## Error model
+
+Keep separate:
+
+1. host delivery A_Err;
+2. protocol validation error;
+3. command/domain result.
+
+This makes diagnostics distinguish target missing from command rejected.
+
+## Tests
+
+- target effect missing;
+- target removed/reordered;
+- wrong protocol version;
+- short message;
+- unknown opcode;
+- correct request/response;
+- layer-time conversion;
+- repeated calls;
+- save/reopen when persistent state involved;
+- stale-cache check;
+- cleanup on call error.
+
+## Verification boundary
+
+The contract is source-reviewed against SDK 25.6 and sample history, but the Bible bridge remains host-test-required until the actual caller/effect pair is compiled and run.
 
 
 ---
 
 <!-- SOURCE: 20-REFERENCE-IMPLEMENTATIONS/Bridges/PICA-Provider-Consumer/README.md -->
 
-# PICA provider ↔ consumer bridge
+# PICA provider ↔ consumer reference
 
 Status: **sample-derived / host-test-required**.
 
-Two native modules can communicate through a versioned PICA suite. `SharedSuite.h` is the ABI contract. The provider registers the suite with the host's suite registry; the consumer acquires it by exact suite name/version and releases it after use.
+SharedSuite.h forwards to the canonical shared ABI in 16-WORKING-TEMPLATES/pica-shared-suite.
 
-See `15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md` and `19-NATIVE-CODE-FOUNDATION/01-SUITE-ACQUISITION.md`. Treat the suite struct as a C ABI: POD-compatible arguments, explicit versions, documented ownership and no exceptions across the boundary.
+## Model
+
+~~~text
+provider initializes
+→ publishes versioned function table
+→ consumer AcquireSuite(name, version)
+→ consumer calls table
+→ consumer ReleaseSuite(name, version)
+→ provider remains valid for active acquisitions/lifecycle
+~~~
+
+The supplied SDK review uses Sweetie as the provider pattern and Checkout as an optional consumer pattern.
+
+## ABI design
+
+Treat the suite struct as a C ABI.
+
+Use:
+
+- stable unique suite name;
+- explicit public version;
+- fixed-width/POD-compatible inputs;
+- explicit lengths/sizes;
+- explicit ownership;
+- A_Err/product result codes.
+
+Avoid:
+
+- std::string/std::vector;
+- exceptions crossing boundary;
+- C++ class layout;
+- allocator ambiguity;
+- temporary borrowed pointers with undocumented lifetime.
+
+## Public version
+
+AcquireSuite uses the public suite version.
+
+Do not confuse it with low-level internal provider version fields.
+
+A breaking layout/semantic change needs a new public version.
+
+## Provider lifetime
+
+A published function table must remain valid for every legitimate consumer acquisition.
+
+Static table lifetime is a simple pattern used by the SDK sample, but it does not prove hot replacement/unload safety.
+
+Do not replace or free provider state under active consumers without a separately designed lifecycle.
+
+## Consumer ownership
+
+Use a balanced acquire/release owner such as 19-NATIVE-CODE-FOUNDATION/code/PicaSuiteRef.h.
+
+Remember that the helper itself requires:
+
+- stable suite-name lifetime;
+- valid SPBasicSuite until release;
+- correct thread/lifecycle for acquisition.
+
+## Optional vs required
+
+Optional:
+
+~~~text
+suite absent
+→ feature disabled
+→ plug-in continues
+~~~
+
+Required:
+
+~~~text
+suite absent/wrong version
+→ initialization/command fails clearly
+~~~
+
+Never dereference a missing table.
+
+## Thread contract
+
+Publishing a suite does not make its functions thread-safe.
+
+Document each function/service as one of:
+
+- main-thread-only;
+- render-thread-safe;
+- serialized internally;
+- re-entrant;
+- may call host;
+- must not call host.
+
+Consumer follows the most conservative contract if unspecified.
+
+## Tests
+
+- provider missing;
+- correct version;
+- wrong version;
+- repeated acquire/release;
+- two consumers;
+- provider function error;
+- malformed sizes;
+- shutdown ordering;
+- concurrency mode;
+- restart.
+
+## Verification boundary
+
+Sweetie/Checkout prove a provider/consumer pattern in the SDK, not this product ABI in the host. The Bible shared suite remains host-test-required until provider and consumer are compiled and exercised together.
 
 
 ---
 
 <!-- SOURCE: 20-REFERENCE-IMPLEMENTATIONS/Effect/CustomUI-Drawbot/README.md -->
 
-# Custom UI / Drawbot starter
+# Custom UI / Drawbot reference
 
-Status: **acquisition skeleton / SDK 25.6 macOS syntax-checked / host-test-required**. This code obtains a drawing reference; it does not create paths or draw UI.
+Status: **acquisition skeleton / SDK 25.6 macOS syntax-checked / host-test-required**.
 
-Use this with Adobe's Custom ECW UI / Drawbot-capable sample shell. The stable pattern is:
+EventSkeleton.cpp intentionally stops after obtaining the drawing reference. It does not draw a path, text, icon or control.
 
-`PF_Cmd_EVENT` → inspect `PF_EventExtra` → acquire `PF_EffectCustomUISuite` → obtain `DRAWBOT_DrawRef` → acquire Drawbot supplier/surface/path suites → draw → release temporary Drawbot objects.
+## Purpose
 
-Do not cache per-event Drawbot surface/path handles globally. See `02-EFFECT-PLUGINS/02-PARAMETERS-UI.md` and the official SDK guide's Custom UI & Drawbot section.
+The skeleton proves the outer event/acquisition shape without pretending a partial Drawbot implementation is finished.
+
+~~~text
+PF_Cmd_EVENT
+→ validate PF_EventExtra
+→ accept PF_Event_DRAW
+→ acquire EffectCustomUISuite
+→ PF_GetDrawingReference
+→ obtain Drawbot service objects
+→ draw
+→ release created Drawbot resources
+~~~
+
+The last drawing/resource steps are still to be implemented.
+
+## Start from the correct SDK shell
+
+Use Adobe Custom ECW UI / Drawbot-capable sample code from the target SDK for the full event/PiPL/UI setup.
+
+The supplied SDK review uses Custom_ECW_UI and CCU as evidence sources.
+
+Do not bolt EventSkeleton into an arbitrary effect and assume the necessary custom UI flags/parameter UI configuration exist.
+
+## Event filtering
+
+The skeleton returns immediately for non-draw events.
+
+A real UI may need to handle:
+
+- mouse/down/up/move;
+- cursor;
+- key events;
+- click/drag;
+- draw;
+- update/invalidations.
+
+Handle only the event types the feature actually needs.
+
+## Drawbot ownership
+
+Separate:
+
+- borrowed draw/context references from AE;
+- acquired Drawbot suites;
+- product-created path/brush/pen/font/image objects.
+
+Created Drawbot objects need the matching supplier/resource release API.
+
+Do not cache per-event surface/path handles globally.
+
+## Async manager boundary
+
+The SDK source review documents an async-manager requirement around supported custom UI async behavior.
+
+Do not start background UI work and later touch event-scoped Drawbot references from another thread.
+
+If worker computation is needed:
+
+~~~text
+worker computes plain immutable data
+→ host/UI callback receives result
+→ reacquire current draw context
+→ draw
+~~~
+
+## Coordinate/state
+
+Before drawing define:
+
+- effect controls window vs comp/layer context;
+- coordinate conversion;
+- clipping;
+- device scale/HiDPI behavior;
+- parameter hit regions;
+- invalidation/redraw triggers.
+
+Do not infer coordinates from one display setup.
+
+## Acceptance path
+
+Implement incrementally:
+
+1. untouched sample loads;
+2. drawing callback observed;
+3. draw one fixed line/rectangle;
+4. draw parameter-dependent shape;
+5. resize/HiDPI;
+6. mouse interaction if needed;
+7. invalidation;
+8. repeated open/close;
+9. MFR render remains unaffected.
+
+## Verification boundary
+
+Syntax checking only proves declarations/types. This remains a skeleton until it visibly draws and its resource/event lifecycle passes in the target AE host.
 
 
 ---
 
 <!-- SOURCE: 20-REFERENCE-IMPLEMENTATIONS/Effect/SmartFX-MFR/README.md -->
 
-# SmartFX pass-through (MFR validation pending)
+# SmartFX pass-through reference
 
 Status: **source implementation / SDK 25.6 macOS syntax-checked / host-test-required**.
 
-Start from Adobe's SmartFX-capable effect sample. Keep its utility sources/project files. Use `SmartFxMfr.cpp` as the implementation, and synchronize PiPL identity and flags with the code. The render uses the host World Transform copy callback, avoiding manual rowbytes/pixel-format assumptions. Validate 8/16/32-bpc, ROI and origins in AE before extending it.
+SmartFxMfr.cpp is intentionally a small pass-through reference with SmartFX support. It does **not** currently declare MFR support.
 
-What this demonstrates:
+## Why MFR stays disabled
 
-1. capability declaration in `GLOBAL_SETUP`;
-2. `SMART_PRE_RENDER` requests input based on output ROI;
-3. `SMART_RENDER` checks out input/output through SmartFX callbacks;
-4. no mutable render globals;
-5. MFR is **not declared** until the final render path passes concurrent-frame host tests.
+The source has no mutable render globals, but thread safety is a whole-effect property.
 
-Run `scripts/check_native.py` against your SDK for syntax/type checks, build in the sample shell, then record host results in `VERIFICATION.md`.
+PF_OutFlag2_SUPPORTS_THREADED_RENDERING is enabled only after the final product render path, dependencies, caches and third-party code pass concurrent-frame host tests.
+
+Source shape alone is not enough.
+
+## Start from a SmartFX-capable SDK project
+
+Preserve the exact SDK sample project, resources and utility files.
+
+Synchronize:
+
+- product name/match name;
+- entry point;
+- PiPL flags;
+- GlobalSetup flags;
+- architectures.
+
+Do not graft only SmartFxMfr.cpp into a broken/incomplete project shell.
+
+## GlobalSetup
+
+The reference declares:
+
+- deep-color awareness;
+- SmartFX support;
+- float-color awareness.
+
+It deliberately omits the threaded-rendering flag.
+
+A future product must keep PiPL/outflags/runtime behavior consistent.
+
+## Smart pre-render
+
+The implementation copies the output request into the input checkout request and records the returned result/max-result rectangles.
+
+This demonstrates the request/rectangle lifecycle, not an optimized dependency analysis.
+
+A real effect should calculate only the input region it truly needs.
+
+## Smart render
+
+The reference:
+
+1. checks out input pixels using checkout ID 1;
+2. checks out output;
+3. validates worlds;
+4. uses WorldTransformSuite copy;
+5. always checks input pixels back in if checkout succeeded;
+6. preserves the first operation error unless checkin is the first error.
+
+This avoids manual rowbytes/pixel-format loops in the pass-through baseline.
+
+## What to test before extending
+
+- full frame;
+- small ROI;
+- edge ROI;
+- empty/single-pixel region if host path generates it;
+- odd dimensions;
+- nonzero origin;
+- 8/16/32-bpc;
+- alpha;
+- save/reopen;
+- repeated random frame requests.
+
+## Adding algorithm code
+
+Keep the existing host lifecycle and replace only the copy operation with a typed internal render core.
+
+Do not mix algorithm rewrite, parameter-system rewrite and MFR enablement in one change.
+
+## Enabling MFR
+
+Follow 12-RECIPES/02-MFR-MIGRATION.md.
+
+Required before setting PF_OutFlag2_SUPPORTS_THREADED_RENDERING:
+
+- state inventory;
+- thread-safe render path;
+- third-party dependency review;
+- repeated MFR stress;
+- MFR off/on pixel comparison;
+- cancellation;
+- memory trend;
+- lock review.
+
+## Verification command
+
+Use scripts/check_native.py against the exact SDK for syntax/type checks, then compile/link in the SDK project and run host fixtures.
+
+Record the host result in VERIFICATION/evidence; do not replace NOT RUN with PASS after syntax checking.
+
+## Verification boundary
+
+Current evidence is syntax/type level for the supplied SDK baseline. Host ROI/pixel/MFR acceptance remains open.
 
 
 ---
 
 <!-- SOURCE: 20-REFERENCE-IMPLEMENTATIONS/GPU/README.md -->
 
-# GPU effect implementation path
+# GPU effect reference path
 
-Status: **SDK sample workspace: `Effect/SDK_Invert_ProcAmp`; host GPU-test pending**.
+Status: **SDK sample workspace: Effect/SDK_Invert_ProcAmp / host GPU-test pending**.
 
-The implementation is deliberately based on Adobe's version-matched GPU sample because kernel build dependencies, PiPL flags, GPU device callbacks and generated assets vary by SDK. Materialize it with:
+Materialize the exact licensed SDK sample:
 
-```bash
+~~~bash
 python3 scripts/materialize_sdk_examples.py "/path/to/SDK/Examples" --only gpu-effect
-```
+~~~
 
-Keep the sample project and replace the CPU/GPU math only after CPU reference and tolerance tests exist. Do not enable GPU flags in a custom binary without checking both `GLOBAL_SETUP` and `PF_RenderOutputFlag_GPU_RENDER_POSSIBLE`.
+## Why use the SDK sample shell
+
+GPU effect support spans more than one render function:
+
+- GlobalSetup capability declaration;
+- GPU device setup;
+- device-specific capability flags;
+- GPU data lifetime;
+- pre-render/render selectors;
+- GPU world format/ownership;
+- device setdown;
+- kernel build assets/toolchain.
+
+These details vary by SDK and platform, so the Bible keeps the official sample project/plumbing rather than inventing a replacement build shell.
+
+## CPU oracle first
+
+Before changing GPU math:
+
+~~~text
+known-good CPU algorithm
+→ deterministic fixtures
+→ fixed numeric tolerance
+→ GPU implementation
+→ automated comparison
+~~~
+
+Do not develop CPU and GPU semantics independently.
+
+## Capability declaration
+
+A GPU support flag in GlobalSetup is only the first gate.
+
+Device setup must also report what the actual framework/device can render. The final path must handle a device/backend that cannot support the effect.
+
+Do not advertise GPU support based only on compile-time macros.
+
+## gpu_data lifetime
+
+Treat device setup data as product-owned state with explicit device lifetime.
+
+~~~text
+GPU_DEVICE_SETUP
+→ create device resources / gpu_data
+→ GPU renders use them
+→ GPU_DEVICE_SETDOWN
+→ release
+~~~
+
+No render may use gpu_data after setdown.
+
+## World ownership
+
+GPU worlds/buffers are host/API-owned according to the relevant checkout contract. Do not free them with an unrelated allocator.
+
+Keep every checkout/checkin/release pair visible.
+
+## CPU fallback
+
+Test unsupported/failing GPU path.
+
+Expected behavior must be defined:
+
+- host selects CPU render;
+- product returns a supported capability/error path;
+- no half-initialized device state remains.
+
+A GPU-only crash is not an acceptable fallback.
+
+## Correctness fixtures
+
+At minimum compare:
+
+- 8/16/32 where claimed;
+- alpha;
+- gradients/edges;
+- odd dimensions;
+- ROI/origins where supported;
+- parameter boundaries;
+- NaN/Inf policy for float;
+- repeated render.
+
+Use 12-RECIPES/04-CPU-GPU-EQUIVALENCE.md.
+
+## MFR combination
+
+If MFR and GPU are both public claims, test them together.
+
+Look for shared device-state races, cancellation, cross-frame buffer reuse and teardown while requests are in flight.
+
+## Performance
+
+Profile:
+
+~~~text
+world preparation
+→ upload/translation
+→ dispatch
+→ kernel
+→ synchronization
+→ download/conversion
+~~~
+
+Kernel time alone is not end-user render time.
+
+## Build/release
+
+GPU dependencies/assets need the same architecture/signing/package discipline as the main plug-in.
+
+A Universal macOS plug-in with a one-architecture nested GPU/helper dependency is not Universal in practice.
+
+## Verification boundary
+
+The reference remains host GPU-test pending. Materializing the SDK sample and compiling it does not prove the modified product kernel, fallback or performance.
 
 
 ---
