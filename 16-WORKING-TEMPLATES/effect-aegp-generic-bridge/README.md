@@ -1,12 +1,12 @@
 # Effect ↔ AEGP generic bridge
 
-Status: **protocol template; source-reviewed against SDK 25.6, not host-verified**.
+Status: **protocol/source template; SDK 25.6 contract-reviewed; runtime result not claimed**.
 
 Use this only for a pair of plug-ins you control. See [AEGP → Effect](../../15-COMMUNICATION/03-AEGP-TO-EFFECT.md).
 
 ## Current AEGP call shape
 
-In SDK 25.6 `AEGP_EffectSuite4::AEGP_EffectCallGeneric` takes:
+In SDK 25.6 current `AEGP_EffectSuite5::AEGP_EffectCallGeneric` takes:
 
 ```text
 plugin id
@@ -61,10 +61,10 @@ This example assumes the effect command is already on the correct SDK callback p
 - send a temporary pointer that the effect stores for later use;
 - assume struct packing/layout without explicit compile-time checks on every binary that participates;
 - use hidden mutable state as a render dependency;
-- treat old EffectSuite2 sample syntax as current EffectSuite4 syntax;
+- treat old EffectSuite2/legacy syntax as current EffectSuite5 syntax;
 - swallow host-call error because the protocol field looks successful.
 
-## Required acceptance
+## Product validation cases
 
 - missing target;
 - short/wrong-version payload;
