@@ -6596,52 +6596,188 @@ This makes support and rollback possible without guessing what was shipped.
 
 # Test matrix
 
-## Minimal matrix
+A full Cartesian product of every AE version, OS, CPU, color depth, GPU and scenario can be too expensive. The answer is not to test one happy path; it is to define risk-based lanes.
+
+## Axes
 
 | Axis | Values |
 |---|---|
 | AE | every claimed major/minor family |
-| OS | minimum supported + current stable |
+| OS | minimum supported + current stable + important transition versions |
 | CPU | mac arm64, mac x86_64 if claimed, Win x64, Win ARM64 if claimed |
-| BPC | 8 / 16 / 32 |
+| BPC | 8 / 16 / 32 as claimed |
 | MFR | off / on |
-| GPU | off / each supported backend |
-| Resolution | tiny / HD / 4K / stress |
-| Project | new / migrated old project |
+| GPU | CPU fallback / each claimed backend |
+| Resolution | tiny / odd / HD / 4K / stress |
+| Project | new / migrated old / malformed persistence |
+| Render mode | UI preview / render queue / aerender if supported |
+| Install | fresh / upgrade / uninstall / repair where applicable |
 
-Полный Cartesian product может быть дорогим. Делить на:
-- PR smoke matrix;
-- nightly expanded matrix;
-- pre-release full matrix.
+## Test lanes
+
+### PR smoke
+
+Fast failures:
+
+- pure unit tests;
+- protocol/schema tests;
+- native syntax/build for primary dev architecture where available;
+- one small golden CPU fixture;
+- generated docs/resources validation.
+
+Goal: reject obvious regressions quickly.
+
+### Nightly / continuous integration
+
+Broader:
+
+- multiple render fixtures;
+- MFR stress loop;
+- GPU comparison on equipped runner;
+- memory trend;
+- installer smoke in VM;
+- current GA AE host cycle where automation exists.
+
+Goal: find concurrency/environment regressions before release week.
+
+### Pre-release matrix
+
+Every public support claim:
+
+- all supported AE versions/families;
+- all claimed OS/CPU targets;
+- all claimed BPC modes;
+- MFR/GPU combinations;
+- old project migration;
+- installer fresh/upgrade/uninstall;
+- clean-machine signing/trust path.
+
+This lane produces release evidence.
+
+## Pairwise/risk reduction
+
+When full Cartesian coverage is impossible:
+
+1. identify high-risk interactions;
+2. use pairwise coverage for lower-risk dimensions;
+3. always run explicitly dangerous combinations.
+
+Never omit:
+
+- MFR + mutable instance state;
+- GPU + 32-bpc if both claimed;
+- oldest project schema + newest plug-in;
+- installer upgrade across a filename/path change;
+- each CPU architecture actually shipped.
+
+Document what was not combined.
 
 ## Required project fixtures
 
-### `basic.aep`
+### basic.aep
+
 - one layer;
 - one effect;
-- defaults.
+- defaults;
+- deterministic source.
 
-### `animated-extremes.aep`
-- every param animated;
-- min/max/odd values;
-- time remap / random seeks.
+Purpose: loading/default/basic render.
 
-### `stacked.aep`
+### animated-extremes.aep
+
+- every important parameter animated;
+- min/max/boundary values;
+- abrupt interpolation where relevant;
+- random seeks.
+
+Purpose: time and parameter handling.
+
+### stacked.aep
+
 - multiple instances;
 - masks/transforms/precomps;
-- other common effects around yours.
+- common effects before/after;
+- multiple layer sizes.
 
-### `mfr-stress.aep`
+Purpose: composition interaction/state separation.
+
+### mfr-stress.aep
+
 - long duration;
 - multiple comps/layers/instances;
-- concurrent render pressure.
+- different parameter values;
+- enough work for concurrent frames.
 
-### `color-depth.aep`
+Purpose: race/state bleed/deadlock.
+
+### color-depth.aep
+
 - 8/16/32-bpc variants;
-- HDR and transparency fixtures.
+- transparency;
+- HDR/negative float values where valid;
+- gradients and edge colors.
 
-### `legacy-project.aep`
-- saved by previous shipped plug-in version.
+Purpose: pixel format correctness.
+
+### roi-origins.aep
+
+- odd sizes;
+- cropped/precomp offsets;
+- nonzero origins;
+- partial regions.
+
+Purpose: SmartFX/rowbytes/coordinate bugs.
+
+### legacy-project-N.aep
+
+One fixture per materially different persisted schema.
+
+Purpose: project migration.
+
+### malformed-state fixtures
+
+Only if product owns serialized data:
+
+- truncated header;
+- unknown version;
+- impossible length/count;
+- corrupt checksum if used.
+
+Purpose: fail safely.
+
+## Fixture immutability
+
+Release fixtures should be versioned and not silently re-saved by the newest AE before the migration test.
+
+Store:
+
+- creation AE version;
+- product version;
+- fixture purpose;
+- expected output/hash/metric.
+
+## Environment identity
+
+Each matrix result records:
+
+~~~json
+{
+  "ae": "...",
+  "os": "...",
+  "cpu": "...",
+  "gpu": "...",
+  "driver": "...",
+  "plugin_hash": "...",
+  "fixture": "...",
+  "result": "PASS"
+}
+~~~
+
+Without environment identity, a green cell is hard to reproduce.
+
+## Stop rule
+
+If a support-matrix cell is claimed but never exercised by any planned lane, either add evidence or remove the claim.
 
 
 ---
@@ -6650,45 +6786,168 @@ This makes support and rollback possible without guessing what was shipped.
 
 # Render correctness
 
-## Golden image strategy
+Render tests should compare actual output data, not screenshots of the After Effects UI.
 
-Не сравнивать screenshots UI. Сравнивать actual rendered pixel output.
+## Golden strategy
 
-Для deterministic CPU path:
-- exact hash, если mathematically stable across platforms;
-- otherwise pixel diff with strict documented tolerance.
+Choose the strictest comparison that remains valid for the algorithm.
 
-Для GPU/float:
-- max absolute error;
+### Exact comparison
+
+Use exact bytes/hash only when output is expected to be bit-identical for the defined environment.
+
+Good candidates:
+
+- integer copy/pass-through;
+- deterministic lookup/table operations;
+- exact alpha/channel routing.
+
+Do not use an exact hash for a floating GPU path if mathematically equivalent outputs can vary in low bits.
+
+### Tolerance comparison
+
+For float/GPU/numerical algorithms record:
+
+- maximum absolute error;
+- maximum relative error where meaningful;
 - mean/RMS error;
-- count of pixels above tolerance;
-- separate alpha tolerance.
+- count/percentage of pixels above threshold;
+- separate alpha threshold;
+- NaN/Inf count.
+
+Tolerance is part of the test specification, not something chosen after seeing the result.
+
+## Compare in a controlled representation
+
+Avoid differences caused only by output codec or color management when the test intends to measure the effect algorithm.
+
+Where possible compare:
+
+- uncompressed/lossless output;
+- known project working space;
+- explicit bit depth;
+- known alpha interpretation.
+
+If color management is part of the feature, then color-management behavior itself must become part of the fixture.
 
 ## Test patterns
 
-- impulse pixel;
-- horizontal/vertical gradient;
-- checkerboard 1px/2px;
+Use synthetic patterns that make specific bugs obvious:
+
+- single impulse pixel;
+- horizontal gradient;
+- vertical gradient;
+- 1px and 2px checkerboard;
 - transparent colored edges;
-- solid black/white/gray;
-- HDR negative→positive ramp;
-- odd dimensions (1x1, 3x5, 1919x1079);
-- very wide/tall image;
+- fully transparent nonzero RGB;
+- solid black/white/mid-gray;
+- primary/secondary colors;
+- HDR negative -> positive ramp;
+- odd dimensions: 1x1, 3x5, 1919x1079;
+- very wide/tall frame;
 - nontrivial alpha.
+
+Natural images are useful later but are poor at isolating indexing/alpha/rowbytes defects.
+
+## Alpha
+
+Test independently:
+
+- opaque;
+- fully transparent;
+- partial alpha;
+- colored transparent pixels;
+- premultiplied-looking edge cases if algorithm interacts with alpha.
+
+Never infer alpha correctness from RGB similarity.
+
+## Rowbytes and origins
+
+A render implementation must not assume tightly packed rows or zero origins unless the API guarantees it for that path.
+
+Fixtures should exercise:
+
+- odd width;
+- cropped/offset layers;
+- partial render region;
+- nonzero origin;
+- ROI smaller than full frame.
+
+## SmartFX ROI
+
+For SmartFX/pre-render capable effects include:
+
+- full frame;
+- small requested rectangle;
+- rectangle touching each edge;
+- empty rectangle;
+- single-pixel rectangle;
+- output request larger/smaller than meaningful source region.
+
+Assert both output correctness and safe behavior.
 
 ## Temporal effects
 
-Если output зависит от time:
+If output depends on time/history:
+
+- sequential forward render;
 - random seek order;
-- backwards render;
-- duplicate frames;
+- backwards seeks;
+- repeated same frame;
 - skipped frames;
-- render after cache purge;
-- same frame from different render contexts.
+- cache purge;
+- render after project reopen;
+- same frame requested from different render contexts.
+
+The same frame/time/configuration should not depend on accidental prior preview order unless the effect explicitly implements documented temporal state.
+
+## CPU/GPU equivalence
+
+Compare CPU and each GPU backend using the same input/output metric.
+
+Report:
+
+~~~text
+backend
+frame/time
+max abs diff
+RMS diff
+alpha max diff
+pixels above tolerance
+~~~
+
+A fast GPU output outside tolerance is a correctness failure.
+
+## Error pixels
+
+Diff visualization helps triage.
+
+Generate:
+
+- absolute-difference image;
+- threshold mask;
+- coordinates/value of worst N pixels.
+
+Preserve those artifacts on CI failure.
+
+## Golden update policy
+
+Changing expected output is code review work.
+
+A golden update must explain:
+
+- intended algorithm change;
+- why old expected output is wrong/obsolete;
+- tolerance change if any;
+- affected supported versions.
+
+Never "accept new golden" merely to make CI green.
 
 ## Pass condition
 
-Tolerance должна быть частью test spec до реализации backend-а.
+Every fixture defines PASS before implementation changes are evaluated.
+
+A test with no fixed expected metric is an observation, not acceptance evidence.
 
 
 ---
@@ -6697,44 +6956,161 @@ Tolerance должна быть частью test spec до реализации
 
 # MFR stress tests
 
-## Purpose
+Multi-Frame Rendering changes a plug-in from "one frame at a time in my preview" into a concurrent execution problem.
 
-Поймать race/deadlock/state bleed, которые не проявляются в single-frame preview.
+The purpose of stress tests is to expose races, deadlocks, state bleed and lifetime defects that normal preview rarely reproduces.
 
-## Scenarios
+## Preconditions
 
-1. Один effect instance, long comp, full render.
-2. 20+ instances одного effect.
-3. Несколько comps в render queue.
-4. Одновременно разные parameter values.
-5. Rapid cancel/restart renders.
-6. Cache purge между runs.
-7. MFR off → on → off.
-8. GPU backend вместе с MFR.
-9. Old project with migrated sequence data.
-10. Repeated render loop 50–100 раз для flaky races.
+Do not enable an MFR capability flag simply because code compiles.
+
+Before stress:
+
+- identify global mutable state;
+- identify sequence/instance state;
+- identify caches;
+- identify third-party libraries with unknown thread safety;
+- identify locks held near host calls;
+- identify lazy initialization.
+
+Write down what is expected to be shared vs per-instance vs per-render-thread.
+
+## Core scenarios
+
+1. One effect instance, long composition.
+2. 20+ instances of the same effect.
+3. Several comps queued together.
+4. Different parameter values per instance.
+5. Rapid cancel/restart.
+6. Cache purge between runs.
+7. MFR off -> on -> off.
+8. GPU backend with MFR.
+9. Old project after sequence-data migration.
+10. Repeated render 50-100+ times for flaky races.
+11. Multiple output resolutions/sizes.
+12. Same source reused by many comps.
+13. Failure injection during allocation/cache creation if possible.
+
+## State-bleed fixture
+
+Create several instances with intentionally distinctive output:
+
+~~~text
+instance A -> red / parameter 1
+instance B -> green / parameter 2
+instance C -> blue / parameter 3
+~~~
+
+Concurrent output must never contain state from another instance/frame.
+
+This is more diagnostic than using nearly identical parameters.
+
+## Randomized scheduling pressure
+
+Host scheduling is not under the test's full control, but increase variety:
+
+- long/short frames;
+- random parameter animation;
+- mixed layer sizes;
+- CPU/GPU combinations;
+- repeated cancel;
+- memory pressure.
+
+Do not write a test that passes only because every frame has identical work duration.
 
 ## Observability
 
-Debug build log:
-- instance id;
+Debug/stress logging should include enough identity to correlate concurrency:
+
+- plug-in build;
+- instance ID/refcon identity;
 - frame/time;
-- thread id;
+- thread ID;
 - backend;
 - sequence/global state revision;
-- cache key/hit.
+- cache key/hit/miss;
+- request start/end;
+- cancellation.
 
-Лог должен позволять доказать, что два frames не пишут один unsafe state.
+Avoid logging every pixel or creating so much I/O that the logging serializes the render.
 
-## Failures
+## Determinism
 
-Любой из этих симптомов — release blocker:
+Run the same fixture repeatedly and compare output.
+
+Look for:
+
+- different hash/diff between runs;
+- rare corrupted tile/row;
+- one-frame parameter leak;
+- wrong cache reuse;
+- output that changes only under high concurrency.
+
+A race that appears 1 in 100 runs is still a release blocker.
+
+## Deadlock/hang detection
+
+Stress harness needs a timeout with useful diagnostics.
+
+On timeout preserve:
+
+- process/thread dump or sample;
+- last plug-in log events;
+- frame/request IDs in flight;
+- AE version/OS;
+- MFR state.
+
+Do not kill and discard all evidence.
+
+## Memory trend
+
+Track memory across repeated renders.
+
+Distinguish:
+
+- one-time host/cache warmup;
+- bounded reusable cache;
+- unbounded growth.
+
+A useful stress run includes purge/restart checkpoints so retained caches are not automatically mislabeled leaks.
+
+## Lock review
+
+A lock can make races disappear by serializing everything and still be a performance defect.
+
+Measure:
+
+- lock wait time;
+- critical-section duration;
+- whether lock is held across AE suite/host callbacks;
+- whether one global lock serializes independent instances.
+
+Correctness first, then remove unnecessary serialization with evidence.
+
+## Third-party libraries
+
+If an external library uses hidden global state, MFR safety may fail even when your own code is clean.
+
+Test each integration under actual concurrent calls or isolate it behind a safe architecture.
+
+Do not infer thread safety from "works in multiple applications".
+
+## Failure symptoms
+
+Release blocker:
+
 - nondeterministic pixels;
 - sporadic crash;
 - hang/deadlock;
-- state from another layer/instance;
-- increasing memory every render;
-- corrupted project after save/reopen.
+- cross-instance state;
+- corrupted cache;
+- increasing memory without bound;
+- project corruption after save/reopen;
+- cancellation leaving persistent broken state.
+
+## MFR claim rule
+
+Until the stress matrix passes, keep MFR disabled in the shipping capability declaration and use a separately identified test build for experiments.
 
 
 ---
@@ -6743,44 +7119,181 @@ Debug build log:
 
 # Performance testing
 
+Performance work needs a fixed workload, fixed environment and defined regression threshold. "Feels faster" is not a benchmark.
+
 ## Metrics
+
+Measure what matters for the product:
 
 - cold first frame;
 - warm frame;
-- full comp render time;
-- per-frame median/p95;
-- peak RSS/memory;
+- full composition render time;
+- per-frame median/p95/p99;
+- peak RSS/working set;
+- allocations per frame;
 - MFR scaling;
 - CPU utilization;
-- GPU kernel + synchronization time;
-- cache hit rate.
+- lock wait time;
+- GPU kernel time;
+- CPU<->GPU transfer/synchronization time;
+- cache hit rate;
+- panel command latency for interactive tools.
 
 ## Baseline
 
-Каждый release сравнивать с last shipped version на одной машине/AE build/project.
+Compare each candidate to a known baseline:
 
-Пример gate:
+~~~text
+same machine
+same AE build
+same OS
+same project
+same output settings
+same MFR/GPU mode
+last shipped plug-in vs candidate
+~~~
 
-```text
-Typical project: no >5% regression without explicit approval
-Stress project: no OOM / unbounded growth
-MFR scaling: no global-lock serialization regression
-GPU: must beat CPU on target workload class or have another justified benefit
-```
+Changing hardware/driver/AE invalidates a direct regression percentage unless the baseline is rerun there too.
 
-Numbers — product-specific; главное, чтобы threshold был заранее определён.
+## Example gates
+
+Product-specific thresholds should be chosen before measuring the candidate.
+
+~~~text
+Typical project:
+  median render regression <= 5% unless approved
+
+Stress:
+  no OOM or unbounded growth
+
+MFR:
+  no accidental global serialization
+
+GPU:
+  must meet target workload benefit or have an explicit non-speed reason
+~~~
+
+Do not blindly copy 5% into every product; noise level and workload determine a meaningful threshold.
+
+## Warmup
+
+Separate:
+
+- process cold start;
+- first plug-in initialization;
+- first GPU pipeline/kernel setup;
+- first cache fill;
+- steady state.
+
+A benchmark that mixes all five into one average is hard to interpret.
+
+## Repetitions
+
+Run enough repetitions to understand noise.
+
+Record:
+
+- sample count;
+- median;
+- p95;
+- min/max if useful;
+- environment thermal/power mode.
+
+Discarding "slow outliers" without a predeclared rule can hide the exact stalls users care about.
+
+## MFR scaling
+
+Measure relative to MFR-off or single-concurrency baseline.
+
+Useful output:
+
+~~~text
+threads/host mode
+frames
+wall time
+CPU utilization
+speedup
+peak memory
+~~~
+
+More CPU utilization is not itself success. It must produce useful throughput without unacceptable memory growth.
+
+## GPU
+
+Break GPU time into:
+
+~~~text
+upload / world preparation
+kernel/compute
+synchronization
+download / conversion
+host overhead
+~~~
+
+Optimizing a 1 ms kernel does not matter if transfers cost 12 ms.
+
+Test small and large frames; GPU crossover points vary.
+
+## Memory
+
+Track:
+
+- peak memory;
+- steady-state retained memory;
+- per-frame allocation count;
+- cache size;
+- memory after purge;
+- memory after project close if relevant.
+
+Performance fixes that create unbounded caches are regressions.
+
+## Interactive UI/panel
+
+For interactive tools, render throughput is not enough.
+
+Measure:
+
+- click/command -> host response latency;
+- selection refresh;
+- panel startup;
+- large-project state snapshot;
+- cancellation response.
+
+Avoid high-frequency evalScript polling that makes UI benchmarks look like host performance problems.
 
 ## Profiling order
 
-1. time whole render;
-2. locate slow selector/backend;
+1. measure whole user operation;
+2. locate slow selector/backend/component;
 3. profile algorithm;
-4. allocation profile;
-5. lock contention;
-6. GPU transfers/sync;
-7. host callbacks/checkouts.
+4. inspect allocations;
+5. inspect lock contention;
+6. inspect GPU transfer/sync;
+7. inspect host callbacks/checkouts;
+8. optimize;
+9. rerun correctness first;
+10. rerun benchmark.
 
-Не оптимизировать по ощущениям.
+Do not optimize from intuition alone.
+
+## Performance evidence
+
+Store benchmark report with:
+
+- product/build hashes;
+- baseline version;
+- AE/OS;
+- CPU/GPU/RAM;
+- driver;
+- project fixture hash;
+- MFR/GPU settings;
+- raw samples or machine-readable summary.
+
+Without that, a chart cannot be reproduced.
+
+## Correctness remains gate 0
+
+A faster output outside pixel tolerance, a cache that returns stale data, or an MFR lock removal that introduces races is not a performance win.
 
 
 ---
@@ -6789,54 +7302,399 @@ Numbers — product-specific; главное, чтобы threshold был зар
 
 # Crash diagnostics
 
+Crash investigation is much easier when every shipped artifact has an identity and matching symbols.
+
 ## Every build needs identity
 
-Минимум:
-- semantic version;
+At minimum record:
+
+- semantic product version;
 - internal build number;
 - git SHA;
-- platform/arch;
-- build timestamp or reproducible build ID;
-- SDK generation.
+- platform/architecture;
+- exact binary SHA-256;
+- toolchain;
+- AE SDK generation/build;
+- build configuration.
 
-## macOS bundle
+Expose a user-readable version somewhere that support can collect without opening the binary in a hex editor.
 
-Хранить exact `.dSYM` release artifact.
+## macOS
 
-Crash ticket:
-- `.ips`/crash report;
-- AE build;
-- OS;
-- architecture;
-- project;
-- repro;
-- GPU/MFR state.
+Archive the exact dSYM corresponding to every shipped native binary.
+
+Crash ticket should collect where possible:
+
+- .ips/crash report;
+- AE exact version/build;
+- macOS version;
+- CPU architecture;
+- plug-in version/hash;
+- project or minimal reproduction;
+- operation when crash occurred;
+- MFR state;
+- GPU/backend;
+- hardware/driver relevant details;
+- whether fresh AE launch reproduces.
+
+Symbolication must use the matching dSYM. A similarly named dSYM from another rebuild is not evidence.
 
 ## Windows
 
-Хранить exact PDB.
+Archive exact PDB per architecture/build.
 
 Crash ticket:
-- dump;
-- AE build;
+
+- dump type/path;
+- AE exact version/build;
 - Windows build;
+- x64/ARM64;
+- plug-in version/hash;
 - CPU/GPU/driver;
-- project;
-- repro;
-- GPU/MFR.
+- project/repro;
+- MFR/GPU mode;
+- installer version if load/startup related.
+
+Tie PDB to the binary hash.
 
 ## Triage classification
 
-1. load/init crash;
-2. params/UI event crash;
-3. render CPU;
-4. render GPU;
-5. MFR race;
-6. project serialization/migration;
-7. third-party dependency;
-8. host-only reproducible without plug-in modification.
+Start with a stable class:
 
-Если bug воспроизводится unmodified Adobe sample при тех же условиях — это важный сигнал для отделения SDK/host issue от собственного кода.
+1. plug-in discovery/load/init;
+2. parameter/UI/event callback;
+3. CPU render;
+4. GPU setup/render/setdown;
+5. MFR/concurrency;
+6. project serialization/migration;
+7. script/panel/bridge;
+8. installer/update;
+9. third-party dependency;
+10. host/environment baseline.
+
+Classification keeps unrelated crash families from being mixed into one ticket.
+
+## First question: where is the fault?
+
+A stack containing AE and the plug-in is not enough to blame either component.
+
+Inspect:
+
+- crashing instruction/module;
+- top symbolized frames;
+- exception type;
+- corrupted parameters/pointers;
+- prior plug-in logs;
+- whether memory corruption could have happened earlier.
+
+A crash inside an OS/Adobe function can still be caused by invalid data supplied earlier by the plug-in.
+
+## Known-good baseline
+
+If the failure can be expressed using an untouched Adobe sample or a tiny minimal plug-in, reproduce there.
+
+Result meanings:
+
+- product only fails -> focus product/integration;
+- sample also fails -> isolate host/SDK/environment;
+- both pass but customer project fails -> reduce project/state.
+
+Do not publish "Adobe bug" from one ambiguous stack.
+
+## Reproduction reduction
+
+Reduce in this order:
+
+~~~text
+customer project copy
+→ remove unrelated comps/layers
+→ remove unrelated effects
+→ freeze input asset
+→ freeze frame/time
+→ isolate parameter values
+→ isolate MFR/GPU
+→ minimal reproducible project
+~~~
+
+Keep an original copy before destructive reduction.
+
+## Hangs
+
+A hang is not a crash but needs similar evidence.
+
+Collect:
+
+- process sample/thread dump;
+- all thread stacks;
+- last progress/log message;
+- locks/waits if identifiable;
+- operation duration;
+- MFR state;
+- helper process state.
+
+A timeout followed by force-kill without a thread dump destroys the best evidence.
+
+## Memory corruption
+
+Symptoms can appear far after the write that caused them.
+
+Use platform sanitizers/debug allocators where compatible with the host/test harness, and reproduce pure core/adapter code outside AE when possible.
+
+High-risk areas:
+
+- rowbytes/pixel indexing;
+- stale host references;
+- buffer size arithmetic;
+- cross-module ABI;
+- async callback lifetime;
+- cache ownership.
+
+## Crash loops
+
+If a plug-in crashes AE during startup, support needs a recovery path.
+
+Document:
+
+- where the plug-in is installed;
+- how to temporarily remove/disable it;
+- how to preserve user projects/settings;
+- how to collect the failing binary/log before removal.
+
+Do not make recovery require running the crashing plug-in.
+
+## Privacy
+
+Crash packages can contain project paths/names and memory contents.
+
+Define:
+
+- what users should redact;
+- how dumps are transferred;
+- retention/access policy;
+- whether project files are required.
+
+Do not request full private projects by default when a reduced fixture is enough.
+
+## Release use
+
+Crash-free local development is not a metric by itself.
+
+Release confidence comes from:
+
+- stress loops;
+- migration fixtures;
+- installer/load tests;
+- exact symbols retained;
+- ability to diagnose the failures that do escape.
+
+
+---
+
+<!-- SOURCE: 10-TESTING/06-EVIDENCE-AND-ACCEPTANCE.md -->
+
+# Evidence and acceptance
+
+This chapter defines what a PASS means in the Bible.
+
+## Evidence unit
+
+A test result is only useful when it identifies:
+
+- requirement/capability;
+- artifact under test;
+- environment;
+- procedure/command;
+- expected result;
+- observed result;
+- terminal status;
+- retained evidence.
+
+Template:
+
+~~~yaml
+id: MFR-001
+capability: multi-frame rendering
+artifact:
+  version: 1.2.3
+  git_sha: ...
+  sha256: ...
+environment:
+  ae: ...
+  os: ...
+  arch: ...
+procedure:
+  fixture: mfr-stress.aep
+  command: ...
+expected:
+  - deterministic output
+  - no crash/deadlock
+observed:
+  - ...
+status: PASS
+evidence:
+  - render hash/report
+  - log
+~~~
+
+## Status vocabulary
+
+Use a small vocabulary:
+
+- NOT_RUN — required test exists but was not executed;
+- BLOCKED — cannot execute because a named dependency/environment is unavailable;
+- FAIL — executed and acceptance criterion failed;
+- PASS — executed and criterion passed;
+- OBSERVED — exploratory observation without complete acceptance assertion.
+
+Do not use "probably", "seems fine" or "green" as a release status.
+
+## Documentation review is separate
+
+A chapter can be source-reviewed while implementation acceptance remains NOT_RUN.
+
+Likewise a compiler can accept a sample while host load remains NOT_RUN.
+
+Keep separate dimensions:
+
+~~~text
+documentation/source evidence
+implementation state
+compiler/build evidence
+host behavior evidence
+release/package evidence
+~~~
+
+This prevents a documentation CI job from accidentally becoming "plug-in tested".
+
+## Artifact identity
+
+Every PASS belongs to one exact artifact.
+
+If the binary changes, even from the same git commit:
+
+- assign a new hash;
+- do not reuse the old PASS automatically.
+
+If packaging changes but the inner binary does not, installer/package acceptance still needs the new package artifact identity.
+
+## Environment identity
+
+At minimum:
+
+- AE exact version/build;
+- OS exact version/build where relevant;
+- CPU architecture;
+- GPU/backend/driver for GPU tests;
+- MFR setting;
+- SDK/toolchain for build evidence.
+
+"Latest AE" is not a reproducible environment name.
+
+## Expected result first
+
+Write expected result before running the candidate when practical.
+
+Bad:
+
+> Rendered image looked close enough.
+
+Good:
+
+> Max absolute RGB error <= 1/32768 and alpha exact for fixture X.
+
+Predeclared thresholds reduce biased acceptance.
+
+## Negative tests
+
+Acceptance includes failure behavior.
+
+Examples:
+
+- missing dependency;
+- unsupported architecture;
+- malformed sequence data;
+- invalid panel command;
+- allocation failure where injectable;
+- cancellation;
+- notarization/signature failure;
+- locked file during upgrade.
+
+A product that only works when nothing goes wrong is not release-ready.
+
+## Evidence storage
+
+Keep machine-readable result plus human-readable summary.
+
+Suggested:
+
+~~~text
+evidence/
+└── 1.2.3/
+    ├── manifest.json
+    ├── mac-arm64-ae26/
+    │   ├── results.json
+    │   ├── logs/
+    │   └── renders/
+    └── win-x64-ae26/
+        └── ...
+~~~
+
+Do not commit proprietary/customer content to a public repository. Store references/hashes in the public report when raw evidence must stay private.
+
+## Manual tests
+
+Manual tests are valid evidence if they are reproducible and recorded.
+
+A manual result should include:
+
+- exact steps;
+- tester/date;
+- artifact hash;
+- environment;
+- observed outcome;
+- screenshot/video only as supporting evidence, not the sole assertion when pixels/data can be measured.
+
+## Flaky tests
+
+A flaky test is not a PASS.
+
+Classify:
+
+- product nondeterminism;
+- host/environment instability;
+- harness defect.
+
+Until resolved, affected capability remains blocked or failed according to the release policy.
+
+## Acceptance gate
+
+A capability is accepted only when:
+
+1. implementation exists;
+2. required build/package succeeds;
+3. named test set passes;
+4. no blocker from a higher-risk lane remains;
+5. documentation support claim matches tested scope.
+
+## Evidence invalidation
+
+Re-run when:
+
+- source affecting feature changes;
+- compiler/toolchain materially changes;
+- SDK changes;
+- AE major/minor support changes;
+- OS architecture changes;
+- installer/signing payload changes;
+- GPU backend/critical dependency changes.
+
+Use risk judgment for unrelated documentation-only edits, but never transfer a PASS to a different binary by convenience.
+
+## Bible rule
+
+When this repository says host-verified, the corresponding record must name the actual host run.
+
+When it says source-reviewed, that must not be read as host-verified.
 
 
 ---
@@ -6845,28 +7703,131 @@ Crash ticket:
 
 # Testing strategy
 
-AE plug-in нельзя тестировать одной фразой «открыл AE, эффект работает».
+An After Effects plug-in is not tested by saying "AE opened and the effect looked fine".
 
-## Layers
+Testing must prove each public capability at the layer where that capability can actually fail.
 
-1. **Pure core unit tests** — math/data logic без AE.
-2. **Adapter tests** — conversion between SDK types and internal model.
-3. **Golden render tests** — known inputs → known outputs.
-4. **Host integration tests** — actual AE.
-5. **Cross-version matrix** — каждый supported AE.
-6. **Platform/architecture matrix**.
-7. **Performance regression**.
-8. **Installer/upgrade/uninstall**.
-9. **Crash/recovery**.
+## Evidence ladder
+
+~~~text
+pure unit test
+→ adapter/contract test
+→ native compile/link
+→ package/install
+→ AE host load
+→ operation/render
+→ stress/error/cancel
+→ cross-version/platform matrix
+~~~
+
+A higher-level PASS does not erase a lower-level failure, and a lower-level PASS does not imply the higher level.
+
+Examples:
+
+- compiler success does not prove PiPL loading;
+- AE loading does not prove correct pixels;
+- one correct frame does not prove MFR safety;
+- a signed installer does not prove upgrade/uninstall safety.
+
+## Test layers
+
+1. **Pure core unit tests** — algorithms/data logic without AE.
+2. **Adapter tests** — conversion between SDK/host types and internal model.
+3. **Contract tests** — protocol/schema/ownership validation.
+4. **Native build tests** — compile, resources, link, architecture.
+5. **Golden render tests** — known inputs -> measurable outputs.
+6. **Host integration tests** — actual After Effects.
+7. **Concurrency/stress** — MFR, repeated render, cancel, cache churn.
+8. **Cross-version matrix** — every claimed AE family.
+9. **Platform/architecture matrix**.
+10. **Performance regression**.
+11. **Installer/upgrade/uninstall**.
+12. **Crash/recovery and diagnostics**.
+
+## Capability -> evidence rule
+
+Every capability claim must point to matching evidence:
+
+| Claim | Minimum evidence |
+|---|---|
+| 8/16/32-bpc | host render fixtures at each claimed depth |
+| SmartFX ROI | partial/empty ROI host tests |
+| MFR supported | concurrent-frame stress |
+| GPU supported | backend host run + CPU/GPU comparison + fallback |
+| Apple Silicon | arm64 native host load/operation |
+| Intel macOS | x86_64 host load if still claimed |
+| Windows x64 | real Windows x64 build + AE host load |
+| Windows ARM64 | native ARM64 host/build matrix |
+| CEP panel | install/open/bridge/error/restart tests |
+| installer safe | fresh/upgrade/failure/uninstall evidence |
+| old projects supported | migration fixtures and save/reopen |
+
+If the evidence does not exist, narrow the claim.
+
+## Determinism before automation
+
+Before writing a test harness, define what PASS means.
+
+For a render test specify:
+
+- input project/assets;
+- frame/time;
+- output format/color settings;
+- expected pixel metric;
+- tolerance;
+- platform/AE scope.
+
+For an installer test specify:
+
+- initial machine state;
+- old version if upgrade;
+- expected files/registry/receipts;
+- expected failure rollback;
+- final machine state.
+
+Automation without a deterministic assertion is only scripted activity.
+
+## Preserve artifacts
+
+A useful failed test keeps enough evidence to investigate:
+
+- exact binary/package hash;
+- AE/OS/toolchain versions;
+- project/fixture version;
+- stdout/stderr/log;
+- render output/diff;
+- crash dump/report;
+- installer log;
+- command and exit code.
+
+Do not delete the only failing render because the CI workspace ended.
+
+## Separate product and host failures
+
+Always keep one minimal Adobe/sample baseline or known-good host check available.
+
+When a failure appears, ask:
+
+~~~text
+same AE/OS
++ untouched/known-good sample
++ equivalent host action
+~~~
+
+If the host/sample also fails, that changes the investigation path. It does not automatically prove an Adobe bug, but it prevents wasting time inside unrelated product code.
 
 ## Release principle
 
-Каждая заявленная capability должна иметь проверку:
-- MFR supported → test MFR concurrency;
-- GPU supported → CPU/GPU equivalence + fallback;
-- 32 bpc supported → float fixtures;
-- Apple Silicon supported → arm64 real host test;
-- Windows ARM64 supported → real/native host test.
+No release capability is accepted without a named test and evidence record.
+
+See:
+
+- 01-TEST-MATRIX.md
+- 02-RENDER-CORRECTNESS.md
+- 03-MFR-STRESS.md
+- 04-PERFORMANCE.md
+- 05-CRASH-DIAGNOSTICS.md
+- 06-EVIDENCE-AND-ACCEPTANCE.md
 
 
 ---
