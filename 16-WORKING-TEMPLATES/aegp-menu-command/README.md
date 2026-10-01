@@ -1,6 +1,6 @@
 # AEGP menu command working template
 
-Status: **drop-in source pattern / host verification pending**.
+Status: **drop-in/source pattern; runtime result not claimed by Bible**.
 
 MenuTool.cpp is intended to replace the implementation layer inside an official AEGP sample project from the exact target SDK.
 
