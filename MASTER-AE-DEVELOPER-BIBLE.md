@@ -13658,98 +13658,294 @@ AE пушит отображаемые frames в plug-in. Подходит дл�
 
 # Host call flows
 
-## Effect
+Главная идея native AE development: **After Effects владеет lifecycle и вызывает plug-in через определённые entry points/callbacks**.
+
+Большинство архитектурных ошибок начинается, когда plug-in мысленно превращают в standalone приложение с собственным main loop.
+
+## Effect plug-in
 
 ```text
-AE loads module / reads PiPL
-        |
-        v
-PluginDataEntryFunction* -> registers effect metadata
-        |
-        v
-EffectMain(PF_Cmd_GLOBAL_SETUP)
-        |
-        v
-EffectMain(PF_Cmd_PARAM_SETUP)
-        |
-        +---- per instance ---> SEQUENCE_SETUP / RESETUP / FLATTEN / SETDOWN
-        |
-        +---- render ----------> FRAME_SETUP -> RENDER -> FRAME_SETDOWN
-        |                       or SMART_PRE_RENDER -> SMART_RENDER
-        |
-        +---- UI --------------> EVENT / USER_CHANGED_PARAM / UPDATE_PARAMS_UI
-        |
-        v
-GLOBAL_SETDOWN
+AE scans module / PiPL
+→ registration entry point
+→ EffectMain(GLOBAL_SETUP)
+→ EffectMain(PARAM_SETUP)
+→ instance / render / UI selectors
+→ GLOBAL_SETDOWN
 ```
 
-Главное: plug-in **не крутит свой loop** и не «спрашивает AE, есть ли работа». AE вызывает plug-in тогда, когда render graph или UI нуждается в нём.
+### Global lifecycle
 
-## AEGP
+`GLOBAL_SETUP`/`GLOBAL_SETDOWN` — host-level lifetime. Здесь объявляются capabilities и global data, но не frame-specific mutable state.
+
+### Parameter lifecycle
+
+`PARAM_SETUP` определяет parameter model. Persistent parameter identity должна быть deliberate: project compatibility зависит не только от UI index.
+
+### Instance sequence
+
+В зависимости от effect используются `SEQUENCE_SETUP`, `RESETUP`, `FLATTEN`, `SETDOWN`.
+
+Sequence data — host-managed lifecycle, а не arbitrary static global.
+
+### Classic render
+
+```text
+FRAME_SETUP
+→ RENDER
+→ FRAME_SETDOWN
+```
+
+### SmartFX
+
+```text
+SMART_PRE_RENDER
+→ checkout dependencies / calculate result rect
+→ SMART_RENDER
+→ checkout pixels / render / checkin
+```
+
+Pre-render и render имеют разные ownership/lifetime contracts.
+
+### GPU
+
+```text
+GPU_DEVICE_SETUP
+→ SMART_PRE_RENDER
+→ SMART_RENDER_GPU
+→ GPU_DEVICE_SETDOWN
+```
+
+Global GPU capability не означает, что каждый frame будет GPU-rendered.
+
+### UI
+
+UI selectors вроде `EVENT`, `USER_CHANGED_PARAM`, `UPDATE_PARAMS_UI` не должны становиться hidden source of render truth.
+
+## Effect anti-pattern
+
+Плохо:
+
+```text
+background thread loops forever
+→ polls AE
+→ modifies global effect state
+→ render reads it
+```
+
+Effect должен работать в host-owned selector lifecycle.
+
+## AEGP flow
+
+```text
+AE loads AEGP
+→ EntryPointFunc(...)
+→ register hooks / commands / services
+→ EntryPoint returns
+→ AE invokes callbacks later
+→ callback acquires/uses suites
+→ query/mutate host
+```
+
+Entry point — прежде всего registration phase, не application loop.
+
+### Command flow
+
+```text
+user action
+→ AE command dispatch
+→ CommandHook
+→ validate current state
+→ optional Undo group
+→ mutate/query
+→ cleanup
+→ return A_Err
+```
+
+### Update-menu flow
+
+UpdateMenuHook должен быстро обновлять enable/check state. Не сканируйте огромный проект каждый раз при открытии меню.
+
+### Idle flow
+
+Idle hook — возможность выполнить bounded work на host-safe path. Это не гарантия отдельного background worker.
+
+### Death/shutdown
+
+Освобождайте product-owned global resources. Не вызывайте host APIs после их documented lifetime.
+
+## Keyframer flow
+
+```text
+menu/UI command
+→ resolve selected stream/property
+→ validate keyframe capability
+→ undo
+→ batch keyframe API
+→ cleanup
+```
+
+См. [Keyframers](14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md).
+
+## Native panel flow
+
+```text
+AE loads/registers panel provider
+→ user opens Window-menu panel
+→ create callback
+→ host owns workspace/docking lifecycle
+→ panel events/commands
+→ visibility/destroy lifecycle
+```
+
+Native panel — не Effect custom UI. View lifetime не должен становиться project-model lifetime.
+
+## AEIO input flow
 
 ```text
 AE launch
-  |
-  v
-AEGP EntryPointFunc(pica_basicP, version, plugin_id, global_refcon)
-  |
-  +-- register CommandHook
-  +-- register UpdateMenuHook
-  +-- register IdleHook
-  +-- register DeathHook
-  +-- optionally RegisterIO / RegisterArtisan / panel callbacks
-  |
-  v
-EntryPointFunc returns
-  |
-  v
-AE later invokes registered hooks
-  |
-  v
-hook -> acquire/call AEGP suites -> mutate/query AE
+→ AEGP_RegisterIO
+→ AE receives function block
+→ VerifyFileImportable
+→ InitInSpecFromFile
+→ metadata/frame/audio callbacks
+→ input-spec disposal
 ```
 
-AEGP entry point — регистрационная фаза. Основная работа происходит позднее в hooks.
+AEIO importer принадлежит media lifecycle, а не general project automation.
 
-## AEIO
+## AEIO output flow
 
 ```text
-AE launch -> AEGP entry -> AEGP_RegisterIO()
-                       |
-                       v
-User imports file -> VerifyFileImportable -> InitInSpecFromFile
-                       |
-                       v
-AE asks metadata / frame / audio through AEIO function block
-
-Render/output -> AE creates OutSpec -> AEIO callbacks -> encoded file
+create output spec
+→ configure
+→ start/add frames/audio
+→ finalize
+→ dispose output spec
 ```
 
-## Artisan
+Partial output/failure cleanup должен быть explicit.
+
+## Artisan flow
 
 ```text
-AE launch -> AEGP entry -> AEGP_RegisterArtisan()
-                       |
-                       v
-User selects renderer for composition
-                       |
-                       v
-AE creates render context -> Artisan callbacks -> rendered 3D result
+AE launch
+→ AEGP_RegisterArtisan
+→ renderer selected for comp
+→ host creates renderer context
+→ frame/render callbacks
+→ teardown
 ```
 
-## BlitHook
+Artisan заменяет composition 3D renderer path. Это не «GPU API для effects».
+
+## BlitHook flow
 
 ```text
-AE Composition panel displays frame
-              |
-              v
-         BlitHook callback
-              |
-              v
-     consume/copy/send frame
+Composition panel has display frame
+→ display/blit callback
+→ consumer receives/copies/processes frame
 ```
 
-Это display-time stream, не замена normal Effect/Render Queue pipeline.
+Display-time frame stream не равен Render Queue/Effect render pipeline.
+
+## Shared PICA suite flow
+
+Provider публикует named/versioned function table; consumer делает `AcquireSuite`, использует сервис и делает `ReleaseSuite`.
+
+Suite reference counting не делает service methods thread-safe автоматически.
+
+## Effect ↔ AEGP generic call
+
+```text
+AEGP owns effect instance ref
+→ AEGP_EffectCallGeneric
+→ PF_Cmd_COMPLETELY_GENERAL
+→ effect validates message version/size
+→ handles command
+→ return
+```
+
+Подходит для небольших control messages, не для high-volume pixel data.
+
+## Script flow
+
+```text
+ExtendScript
+→ scripting DOM
+→ project/UI mutation
+```
+
+Script runtime и native SDK имеют разные object/lifetime models. Raw native handles в script не передаются.
+
+## CEP flow
+
+```text
+panel JS
+→ evalScript / event
+→ ExtendScript dispatcher
+→ AE scripting DOM
+→ structured result
+```
+
+Panel DOM не должен быть authoritative project state.
+
+## Hybrid flow
+
+```text
+UI panel
+→ semantic command
+→ orchestration layer
+→ native service/effect/AEGP
+→ After Effects
+```
+
+Heavy data остаётся native; panel получает control/status.
+
+## Threading boundary
+
+Callback origin не означает, что любые host calls разрешены с любого thread.
+
+Разделяйте worker-safe pure compute и host-facing query/mutation.
+
+## Ownership boundary
+
+Для каждой стрелки flow diagram задайте: borrowed? caller-owned? host-owned? matching dispose/checkin/release? valid until when?
+
+Если диаграмма не может ответить — architecture incomplete.
+
+## Failure boundary
+
+Определите initialization failure, callback failure, partial resource creation, cleanup failure, host-state change и shutdown.
+
+Return path должен сохранять first meaningful error и всё равно выполнять safe cleanup.
+
+## Choosing the flow
+
+| Product need | Primary flow |
+|---|---|
+| render pixels/audio effect | Effect |
+| project automation/native tool | AEGP |
+| bulk keyframes | Keyframer |
+| native dockable UI | Panel |
+| media import/export | AEIO |
+| replace 3D renderer | Artisan |
+| observe composition display | BlitHook |
+| share native service | PICA |
+| panel automation | CEP/Script |
+| mixed UI + native compute | Hybrid |
+
+## Related chapters
+
+- [Native taxonomy](14-NATIVE-INTEGRATIONS/01-TAXONOMY.md)
+- [Effects](14-NATIVE-INTEGRATIONS/04-EFFECTS.md)
+- [AEGP tools](14-NATIVE-INTEGRATIONS/05-AEGP-TOOLS.md)
+- [Communication architecture](14-NATIVE-INTEGRATIONS/../01-ARCHITECTURE/07-COMMUNICATION-ARCHITECTURE.md)
+- [Communication section](14-NATIVE-INTEGRATIONS/../15-COMMUNICATION/README.md)
+- [Lifetime/threading cookbook](14-NATIVE-INTEGRATIONS/../17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md)
+
+## Evidence boundary
+
+Flows — architecture summaries derived from documented SDK models/source-reviewed families. Exact selector/function availability остаётся version-sensitive.
 
 
 ---
@@ -14104,66 +14300,272 @@ Source review for GPU/audio/Custom UI: [15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md](14-NA
 
 # AEGP tools — native automation and deep AE integration
 
-AEGP — основной C++ путь для инструментов, которые работают **с проектом**, а не только с пикселями одного эффекта.
+AEGP — основной native C++ путь для инструментов, работающих с **After Effects project/host model**, а не только с пикселями одного Effect instance.
 
-## Что AEGP умеет
+Думайте об AEGP как о сочетании registered callbacks + versioned host suites, а не как о втором scripting DOM.
 
-- создавать/открывать/сохранять project-level structures;
-- читать/создавать compositions и project items;
-- добавлять/удалять/переупорядочивать layers;
-- работать с footage;
-- находить и добавлять effects;
-- читать/писать property streams;
-- keyframes, markers, masks;
-- text data;
-- render queue, output modules, render options;
-- preferences/persistent data;
-- menu commands + command hooks;
-- idle/death hooks;
-- запускать ExtendScript через `AEGP_ExecuteScript`;
-- получать rendered frames через Render suites;
-- регистрировать специализированные AEIO/Artisan modules;
-- публиковать собственные suites.
+## Когда AEGP подходит
 
-## Menu tool pattern
+- native project/item/layer access;
+- menu commands/hooks;
+- render queue integration;
+- streams/keyframes;
+- footage operations;
+- rendered-frame services;
+- native panels;
+- shared PICA services;
+- AEIO/Artisan registration;
+- native performance around project operations.
+
+## Когда scripting проще
+
+ExtendScript лучше, если операция небольшая/редкая, нужный API уже удобно доступен в DOM и deployment simplicity важнее native throughput.
+
+Hybrid часто оптимален:
 
 ```text
-EntryPoint
-  -> GetUniqueCommand
-  -> InsertMenuCommand
-  -> RegisterCommandHook
-  -> RegisterUpdateMenuHook
-
-User opens menu
-  -> UpdateMenuHook: enable/disable
-
-User clicks
-  -> CommandHook
-     -> StartUndoGroup
-     -> query selection/project
-     -> mutate project
-     -> EndUndoGroup
+panel/script UI
+→ semantic command
+→ native AEGP service
+→ AE
 ```
 
-## UI-thread rule
+## Lifecycle
 
-AEGP не является general multithreaded API. Проектные изменения выполняются из host callback/main thread. Для фоновой тяжёлой работы отделяйте pure compute от AE handles, а commit обратно в AE делайте в разрешённом host callback.
+```text
+EntryPointFunc
+→ obtain plugin context/ID
+→ register hooks/commands/services
+→ return
+→ AE invokes callbacks later
+→ callbacks use suites
+→ shutdown cleanup
+```
 
-## Native tool examples by capability
+Entry point — registration phase, не main loop.
 
-| Продуктовая задача | AEGP suites/pattern |
-|---|---|
-| Batch rename layers | Collection + Layer + Stream + Undo |
-| Add keyframes | Stream + Keyframe |
-| Build comp from files | Project + Footage + Comp + Layer |
-| Render queue manager | Render Queue + RQ Item + Output Module |
-| Replace footage | Footage suite |
-| Inspect installed effects | Effect suite |
-| Run helper JSX | Utility `AEGP_ExecuteScript` |
-| Native menu action | Command + Register |
-| Native service for several plugins | publish PICA suite |
+## Capability map
 
-См. рабочий drop-in шаблон: `16-WORKING-TEMPLATES/aegp-menu-command/`.
+### Project/items
+
+Proj + Item suites: project traversal, root, items, project-level state.
+
+### Compositions/layers
+
+Comp + Layer suites: composition creation/access, layer enumeration и identity.
+
+### Effects
+
+Effect suite: installed effects, apply/remove instances, match names, generic-call bridge.
+
+### Streams/properties
+
+Stream + DynamicStream: properties, expressions, effect parameters и property hierarchy.
+
+### Keyframes
+
+Keyframe suite: bulk keyframe operations и interpolation/ease metadata.
+
+### Masks/text/markers/footage
+
+Dedicated suites + Stream/Memory ownership rules.
+
+### Render queue
+
+RenderQueue + RQItem + OutputModule. Queue-wide state и item state — разные вещи.
+
+### Frame rendering
+
+Render/RenderOptions/World paths дают rendered-frame workflow с receipt/checkin ownership.
+
+### Utility
+
+Reporting, undo, script execution и host utilities.
+
+## Commands
+
+Typical menu-tool setup:
+
+```text
+GetUniqueCommand
+→ InsertMenuCommand
+→ RegisterCommandHook
+→ RegisterUpdateMenuHook
+```
+
+CommandHook делает actual operation. UpdateMenuHook — только cheap UI state.
+
+## Idle hook
+
+Хорошо: consume queued lightweight commands, bounded maintenance, host-safe commit.
+
+Плохо: full project scan every idle, heavy network IO, unbounded work, render logic.
+
+## Death hook
+
+Освобождайте product-owned global resources. Shutdown order может ограничивать доступность host services.
+
+## Undo
+
+Для user-visible mutation:
+
+```text
+StartUndoGroup
+→ changes
+→ EndUndoGroup
+```
+
+Undo не равен transaction rollback. Mid-operation failure может оставить partial state, поэтому validate before mutate.
+
+## Handles and refs
+
+Classify each ref as borrowed/newly-owned/host-managed/disposable/checkin-required/stable ID vs ephemeral ref.
+
+Не храните `AEGP_StreamRefH`/effect refs в long-lived app state без documented guarantee.
+
+Лучше хранить stable product identity и re-resolve host ref at execution time.
+
+## Strings
+
+APIs могут возвращать UTF-8, UTF-16 или MemHandle-backed strings. Encoding и ownership — отдельные контракты.
+
+## Time domains
+
+Документируйте, где comp/layer/stream/render time. Не делайте helper `GetTime()` без domain.
+
+## Threading
+
+AEGP — не general thread-safe API.
+
+```text
+worker: pure compute / IO / parsing
+host callback: re-resolve handles + query/mutate AE
+```
+
+Opaque AE handles не должны путешествовать на worker только потому, что computation background.
+
+## State freshness
+
+Project state может измениться между panel request, background compute и commit.
+
+Используйте generation/revision, stable IDs и revalidation.
+
+## ExecuteScript
+
+`AEGP_ExecuteScript` полезен для scripting-only capability, но не должен превращать native product в генератор arbitrary script strings на каждый action.
+
+## Render Queue tools
+
+Разделяйте queue-wide state, item state, output module, output path и execution. Structural changes могут инвалидировать refs.
+
+## Rendered frames
+
+```text
+configure render options
+→ render/checkout receipt
+→ access borrowed world
+→ consume/copy
+→ checkin receipt
+```
+
+Borrowed world нельзя сохранять beyond receipt lifetime.
+
+## Native service pattern
+
+Если нескольким компонентам нужен один service — versioned PICA suite предпочтительнее raw global symbol lookup как public module API.
+
+## Native panel pattern
+
+```text
+panel view
+↕ controller/model
+↕ AEGP host adapter
+```
+
+UI widget lifetime не должен быть project model lifetime.
+
+## Error strategy
+
+Обогащайте host errors контекстом. Вместо `error 4` полезнее `rename failed: layer no longer exists; host error 4`.
+
+## Partial initialization
+
+Registration может упасть после успешной регистрации части hooks. Планируйте, что остаётся alive, что disable-ится и какой cleanup legal.
+
+Не предполагайте, что failed EntryPoint автоматически unregister-ит всё.
+
+## Performance
+
+Типичные traps: repeated full-project traversal, one-key-per-transaction, repeated string conversion, script bridge per tiny operation.
+
+Batch semantic work, когда host API предлагает batch/transaction model.
+
+## Product architecture examples
+
+### Layer batch tool
+
+```text
+UI command
+→ normalize LayerIDs
+→ host callback
+→ revalidate
+→ undo
+→ mutate
+→ fresh result
+```
+
+### Keyframe generator
+
+```text
+worker computes times/values
+→ host callback resolves stream
+→ batch keyframe API
+→ cleanup
+```
+
+### Render queue manager
+
+```text
+read queue snapshot
+→ UI edits desired config
+→ command applies current refs
+→ re-query after structural mutation
+```
+
+## Anti-patterns
+
+- cache opaque refs globally;
+- call host from arbitrary thread;
+- use menu/idle hook as application loop;
+- mix UI state with project source of truth;
+- ignore cleanup;
+- copy obsolete sample suite generation as current API.
+
+## Production workflow
+
+1. Choose minimum suites.
+2. Pin target SDK baseline.
+3. Define stable product-level model.
+4. Register only needed hooks.
+5. Resolve refs late.
+6. Validate before mutate.
+7. Group undo appropriately.
+8. Cleanup owned resources.
+9. Report contextual errors.
+10. Gate version/platform differences explicitly.
+
+## Related chapters
+
+- [AEGP hooks/suites](14-NATIVE-INTEGRATIONS/../03-AEGP/01-HOOKS-SUITES.md)
+- [Project/render automation](14-NATIVE-INTEGRATIONS/../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md)
+- [Native suite cookbook](14-NATIVE-INTEGRATIONS/../17-NATIVE-SUITE-COOKBOOK/README.md)
+- [Communication architecture](14-NATIVE-INTEGRATIONS/../01-ARCHITECTURE/07-COMMUNICATION-ARCHITECTURE.md)
+- [Keyframers](14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md)
+- [Native panels](14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md)
+
+## Evidence boundary
+
+Suite generations/key ownership for current baseline are source-reviewed against SDK 25.6 records. Эта глава описывает architecture, а не runtime claim конкретного binary.
 
 
 ---
