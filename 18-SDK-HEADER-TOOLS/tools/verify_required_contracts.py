@@ -39,16 +39,38 @@ def load_manifest(path: Path) -> dict:
             or not entry["area"]
         ):
             raise ValueError("Malformed required_tables entry")
+        functions = entry.get("required_functions", [])
+        if (
+            not isinstance(functions, list)
+            or any(not isinstance(name, str) or not name for name in functions)
+        ):
+            raise ValueError(f"Malformed required_functions for {entry['name']}")
     return data
 
 
 def verify_required(inventory: dict, manifest: dict):
-    present = {table.get("name") for table in inventory["tables"] if isinstance(table, dict)}
-    missing = [
-        entry
-        for entry in manifest["required_tables"]
-        if entry["name"] not in present
-    ]
+    present = {}
+    for table in inventory["tables"]:
+        if not isinstance(table, dict) or not isinstance(table.get("name"), str):
+            continue
+        functions = table.get("functions")
+        present[table["name"]] = {
+            f.get("name")
+            for f in functions
+            if isinstance(f, dict) and isinstance(f.get("name"), str)
+        }
+
+    missing = []
+    for entry in manifest["required_tables"]:
+        if entry["name"] not in present:
+            missing.append({**entry, "missing_functions": None})
+            continue
+
+        required_functions = entry.get("required_functions", [])
+        absent = [name for name in required_functions if name not in present[entry["name"]]]
+        if absent:
+            missing.append({**entry, "missing_functions": absent})
+
     return len(manifest["required_tables"]), missing
 
 
@@ -71,7 +93,11 @@ def main(argv=None):
         f"target={manifest.get('target_sdk', 'unspecified')}"
     )
     for entry in missing:
-        print(f"MISSING {entry['name']} [{entry['area']}]")
+        if entry.get("missing_functions") is None:
+            print(f"MISSING_TABLE {entry['name']} [{entry['area']}]")
+        else:
+            names = ",".join(entry["missing_functions"])
+            print(f"MISSING_FUNCTIONS {entry['name']} [{entry['area']}]: {names}")
 
     return 1 if missing else 0
 
