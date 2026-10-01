@@ -1,6 +1,6 @@
 # SDK Header Tools — declaration index and symbol-name checks
 
-Это вспомогательный индексатор локальных SDK headers. Он не является C/C++ compiler, signature checker или полным ABI diff. Проверка типов выполняется отдельно через `scripts/check_native.py`.
+Это fail-closed preflight для локального SDK: declaration inventory + symbol-name checks + отдельный real-compiler syntax/type driver. Regex inventory сам по себе не является signature/ABI proof; типы проверяет `scripts/check_native.py`.
 
 Главное правило: точный контракт сборки задают headers целевого SDK. Regex parser поддерживает ограниченные формы объявлений. Неполный разбор таблицы теперь сохраняет диагностику и возвращает ошибку; `--allow-incomplete` разрешает только исследовательский индекс. Реальный SDK 25.6 содержит неподдерживаемые объявления, поэтому полного inventory пока нет.
 
@@ -83,3 +83,39 @@ python3 tests/test_inventory.py
 3. код компилируется внутри ближайшего официального Adobe sample;
 4. binary загружается в целевой AE;
 5. smoke tests проходят на заявленных macOS/Windows + architecture + AE versions.
+
+
+## Полный локальный Gate-4 runner
+
+Передавайте **SDK Examples root**, не только Headers:
+
+macOS:
+
+```bash
+cd 18-SDK-HEADER-TOOLS
+./run-macos.sh "/path/to/After Effects SDK/Examples"
+```
+
+Windows, из Visual Studio Developer Command Prompt / VsDevCmd:
+
+```powershell
+cd 18-SDK-HEADER-TOOLS
+.\run-windows.ps1 "C:\path\to\After Effects SDK\Examples"
+```
+
+Оба runner'а выполняют:
+
+1. inventory exact headers;
+2. отказ при parser diagnostics;
+3. schema/version validation;
+4. cookbook symbol-name preflight;
+5. C++17 compiler syntax/type checks;
+6. запись `generated/local-sdk/native-compile-report.json`.
+
+Compile report сохраняет aggregate SDK-header manifest SHA-256, compiler identity, exact commands и status каждой translation unit.
+
+Это **не** resource/PiPL build, link или AE host test.
+
+## Inventory compatibility guard
+
+`verify_recipe_symbols.py` и `diff_sdk_inventory.py` принимают только поддерживаемую `schema_version=1` и отклоняют malformed/empty function declarations. Signature/order drift покрыт portable regression tests. Старый/неполный JSON нельзя использовать как скрытый источник зелёной проверки.
