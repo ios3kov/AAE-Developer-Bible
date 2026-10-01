@@ -13128,7 +13128,7 @@ Updated: **2026-10-01**. Previously recorded native compilation baseline: **Adob
 
 ## Current work — writing the Bible from the supplied SDK
 
-The user supplied `ae25.6_61.64bit.AfterEffectsSDK`. Source identity and reviewed ranges are recorded in the [first supplied-SDK review](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md), [parameter/pixel review](18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md), and [memory/MFR review](18-SDK-HEADER-TOOLS/07-MEMORY-MFR-SDK25.6.md).
+The user supplied `ae25.6_61.64bit.AfterEffectsSDK`. Source identity and reviewed ranges are recorded in the [first supplied-SDK review](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md), [parameter/pixel review](18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md), [memory/MFR review](18-SDK-HEADER-TOOLS/07-MEMORY-MFR-SDK25.6.md), and [registration/PiPL and AEGP review](18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md).
 
 Completed editorial changes:
 
@@ -13139,13 +13139,17 @@ Completed editorial changes:
 - [Auxiliary channels](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md): semantic types, descriptors, requested/returned datatype, raw layout and mandatory checkin.
 - [Memory, lifetime and errors](01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md): resource ownership, paired release APIs, host-managed state locks, both flatten operations, pre-render deletion, error-preserving cleanup and limits of existing helpers.
 - [MFR and thread safety](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md): exact flags and selector constraints, read-only sequence access, mutable thread-local copies, Compute Cache keys/values/receipts and waiting modes.
-- Section reading route and VERIFICATION now link all three editorial iterations separately from the earlier native compiler baseline.
+- [Registration, PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md): separate Effect registration, EffectMain and AEGP initializer contracts; resource Kind, exported symbols, architecture records, version domains, outflags and platform resource pipelines.
+- [AEGP lifecycle, hooks and suites](03-AEGP/01-HOOKS-SUITES.md): plugin/command IDs, global and hook refcons, suite-version macros, command/update/idle/death callbacks and partial-initialization ownership; the existing MenuTool is reviewed, not changed or host-verified.
+- The AEGP reading route and VERIFICATION distinguish all four editorial reviews from the earlier native compiler baseline.
 
 The third review identifies ten SDK source files by SHA-256 and inspects three existing Bible helpers at snapshot `fcfb0e32c14916b55c2bcdbe414d3d1b3f524eeb`. It records the PF handle suite version-number nuance, conditional sequence-setup threading statements, a schematic bool/error-code mismatch in the Compute Cache comment, and PathMaster's cross-platform caveat. Existing helpers borrow suite dependencies and discard cleanup return codes; their limitations are documented, not silently repaired or called host-verified.
 
 This is documentation and SDK source-review work within the agreed subject matter of [the completion plan](COMPLETION-PLAN.md). It does not complete stages 3–4 or bypass outstanding safety, reuse-audit, compiler and host gates. **Native readout-adapter development remains paused; the deliverable is the Bible, not a separate testing product.** No new user AE run is requested.
 
-**Next editorial block: registration/PiPL and AEGP lifecycle**, related to the supplied SDK and existing MenuTool. This reading/writing order is not a claim that earlier acceptance gates are closed. Their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
+The fourth source-review record covers 19 supplied-SDK files and the unchanged MenuTool at snapshot `2b0dddfbb329024fbd5e8925d57ce425511840b0`. The registration/PiPL and AEGP chapters plus the source record and reading route are present in Git by `859b9c6c816a7cb5a360f61869d1bcf1531aede3`. This is source-backed editorial work, not a new initializer, resource build, native binary or host test.
+
+**Next editorial block: AEGP project and render automation**, expanding the existing chapter against the supplied SDK and current Bible recipes. This reading/writing order is not a claim that earlier acceptance gates are closed. Their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
 
 ## Earlier baseline evidence
 
