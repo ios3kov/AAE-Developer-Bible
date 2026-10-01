@@ -8107,28 +8107,165 @@ The goal is not necessarily byte-for-byte reproducibility across Apple's signing
 
 # macOS developer bible
 
-## Target
+Этот раздел описывает полный macOS lifecycle native After Effects product: от SDK/Xcode setup до debugging, GPU, signing, packaging и CI.
 
-Коммерческий native AE plug-in на Mac в 2026 должен по умолчанию рассматриваться как:
+Это **platform guide для разработчика продукта**. Bible не обязана собирать собственные demo binaries, чтобы объяснять workflow.
 
-- **Universal binary:** arm64 + x86_64, если продукт всё ещё заявляет Intel support;
-- собранный в Xcode;
-- корректно PiPL-marked для обеих architectures;
-- ad-hoc signed в dev workflow на macOS 15+;
-- Developer ID signed + notarized для внешнего release;
-- проверенный отдельно на Apple Silicon native AE и Intel path, если Intel заявлен.
+## Platform strategy
 
-## Read order
+На Mac сначала определите product policy:
 
-1. `01-XCODE-SETUP.md`
-2. `02-UNIVERSAL-BINARY.md`
-3. `03-DEBUGGING.md`
-4. `04-GPU.md`
-5. `05-SIGNING-NOTARIZATION.md`
-6. `06-INSTALLATION-PACKAGING.md`
-7. `07-CI.md`
-8. `08-NATIVE-SDK-VALIDATION.md`
-9. `09-PRODUCTION-BUILD-PIPELINE.md`
+- arm64 only;
+- Universal arm64 + x86_64;
+- separate helper/native components;
+- minimum macOS policy;
+- GPU backend;
+- signing/notarization requirements.
+
+Не начинайте с Xcode target settings, пока architecture/support matrix не записана.
+
+## Apple Silicon
+
+arm64 — отдельная architecture с собственными implications:
+
+- native dependencies;
+- assembly/SIMD assumptions;
+- GPU/backend libraries;
+- helper tools;
+- code signing of nested components.
+
+«Main binary arm64» не означает, что весь bundle Apple-Silicon-ready.
+
+## Intel support
+
+Если продукт всё ещё заявляет Intel support, решите:
+
+- Universal one-bundle;
+- separate artifacts;
+- end-of-support policy.
+
+Каждая nested native dependency должна соответствовать этой политике.
+
+## Build shell
+
+Для native AE work безопаснее начинать от ближайшего Adobe SDK sample project.
+
+Причина — sample уже содержит host-specific resource/PiPL/build plumbing.
+
+Сначала поймите этот contract, потом переносите build в собственную систему.
+
+## Development install
+
+Разделяйте:
+
+```text
+compiler output
+→ development install copy
+→ immutable release candidate
+→ signed/notarized distribution
+```
+
+Не тестируйте случайно один bundle, а публикуйте другой.
+
+## Debugging
+
+Debug strategy должна включать:
+
+- exact AE executable/build;
+- actual loaded plug-in path;
+- matching dSYM;
+- architecture;
+- MFR/GPU state;
+- minimal repro.
+
+Platform signing restrictions могут влиять на debugger attach; version-sensitive details находятся в [debugging chapter](08-MACOS/03-DEBUGGING.md).
+
+## GPU
+
+macOS GPU work должен сохранять один effect semantics между CPU и Metal.
+
+Apple Silicon unified memory не отменяет synchronization/lifetime costs.
+
+См. [GPU development](08-MACOS/04-GPU.md).
+
+## Signing
+
+Различайте:
+
+- ad-hoc/dev signing;
+- Developer ID signing;
+- notarization;
+- stapling/verification;
+- signed nested dependencies.
+
+Не модифицируйте bundle после final signing.
+
+## Packaging
+
+Installer/package должен владеть своими files и не удалять чужие Adobe/user assets.
+
+Upgrade/uninstall policy проектируется так же тщательно, как first install.
+
+## CI
+
+Полезные lanes:
+
+```text
+portable tests
+→ native platform build
+→ bundle/resource inspection
+→ package
+→ release signing/notarization
+```
+
+Конкретный product может добавить host smoke lane, но это не часть редакционной готовности Bible.
+
+## Evidence discipline
+
+Для product artifact полезно сохранять:
+
+- Git SHA;
+- SDK baseline;
+- Xcode/Clang identity;
+- architectures;
+- dependency versions;
+- bundle hash;
+- dSYM;
+- signing/notary record.
+
+## Common mistakes
+
+- assuming Universal because Xcode target says Universal while nested dylib is single-arch;
+- copying C++ source out of sample and losing PiPL/resource step;
+- signing outer bundle before nested components;
+- modifying bundle after signing;
+- using developer absolute paths for resources;
+- debugging a stale copy from another MediaCore location;
+- treating ad-hoc signing as release signing;
+- notarizing a different artifact than QA tested.
+
+## Recommended read order
+
+1. [Xcode setup](08-MACOS/01-XCODE-SETUP.md)
+2. [Universal binary](08-MACOS/02-UNIVERSAL-BINARY.md)
+3. [Debugging](08-MACOS/03-DEBUGGING.md)
+4. [GPU](08-MACOS/04-GPU.md)
+5. [Signing/notarization](08-MACOS/05-SIGNING-NOTARIZATION.md)
+6. [Installation/packaging](08-MACOS/06-INSTALLATION-PACKAGING.md)
+7. [CI](08-MACOS/07-CI.md)
+8. [SDK contract/source validation](08-MACOS/08-NATIVE-SDK-VALIDATION.md)
+9. [Production build pipeline](08-MACOS/09-PRODUCTION-BUILD-PIPELINE.md)
+
+## Related Bible sections
+
+- [Environment matrix](08-MACOS/../00-START-HERE/02-ENVIRONMENT-MATRIX.md)
+- [Build system strategy](08-MACOS/../01-ARCHITECTURE/06-BUILD-SYSTEM.md)
+- [Testing](08-MACOS/../10-TESTING/README.md)
+- [Distribution](08-MACOS/../11-DISTRIBUTION/README.md)
+
+## Evidence boundary
+
+This section documents the macOS product workflow. Historical compiler/runtime evidence for Bible source snapshots remains evidence about those snapshots, not a requirement that Bible itself ship a Mac binary.
 
 
 ---
@@ -9673,29 +9810,183 @@ This makes support and rollback possible without guessing what was shipped.
 
 # Windows developer bible
 
-## Target
+Этот раздел описывает Windows lifecycle native After Effects product: Visual Studio, x64/ARM64, debugging, GPU, signing, packaging и CI.
 
-Коммерческий native AE plug-in на Windows в 2026:
+Это **platform guide для разработчика продукта**, а не обязательная Windows build lane самой Bible.
 
-- Visual Studio project based on Adobe SDK sample;
-- x64 как основной shipping target;
-- ARM64 target добавлять там, где target Adobe hosts работают native и продукт заявляет поддержку;
-- PiPL resource build step сохранён;
-- symbols/PDB архивируются;
-- release binaries Authenticode-signed;
-- installer использует корректный Adobe plug-in path policy/registry.
+## Platform strategy
 
-## Read order
+Сначала определите:
 
-1. `01-VISUAL-STUDIO-SETUP.md`
-2. `02-X64-ARM64.md`
-3. `03-DEBUGGING.md`
-4. `04-GPU.md`
-5. `05-CODE-SIGNING.md`
-6. `06-INSTALLATION-PACKAGING.md`
-7. `07-CI.md`
-8. `08-NATIVE-SDK-VALIDATION.md`
-9. `09-PRODUCTION-BUILD-PIPELINE.md`
+- x64 support;
+- ARM64 policy;
+- minimum Windows policy;
+- compiler/toolset;
+- GPU backend;
+- dependency/runtime policy;
+- installer/signing policy.
+
+Не начинайте с project configuration, пока support matrix не определена.
+
+## x64
+
+x64 остаётся типичным baseline для существующего Windows ecosystem, но product должен документировать собственную support policy, а не полагаться на привычку.
+
+## ARM64
+
+ARM64 support — отдельный target.
+
+Нужно проверить всю native chain:
+
+- main `.aex`;
+- dependent DLLs;
+- helper executables;
+- codecs/libraries;
+- GPU/runtime components;
+- installer logic.
+
+Один ARM64 main binary не делает продукт ARM64-ready.
+
+## Visual Studio / Adobe sample
+
+Начинайте от ближайшего Adobe SDK sample, чтобы сохранить:
+
+- PiPL conversion/resource step;
+- required exports;
+- project defines;
+- host-specific build layout.
+
+Сначала соберите/поймите sample shell, потом переносите implementation.
+
+## Runtime/CRT/ABI
+
+Windows native product должен иметь deliberate policy:
+
+- `/MD` vs debug runtime;
+- toolset;
+- iterator/debug ABI;
+- exception/RTTI boundary;
+- third-party DLL architecture;
+- exported symbol surface.
+
+Не экспортируйте STL types как stable ABI между independently versioned modules.
+
+## Development install
+
+Разделяйте build output и privileged install step.
+
+Не делайте Visual Studio постоянно elevated только потому, что MediaCore path находится под Program Files.
+
+## Debugging
+
+Debug strategy:
+
+- exact AE process;
+- actual loaded module path;
+- matching PDB;
+- architecture;
+- dependency tree;
+- MFR/GPU state;
+- crash dump/minimal repro.
+
+См. [Windows debugging](09-WINDOWS/03-DEBUGGING.md).
+
+## GPU
+
+Windows GPU product может иметь CPU/CUDA/DirectX backends.
+
+Backend/device selection, runtime dependencies и shader/kernel assets должны быть explicit.
+
+См. [Windows GPU](09-WINDOWS/04-GPU.md).
+
+## Signing
+
+Release binaries/installer могут использовать Authenticode according to product policy.
+
+Signing не исправляет broken binary/resource/dependency layout.
+
+Сначала правильный artifact, потом signing.
+
+## Installer
+
+Installer должен:
+
+- использовать documented Adobe install-path policy/registry;
+- владеть только своими files;
+- поддерживать upgrade/uninstall;
+- не удалять user/project data;
+- учитывать multiple AE versions;
+- логировать actionable install errors.
+
+## PDB discipline
+
+Для каждой shipping binary сохраняйте matching PDB и artifact identity.
+
+Новый PDB под старым version label делает crash analysis недостоверным.
+
+## CI
+
+Типичный Windows product lane:
+
+```text
+portable tests
+→ x64/ARM64 native build as claimed
+→ resource/PiPL inspection
+→ package
+→ signing
+→ installer artifact
+```
+
+Host smoke может быть отдельным product lane; Bible не обязана выполнять его для source examples.
+
+## Dependency policy
+
+Для каждой native dependency фиксируйте:
+
+- version;
+- license;
+- x64/ARM64;
+- static/dynamic;
+- runtime DLL;
+- minimum OS;
+- signing/installer implications.
+
+Не обнаруживайте x64-only dependency уже у пользователя.
+
+## Common mistakes
+
+- потерять PiPL resource conversion при переносе project;
+- hardcode developer AE path;
+- случайно shipping Debug CRT dependency;
+- PDB не совпадает с `.aex`;
+- DLL architecture mismatch;
+- DirectX/CUDA asset отсутствует в installer;
+- installer кладёт файл не в тот Adobe path;
+- multiple stale copies plug-in в разных MediaCore directories;
+- signing different binary than QA evaluated.
+
+## Recommended read order
+
+1. [Visual Studio setup](09-WINDOWS/01-VISUAL-STUDIO-SETUP.md)
+2. [x64 / ARM64](09-WINDOWS/02-X64-ARM64.md)
+3. [Debugging](09-WINDOWS/03-DEBUGGING.md)
+4. [GPU](09-WINDOWS/04-GPU.md)
+5. [Code signing](09-WINDOWS/05-CODE-SIGNING.md)
+6. [Installation/packaging](09-WINDOWS/06-INSTALLATION-PACKAGING.md)
+7. [CI](09-WINDOWS/07-CI.md)
+8. [SDK contract/source validation](09-WINDOWS/08-NATIVE-SDK-VALIDATION.md)
+9. [Production build pipeline](09-WINDOWS/09-PRODUCTION-BUILD-PIPELINE.md)
+
+## Related Bible sections
+
+- [Environment matrix](09-WINDOWS/../00-START-HERE/02-ENVIRONMENT-MATRIX.md)
+- [Build system strategy](09-WINDOWS/../01-ARCHITECTURE/06-BUILD-SYSTEM.md)
+- [Testing](09-WINDOWS/../10-TESTING/README.md)
+- [Distribution](09-WINDOWS/../11-DISTRIBUTION/README.md)
+
+## Evidence boundary
+
+This section documents Windows product development workflow. Bible does not need to build its reference source on every Windows architecture for the guidance to be editorially complete.
 
 
 ---
