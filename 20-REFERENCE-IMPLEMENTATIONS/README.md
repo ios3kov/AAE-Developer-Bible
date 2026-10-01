@@ -1,48 +1,59 @@
 # Reference implementations
 
-v1.1 verification: [coverage matrix](../FINAL-COVERAGE-AUDIT.md), [commands and results](../VERIFICATION.md). AEIO/Artisan/native-panel entries are **guide only**; Drawbot is an acquisition skeleton. Script/CEP host execution is pending. The historical matrix below describes intended integration, not test evidence.
+This section maps Bible concepts to **reference source shapes and official SDK sample starting points**.
 
-## v1.2 implementation workspaces
+It is not a suite of binaries that must be built to complete the Bible.
 
-Materialize the exact licensed SDK samples locally:
+## Purpose
 
-```bash
-python3 scripts/materialize_sdk_examples.py "/path/to/SDK/Examples"
-```
+Use this section when a reader asks:
 
-This creates untracked graft workspaces for AEIO (`IO`), Artisan (`Artie`), native panel (`Panelator`), GPU (`SDK_Invert_ProcAmp`), PICA (`Sweetie`) and Effect↔AEGP (`Commando`). SDK project/PiPL/utility files remain owned by Adobe and are not redistributed here.
+- what source shape does this architecture turn into;
+- which Adobe sample should I start from;
+- where is the relevant Bible recipe/header;
+- what pieces are intentionally omitted.
 
-MenuTool, Keyframer and bridge files forward to canonical sources in sections 16/17. Compile either location, not both, and retain the relative directory layout or copy the canonical implementation.
+For native work, Adobe SDK project/PiPL/utility files remain licensed external material and are not redistributed here.
 
-This directory turns the architecture chapters into copyable starting points.
+## Reference vocabulary
 
-## Status vocabulary
+- **source example** — Bible-owned source illustrating a contract/pattern;
+- **sample-derived pattern** — explanation/source shape based on a named Adobe sample family;
+- **guide-only** — architecture and integration route, intentionally no implementation;
+- **skeleton** — intentionally partial source for one boundary;
+- **runtime observed** — used only where a concrete recorded execution result exists.
 
-- **drop-in** — intended to be copied into the closest official Adobe SDK sample shell.
-- **sample-derived** — follows the public SDK/sample contract, but still needs the exact SDK version's headers/project plumbing.
-- **host-test-required** — host execution is pending; this label alone does not establish that source is implemented or compiled.
-- **guide-only** — architecture/sample selection, no implementation supplied.
-- **skeleton** — partial code, missing behavior explicitly documented.
-
-**Important:** Adobe's SDK headers and sample project files are not redistributed here. For native projects, start from the closest official SDK sample, then replace the implementation with the files here. This is deliberate: PiPL/resource build plumbing and platform settings change across SDK releases.
+Older `host-test-required` wording is superseded. Lack of a Bible-owned runtime run is an evidence boundary, **not a TODO required to finish the documentation**.
 
 ## Native-first matrix
 
-| Family | Example | Status | Purpose |
+| Family | Reference | Editorial status | Purpose |
 |---|---|---|---|
-| Effect | `../16-WORKING-TEMPLATES/effect-basic` | drop-in | classic pixel effect |
-| Effect | `Effect/SmartFX-MFR` | SDK syntax-checked / host-test-required | SmartFX pass-through; MFR disabled |
-| Effect UI | `Effect/CustomUI-Drawbot` | skeleton / SDK syntax-checked | Drawbot acquisition only; no drawing |
-| AEGP | `AEGP/MenuTool` | drop-in | menu command + host callback lifecycle |
-| AEGP | `AEGP/Keyframer` | sample-derived / host-test-required | keyframe batching path |
-| AEGP UI | `AEGP/NativePanel` | guide-only | native panel registration path |
-| AEIO | `AEIO/MinimalRegistrar` | guide-only | importer/exporter registration boundary |
-| Artisan | `Artisan/MinimalRegistrar` | guide-only | custom renderer registration boundary |
-| Bridge | `Bridges/Effect-AEGP` | sample-derived / host-test-required | `AEGP_EffectCallGeneric` message ABI |
-| Bridge | `Bridges/PICA-Provider-Consumer` | sample-derived / host-test-required | plug-in ↔ plug-in PICA suite ABI |
-| Script | `Scripts/ScriptUI-Panel` | source supplied / host-test pending | dockable ExtendScript panel |
-| CEP | `../16-WORKING-TEMPLATES/cep-panel-bridge` | logic supplied / packaging and host-test pending | panel ↔ ExtendScript JSON bridge |
+| Effect | `../16-WORKING-TEMPLATES/effect-basic` | source example | classic pixel-effect shape |
+| Effect | `Effect/SmartFX-MFR` | source example | SmartFX/MFR architecture shape |
+| Effect UI | `Effect/CustomUI-Drawbot` | skeleton | Drawbot acquisition/UI boundary |
+| AEGP | `AEGP/MenuTool` | source example | menu command + callback lifecycle |
+| AEGP | `AEGP/Keyframer` | sample-derived pattern | keyframe batching route |
+| AEGP UI | `AEGP/NativePanel` | guide-only | Panelator path |
+| AEIO | `AEIO/MinimalRegistrar` | guide-only | IO/FBIO registration path |
+| Artisan | `Artisan/MinimalRegistrar` | guide-only | Artie registration path |
+| Bridge | `Bridges/Effect-AEGP` | source pattern | generic-call message ABI |
+| Bridge | `Bridges/PICA-Provider-Consumer` | source pattern | published suite ABI |
+| Script | `Scripts/ScriptUI-Panel` | source example | ScriptUI panel pattern |
+| CEP | `../16-WORKING-TEMPLATES/cep-panel-bridge` | source example | panel ↔ JSX dispatcher |
 
-## Build rule
+## Using native references
 
-Native examples intentionally do **not** invent replacement Xcode/Visual Studio projects. Copy the matching Adobe SDK sample project and graft in the implementation. See `08-MACOS`, `09-WINDOWS`, and `18-SDK-HEADER-TOOLS`.
+If a reader chooses to build one:
+
+1. obtain the target Adobe SDK legally;
+2. start from the closest official sample project;
+3. keep the sample's PiPL/resource/platform plumbing;
+4. graft the Bible source/pattern;
+5. apply the product's own compiler/host/release testing.
+
+Those product-validation steps are described elsewhere in the Bible, but **the Bible itself does not need to execute them for every reference**.
+
+`scripts/materialize_sdk_examples.py` can create local untracked sample workspaces as an optional developer utility.
+
+Historical compiler/runtime evidence, where present, remains documented in [VERIFICATION.md](../VERIFICATION.md).
