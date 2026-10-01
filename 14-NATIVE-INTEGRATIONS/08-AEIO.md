@@ -205,7 +205,7 @@ Source review can prove callback names, signatures and documented ownership. It 
 - color management is correct in actual project;
 - thread behavior/performance.
 
-Those require the host test matrix in [AEIO chapter](../04-AEIO/README.md) and Gate 6/7 evidence.
+Those require product-specific runtime evidence only if a developer wants to claim those results; they are not Bible completion requirements.
 
 ## Source record
 
