@@ -22,7 +22,7 @@ Do **not** copy the old ProjDumper EffectSuite2 call shape literally; that bundl
 
 ## Effect side
 
-Handle `PF_Cmd_COMPLETELY_GENERAL` and validate payload size/version before reading it.
+Handle `PF_Cmd_COMPLETELY_GENERAL` and validate payload size/version before reading it. `Protocol.h` also pins standard-layout/trivially-copyable requirements, 32-bit opcode width, total size and field offsets so accidental compiler-visible ABI drift fails at build time.
 
 ```cpp
 case PF_Cmd_COMPLETELY_GENERAL: {
@@ -59,7 +59,7 @@ This example assumes the effect command is already on the correct SDK callback p
 
 - send STL types;
 - send a temporary pointer that the effect stores for later use;
-- assume struct packing without explicit checks;
+- assume struct packing/layout without explicit compile-time checks on every binary that participates;
 - use hidden mutable state as a render dependency;
 - treat old EffectSuite2 sample syntax as current EffectSuite4 syntax;
 - swallow host-call error because the protocol field looks successful.
