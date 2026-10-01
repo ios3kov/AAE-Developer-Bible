@@ -139,3 +139,8 @@ See:
 8. `08-CLEAN-MACHINE-ACCEPTANCE.md`
 
 The final three chapters define the evidence boundary between "compiled", "loaded", "behavior verified" and "release verified".
+
+
+## FakeHostAdapter case study
+
+The [reuse audit](../22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md) records a useful pattern from FSTR Line: a fake host should implement the **same snapshot/command contract and validation rules** as the real adapter. It is valuable for stale-revision, wrong-target and pure-state tests, but its PASS must never be promoted to AE host evidence.
