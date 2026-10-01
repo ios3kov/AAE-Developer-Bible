@@ -46,7 +46,7 @@ The real-header audit on 2026-10-01 records:
 
 This establishes the **contract baseline used by the documentation**. It does not create a requirement to compile the whole repository.
 
-See [SDK tools](18-SDK-HEADER-TOOLS/README.md), [SDK source record](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md) and [real-header audit](18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md).
+See [SDK tools](18-SDK-HEADER-TOOLS/README.md), [SDK source record](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md) and [real-header audit](18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md).
 
 Historical filenames containing “Gate 4” are retained for stable links/history; the old build-gate completion model is superseded.
 
