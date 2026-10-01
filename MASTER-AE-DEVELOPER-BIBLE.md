@@ -26692,14 +26692,18 @@ A checked item requires recorded evidence. Documentation presence alone is not c
 
 ## Gate 3 — Documentation consistency
 
-- [ ] Mark superseded hypotheses explicitly.
-- [ ] Correct the historical 3D Channel Extract "no physical standalone plug-in" claim wherever it can read as current truth.
-- [ ] Current classification matches runtime evidence.
-- [ ] Add section 21 to MkDocs navigation.
-- [ ] README, STATUS, coverage, verification and checklist use compatible readiness language.
-- [ ] MASTER and manifest regenerate cleanly.
-- [ ] MkDocs strict build passes.
-- [ ] Historical logs remain preserved but separated from current conclusions.
+**Status: CLOSED — 2026-10-01.** Current conclusions were reconciled without deleting historical evidence. Regenerate Docs run `36840097693` and Validate run `36840097663` passed on the updated working line.
+
+- [x] Mark superseded hypotheses explicitly.
+- [x] Correct the historical 3D Channel Extract "no physical standalone plug-in" claim wherever it can read as current truth.
+- [x] Current classification matches the retained binary/runtime evidence boundaries.
+- [x] Add section 21 to MkDocs navigation.
+- [x] README, STATUS, coverage, verification and checklist use compatible readiness language.
+- [x] MASTER and manifest regenerate cleanly.
+- [x] MkDocs strict build passes.
+- [x] Historical logs remain preserved but separated from current conclusions.
+
+The current 3D Channel Extract index now states that the physical `Aux_Channel_Extract.plugin` module is proven present; the earlier absent/HOST-BUILTIN interpretation is retained only as a superseded historical search conclusion.
 
 ## Gate 3A — Reuse audit: FSTR Line and AE Hot Loader
 
