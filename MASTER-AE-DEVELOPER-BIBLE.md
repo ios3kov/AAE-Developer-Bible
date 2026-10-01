@@ -21701,6 +21701,24 @@ Compile report сохраняет aggregate SDK-header manifest SHA-256, compile
 `verify_recipe_symbols.py` и `diff_sdk_inventory.py` принимают только поддерживаемую `schema_version=1` и отклоняют malformed/empty function declarations. Signature/order drift покрыт portable regression tests. Старый/неполный JSON нельзя использовать как скрытый источник зелёной проверки.
 
 
+## Required SDK 25.6 contract manifest
+
+`sdk25.6-required-contracts.json` is a fail-closed minimum baseline for the current Bible edition.
+
+It pins contract-table generations used by the reviewed chapters and native examples, including AEGP project/item/comp/layer/effect/stream/keyframe/render families, AEIO, Artisan, panels, GPU, Custom UI/Drawbot and PICA. High-risk tables also list required functions.
+
+`verify_required_contracts.py` fails when:
+
+- a required table is absent;
+- a required function is absent from its pinned table;
+- the inventory schema is unsupported;
+- parser diagnostics make the inventory incomplete.
+
+This prevents a parser run from becoming green merely because it returned *some* tables.
+
+The manifest is **necessary, not sufficient** evidence. Real compiler and host gates still follow.
+
+
 ---
 
 <!-- SOURCE: 18-SDK-HEADER-TOOLS/generated/README.md -->
@@ -27295,13 +27313,15 @@ Do not infer absence of all AE notification mechanisms from one negative probe. 
 
 ## Gate 4 — SDK verification
 
-- [ ] Required SDK 25.6 contract families parse without unresolved required declarations.
-- [ ] Parser diagnostics cannot masquerade as ABI/signature validation.
-- [ ] Recipes are checked by real compilation against the declared SDK.
-- [ ] Native source set compiles with strict warnings.
-- [ ] Tests cover malformed/partial/version/signature drift cases.
-- [ ] CI distinguishes portable synthetic checks from licensed-SDK checks.
-- [ ] Windows SDK validation is reproducible.
+**Status: OPEN. Portable tooling is hardened; fresh licensed-SDK compiler evidence is still required after the current source changes.**
+
+- [ ] Required SDK 25.6 contract families parse without unresolved required declarations. A fail-closed required-table/function manifest now exists; fresh exact-SDK inventory run remains required.
+- [x] Parser diagnostics cannot masquerade as ABI/signature validation. Inventory diagnostics, unsupported schema and malformed declarations are rejected by downstream verification.
+- [ ] Recipes are checked by real compilation against the declared SDK. Historical macOS SDK 25.6 syntax evidence exists, but current recipe sources must be recompiled.
+- [ ] Native source set compiles with strict warnings on the current revision. Historical macOS baseline does not automatically transfer after source changes.
+- [x] Tests cover malformed/partial/version/signature/suite-generation/required-contract drift cases.
+- [x] CI distinguishes portable synthetic checks from licensed-SDK checks and labels host boundaries explicitly.
+- [ ] Windows SDK validation is reproducible end-to-end. The PowerShell/MSVC runner and syntax checks exist; a real licensed-SDK MSVC run is still required.
 
 ## Gate 5 — Three host-verified references
 
