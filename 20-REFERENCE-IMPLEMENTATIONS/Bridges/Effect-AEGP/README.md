@@ -1,6 +1,6 @@
 # Effect ↔ AEGP bridge reference
 
-Status: **sample-derived / host-test-required**.
+Status: **sample-derived / runtime result not claimed**.
 
 Protocol.h forwards to the canonical protocol in 16-WORKING-TEMPLATES/effect-aegp-generic-bridge.
 
@@ -97,4 +97,4 @@ This makes diagnostics distinguish target missing from command rejected.
 
 ## Verification boundary
 
-The contract is source-reviewed against SDK 25.6 and sample history, but the Bible bridge remains host-test-required until the actual caller/effect pair is compiled and run.
+The contract is source-reviewed against SDK 25.6 and sample history, but the Bible bridge remains runtime result not claimed until the actual caller/effect pair is compiled and run.
