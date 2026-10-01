@@ -15,8 +15,6 @@ def load_inventory(path: Path) -> dict:
     data = json.loads(path.read_text("utf-8"))
     if not isinstance(data, dict) or data.get("schema_version") != INVENTORY_SCHEMA_VERSION:
         raise ValueError("Unsupported or missing inventory schema_version")
-    if data.get("unparsed_candidate_tables") or data.get("partial_candidate_tables"):
-        raise ValueError("Inventory is incomplete; parser diagnostics are present")
     tables = data.get("tables")
     if not isinstance(tables, list) or not tables:
         raise ValueError("Inventory contains no contract tables")
@@ -48,6 +46,15 @@ def load_manifest(path: Path) -> dict:
     return data
 
 
+def diagnostic_table_names(inventory: dict) -> set[str]:
+    names: set[str] = set()
+    for key in inventory.get("partial_candidate_tables", {}):
+        names.add(str(key).rsplit(":", 1)[-1])
+    for values in inventory.get("unparsed_candidate_tables", {}).values():
+        names.update(str(value) for value in values)
+    return names
+
+
 def verify_required(inventory: dict, manifest: dict):
     present = {}
     for table in inventory["tables"]:
@@ -60,16 +67,20 @@ def verify_required(inventory: dict, manifest: dict):
             if isinstance(f, dict) and isinstance(f.get("name"), str)
         }
 
+    diagnostics = diagnostic_table_names(inventory)
     missing = []
     for entry in manifest["required_tables"]:
+        if entry["name"] in diagnostics:
+            missing.append({**entry, "missing_functions": [], "parser_diagnostic": True})
+            continue
         if entry["name"] not in present:
-            missing.append({**entry, "missing_functions": None})
+            missing.append({**entry, "missing_functions": None, "parser_diagnostic": False})
             continue
 
         required_functions = entry.get("required_functions", [])
         absent = [name for name in required_functions if name not in present[entry["name"]]]
         if absent:
-            missing.append({**entry, "missing_functions": absent})
+            missing.append({**entry, "missing_functions": absent, "parser_diagnostic": False})
 
     return len(manifest["required_tables"]), missing
 
@@ -93,7 +104,9 @@ def main(argv=None):
         f"target={manifest.get('target_sdk', 'unspecified')}"
     )
     for entry in missing:
-        if entry.get("missing_functions") is None:
+        if entry.get("parser_diagnostic"):
+            print(f"INCOMPLETE_REQUIRED {entry['name']} [{entry['area']}]")
+        elif entry.get("missing_functions") is None:
             print(f"MISSING_TABLE {entry['name']} [{entry['area']}]")
         else:
             names = ",".join(entry["missing_functions"])
