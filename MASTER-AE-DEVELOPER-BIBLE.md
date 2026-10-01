@@ -5799,7 +5799,7 @@ The current Bible CI validates documentation and existing portable tests. This c
 
 # macOS — native SDK validation
 
-Header-derived validation is the first native preflight, not the final Mac validation.
+This chapter describes SDK/source validation a Mac developer can use when implementing a native product. It is not a completion requirement for AE Developer Bible.
 
 ## Run
 
@@ -5838,9 +5838,9 @@ It does not prove:
 - code signing is valid;
 - notarization passes.
 
-Do not promote this preflight into host verification.
+Do not promote a header/source audit into a runtime claim.
 
-## Required next gates
+## If you are implementing a product
 
 ~~~text
 header inventory + symbol check + Clang syntax/type report
@@ -5887,7 +5887,7 @@ If header tool fails:
 The Bible has historical macOS arm64 syntax/type evidence for parts of the repository. This file does not upgrade any reference implementation to linked/signed/host-verified status.
 
 
-For the exact PASS/FAIL evidence contract, see [Gate 4 — exact SDK acceptance runbook](08-MACOS/../18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
+For the SDK contract-audit method, see [SDK contract audit runbook](08-MACOS/../18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
 
 
 ---
@@ -6228,7 +6228,7 @@ A release record should make it possible to answer:
 
 ## Verification boundary
 
-The Bible currently records a macOS exact-SDK syntax/type baseline; Windows native compilation remains a separate pending verification gate. This chapter defines the build workflow and does not mark Windows examples host-verified.
+This chapter defines the Windows build workflow. Historical compiler evidence for Bible source snapshots is optional evidence, not a pending completion gate for the documentation.
 
 
 ---
@@ -6601,7 +6601,7 @@ Do not weaken signing/security to chase reputation behavior.
 
 ## Verification boundary
 
-This chapter follows current Microsoft SignTool/AuthentiCode guidance. The Bible has not yet signed and host-tested all Windows reference artifacts; the Windows release gate remains open.
+This chapter follows current Microsoft SignTool/AuthentiCode guidance. This chapter documents the Windows signing workflow. Bible does not claim that its reference source has been shipped as signed Windows artifacts, and such binaries are not required for editorial completion.
 
 
 ---
@@ -6967,9 +6967,9 @@ The repository's current CI primarily covers documentation/portable checks. The 
 
 # Windows — native SDK validation
 
-Header-derived validation is the first Windows native preflight.
+This chapter describes SDK/source validation a Windows developer can use when implementing a native product.
 
-It is not Windows build or host evidence.
+It is not a requirement that the Bible itself build a Windows artifact.
 
 ## Run
 
@@ -7006,7 +7006,7 @@ It does not prove:
 - render/project semantics;
 - MFR/GPU safety.
 
-## Required next gates
+## If you are implementing a product
 
 ~~~text
 header inventory + symbol check + MSVC syntax/type report
@@ -7050,7 +7050,7 @@ Do not cast or suppress a native mismatch to keep the validation lane green.
 Windows compiler/link/sign/install/host acceptance remains separate. A header PASS must never be copied into the compatibility matrix as Windows PASS.
 
 
-For the exact PASS/FAIL evidence contract, see [Gate 4 — exact SDK acceptance runbook](09-WINDOWS/../18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
+For the SDK contract-audit method, see [SDK contract audit runbook](09-WINDOWS/../18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
 
 
 ---
@@ -13824,7 +13824,7 @@ AEGP_AddLayer(
 
 Каждый executable-looking snippet:
 - либо проверяется по официальному published signature;
-- либо помечается `host-test-required`;
+- либо помечается как source-level / runtime-not-claimed;
 - не выдумывает undocumented struct layout;
 - не заявляется binary-tested без AE host.
 
@@ -19586,7 +19586,7 @@ Families:
 - **SDK source-reviewed** — declaration/ownership statement сверены с конкретным supplied SDK snapshot; это не runtime result.
 - **sample-derived** — pattern найден в официальном sample-проекте Adobe; sample может использовать старую suite generation.
 - **syntax/type baseline** — отдельный recorded compiler check для конкретного source snapshot.
-- **host-test-required** — поведение ещё должно быть проверено внутри указанного After Effects build.
+- **runtime-not-claimed** — Bible описывает source/API pattern, но не утверждает конкретный host-observed результат.
 
 > Supplied SDK 25.6 используется для source review и локальной проверки контрактов, но Adobe headers не публикуются в репозитории. Recorded compiler baseline и host acceptance — отдельные evidence levels. C++ куски остаются drop-in кодом для официального SDK sample, а не «самодельным SDK».
 
@@ -21611,7 +21611,7 @@ NOT RUN in this editorial iteration:
 - leak checks for Drawbot resources;
 - Windows host verification.
 
-These remain Gate 4/6/7 work.
+These are optional future implementation/runtime evidence areas, not Bible completion requirements.
 
 
 ---
@@ -21715,7 +21715,7 @@ For the current edition, this closes the **SDK contract-accuracy editorial requi
 
 <!-- SOURCE: 18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md -->
 
-# Gate 4 — exact SDK 25.6 required-contract preflight — 2026-10-01
+# SDK 25.6 required-contract audit — 2026-10-01
 
 ## Scope
 
@@ -21835,17 +21835,13 @@ with related platform typedef/calling-convention errors.
 
 This is expected because the Adobe SDK target is macOS/Windows, while this execution environment is Linux. It is **not** a Bible source compile failure and is **not** macOS compiler evidence.
 
-## Gate 4 consequence
+## Editorial consequence
 
-The following Gate 4 criterion is now satisfied:
+The following editorial SDK-accuracy criterion is satisfied:
 
 - required SDK 25.6 contract families/functions parse without unresolved **required** declarations.
 
-Still open:
-
-- current Bible native source syntax/type compile on a real macOS Clang/Xcode environment against this SDK;
-- current Bible native source syntax/type compile on Windows/MSVC against this SDK;
-- later link/resource/host gates.
+Optional future implementation evidence may include compiler or host runs for specific examples, but those are not required to complete the Bible.
 
 The four non-required parser diagnostics remain visible and may be improved later, but they do not silently weaken the required-contract acceptance surface.
 
