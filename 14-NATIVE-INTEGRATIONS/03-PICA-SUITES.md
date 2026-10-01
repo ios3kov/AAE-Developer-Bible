@@ -182,6 +182,6 @@ Published suite лучше, когда нужен повторяемый сер�
 
 - [Plug-in → Plug-in через PICA](../15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md)
 - [Effect ↔ AEGP generic bridge](../15-COMMUNICATION/03-AEGP-TO-EFFECT.md)
-- [PICA shared-suite template](../16-WORKING-TEMPLATES/pica-shared-suite/)
+- [PICA shared-suite template](../16-WORKING-TEMPLATES/pica-shared-suite/README.md)
 - [Memory/lifetime](../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md)
 - [Threading boundaries](../15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
