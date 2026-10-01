@@ -2573,10 +2573,12 @@ AEGP (After Effects General Plug-in) — интеграция с приложе�
 
 1. [PiPL, регистрация и загрузка](03-AEGP/../01-ARCHITECTURE/03-PIPL-AND-LOADING.md): разные точки входа, Kind, версии, экспорт, ресурсные цепочки Windows/macOS и границы диагностики загрузки.
 2. [AEGP: инициализация, hooks и suites](03-AEGP/01-HOOKS-SUITES.md): plugin/command IDs, global и hook refcon, версии suites, command/update/idle/death callbacks, частичная инициализация и UI suppression.
-3. [Операции с проектом и рендером](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md): следующий раздел для подробной редакционной сверки с поставкой SDK.
+3. [Операции с проектом и рендером](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md): чтение project/item/comp/layer, время, Undo и частичные ошибки; очередь, enum статуса и invalidation; render options, borrowed worlds, sync/async receipts и кэш.
 4. [Владение памятью и ошибки](03-AEGP/../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md): разные release API и пределы существующих ownership helpers.
 
 Регистрация/PiPL и lifecycle hooks расширены **2026-10-01 по SDK 25.6 build 61**. [Запись сверки](03-AEGP/../18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md) содержит 19 source hashes, диапазоны строк, сохранённые расхождения и разбор [MenuTool](03-AEGP/../16-WORKING-TEMPLATES/aegp-menu-command/MenuTool.cpp). Сам MenuTool не менялся и не запускался в этой итерации.
+
+[Сверка проекта и рендера](03-AEGP/../18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md) добавляет диапазоны шести SDK-файлов и разбор трёх существующих рецептов. У RenderQueueRecipes обнаружено использование TRUE вместо именованного статуса: это не QUEUED. Ошибка и необходимость исправления кода отмечены в главе и README рецептов; host-проверка не заявляется.
 
 ## Когда рассматривать AEGP
 
@@ -2588,7 +2590,7 @@ AEGP (After Effects General Plug-in) — интеграция с приложе�
 
 Текст сверяется с declarations и samples; архитектурные рекомендации помечены отдельно. Source review не равен native build, удачная компиляция не равна загрузке, а успешный initializer не равен готовности всех функций.
 
-[COMPLETION-CHECKLIST](03-AEGP/../COMPLETION-CHECKLIST.md) сохраняет отдельную приёмку MenuTool: сборка/регистрация, отсутствие дублей меню, действие команды, update hook, ошибки и завершение. Редакционное обновление этих пунктов не закрывает.
+[COMPLETION-CHECKLIST](03-AEGP/../COMPLETION-CHECKLIST.md) сохраняет отдельную приёмку MenuTool: сборка/регистрация, отсутствие дублей меню, действие команды, update hook, ошибки и завершение. Редакционное обновление этих пунктов не закрывает. Следующая тема написания — streams и ключевые кадры; это порядок чтения/написания, не закрытие более ранних gates.
 
 
 ---
