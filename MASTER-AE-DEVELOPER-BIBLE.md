@@ -27541,6 +27541,8 @@ No source-project host result is promoted into Bible host verification. FSTR SYN
 - Closed Gate 3A reuse audit: exact FSTR/AE Hot Loader file+commit mapping, transfer decisions, provenance review and independent FSTR portable rerun.
 - Hardened Gate 4 tooling with inventory schema guards, required SDK 25.6 tables/functions, exact SuiteHandler-generation checks and compiler-report provenance.
 - Added cross-platform Gate 4 runners for Clang/MSVC, clean-Git evidence requirements, strict portable native protocol-header compilation and an exact-SDK acceptance runbook.
+- Re-ran Gate 4 against the supplied Adobe SDK 25.6: 35/35 required contracts and 39/39 cookbook call-sites pass; corrected Drawbot Surface v2 and added callback-typedef parsing for Artisan/related entry tables.
+- Preserved four non-required parser diagnostics explicitly instead of treating them as hidden success; current macOS/MSVC compiler acceptance remains open.
 
 - Expanded the full testing section with explicit build/host/release evidence layers, richer matrices, render/ROI correctness, MFR stress, performance and crash diagnostics.
 - Added an evidence/acceptance chapter with PASS/FAIL/BLOCKED/NOT_RUN vocabulary tied to exact artifact and environment identity.
@@ -28032,7 +28034,7 @@ Edition: **v1.1 working line**, updated 2026-10-01. A chapter being present does
 | JSX / ScriptUI | Usage guidance | Scripts supplied | AE execution pending |
 | CEP | Dispatcher architecture | Logic files; packaging dependencies external | Host execution pending |
 | GPU | Backend design and testing guidance | SDK_Invert_ProcAmp sample path | GPU comparison pending |
-| SDK tooling | Reproducible commands and limits | Declaration index, symbol-name check, textual/order diff | Synthetic regression tests; full SDK index incomplete |
+| SDK tooling | Reproducible commands, required-contract manifest and evidence boundaries | Declaration inventory, required table/function gate, exact SuiteHandler-generation check, compiler-report driver | Real SDK 25.6 required preflight PASS: 35/35 contracts, 39/39 cookbook calls; 4 non-required partial diagnostics retained; current macOS/MSVC compile still pending |
 | C++ foundation | Ownership/undo/callback guidance | Helpers | Behavioral stub tests and SDK syntax/type check |
 | macOS / Windows | Build/sign/package plus clean-machine release pipelines | Sample materializer + syntax drivers | historical macOS syntax baseline; Windows native compile/host still pending |
 | Built-in effect research atlas | Evidence levels, execution plan and effect catalog | 3D Channel Extract evidence/function-map pilot | partial static/runtime evidence; full-effect acceptance and catalog completion remain open |
