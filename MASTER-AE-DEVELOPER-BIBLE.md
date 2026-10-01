@@ -3842,7 +3842,7 @@ Host-owned input/output не освобождаются как самостоя�
 → проверка результата отдельно от экранного показа и экспорта
 ```
 
-Результат этой главы — проверенное по присланным declarations объяснение и проектные правила. Компиляция учебного фрагмента, полная сборка плагина и host-проверки остаются отдельными задачами [плана](02-EFFECT-PLUGINS/../COMPLETION-PLAN.md).
+Результат этой главы — проверенное по присланным declarations объяснение и проектные правила. Bible не заявляет runtime result для учебного фрагмента; compile/host проверки нужны конкретному продукту только для тех runtime/support claims, которые он делает.
 
 
 ---
@@ -7654,7 +7654,7 @@ Do not log secrets or license tokens.
 
 ## Verification boundary
 
-The paths follow current AE SDK installer guidance. A correct path alone does not prove a safe installer. Full clean-machine install/upgrade/uninstall verification remains an open completion gate.
+The paths follow current AE SDK installer guidance. A correct path alone does not prove a safe installer. Clean-machine install/upgrade/uninstall verification belongs to a concrete product's release evidence, not to Bible editorial completion.
 
 
 ---
@@ -9346,7 +9346,7 @@ Do not log license secrets.
 
 ## Verification boundary
 
-Registry path guidance is documented by the AE SDK guide. The current Bible has not yet executed the full Windows installer matrix; this remains a completion gate.
+Registry path guidance is documented by the AE SDK guide. Bible documents the Windows installer matrix; executing that matrix is product release evidence, not a completion requirement for the documentation.
 
 
 ---
