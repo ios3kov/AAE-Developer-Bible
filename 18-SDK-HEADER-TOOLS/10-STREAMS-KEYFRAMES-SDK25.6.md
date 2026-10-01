@@ -152,3 +152,19 @@ GitHub Validate проверяет итоговый committed documentation tree
 ## Следующий редакционный блок
 
 После streams/keyframes логично сверить masks, text/markers и footage/import ownership и продолжить редакционный coverage sweep. Compiler/host evidence для отдельных examples остаётся optional evidence, а не completion gate.
+
+## Later cookbook consistency update — 2026-10-01
+
+A later editorial block reconciled the canonical Effect/Stream/Keyframe source material with the already-established SDK 25.6 baseline.
+
+Changes after the original source review:
+
+- `EffectStreamRecipes.cpp` was updated from the compatibility `EffectSuite4()` accessor to current `EffectSuite5()`;
+- `AegpEffectRefOwner` and its portable stub/test were updated from `AEGP_EffectSuite4` to `AEGP_EffectSuite5`;
+- Streams remain on `StreamSuite6` / `DynamicStreamSuite4`;
+- Keyframes remain on `KeyframeSuite5`;
+- Keyframer/bridge documentation now uses product-validation guidance instead of mandatory Bible host-test language.
+
+The original blob hashes above remain provenance for the earlier review snapshot. They are not rewritten retroactively.
+
+This update is source/editorial consistency work. No runtime result is claimed.
