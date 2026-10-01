@@ -1,7 +1,7 @@
 # Native Suite Cookbook
 
 **Edition:** v1.1 documentation line  
-**Primary acceptance baseline:** After Effects / SDK 25.6 for the current Bible plan. Later-version notes are explicitly version-gated.
+**Primary contract baseline:** Adobe After Effects SDK 25.6 build 61. Later-version notes are explicitly version-gated.
 
 Этот раздел — практический слой над AEGP/native API: **какую suite брать, какой handle получить, кто им владеет, что надо dispose-ить и в каком порядке вызывать функции**.
 
@@ -62,7 +62,7 @@ Return A_Err
 
 ## Version discipline
 
-Главы `05-STREAMS-PROPERTIES.md` и `06-KEYFRAMES.md` перепроверены по supplied SDK 25.6: `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`, `AEGP_KeyframeSuite5`. Главы `07-MASKS.md`, `08-TEXT-MARKERS.md`, `09-FOOTAGE-IMPORT.md` также приведены к baseline 25.6: `MaskSuite6`, `MaskOutlineSuite3`, `TextDocumentSuite1`, `MarkerSuite3`, `FootageSuite5`, `ItemSuite9`, `CompSuite12`, `LayerSuite9`. Более поздние API не должны молча становиться baseline 25.6. Источники: `18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md` и `11-MASK-TEXT-FOOTAGE-SDK25.6.md`.
+Главы `02-COMPOSITIONS.md` / `03-LAYERS.md` и `05-STREAMS-PROPERTIES.md` / `06-KEYFRAMES.md` перепроверены по supplied SDK 25.6. Composition/layer baseline: `AEGP_CompSuite12` + `AEGP_LayerSuite9`. Streams/keyframes: `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`, `AEGP_KeyframeSuite5`. Главы `07-MASKS.md`, `08-TEXT-MARKERS.md`, `09-FOOTAGE-IMPORT.md` также приведены к baseline 25.6: `MaskSuite6`, `MaskOutlineSuite3`, `TextDocumentSuite1`, `MarkerSuite3`, `FootageSuite5`, `ItemSuite9`, `CompSuite12`, `LayerSuite9`. Более поздние API не должны молча становиться baseline 25.6. Источники: `18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md` и `11-MASK-TEXT-FOOTAGE-SDK25.6.md`.
 
 
 ## Render Queue / frame-render baseline
