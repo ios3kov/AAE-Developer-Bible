@@ -414,3 +414,32 @@ Editorial/source conclusions:
 - working/reference docs use product-validation guidance rather than mandatory Bible host-test language.
 
 **Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new AEIO importer/exporter host run is claimed.
+
+
+## Artisan renderer lifecycle / scene architecture block (2026-10-01)
+
+The Artisan documentation/reference block was reconciled around the supplied SDK 25.6 contracts:
+
+```text
+AEGP_RegisterArtisan / RegisterInteractiveArtisan
+→ PR_ArtisanEntryPoints
+→ CanvasSuite8 / ArtisanUtilSuite1
+→ borrowed render/layer/query contexts
+→ product-owned normalized scene / renderer state
+```
+
+Editorial/source conclusions:
+
+- global, instance and render data are separate plugin-owned state scopes;
+- borrowed render/query/layer contexts are not persistent product identity;
+- `FlattenInstance` is a versioned platform-independent persistence boundary, not a dump of live runtime objects;
+- textures, owned worlds and render receipts are distinct resource families with distinct cleanup;
+- render receipts are host cache evidence, not serializable image/product cache identity;
+- scene extraction is separated from renderer core and must use render-context time/ROI/downsample;
+- bins, track mattes, precomps and mixed 2D/3D semantics prevent treating the host scene as a naive independent-layer list;
+- interactive view state is separated from persistent instance/final-render state;
+- cancellation and partial failure preserve instance/global state while cleaning frame-local resources;
+- old Artie CanvasSuite5/LayerSuite5/ItemSuite6/StreamSuite2 usage remains historical sample evidence, not the current 25.6 signature baseline;
+- registration/reference docs use RUNTIME-NOT-CLAIMED and product-validation guidance rather than mandatory Bible host testing.
+
+**Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new Artisan registration/render/interactive host run is claimed.
