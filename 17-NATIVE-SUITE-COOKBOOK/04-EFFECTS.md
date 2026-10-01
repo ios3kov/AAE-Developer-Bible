@@ -4,7 +4,7 @@
 
 **Current suite:** `AEGP_EffectSuite5`.
 
-Existing Bible source examples may use the older `AEGP_EffectSuite4` subset for compatibility. Do not treat that source dependency as the current SDK generation and never cast suite tables between generations.
+Historical/compatibility source examples may use the older `AEGP_EffectSuite4` subset. The canonical Bible effect recipe and ownership helper are now aligned to current SDK 25.6 `AEGP_EffectSuite5`. Never cast suite tables between generations.
 
 ## Layer effect refs are owned references
 
@@ -254,15 +254,17 @@ resolve fresh LayerH
 → re-query state
 ```
 
-## Current Suite5 vs older Suite4 source examples
+## Current Suite5 vs historical Suite4 source
 
-Why older Bible C++ may still say `EffectSuite4()`:
+Current Bible baseline and canonical source now use `AEGP_EffectSuite5`.
 
-- it uses a compatibility subset;
-- SDK 25.6 still contains historical generations via SuiteHandler support;
-- source dependency is not the definition of current header generation.
+Older Adobe samples or explicitly compatibility-shaped source may still use Suite4 or earlier generations. Read those as historical/compatibility dependencies only:
 
-New Bible baseline manifest now pins `AEGP_EffectSuite5`.
+- do not infer current generation from old sample source;
+- do not cast Suite4 to Suite5;
+- do not silently downgrade new baseline examples to an older table merely because the called member exists there.
+
+The required-contract manifest pins `AEGP_EffectSuite5` for SDK 25.6.
 
 ## Related chapters
 
