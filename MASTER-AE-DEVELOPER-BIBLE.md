@@ -18015,7 +18015,7 @@ This chapter describes the reviewed AEGP lifecycle, including a known legacy/cur
 
 ## 1. Текущий контракт SDK 25.6
 
-В `AEGP_EffectSuite4` функция имеет смысловую форму:
+В current SDK 25.6 `AEGP_EffectCallGeneric` находится в `AEGP_EffectSuite5` и имеет смысловую форму:
 
 ```text
 AEGP_EffectCallGeneric(
@@ -18042,7 +18042,7 @@ EffectCallGeneric(plugin_id, effect_ref, time, extra)
 
 То есть без отдельного `PF_Cmd` аргумента.
 
-Это полезный исторический pattern, но **не сигнатура SDK 25.6 для нового кода**. В новой реализации нельзя копировать старую строку вызова буквально; нужно компилировать против текущего header.
+Это полезный исторический pattern, но **не current suite generation SDK 25.6 для нового кода**. В новой реализации нельзя копировать старую строку вызова буквально; нужно компилировать против текущего header.
 
 Источник: `AEGP/ProjDumper/ProjDumper.cpp:142–168`.
 
@@ -26345,7 +26345,7 @@ The sample demonstrates publication, not general hot replacement. It does not sh
 
 ### Current generic Effect call
 
-`Headers/AE_GeneralPlug.h:2162–2168` declares the current `AEGP_EffectSuite4::AEGP_EffectCallGeneric` with plugin id, effect ref, layer-time value, explicit `PF_Cmd` and `void* extra`.
+`Headers/AE_GeneralPlug.h:2162–2168` declares `AEGP_EffectCallGeneric` inside the current `AEGP_EffectSuite5` table with plugin id, effect ref, layer-time value, explicit `PF_Cmd` and `void* extra`.
 
 The header explicitly says old behavior is obtained by passing `PF_Cmd_COMPLETELY_GENERAL`.
 
@@ -26390,7 +26390,7 @@ The README was corrected; the header was not changed in this editorial pass.
 
 ### Generic-bridge template lacked the explicit current command/time emphasis
 
-The template documentation was updated to require current `EffectSuite4` call semantics: explicit `PF_Cmd_COMPLETELY_GENERAL` for the historical path, and time in the target layer timebase.
+The template documentation was updated to require current `EffectSuite5` call semantics: explicit `PF_Cmd_COMPLETELY_GENERAL` for the historical path, and time in the target layer timebase.
 
 No new host call was made.
 
@@ -33446,7 +33446,7 @@ Custom UI review records PF_Cmd_EVENT, event contexts, PF_CustomUIInfo, PF_Effec
 
 Expanded [PICA suites](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md), [AEGP → Effect](15-COMMUNICATION/03-AEGP-TO-EFFECT.md), [Plug-in → Plug-in PICA](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md), [legacy/native boundaries](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) and the two existing bridge-template READMEs from the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md) records 13 SDK/source hashes and exact ranges.
 
-Reviewed contracts include SPBasic public-version acquire/release reference counting; SPSuites public/internal version separation and AddSuite publication; Sweetie’s static DuckSuite provider; Checkout’s optional acquire/use/release consumer; current EffectSuite4 generic-call command/time arguments; PF_Cmd_COMPLETELY_GENERAL dispatch; and the old ProjDumper/Shifter workflow. The review also records that bundled Commando’s initializer signature differs from the current AEGP_PluginInitFuncPrototype and therefore must not be copied as the 25.6 reference signature.
+Reviewed contracts include SPBasic public-version acquire/release reference counting; SPSuites public/internal version separation and AddSuite publication; Sweetie’s static DuckSuite provider; Checkout’s optional acquire/use/release consumer; current EffectSuite5 generic-call command/time arguments; PF_Cmd_COMPLETELY_GENERAL dispatch; and the old ProjDumper/Shifter workflow. The review also records that bundled Commando’s initializer signature differs from the current AEGP_PluginInitFuncPrototype and therefore must not be copied as the 25.6 reference signature.
 
 Source limits are explicit: Sweetie does not demonstrate generic suite unpublish/hot replacement; suite refcount does not prove thread safety; the current Bible SharedSuite header is C++-oriented despite its C-shaped ABI; old bundled sample suite generations remain pattern evidence rather than current signatures.
 
