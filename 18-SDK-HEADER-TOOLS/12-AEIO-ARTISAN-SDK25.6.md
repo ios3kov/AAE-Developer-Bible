@@ -155,3 +155,34 @@ AEIO handles media I/O; Artisan handles renderer integration. Neither replaces t
 | Windows host tests | NOT RUN |
 
 GitHub docs CI подтверждает repository/document build. Runtime/product evidence остаётся отдельным классом доказательств.
+
+## Later AEIO production-guidance update — 2026-10-01
+
+A later logical block completed the AEIO production-architecture layer without changing the SDK 25.6 contract baseline.
+
+Baseline remains:
+
+- `AEIO_ModuleInfo`;
+- frozen `AEIO_FunctionBlock4`;
+- current `AEGP_IOInSuite7`;
+- current `AEGP_IOOutSuite6`;
+- registration through `AEGP_RegisterIO`.
+
+The later pass added/reconciled:
+
+- explicit InSpec/OutSpec private-state machines;
+- live options versus versioned flat options;
+- random/repeated/sparse frame request assumptions;
+- source-file lifetime and `CloseSourceFiles` reasoning;
+- bounded file verification for untrusted media;
+- input/output audio contracts;
+- output finalization and optional atomic temp→final strategy;
+- metadata/marker/auxiliary-channel boundaries;
+- cancellation and idempotent partial cleanup;
+- error taxonomy separating unsupported/corrupt/I/O/resource/cancel/host/cleanup;
+- product-validation wording consistent with `EDITORIAL-GUIDE.md`;
+- explicit Footage Suite versus AEIO responsibility boundary.
+
+The original hashes/sample observations above remain provenance for the SDK source review.
+
+**Evidence level after this pass:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new importer/exporter runtime result is asserted.
