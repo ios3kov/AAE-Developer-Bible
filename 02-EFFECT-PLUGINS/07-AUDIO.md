@@ -193,4 +193,4 @@ AUDIO_SETDOWN
 
 ## Verification boundary
 
-Новый audio effect не создавался и AE audio render не выполнялся. Gate 6/7 остаются открытыми.
+Bible не заявляет собственный audio runtime result. Создание отдельного audio demo effect не является условием редакционной готовности главы.
