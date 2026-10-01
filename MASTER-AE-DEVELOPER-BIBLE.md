@@ -13174,6 +13174,16 @@ See [verification commands and results](VERIFICATION.md) and [coverage matrix](F
 
 # Verification — v1.1
 
+## Registration/PiPL and AEGP lifecycle chapter review (2026-10-01)
+
+Expanded [registration, PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md) and [AEGP hooks and suites](03-AEGP/01-HOOKS-SUITES.md). The [fourth source-review record](18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md) identifies 19 files from SDK 25.6 build 61, exact ranges and the unchanged Bible MenuTool source. The chapters, review record and AEGP reading route are present by commit `859b9c6c816a7cb5a360f61869d1bcf1531aede3`; this status reconciliation does not create a new native implementation.
+
+The recorded review distinguishes Effect registration, EffectMain and AEGP initialization; resource Kind, exports and architecture entries; independent version fields; PiPL/global outflags and the documented override exception; Windows/macOS resource build descriptions; suite acquisition, hook refcons and command/update/idle/death lifetimes. The historical source observations include RegisterSuite5's version macro evaluating to 6, the wrong decimal comment beside Skeleton's PiPL outflags and unequal Reserved Info values whose runtime priority remains unestablished.
+
+MenuTool's later initialization errors deliberately retain state after hook registration and may return A_Err_NONE with the command disabled. That is not complete functional success. The source review also records discarded DisableCommand/ReportInfo errors and absent UI-suppression handling. The implementation was not silently changed; partial-initialization, exception and shutdown paths still require actual host verification.
+
+**Verification level: existing SDK-source review and documentation.** No new exact-SDK compiler run, resource compilation, linking, loaded-module test, MenuTool execution, installer test or failure-injection run is established by this editorial update. Runtime compatibility and the full plan gates remain open. Any CI result must be tied to its actual commit/run; this paragraph is not itself an assertion that a new CI run passed.
+
 ## Memory/lifetime and MFR chapter review (2026-10-01)
 
 Expanded [memory, resource lifetime and errors](01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) and [MFR/thread safety](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md) from the supplied SDK 25.6 build 61. The [third source-review record](18-SDK-HEADER-TOOLS/07-MEMORY-MFR-SDK25.6.md) identifies ten source files by SHA-256 and records exact declaration/comment/sample ranges.
