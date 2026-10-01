@@ -2,6 +2,8 @@
 
 Updated: **2026-10-01**
 
+Canonical writing rules: [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). This file tracks progress only.
+
 Этот файл — **редакционный чеклист**, а не программа QA собственных плагинов.
 
 ## Definition of done
