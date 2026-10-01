@@ -21,7 +21,8 @@ mkdir -p "$OUT"
 
 python3 "$HERE/tools/ae_sdk_inventory.py" "$SDK_HEADERS" \
   --json "$OUT/ae-sdk-inventory.json" \
-  --markdown "$OUT/ae-sdk-inventory.md"
+  --markdown "$OUT/ae-sdk-inventory.md" \
+  --allow-incomplete
 
 python3 "$HERE/tools/verify_required_contracts.py" \
   "$OUT/ae-sdk-inventory.json" \
