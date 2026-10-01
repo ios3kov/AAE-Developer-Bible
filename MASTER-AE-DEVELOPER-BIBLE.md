@@ -9361,129 +9361,193 @@ See [release checklist](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md).
 
 ## Goal
 
-Reach a minimal native effect that can be reproduced from a clean checkout, built with the target SDK, installed, loaded by After Effects and rendered before product-specific complexity is added.
+Get one minimal native effect from clean source to a real After Effects host with the smallest possible number of moving parts.
 
-## Phase 1 — establish an untouched baseline
+Adobe SDK guidance recommends starting from the supplied Skeleton sample rather than reconstructing the host-specific project and Windows PiPL build machinery from scratch.
 
-1. Choose the exact After Effects SDK version.
-2. Copy Skeleton or the closest official sample.
-3. Record SDK build, toolchain, OS and architecture.
-4. Build the untouched sample.
-5. Preserve the original PiPL/resource build steps.
-6. Install it into the documented development location.
-7. Launch the target AE version.
-8. Apply the sample and render one deterministic frame.
+## Preconditions
 
-If the official sample baseline does not load, stop. Do not debug product code that does not exist yet.
+Record:
 
-## Phase 2 — rename without changing behavior
+- target After Effects version/build;
+- target AE SDK version/build;
+- OS and CPU architecture;
+- compiler/toolchain;
+- intended development install path.
 
-Change only identity:
+Do not begin by renaming everything, adding dependencies and changing build output at once.
 
-- product/display name;
-- identifiers that must be unique;
-- entry metadata where required;
-- output filename/bundle identifiers;
+## Phase 1 — prove the untouched sample
+
+~~~text
+copy Skeleton
+→ build untouched
+→ install into development plug-in path
+→ launch target AE
+→ find/apply sample
+→ render one deterministic frame
+~~~
+
+If the untouched sample does not load, stop. Product code is not yet the problem.
+
+Capture:
+
+- binary hash;
+- build command/configuration;
+- AE version;
+- install path;
+- load/render result.
+
+## Phase 2 — fork identity only
+
+Change only product identity:
+
+- project/target name;
+- effect display name;
+- match name where intentionally chosen;
+- category;
+- bundle/file metadata;
+- entry point only if necessary and consistently updated;
 - version metadata.
 
 Keep render behavior unchanged.
 
-Then repeat:
+Rebuild and load again.
+
+This separates identity/PiPL mistakes from algorithm mistakes.
+
+## Phase 3 — preserve PiPL and entry-point contract
+
+Cross-check:
 
 ~~~text
-build
-→ install
-→ load
-→ apply
-→ render
+PiPL entry declaration
+↔ exported effect entry symbol
+↔ architecture declaration
+↔ actual binary architecture
 ~~~
 
-This isolates registration/resource mistakes from algorithm mistakes.
+On macOS inspect the final executable slices. On Windows verify the PiPL resource is generated and linked into the .aex.
 
-## Phase 3 — isolate the render core
+Do not copy only C++ files from Skeleton and discard resource build steps.
 
-Prefer:
+## Phase 4 — introduce an internal core
+
+Keep host glue thin:
 
 ~~~text
-AE adapter
-→ internal pixel/view abstraction
-→ RenderCore
-→ output adapter
+PF callback / SmartFX adapter
+        ↓
+validate AE inputs
+        ↓
+convert to internal image/parameter views
+        ↓
+RenderCore
+        ↓
+write output
 ~~~
 
-Keep RenderCore independent of PF_InData, host handles and UI wherever practical.
+RenderCore should avoid AE handles where practical. That lets most algorithm tests run outside the host.
 
-That gives you a unit-testable algorithm and smaller host boundary.
+## Phase 5 — first deterministic operation
 
-## Phase 4 — first golden fixture
+Choose deliberately simple behavior:
 
-Before advanced features:
+- copy/pass-through;
+- gain/multiply;
+- channel swap;
+- another operation with an obvious expected result.
 
-- one deterministic source image;
-- one parameter set;
-- one frame/time;
-- known BPC;
-- explicit expected output.
+Create a synthetic fixture and expected output before adding UI complexity.
 
-Test RenderCore outside AE, then compare the host output.
+For a gain example:
 
-## Phase 5 — add capabilities one by one
+~~~text
+input pixel + gain
+→ expected channel values
+→ compare exact/tolerance according to pixel format
+~~~
+
+## Phase 6 — pixel formats
+
+Add only the formats the product intends to support.
+
+For every claimed depth verify separately:
+
+- 8-bpc;
+- 16-bpc;
+- 32-bpc float if claimed;
+- alpha;
+- odd dimensions;
+- nontrivial rowbytes/origin where relevant.
+
+Do not mark 32-bpc supported because 8-bpc code compiled under a generic template.
+
+## Phase 7 — save/reopen
+
+Create a project with the effect:
+
+~~~text
+apply
+→ change parameters
+→ save
+→ close AE
+→ reopen
+→ inspect parameters
+→ render same frame
+~~~
+
+This catches parameter identity/persistence problems early.
+
+## Phase 8 — only then add advanced features
 
 Recommended order:
 
-1. 8-bpc baseline;
-2. 16-bpc if claimed;
-3. 32-bpc if claimed;
-4. alpha/odd sizes/origins;
-5. SmartFX/ROI if needed;
-6. persistence/sequence state;
-7. custom UI;
-8. MFR;
-9. GPU.
+~~~text
+basic CPU correctness
+→ parameter/UI behavior
+→ SmartFX/ROI
+→ MFR
+→ GPU
+→ custom UI/panel/native bridges
+~~~
 
-After each step, keep the previous fixture passing.
+Each stage inherits the previous correctness fixtures.
 
-## macOS
+## Failure evidence
 
-For development use the per-user MediaCore path and an ad-hoc-signed plug-in when required by the macOS/AE version.
+If load fails, preserve:
 
-Before release later:
+- exact artifact;
+- AE log/crash report;
+- architecture;
+- signature state;
+- PiPL/resource result;
+- dependencies;
+- install path.
 
-- architecture slices;
-- Developer ID;
-- notarization;
-- clean install.
+If pixels fail, preserve the rendered output and diff rather than only a screenshot.
 
-Do not mix release-signing complexity into the first algorithm bring-up.
+## Acceptance gate
 
-## Windows
+The first-effect baseline is accepted only when every platform the current product actually claims has:
 
-Preserve the sample's PiPL resource-generation custom build step.
+- clean native build/link;
+- correct resource/entry contract;
+- development install;
+- AE discovery/load;
+- deterministic render fixture;
+- save/reopen;
+- matching symbols archived.
 
-Start with x64 unless product requirements explicitly demand ARM64 immediately.
-
-Archive the matching PDB once the project becomes a real product candidate.
-
-## Done means
-
-The first-effect milestone is complete only when a recorded artifact can demonstrate:
-
-- exact SDK/toolchain known;
-- native build succeeds;
-- PiPL/entry point valid;
-- AE discovers the plug-in;
-- effect can be applied;
-- deterministic frame matches expected output;
-- save/reopen does not lose basic state;
-- debugger symbols match the artifact.
-
-"Source compiles" is not done.
+A platform not yet tested remains pending; do not widen the support statement.
 
 ## Next
 
-Only after this baseline should you add SmartFX, MFR, GPU or a complex panel.
-
-See 10-TESTING/06-EVIDENCE-AND-ACCEPTANCE.md for the evidence record.
+- [MFR migration](12-RECIPES/02-MFR-MIGRATION.md)
+- [Render correctness](12-RECIPES/../10-TESTING/02-RENDER-CORRECTNESS.md)
+- [macOS build](12-RECIPES/../08-MACOS/README.md)
+- [Windows build](12-RECIPES/../09-WINDOWS/README.md)
 
 
 ---
@@ -9492,156 +9556,187 @@ See 10-TESTING/06-EVIDENCE-AND-ACCEPTANCE.md for the evidence record.
 
 # Recipe — migrate an existing effect to MFR
 
-## Rule 0
+## Goal
 
-Keep MFR capability disabled in the shipping build until concurrency evidence exists.
+Enable Multi-Frame Rendering only after the effect is actually safe under concurrent render selectors.
 
-Use a separately identifiable experimental build while migrating.
+The public AE SDK guidance requires an effect to be thread-safe before it sets PF_OutFlag2_SUPPORTS_THREADED_RENDERING.
 
-## Step 1 — inventory mutable state
+## Phase 1 — keep the shipping flag off
+
+Start with the effect behaving as non-MFR capable.
+
+Create a separate migration branch/build. Do not set the support flag first and use crashes as the discovery method.
+
+## Phase 2 — inventory mutable state
 
 List every:
 
 - global/static variable;
+- global_data write;
+- sequence_data read/write;
 - singleton;
-- sequence/instance object;
-- cache;
-- lazy initializer;
-- third-party library;
+- lazy initialization path;
 - scratch buffer;
-- log/profiler object.
+- cache;
+- third-party library global;
+- random-number generator;
+- log sink;
+- GPU/device state;
+- lock.
 
-For each, classify:
+Classify each:
 
 ~~~text
 immutable shared
-per-effect-instance
-per-render-frame/thread
-host-owned borrowed
-product cache with synchronization
+instance-owned
+frame-local
+thread-local
+host-owned
 unsafe/unknown
 ~~~
 
-Unknown is a blocker until resolved.
+Unknown is not thread-safe.
 
-## Step 2 — inspect render writes
+## Phase 3 — inspect render-time sequence state
 
-Search every render/pre-render callback for writes to shared or sequence state.
+For modern MFR behavior, treat render-time sequence data as read-only unless using the SDK mechanisms intended for mutable render state.
 
-Ask:
+Prefer:
 
-- can two frames write this simultaneously?;
-- can two effect instances collide?;
-- is state keyed by all dependencies?;
-- can cancel/error leave half-written state?;
-- is any pointer borrowed beyond callback lifetime?
+- read-only sequence data where possible;
+- Compute Cache for expensive shareable computed state;
+- frame-local scratch for transient mutation.
 
-## Step 3 — make scratch local
+The compatibility flag for mutable render sequence data is not a substitute for architecture review; it can carry a performance cost.
 
-Move temporary render data to:
+## Phase 4 — remove hidden serialization
 
-- stack/local objects;
-- frame-local allocation;
-- host-supported thread-local render data;
-- immutable shared tables.
+A single global mutex can make the effect technically race-free while destroying MFR scaling.
 
-Do not make scratch safe by placing one giant global mutex around the render.
+Check every lock:
 
-## Step 4 — caches
+- what state it protects;
+- maximum hold time;
+- whether independent instances contend;
+- whether a host suite/checkout is called while held.
 
-A cache needs:
+Do not hold blocking product locks across host calls; SDK MFR guidance warns this can deadlock.
 
-- complete key;
-- immutable or safely synchronized values;
-- bounded lifetime/size;
-- cancellation/error semantics;
-- no stale project/parameter dependency.
+## Phase 5 — make callbacks re-entrant
 
-If using host cache APIs, follow their documented ownership and receipt rules.
+Render-related callbacks must not depend on a global current frame/current instance.
 
-## Step 5 — third-party code
+Good pattern:
 
-Prove thread safety or isolate it.
+~~~text
+callback inputs
+→ acquire immutable/shared resources
+→ frame-local context
+→ render
+→ release/checkin
+~~~
 
-A library working in multiple applications does not prove concurrent calls are safe.
+Every failure path must still release/checkin resources.
 
-If it has hidden global state, consider:
+## Phase 6 — third-party dependencies
 
-- immutable precomputation;
-- per-instance context;
-- serialized adapter only around the unsafe library;
-- replacement library.
+For each library used during render, obtain evidence for concurrent use.
 
-Measure serialization cost.
+If thread safety is unknown:
 
-## Step 6 — host calls and locks
+- isolate calls behind a deliberately serialized boundary and measure the cost;
+- move work outside concurrent render if semantics permit;
+- replace the dependency;
+- keep MFR disabled.
 
-Never hold a product mutex across a host callback/suite call unless the API and lock ordering are explicitly proven safe.
+Do not infer thread safety from the fact that the library is popular.
 
-This is a deadlock risk.
+## Phase 7 — static/global analysis
 
-## Step 7 — create diagnostic stress fixture
+Use symbol/static analysis as a discovery aid, not as proof.
 
-Use several instances with intentionally different outputs/parameters.
+A scan can find suspicious globals but cannot prove:
 
-Run:
+- correct ownership;
+- no stale pointer;
+- no race inside a third-party library;
+- no deadlock;
+- correct render output.
 
-- long render;
-- 20+ instances;
-- multiple comps;
-- random seek;
+## Phase 8 — create diagnostic fixtures
+
+At minimum:
+
+- many instances with different parameter values;
+- long composition;
+- mixed frame complexity;
+- multiple compositions;
 - cancel/restart;
 - cache purge;
-- repeated 50-100+ loops;
-- GPU + MFR if both claimed.
+- MFR off/on comparison.
 
-Log lightweight instance/frame/thread identity.
+Use visually distinctive instance outputs so state bleed is obvious.
 
-## Step 8 — compare MFR off vs on
+## Phase 9 — repeated stress
 
-Correctness first.
+Run enough repeated renders to expose rare scheduling bugs.
 
-Expected:
+Record:
 
-- deterministic output;
-- no state bleed;
-- no crash;
-- no hang;
-- no unbounded memory growth.
+- output hash/diff;
+- crash/hang;
+- memory trend;
+- thread/instance/frame identity in diagnostic logs;
+- timeout/thread dump on hang.
 
-Pixel comparison must use the render-correctness tolerance defined before the migration.
+One successful render is not acceptance.
 
-## Step 9 — enable capability only in candidate
+## Phase 10 — enable the flag in the candidate
 
-After stress passes, enable the MFR declaration in a candidate build.
+Only after the review and stress harness exist, set the MFR support flag in the candidate build.
 
-Then repeat host tests because changing capability flags changes scheduling.
+Repeat:
 
-## Step 10 — performance
+~~~text
+MFR off reference
+→ MFR on
+→ repeated render
+→ cancel
+→ save/reopen
+→ CPU/GPU combinations if GPU is claimed
+~~~
 
-Measure:
+Output must remain within the predefined correctness tolerance.
 
-- wall time;
+## Phase 11 — performance
+
+After correctness:
+
+- measure wall time;
 - CPU utilization;
-- peak memory;
 - lock wait;
-- speedup vs MFR off.
+- peak memory;
+- cache behavior.
 
-A globally serialized MFR-safe effect may be correct but deliver no benefit. That is a performance decision, not a correctness PASS.
+MFR support that serializes on one global lock may be correct but not useful.
 
-## Step 11 — release gate
+## Acceptance gate
 
-Ship MFR only when:
+Ship MFR support only if:
 
-- correctness PASS;
-- repeated stress PASS;
-- cancellation PASS;
-- migration/persistence PASS;
-- memory bounded;
-- performance acceptable;
-- every claimed platform/architecture covered.
+- mutable state inventory has no unresolved item;
+- concurrency stress passes repeatedly;
+- MFR off/on pixels match expected tolerance;
+- cancellation and error cleanup pass;
+- no deadlock/hang;
+- memory is bounded;
+- third-party dependencies have a safe policy;
+- performance does not reveal accidental global serialization.
 
-Otherwise keep the feature flag off and document the limitation.
+If not, keep PF_OutFlag2_SUPPORTS_THREADED_RENDERING disabled.
+
+See [MFR stress tests](12-RECIPES/../10-TESTING/03-MFR-STRESS.md).
 
 
 ---
@@ -9650,173 +9745,187 @@ Otherwise keep the feature flag off and document the limitation.
 
 # Recipe — plug-in does not load
 
-Do not randomly edit code. Diagnose the loader chain from outside inward.
+## Goal
 
-## 1 — is the file in a scanned location?
+Reduce a load failure to one layer instead of changing code blindly.
+
+Use this order:
+
+~~~text
+discovery
+→ architecture
+→ signature/trust
+→ dependencies
+→ PiPL/resource
+→ exported entry point
+→ initialization
+→ host/version compatibility
+~~~
+
+## 1. Prove the host sees the location
+
+Record the exact installed path.
 
 Check:
 
-- exact installed path;
-- expected package suffix/layout;
-- installer log;
-- file actually exists after install;
-- directory naming does not disable scanning;
-- common MediaCore vs AE-specific policy is intentional.
+- correct native plug-in folder;
+- expected bundle/file suffix;
+- no duplicate older copy earlier in the search path;
+- no installer placing the artifact into another AE version;
+- permissions allow the host to read it.
 
-For Windows release installers, confirm the documented Adobe registry path was resolved rather than guessed.
+For debugging, temporarily remove duplicate product builds so only one candidate exists.
 
-## 2 — is the artifact the expected build?
+## 2. Compare with an untouched sample
 
-Record:
+On the same machine and AE build:
 
-- version;
-- git SHA if available;
-- binary SHA-256;
-- architecture;
-- timestamp/build identity.
-
-A stale copy in another scanned folder can make you debug the wrong plug-in.
-
-Search for duplicate installed versions.
-
-## 3 — architecture
-
-macOS:
-
-~~~bash
-lipo -info "MyPlugin.plugin/Contents/MacOS/MyPlugin"
+~~~text
+known-good Adobe sample
+→ same development install policy
+→ launch AE
 ~~~
 
-Verify the slice AE is currently running.
+If the sample also fails, investigate environment/toolchain/install policy before product code.
 
-Windows:
+## 3. Verify architecture
 
-- inspect PE architecture;
-- verify x64 vs ARM64;
-- verify helper/DLL architecture too.
+### macOS
 
-A correct main binary with one wrong-architecture dependency still fails.
-
-## 4 — PiPL/resource
-
-Check:
-
-- resource exists;
-- plug-in Kind/type is intended;
-- entry point string matches export;
-- architecture entry declaration matches binary;
-- capability flags agree with runtime setup;
-- Windows resource conversion step actually ran.
-
-When possible compare against the untouched sample project.
-
-## 5 — exported symbol
-
-Inspect the final native binary for the expected host entry point.
-
-Do not assume the source function name guarantees the linker exported it.
-
-Check C linkage/name decoration rules.
-
-## 6 — signing
-
-macOS development/release:
+Inspect the executable inside the bundle:
 
 ~~~bash
-codesign -vvv --strict "MyPlugin.plugin"
+lipo -info "/path/MyPlugin.plugin/Contents/MacOS/MyPlugin"
 ~~~
 
-Inspect entitlements/identity as appropriate.
+The required host architecture must exist and agree with PiPL declarations.
 
-On current macOS versions, unsigned development plug-ins may be rejected.
+### Windows
 
-Windows:
+Inspect PE machine type and packaged dependencies.
+
+An x64 .aex does not become ARM64-native because Windows can emulate unrelated applications.
+
+## 4. Verify trust/signing
+
+### macOS
+
+Verify the actual installed bundle, not a build-directory copy:
+
+~~~bash
+codesign -vvv --strict "/path/MyPlugin.plugin"
+~~~
+
+For release artifacts also verify the intended Developer ID/notarization path.
+
+### Windows
 
 ~~~bat
 signtool verify /pa /v MyPlugin.aex
 ~~~
 
-A signature is not required for every development load scenario, but a broken shipping signature/package is a separate release defect.
+Code signing proves identity/integrity, not AE compatibility, but trust failures must be eliminated before deeper debugging.
 
-## 7 — dependencies
-
-macOS:
-
-~~~bash
-otool -L "MyPlugin.plugin/Contents/MacOS/MyPlugin"
-~~~
-
-Windows:
-
-- inspect imports/dependencies with appropriate PE tooling.
+## 5. Inspect dependencies
 
 Look for:
 
 - missing dylib/DLL;
-- wrong architecture;
-- development-only path;
-- Debug CRT;
-- missing GPU/licensing helper;
-- incompatible third-party runtime.
+- wrong architecture dependency;
+- debug runtime dependency;
+- absolute developer-local search path;
+- missing helper/framework;
+- incompatible commercial SDK runtime.
 
-## 8 — initialization crash
+macOS: inspect linked dylibs and nested code architecture.
 
-If AE discovers the module and crashes during load:
+Windows: inspect imports and ensure the clean target machine actually has every required runtime.
 
-- attach debugger before host launch if possible;
-- inspect crash report/dump;
-- minimize global/static constructors;
-- disable optional subsystems;
-- compare against sample baseline;
-- confirm callback exception containment.
+## 6. Verify PiPL/resource
 
-A module that crashes before logging its own initializer may still fail in static initialization.
+Check:
 
-## 9 — duplicate IDs/names/resources
+- PiPL resource was generated;
+- Kind/type is correct for the plug-in family;
+- entry symbol string is correct;
+- architecture declaration matches the binary;
+- effect metadata/version/category are coherent;
+- capability flags do not contradict GlobalSetup.
 
-Check product identifiers copied from Skeleton or another plug-in.
+On Windows, verify the custom .r → resource step was not lost while cloning the project.
 
-Two modules with conflicting identifiers/resources can create confusing behavior.
+## 7. Verify exported entry point
 
-Rename all required identity fields deliberately; do not mass-search/replace blindly.
+The symbol named by the PiPL/resource must exist with the expected C ABI/calling convention.
 
-## 10 — AE cache/preferences only after evidence
+Do not debug EffectMain internals before confirming the host can resolve the symbol.
 
-Clearing preferences/caches can be useful, but do not make it step 1 for every loader problem.
+## 8. Stop risky global initialization
 
-First prove the installed artifact/path/architecture/resource are correct so clearing state does not hide a packaging defect.
+If discovery happens but AE crashes or silently rejects during module load, inspect:
 
-## Minimal loader report
+- global/static constructors;
+- filesystem/network work before host initialization;
+- licensing startup;
+- GPU runtime initialization;
+- helper process launch;
+- environment-variable assumptions.
 
-Record:
+Prefer explicit initialization inside the documented host lifecycle so failures can be reported and cleaned up.
 
-~~~text
-AE version/build:
-OS/arch:
-plugin path:
-plugin SHA-256:
-binary architecture:
-PiPL entry:
-exported entry:
-signature result:
-dependencies:
-observed host behavior:
-~~~
+## 9. Attach debugger / collect crash evidence
 
-## Stop rule
+For an initialization crash:
 
-Change only one layer at a time.
+- exact plug-in hash;
+- exact AE build;
+- crash report/dump;
+- matching dSYM/PDB;
+- top symbolized frames;
+- last product log event.
 
-The goal is to identify the first broken link:
+See [Crash diagnostics](12-RECIPES/../10-TESTING/05-CRASH-DIAGNOSTICS.md).
 
-~~~text
-discovery
-→ architecture
-→ resource/export
-→ trust/signing
-→ dependencies
-→ initialization
-~~~
+## 10. Version boundary
+
+If the same build works in one AE generation and not another:
+
+1. reproduce with identical artifact;
+2. compare host version only;
+3. check SDK compatibility/release notes;
+4. check suite acquisition/version assumptions;
+5. check PiPL capability/version metadata;
+6. preserve both PASS and FAIL evidence.
+
+Do not immediately patch around an assumed Adobe regression.
+
+## 11. Binary search recent changes
+
+If a previously loadable product stopped loading, bisect high-risk changes:
+
+- project/resource file;
+- entry point;
+- architecture;
+- signing;
+- dependency;
+- SDK/toolset;
+- initialization.
+
+Avoid simultaneous speculative fixes.
+
+## Acceptance gate
+
+The incident is resolved when the exact artifact:
+
+- is discovered from the intended path;
+- has correct architecture/dependencies;
+- passes intended trust/signature checks;
+- has correct PiPL/entry contract;
+- completes initialization;
+- appears/loads in the target AE build;
+- has a recorded root cause.
+
+A workaround without root-cause evidence remains a workaround.
 
 
 ---
@@ -9827,158 +9936,173 @@ discovery
 
 ## Goal
 
-Prove that every claimed GPU backend implements the same product semantics as the CPU reference within a predeclared numerical tolerance.
+Prove that each claimed GPU backend implements the same effect semantics as the CPU reference within a predefined numerical tolerance.
 
-Performance comes after correctness.
+GPU support is not accepted because the GPU selector runs or because output looks similar.
 
-## 1 — freeze the reference
+## 1. Freeze the semantic reference
 
-Choose a known CPU implementation and artifact version.
+Before GPU tuning, freeze a known-good CPU implementation and its fixtures.
 
 Record:
 
-- git SHA;
-- binary hash;
+- product commit/hash;
 - AE build;
-- project/fixture version.
+- pixel format;
+- parameter vector;
+- input fixture hash;
+- expected CPU output.
 
-Do not change CPU semantics while evaluating GPU differences without explicitly updating the reference.
+If CPU semantics are still changing, equivalence results are unstable.
 
-## 2 — define fixtures
+## 2. Define comparison metrics before looking at GPU output
+
+For integer/exact paths, exact equality may be appropriate.
+
+For float/GPU paths define:
+
+- max absolute channel error;
+- RMS/mean error;
+- alpha-specific threshold;
+- allowed count/percentage above threshold;
+- NaN/Inf policy.
+
+Tolerance chosen after the failure is not a test specification.
+
+## 3. Use diagnostic inputs
 
 Include:
 
-- gradients;
-- impulse pixels;
-- checkerboards;
-- transparency;
-- colored transparent edges;
-- min/max parameters;
-- odd dimensions;
-- nonzero origins/ROI;
-- HDR negative/positive float values for 32-bpc;
-- temporal cases if relevant.
+- black/white/mid-gray;
+- primary/secondary colors;
+- horizontal/vertical gradients;
+- one-pixel impulse;
+- checkerboard;
+- transparent colored edges;
+- partial alpha;
+- odd frame sizes;
+- HDR negative/positive values where 32-bpc semantics allow them.
 
-Natural images can supplement, not replace, diagnostic fixtures.
+Natural photographs alone hide edge/indexing bugs.
 
-## 3 — define tolerance before results
+## 4. Test parameter boundaries
 
-For each depth/backend define:
+For every important parameter:
 
-- max absolute RGB error;
-- alpha error;
-- RMS/mean error;
-- allowed count above threshold;
-- NaN/Inf policy.
+- default;
+- minimum;
+- maximum;
+- values around branch boundaries;
+- animated values;
+- combinations that change kernel/path.
 
-Exact copy-like effects may require exact output.
+Do not compare only defaults.
 
-## 4 — capture CPU output
+## 5. Match render context
 
-Render the same frame/settings to a comparison-friendly representation.
+CPU and GPU comparisons must use the same:
 
-Avoid lossy codecs.
+- frame/time;
+- project color settings;
+- input;
+- output bit depth;
+- parameters;
+- ROI/request;
+- host version.
 
-Store reference hash/metadata.
+Otherwise the diff mixes algorithm and environment.
 
-## 5 — capture GPU output
+## 6. Preserve raw comparison evidence
 
-For each backend/device class:
+For each failed frame save:
 
-- same project;
-- same frame/time;
-- same parameters;
-- same color settings;
-- same output representation.
+- CPU output;
+- GPU output;
+- absolute-difference image;
+- threshold mask;
+- worst pixel coordinates/values;
+- summary metrics.
 
-Record backend/device/driver.
+This turns a visual mismatch into actionable data.
 
-## 6 — compute differences
+## 7. Common mismatch classes
 
-Report:
+### Alpha/premultiplication
 
-~~~text
-max abs diff
-RMS diff
-alpha max diff
-pixels above tolerance
-worst pixel coordinates/values
-~~~
+RGB can look correct while alpha or transparent RGB is wrong.
 
-Generate a heatmap/threshold mask on failure.
+### Clamp/order
 
-## 7 — investigate semantic causes
+CPU may clamp before an operation while GPU clamps after.
 
-Typical differences:
+### Coordinate/origin
 
-- clamp order;
-- integer normalization;
-- premultiply/unpremultiply;
-- half/float precision;
-- coordinate origin;
-- edge sampling;
-- texture interpolation mode;
-- color transform applied in one path only;
-- different rounding.
+ROI, nonzero origin or odd sizes expose indexing assumptions.
 
-Do not raise tolerance until the cause is understood.
+### Precision
 
-## 8 — repeat across BPC
+Different instruction ordering can create acceptable low-bit float drift; it must remain inside the predefined tolerance.
 
-Test every mode claimed:
+### NaN/Inf
 
-- 8-bpc;
-- 16-bpc;
-- 32-bpc.
+Explicitly define how invalid floating values are handled. Do not allow backend-specific accidental behavior.
 
-Do not infer 16/32 correctness from an 8-bit result.
+## 8. Lifecycle/fallback
 
-## 9 — ROI and odd sizes
+GPU correctness also includes setup/setdown and fallback.
 
-For SmartFX/GPU paths test:
-
-- partial region;
-- empty region;
-- single pixel;
-- odd width/height;
-- cropped/nonzero origins.
-
-Many GPU indexing bugs hide on standard HD dimensions.
-
-## 10 — MFR
-
-If MFR and GPU are both claimed, repeat equivalence under concurrent rendering.
-
-GPU correctness in single-frame preview is not enough.
-
-## 11 — fallback
-
-Force or simulate:
-
-- unsupported device;
-- GPU initialization failure;
-- backend unavailable;
-- allocation failure where testable.
-
-Expected behavior must be defined:
+Test:
 
 ~~~text
-safe CPU fallback
-or
-clear supported failure
+GPU available
+→ GPU render
+→ device/setup failure injected or unavailable
+→ CPU fallback / supported error path
+→ subsequent render remains valid
 ~~~
 
-Never return an uninitialized/partial frame as success.
+No stale gpu_data or device resources after setdown.
 
-## 12 — performance only after PASS
+## 9. MFR + GPU
 
-Once equivalence passes, benchmark transfer, kernel and synchronization cost.
+If both features are claimed, test them together.
 
-A GPU backend that is correct but slower may still be useful for other reasons, but that decision must be explicit.
+Look for:
 
-## Release evidence
+- shared device state races;
+- frame/instance mix-up;
+- unsafe caches;
+- cancellation;
+- device teardown while work exists.
 
-Store CPU/GPU diff report with artifact/environment identity described in 10-TESTING/06-EVIDENCE-AND-ACCEPTANCE.md.
+Passing CPU MFR and single-frame GPU separately is not enough.
+
+## 10. Performance comes after correctness
+
+Only after equivalence passes:
+
+- kernel time;
+- upload/download;
+- synchronization;
+- setup;
+- total frame time;
+- crossover by resolution.
+
+A faster wrong result is a correctness failure.
+
+## Acceptance gate
+
+For every claimed GPU backend and pixel depth:
+
+- comparison fixtures pass predefined tolerance;
+- alpha passes independently;
+- odd/ROI cases pass where relevant;
+- no NaN/Inf regression;
+- setup/setdown pass;
+- CPU fallback/error path passes;
+- MFR combination passes if both are advertised.
+
+See [Render correctness](12-RECIPES/../10-TESTING/02-RENDER-CORRECTNESS.md) and [Performance](12-RECIPES/../10-TESTING/04-PERFORMANCE.md).
 
 
 ---
@@ -9989,31 +10113,53 @@ Store CPU/GPU diff report with artifact/environment identity described in 10-TES
 
 ## Goal
 
-Build a hybrid product where the panel is replaceable, native code handles the work that belongs natively, and no layer depends on undocumented shared state.
+Build a panel-driven product without coupling UI runtime, After Effects automation and heavy native compute into one fragile component.
 
-## Architecture
+In the 2026 transition period, keep the UI shell replaceable so CEP-specific code can later be exchanged for a verified AE UXP path.
+
+## 1. Draw the ownership diagram first
 
 ~~~text
 UI shell
-  CEP today / future AE UXP
-       |
-       | versioned plain command
-       v
+  CEP now / future verified AE UXP
+        |
+        | commands / responses
+        v
 Bridge adapter
-       |
-       +---- project automation ---> ExtendScript / supported host API
-       |
-       +---- native control -------> Effect params / AEGP / PICA / helper IPC
-                                      |
-                                      v
-                                 compute core
+        |
+        v
+AE automation layer
+  ExtendScript / supported host API
+        |
+        +---- project mutation
+        |
+        +---- control request
+                  |
+                  v
+Native core
+  Effect / AEGP / shared suite / helper
 ~~~
 
-Use the simplest bridge that fits the operation.
+Assign one owner for every persistent state.
 
-## 1 — define commands before transport
+## 2. Separate control and data planes
 
-Example:
+Panel bridge carries:
+
+- command IDs;
+- small parameter objects;
+- paths/IDs;
+- progress;
+- status/error;
+- invalidation.
+
+Do not send pixel/audio/large binary buffers as giant evalScript/Base64 messages unless there is a measured, unavoidable reason.
+
+Keep heavy data native or in a purpose-built helper/data path.
+
+## 3. Define protocol version 1 before UI implementation
+
+Request:
 
 ~~~json
 {
@@ -10021,7 +10167,7 @@ Example:
   "requestId": "123",
   "command": "analyzeFrame",
   "payload": {
-    "layerId": "product-stable-id",
+    "layerId": 42,
     "time": 1.25
   }
 }
@@ -10034,141 +10180,157 @@ Response:
   "ok": true,
   "requestId": "123",
   "result": {
-    "jobId": "job-44"
+    "status": "ready"
   }
 }
 ~~~
 
-Do not expose raw pointers/AE handles.
+Error:
 
-## 2 — prefer project state when enough
-
-If the panel only needs to control an effect:
-
-~~~text
-panel
-→ JSX dispatcher
-→ find effect by match name
-→ set normal parameter
-→ AE persists/animates it
+~~~json
+{
+  "ok": false,
+  "requestId": "123",
+  "error": {
+    "code": "NO_LAYER",
+    "message": "Target layer is not available"
+  }
+}
 ~~~
 
-This is preferable to inventing custom IPC for values that naturally belong in the project.
+Human text is not the only machine-readable error contract.
 
-## 3 — choose native bridge only for native need
+## 4. One panel bridge
 
-Use AEGP/PICA/helper IPC when you need:
-
-- high-performance compute;
-- native service lifecycle;
-- data not suitable for effect parameters;
-- integration unavailable to scripting.
-
-Document why the extra bridge exists.
-
-## 4 — control plane vs data plane
-
-Panel/JSX messages carry:
-
-- commands;
-- IDs;
-- options;
-- progress/status;
-- small summaries.
-
-Large frames/buffers stay native/helper-side.
-
-Do not JSON-serialize megabytes of pixels through evalScript.
-
-## 5 — request lifecycle
-
-Define:
+Do not scatter evalScript or native IPC calls through UI components.
 
 ~~~text
-created
-→ accepted
-→ running
-→ completed | failed | cancelled
+component
+→ domain command
+→ bridge.request
+→ transport adapter
 ~~~
 
-Panel must know what happens if:
+This is what makes a future panel-runtime migration practical.
 
-- user closes panel;
-- project changes;
-- helper restarts;
-- AE quits;
-- a late response arrives;
-- user starts a newer request.
+## 5. Validate every boundary
 
-Use request IDs/revisions to drop stale replies.
+Panel side validates user inputs.
 
-## 6 — threading
+Automation/native side validates again:
 
-Worker/helper thread:
+- protocol;
+- command allowlist;
+- message size;
+- enum/range;
+- path;
+- target project object existence;
+- native capability/version.
 
-- pure compute;
-- product-owned buffers;
-- filesystem/network if designed there.
+Never assume local UI input is trusted because it came from your own panel.
 
-Host-side command:
+## 6. Use explicit handshake
 
-- resolve AE objects;
-- call documented suites;
-- mutate project.
+At startup:
 
-Do not touch project handles from arbitrary worker threads.
+~~~text
+panel boot
+→ bridge handshake
+→ protocol versions/capabilities
+→ query authoritative host state
+→ render UI
+~~~
 
-## 7 — backpressure
+If native/helper version is incompatible, fail clearly with component mismatch instead of sending unknown commands.
 
-Pick a policy:
+## 7. Avoid stale responses
 
-- reject while busy;
-- cancel previous;
-- coalesce to latest;
-- bounded queue.
+Use request/generation identity.
 
-Never create an unbounded queue because a slider fires faster than analysis completes.
+~~~text
+request generation 7
+user changes selection → generation 8
+response 7 arrives
+→ ignore
+~~~
 
-## 8 — security
+This matters for selection/preview-heavy panels.
 
-Reject:
+## 8. Choose the native bridge deliberately
 
-- unknown protocol versions;
-- unknown commands;
-- oversized payloads;
-- arbitrary executable paths;
-- arbitrary JSX strings;
-- invalid file traversal.
+Possible documented/product-owned paths:
 
-Treat local IPC as input, not trusted memory.
+- AEGP EffectCallGeneric for small synchronous commands to one effect instance;
+- published PICA suite for in-process native service;
+- AEGP ExecuteScript for rare scripting-DOM capability;
+- explicit external IPC for a helper/service.
 
-## 9 — CEP today
+Do not make undocumented AE internal IPC a shipping dependency.
 
-Centralize all evalScript calls in one adapter.
+## 9. Long operation lifecycle
 
-Adobe's CEP documentation states host JSX runs on the host main thread, so split long commands and avoid polling.
+~~~text
+start(requestId)
+→ progress
+→ cancel(requestId)
+→ canceled or completed
+~~~
 
-## 10 — UXP migration
+Panel reload must not resurrect an old operation result into new state.
 
-When AE UXP is actually available, implement a new AeBridge adapter only after its AE-specific API is verified.
+Define timeout/liveness behavior for helpers.
 
-Do not rewrite the domain model just to change panel runtime.
+## 10. Panel reload/restart
 
-## Acceptance
+Panel DOM is not authoritative persistence.
 
-Test:
+On reload:
 
-- normal command;
-- invalid payload;
-- native/helper unavailable;
-- cancellation;
-- stale response;
-- project switch;
-- panel reload;
-- AE restart;
-- version mismatch.
+1. create bridge;
+2. handshake;
+3. query host/product state;
+4. rebuild UI;
+5. ignore stale responses from the previous generation.
 
-A UI demo that only completes the happy path is not a finished hybrid protocol.
+Test AE restart too.
+
+## 11. Thread boundary
+
+Heavy worker may do pure compute/IO.
+
+AE project/suite access stays on the documented host path unless a specific API explicitly permits other threads.
+
+Do not hold a product mutex while calling back into AE.
+
+## 12. Packaging/version skew
+
+Treat these as independently identifiable components:
+
+- panel;
+- JSX/automation bundle;
+- native plug-in;
+- helper.
+
+Installer/update tests must cover partial mismatch or ensure atomic replacement.
+
+## 13. Acceptance gate
+
+The hybrid product baseline passes when:
+
+- fresh install opens panel;
+- handshake succeeds;
+- one read command works;
+- one project mutation works;
+- one native command works;
+- malformed command is rejected;
+- stale response is ignored;
+- cancel works;
+- panel reload reconstructs state;
+- AE restart works;
+- missing/wrong native component gives clear recovery;
+- no large binary traffic is accidentally routed through JSX.
+
+See [Communication architecture](12-RECIPES/../15-COMMUNICATION/README.md).
 
 
 ---
@@ -10177,147 +10339,230 @@ A UI demo that only completes the happy path is not a finished hybrid protocol.
 
 # Recipe — profiling a slow effect
 
-## Rule
+## Goal
 
-Profile a fixed reproducible workload. Never optimize from a vague report that "the effect feels slow".
+Find the actual bottleneck of a reproducible user operation, change one cause, then prove both performance improvement and unchanged correctness.
 
-## 1 — freeze environment
+## 1. Freeze the workload
 
 Record:
 
-- product build/hash;
-- AE exact build;
+- project/fixture hash;
+- AE exact version/build;
 - OS;
-- CPU;
-- GPU/driver;
-- project fixture;
-- resolution/duration/BPC;
+- CPU/GPU/RAM;
+- driver;
+- plug-in hash;
+- bit depth;
+- resolution;
 - MFR state;
-- GPU state.
+- GPU state;
+- render path.
 
-Run the baseline more than once to estimate noise.
+Do not compare measurements from different environments without rerunning the baseline there.
 
-## 2 — measure whole operation
+## 2. Define the user-level metric
 
-Start from user-visible wall time:
+Choose the metric that matters:
 
-- first frame;
+- first preview frame;
 - warm frame;
-- full comp render;
-- panel command latency if relevant.
+- N-frame render;
+- render queue wall time;
+- panel command latency;
+- project-open operation;
+- memory peak.
 
-If the total problem is 200 ms, optimizing a 1 ms function cannot solve it.
+Start from end-to-end time, not a guessed function.
 
-## 3 — isolate feature switches
+## 3. Warmup policy
 
-Compare:
-
-- CPU vs GPU;
-- MFR off vs on;
-- cache cold vs warm;
-- preview vs render queue if relevant.
-
-Change one dimension at a time.
-
-## 4 — instrument high-level stages
-
-Example:
+Measure separately:
 
 ~~~text
-checkout/input prep
-→ conversion
-→ algorithm
-→ output conversion
-→ host checkin
+cold process/plugin startup
+first GPU/device setup
+first cache fill
+steady state
 ~~~
 
-For SmartFX include pre-render/checkouts.
+Do not average them together unless the product question actually concerns that combined experience.
 
-For GPU include upload/kernel/sync/download.
+## 4. Establish baseline distribution
 
-## 5 — allocations
+Run enough repetitions to see noise.
+
+Record at least:
+
+- sample count;
+- median;
+- p95 when meaningful;
+- min/max or raw samples;
+- thermal/power condition.
+
+A single stopwatch result is not a performance baseline.
+
+## 5. Split by execution path
+
+First toggles:
+
+~~~text
+GPU on vs CPU
+MFR on vs off
+cache cold vs warm
+small vs large frame
+~~~
+
+This identifies which subsystem deserves deeper profiling.
+
+## 6. Time major stages
+
+For a render effect:
+
+~~~text
+host checkout
+→ input conversion/preparation
+→ core algorithm
+→ cache work
+→ GPU upload
+→ kernel
+→ synchronization
+→ download/conversion
+→ checkin/return
+~~~
+
+Do not optimize a 1 ms kernel if 15 ms is spent waiting/copying.
+
+## 7. Inspect allocation pressure
 
 Measure:
 
 - allocations per frame;
-- large transient buffers;
-- reallocations caused by size changes;
-- memory peak;
-- retained cache.
+- transient buffer sizes;
+- peak memory;
+- retained cache;
+- memory after purge/project close.
 
-A fast algorithm can be dominated by allocation churn.
+Common improvement is reusing correctly owned scratch, but never reuse a buffer across concurrent renders without a safe ownership model.
 
-## 6 — locks
+## 8. Inspect locks
 
-Measure:
+For each hot lock:
 
-- lock wait;
-- hold duration;
-- contention across instances;
-- whether lock spans host calls.
+- wait time;
+- hold time;
+- contention count;
+- which instances contend;
+- whether host calls occur while held.
 
-MFR often exposes hidden global serialization.
+A global lock can erase MFR benefit.
 
-## 7 — host interaction
+## 9. Inspect host API frequency
 
-Count expensive host calls/checkouts.
+Repeated tiny suite/checkouts or evalScript calls can dominate interactive workflows.
 
-Ask whether the same immutable data is repeatedly requested or converted.
+Batch work only when semantics remain correct.
 
-Do not cache host-owned pointers beyond their valid lifetime to save a call.
+Do not hide necessary dependency declarations to make profiling numbers smaller.
 
-## 8 — GPU
+## 10. GPU-specific profiling
 
 Separate:
 
+- preparation/upload;
+- dispatch;
+- kernel;
+- synchronization;
+- download/readback.
+
+Test multiple resolutions because GPU crossover varies with workload size.
+
+## 11. Make one change
+
+Examples:
+
+- remove redundant conversion;
+- change cache key/data structure;
+- batch host reads;
+- reduce allocations;
+- shorten lock;
+- optimize kernel;
+- avoid unnecessary readback.
+
+One isolated change gives interpretable evidence.
+
+## 12. Correctness gate before celebrating
+
+Immediately rerun:
+
+- golden pixels;
+- alpha;
+- required bit depths;
+- ROI/origins if relevant;
+- MFR stress;
+- GPU equivalence if touched.
+
+A faster stale/wrong frame is not an optimization.
+
+## 13. Rerun the exact baseline
+
+Compare candidate vs baseline in the same environment.
+
+Report both absolute and relative change.
+
+If improvement is within noise, do not market it as a performance win.
+
+## 14. Keep regression evidence
+
+Store the benchmark definition and machine-readable result beside the release/test evidence so later versions can detect regression.
+
+## Acceptance gate
+
+Keep the optimization only if:
+
+- end-user metric improves measurably;
+- correctness remains inside existing tolerances;
+- memory does not become unbounded;
+- MFR scaling is not harmed;
+- no unsupported environment-specific assumption was introduced.
+
+See [Performance testing](12-RECIPES/../10-TESTING/04-PERFORMANCE.md).
+
+
+---
+
+<!-- SOURCE: 12-RECIPES/README.md -->
+
+# Practical recipes
+
+This section turns the architecture chapters into repeatable workflows.
+
+A recipe is not a shortcut around verification. Every recipe ends with a concrete acceptance condition and points back to the deeper contract chapters.
+
+## Read order
+
+1. [First native effect](12-RECIPES/01-FIRST-EFFECT.md)
+2. [MFR migration](12-RECIPES/02-MFR-MIGRATION.md)
+3. [Plug-in does not load](12-RECIPES/03-DEBUG-PLUGIN-NOT-LOADING.md)
+4. [CPU/GPU equivalence](12-RECIPES/04-CPU-GPU-EQUIVALENCE.md)
+5. [Hybrid panel + native core](12-RECIPES/05-HYBRID-PANEL-NATIVE.md)
+6. [Profiling a slow effect](12-RECIPES/06-PROFILING.md)
+
+## Recipe rule
+
+Use this sequence:
+
 ~~~text
-world/buffer acquisition
-upload
-kernel
-synchronization
-download/conversion
+preconditions
+→ smallest reproducible change
+→ observable checks
+→ failure evidence
+→ acceptance gate
 ~~~
 
-Profile small and large frames because crossover points differ.
+Do not call a recipe complete because a compiler, documentation build or one manual preview was green.
 
-## 9 — optimize one bottleneck
-
-Make one focused change.
-
-Then rerun:
-
-1. correctness;
-2. MFR stress if affected;
-3. memory;
-4. benchmark.
-
-Do not combine five optimizations and lose the cause of a regression.
-
-## 10 — report
-
-Store:
-
-| Metric | Baseline | Candidate | Delta |
-|---|---:|---:|---:|
-| first frame | | | |
-| warm median | | | |
-| p95 | | | |
-| full render | | | |
-| peak memory | | | |
-| lock wait | | | |
-
-Attach environment/artifact identity.
-
-## Reject an "optimization" when
-
-- output leaves tolerance;
-- memory becomes unbounded;
-- cancellation worsens;
-- MFR races appear;
-- improvement is within measurement noise;
-- improvement only exists on an unsupported machine/project.
-
-Performance evidence belongs beside correctness evidence, not instead of it.
+For release evidence, see [Testing strategy](12-RECIPES/../10-TESTING/README.md) and [Release checklist](12-RECIPES/../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md).
 
 
 ---
