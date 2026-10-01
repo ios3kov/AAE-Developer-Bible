@@ -2,7 +2,7 @@
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Core API:** `PR_ArtisanEntryPoints`, `AEGP_RegisterArtisan` / `AEGP_RegisterInteractiveArtisan`, `AEGP_CanvasSuite8`, `AEGP_ArtisanUtilSuite1` plus camera/light/layer/world suites.
-**Verification level:** SDK source-reviewed; no new Artisan build or host render in this editorial iteration.
+**Evidence level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
 
 Artisan — это не «GPU effect» и не callback, который получает один layer image. Artisan регистрируется как **renderer implementation для 3D composition rendering path** и через render context запрашивает scene information у After Effects.
 
@@ -203,28 +203,254 @@ Artisan имеет смысл только после correctness. Отдель�
 - compositing/writeback;
 - interactive cache reuse.
 
-Глобальный mutex может сделать renderer thread-safe ценой полного уничтожения scaling; threading model нужно доказать конкретными host tests, а не только inspection.
+Глобальный mutex может сделать renderer менее race-prone ценой полного уничтожения scaling, но сам по себе не доказывает корректную host/thread architecture. Product runtime claims require product-specific evidence.
 
-## 16. Acceptance matrix
+## 16. Production state machine
 
-- registration + renderer visible/selectable;
-- comp without camera / explicit camera;
+A renderer should model state explicitly:
+
+~~~text
+registration/module state
+→ PR_GlobalDataH
+→ PR_InstanceDataH
+→ PR_RenderDataH
+→ temporary Canvas/World/Texture/Receipt resources
+~~~
+
+### Registration/module state
+
+Long-lived product services such as logging, immutable tables, backend/device registries and shared caches with explicit shutdown.
+
+### GlobalData
+
+Renderer-type state shared across instances where the contract permits it.
+
+### InstanceData
+
+Composition/renderer-instance state: renderer settings, scene policy and persistent configuration.
+
+### RenderData
+
+Frame/render-local state: extracted scene, temporary acceleration structures and render scratch.
+
+Borrowed host contexts such as PR_RenderContextH are not persistent product identity.
+
+## 17. Persistence and flatten/inflate
+
+If renderer instance has persistent settings:
+
+~~~text
+live InstanceData
+→ FlattenInstance
+→ versioned platform-independent bytes
+→ project/save/copy
+→ InstanceSetup
+→ validate/migrate
+→ reconstruct live InstanceData
+~~~
+
+Do not serialize raw pointers, AEGP refs, function-table pointers, GPU handles, mutexes, file descriptors or compiler-dependent object layout.
+
+Flat data should include schema version and size. Unknown/corrupt versions need explicit recovery policy.
+
+## 18. Scene extraction boundary
+
+Keep host scene extraction separate from renderer core:
+
+~~~text
+PR_RenderContextH
+→ Canvas/Camera/Light/Layer/Stream queries
+→ normalized product scene
+→ renderer core
+→ output/writeback
+~~~
+
+This reduces host calls in hot loops and keeps borrowed host refs out of long-lived renderer state.
+
+## 19. Layer/context identity
+
+Layer context is render-context-specific. Do not use layer index, source-item dimensions or prior-frame context pointers as permanent identity.
+
+If a cache needs identity, build a key from supported host identities plus render time/context/version inputs.
+
+## 20. Track mattes and bins
+
+Canvas exposes track-matte contexts and render bins, so production rendering cannot blindly reduce the host scene to one linear independent-layer vector.
+
+Define product policy for track mattes, 2D/3D mixing, transparency, precomps and unsupported compositing cases.
+
+Unsupported material scene behavior should fail/fallback explicitly rather than silently render a plausible but wrong frame.
+
+## 21. Texture acquisition policy
+
+Decide what a requested texture represents:
+
+- host-rendered layer appearance;
+- source-like surface for renderer shading;
+- matte input;
+- cacheable intermediate.
+
+Do not assume every layer should become one texture.
+
+Track texture, world and receipt cleanup obligations independently.
+
+## 22. Render receipts and cache identity
+
+Receipt is host cache evidence, not pixels.
+
+Separate host receipt validity from product scene-cache validity and backend/device state.
+
+Do not serialize receipts or reuse product acceleration structures merely because one host texture receipt remains valid.
+
+## 23. Camera and light extraction
+
+Evaluate camera, lights and layer transforms at render-context time, not UI current time.
+
+If no camera exists, define explicit product behavior rather than inventing arbitrary projection.
+
+## 24. Motion blur and shutter
+
+If product claims motion blur, shutter/time sampling must be part of scene evaluation and cache identity.
+
+Do not read transforms only at center time and call the result motion-blur support.
+
+## 25. ROI and downsample
+
+Respect render-context ROI/downsample. Do not assume full composition, 1:1 scale or zero origin.
+
+## 26. Interactive renderer state
+
+Interactive registration adds a separate view/display lifetime:
+
+~~~text
+final renderer state
+≠ interactive viewport/view state
+~~~
+
+Interactive state may include viewport transforms, display channel, exposure, checkerboard/background and transient buffers.
+
+Do not persist transient view handles inside instance data.
+
+## 27. Query callback policy
+
+Answer only documented query types the renderer supports.
+
+Unsupported queries should use the appropriate unsupported/default behavior rather than fabricated transforms.
+
+## 28. Cancellation
+
+On cancellation:
+
+~~~text
+stop new work
+→ release temporary textures/worlds/receipts
+→ drop render-local caches
+→ preserve global/instance state
+→ return cancel/error
+~~~
+
+Do not destroy persistent renderer settings because one frame was cancelled.
+
+## 29. Partial failure cleanup
+
+A render may fail after camera acquisition, multiple texture checkouts and partial acceleration-structure construction.
+
+Cleanup must release every acquired host resource and product temporary. Preserve primary render error over cleanup failures.
+
+## 30. Unsupported scene-feature policy
+
+Before implementation classify each feature:
+
+| Feature | Policy |
+|---|---|
+| camera | supported / required / fallback |
+| lights | supported / ignored / unsupported |
+| text/shape | host texture / native geometry / unsupported |
+| precomp | host texture / recursive handling / unsupported |
+| track matte | supported / explicit limitation |
+| blending | supported subset / host-assisted / unsupported |
+| motion blur | supported / unsupported |
+| effects | host texture path / unsupported custom path |
+| 2D layers | included / host-composited / unsupported |
+
+Never silently omit a feature that materially changes output.
+
+## 31. Threading and external renderer cores
+
+Do not infer Effect MFR rules.
+
+For worker/GPU/external renderer paths:
+
+- keep host refs/contexts on documented paths;
+- copy/normalize pure data before background work;
+- define cancellation and backend/device lifetime;
+- avoid product mutex across opaque host calls.
+
+## 32. Performance architecture
+
+Measure separately:
+
+- host scene enumeration;
+- property evaluation;
+- texture acquisition;
+- geometry conversion;
+- acceleration structure build/refit;
+- renderer core;
+- compositing/writeback;
+- cache lookup;
+- interactive reuse.
+
+A fast shading core can still lose to expensive scene extraction.
+
+## 33. Product validation guidance
+
+If a concrete Artisan product claims these capabilities, useful runtime cases include:
+
+- registration/selectability;
+- no-camera and explicit-camera scenes;
 - 2D + 3D mixed layers;
-- text/shape/precomp/footage layers;
+- footage/text/shape/precomp;
 - cameras/lights;
 - track mattes;
-- effects before texture/render;
+- effects through intended texture path;
 - transparency/blending;
 - motion blur/shutter;
 - ROI/downsample;
-- 8/16/32-bpc and color management as applicable;
-- save/reopen/duplicate comp/instance flattening;
-- repeated render/context teardown;
-- cancellation/errors;
-- interactive/final parity if interactive claimed;
+- supported bit depth/color behavior;
+- save/reopen/duplicate comp;
+- instance flatten/migration;
+- repeated frame/context teardown;
+- cancellation/error cleanup;
+- renderer switching;
+- interactive/final parity if claimed;
 - performance/memory profiling.
 
-До этого Artisan chapter source-reviewed, а не host-verified.
+These establish product support evidence. Bible remains SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED unless a separate runtime record exists.
+
+## 34. Production workflow
+
+~~~text
+define supported scene semantics
+→ use exact Artie sample as lifecycle skeleton
+→ define Global/Instance/Render state
+→ implement versioned instance persistence
+→ normalize one simple scene from RenderContext
+→ render deterministic output
+→ add textures/mattes/camera/lights deliberately
+→ add cancellation/failure cleanup
+→ add interactive path only if needed
+→ profile/cache after correctness
+~~~
+
+Do not replace every Artie subsystem at once.
+
+## Related chapters
+
+- [Artisan native integration](../14-NATIVE-INTEGRATIONS/09-ARTISAN.md)
+- [Lifetime / threading](../17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md)
+- [Performance architecture](../01-ARCHITECTURE/05-PERFORMANCE-ARCHITECTURE.md)
+- [Memory / persistence](../17-NATIVE-SUITE-COOKBOOK/12-MEMORY-UNDO-PERSISTENCE.md)
+- [Testing](../10-TESTING/README.md)
 
 ## Source record
 
