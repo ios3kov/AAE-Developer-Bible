@@ -6,7 +6,7 @@
 
 ## Место в плане
 
-Итерация расширяет предметную часть stages 3–4 и документирует две integration families из Gate 6. **Gate 6 не закрыт:** нужен минимальный complete example, build/install/host report и correctness/stress evidence.
+Итерация расширяет предметную часть Bible и документирует две integration families. Source review не заявляет runtime behavior; отдельный complete product example не является обязательным условием готовности документации.
 
 Обновлены:
 
@@ -154,4 +154,4 @@ AEIO handles media I/O; Artisan handles renderer integration. Neither replaces t
 | Artisan save/reopen/interactive/resource stress | NOT RUN |
 | Windows host tests | NOT RUN |
 
-GitHub docs CI, if green, confirms repository/document build only. Gate 6/7 remain open.
+GitHub docs CI подтверждает repository/document build. Runtime/product evidence остаётся отдельным классом доказательств.
