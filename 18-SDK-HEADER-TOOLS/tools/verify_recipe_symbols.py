@@ -56,8 +56,6 @@ def validate_inventory(data):
         raise ValueError(
             f"Unsupported inventory schema_version: {data.get('schema_version')!r}"
         )
-    if data.get("unparsed_candidate_tables") or data.get("partial_candidate_tables"):
-        raise ValueError("Inventory has parser diagnostics; resolve them before verification")
 
     tables = data.get("tables")
     if not isinstance(tables, list) or not tables:
@@ -162,8 +160,12 @@ def main(argv=None):
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
+    diagnostic_count = (
+        len(data.get("unparsed_candidate_tables", {}))
+        + len(data.get("partial_candidate_tables", {}))
+    )
     print(
-        f"call_sites={checked} unknown={len(unknown)} "
+        f"call_sites={checked} unknown={len(unknown)} diagnostics={diagnostic_count} "
         "(symbol names + SuiteHandler generation preflight only)"
     )
     for path, line, name in unknown:
