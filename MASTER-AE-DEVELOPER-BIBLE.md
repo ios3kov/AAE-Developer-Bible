@@ -3570,39 +3570,193 @@ Artisan имеет смысл только после correctness. Отдель�
 
 # After Effects scripting object model
 
-Mental map:
+After Effects scripting exposes the host through an ExtendScript object graph. It is a high-level automation API for project structure, timeline state, properties, import and render queue. It is not the same API surface as Effect or AEGP suites.
 
-```text
+## Mental map
+
+~~~text
 app
 └── project
     ├── items
     │   ├── CompItem
     │   │   └── layers
-    │   │       └── properties / effects / masks / markers
+    │   │       └── PropertyGroup / Property
+    │   │           ├── transforms
+    │   │           ├── effects
+    │   │           ├── masks
+    │   │           ├── text animators
+    │   │           └── markers / keyframes
     │   ├── FootageItem
     │   └── FolderItem
     └── renderQueue
         └── RenderQueueItem
             └── OutputModule(s)
-```
+~~~
+
+## Collections are 1-based
+
+AE scripting collections are not normal JavaScript arrays. Items, layers, render-queue entries and many property groups use indices starting at 1.
+
+~~~jsx
+var firstItem = app.project.item(1);
+var firstLayer = comp.layer(1);
+~~~
+
+Make conversion explicit when code moves between zero-based JavaScript arrays and one-based AE collections.
+
+## Validate type before use
+
+An active item can be absent, a composition, footage or a folder. Never cast by assumption.
+
+~~~jsx
+var item = app.project.activeItem;
+
+if (!(item instanceof CompItem)) {
+    throw new Error("Open or select a composition first.");
+}
+~~~
+
+Apply the same rule to layers, footage, output modules and optional properties.
 
 ## Stable targeting
 
-UI display names могут быть локализованы/переименованы. Для effects/properties, где API предоставляет match-name semantics, предпочитать стабильный programmatic identifier.
+Display names may be localized, changed by Adobe or renamed by the user. For effects and properties, prefer stable match-name identifiers where the scripting API exposes them.
 
-## Defensive scripting
+~~~jsx
+var effects = layer.property("ADBE Effect Parade");
+var slider = effects.property("ADBE Slider Control");
+~~~
 
-Перед каждым cast-like assumption:
-- item exists?;
-- type expected?;
-- layer index valid?;
-- property exists?;
-- canSetExpression/canVaryOverTime etc. если применимо?;
-- project saved, если требуется path?
+Use visible names for presentation. Do not make them the only machine identity in a production tool.
+
+For product-owned layers or objects, keep your own stable identifier in deliberate project metadata instead of relying only on a layer name such as "Controller".
+
+## Structural mutation can invalidate references
+
+Indexed property groups are a classic scripting trap. Adding, moving or removing children can rebuild a group and invalidate object references saved earlier.
+
+Risky:
+
+~~~jsx
+var fx = layer.property("ADBE Effect Parade");
+var a = fx.addProperty("ADBE Slider Control");
+fx.addProperty("ADBE Color Control");
+// saved reference a may no longer be valid
+~~~
+
+Safer:
+
+~~~jsx
+var fx = layer.property("ADBE Effect Parade");
+var a = fx.addProperty("ADBE Slider Control");
+var aIndex = a.propertyIndex;
+
+fx.addProperty("ADBE Color Control");
+
+a = fx.property(aIndex); // reacquire after structural mutation
+~~~
+
+Treat host objects as host-owned references, not immortal JavaScript objects.
+
+## Undo groups are not database transactions
+
+For user-triggered mutations, group related operations:
+
+~~~jsx
+app.beginUndoGroup("Build Rig");
+
+try {
+    // validate, then mutate
+} finally {
+    app.endUndoGroup();
+}
+~~~
+
+This gives the user coherent undo history. It does not mean an exception automatically rolls the project back.
+
+If partial mutation is unacceptable:
+
+1. validate prerequisites before the first edit;
+2. collect errors before running a batch;
+3. create resources in a controlled order;
+4. explicitly clean up product-owned resources on failure where possible.
+
+Put undo ownership at the command boundary instead of opening nested undo groups in low-level helpers.
+
+## Defensive scripting checklist
+
+Before a destructive or cast-like assumption, verify:
+
+- app.project exists;
+- active item exists and is the expected type;
+- layer/property index is in range;
+- property/effect exists;
+- canSetExpression, canVaryOverTime, canAddProperty or another capability is true when relevant;
+- input file exists before import/read;
+- project has a path before code depends on project.file;
+- output directory exists and is writable;
+- render-queue references are reacquired after structural changes when required;
+- cancel leaves the project in a deliberate state.
+
+For batch tools, validate as much as possible before the first project mutation.
+
+## Command layer instead of UI-driven scripting
+
+Do not bury the entire product in a button callback.
+
+Prefer:
+
+~~~text
+UI event
+  -> validate plain command
+  -> command/service function
+  -> AE scripting DOM
+  -> normalize plain result
+  -> UI renders result
+~~~
+
+The command function should remain callable from ScriptUI, CEP, a JSX harness or a future UXP adapter without rewriting the operation.
+
+## Long operations
+
+Host-side ExtendScript can block interactive work. Avoid one giant call that performs expensive file parsing, networking or computation and then mutates the project.
+
+Split work into:
+
+1. pure/external computation where practical;
+2. short host mutations;
+3. explicit progress and cancellation checkpoints for genuinely long jobs.
+
+When CEP invokes ExtendScript through evalScript, the host-side script runs on the host main thread. A long script call can starve both AE interaction and CEP event scheduling.
 
 ## Version gates
 
-Новые scripting methods появляются в конкретных AE versions. Если продукт заявляет старый AE, feature detection/version gate обязателен.
+New scripting methods arrive in specific AE versions. Prefer feature detection where possible.
+
+~~~jsx
+if (typeof someObject.someNewMethod === "function") {
+    someObject.someNewMethod();
+} else {
+    // supported fallback or clear compatibility error
+}
+~~~
+
+Use app.version only when behavior cannot be detected directly.
+
+A compatibility statement should name AE versions actually tested, not merely versions whose API documentation contains the method.
+
+## Boundary with expressions
+
+Scripts mutate project state and perform automation. Expressions are evaluated as part of property evaluation and should not be used as a substitute for project orchestration.
+
+See:
+
+- 03-EXPRESSIONS-VS-SCRIPTS.md
+- ../15-COMMUNICATION/05-SCRIPT-TO-AE.md
+
+## Verification boundary
+
+This chapter is documentation of the public scripting model and safe architecture patterns. It does not claim that every fragment has been executed in every supported AE version. Host execution remains a separate acceptance gate.
 
 
 ---
@@ -3611,32 +3765,158 @@ UI display names могут быть локализованы/переимено
 
 # ScriptUI
 
-ScriptUI подходит для небольших native-looking script tools и floating/palette UI.
+ScriptUI is the ExtendScript UI toolkit used for dialogs, palettes and classic script panels. It remains useful when the product is mainly AE automation and does not require a modern web-style application shell.
 
 ## Use when
 
-- UI небольшой;
-- tool mostly scripting automation;
-- не нужен современный web layout;
-- важна минимальная упаковка.
+- UI is small or medium;
+- the tool is mostly scripting automation;
+- minimal packaging matters;
+- a dialog, palette or simple dockable panel is enough;
+- classic controls and layout are acceptable.
 
 ## Avoid when
 
-- сложные virtualized lists/grids;
-- account/web workflows;
-- modern responsive design;
-- сложная app-like state architecture.
+- complex virtualized lists or grids;
+- account, browser or web workflows;
+- modern responsive UI;
+- large application state;
+- heavy asynchronous networking;
+- a product is already structured as a full panel application.
 
-Для такого UI — panel technology.
+For those cases use a panel runtime and keep ScriptUI for small utilities.
+
+## Dialog, palette and dockable panel
+
+Common standalone windows:
+
+~~~jsx
+var dlg = new Window("dialog", "My Tool");
+~~~
+
+~~~jsx
+var win = new Window("palette", "My Tool", undefined, { resizeable: true });
+~~~
+
+A reusable dockable ScriptUI panel should allow the same builder to receive either a host-provided Panel or create a Window.
+
+~~~jsx
+function buildUI(thisObj) {
+    var root = (thisObj instanceof Panel)
+        ? thisObj
+        : new Window("palette", "My Tool", undefined, { resizeable: true });
+
+    // create controls on root
+    return root;
+}
+~~~
+
+Keep UI construction separate from After Effects operations.
+
+## Layout discipline
+
+Prefer ScriptUI layout managers to hard-coded pixel coordinates.
+
+Typical hierarchy:
+
+~~~text
+root
+└── group(column)
+    ├── group(row): inputs
+    ├── status / progress
+    └── group(row): actions
+~~~
+
+For resizable panels, use layout resize handling rather than manually repositioning every control.
+
+Do not assume fonts, DPI, control metrics or platform rendering are identical on macOS and Windows.
 
 ## Architecture
 
-Даже в ScriptUI:
-- UI callbacks → command layer;
-- command layer → AE scripting operations;
-- pure transforms/data logic отдельно.
+Even a small script should separate:
 
-Это облегчает позже перенос UI на UXP/CEP.
+~~~text
+ScriptUI callbacks
+    ↓
+commands
+    ↓
+validation + AE scripting DOM
+    ↓
+plain result object
+    ↓
+render status in UI
+~~~
+
+Bad architecture is a 300-line button callback containing project traversal, file I/O, mutation, error dialogs and UI updates.
+
+Better:
+
+~~~jsx
+button.onClick = function () {
+    var result = Commands.buildRig(readForm());
+    renderResult(result);
+};
+~~~
+
+This separation makes later migration to CEP or UXP much cheaper.
+
+## Long-running work
+
+ScriptUI does not turn ExtendScript into a worker-thread environment. A long synchronous loop freezes the tool and can make AE appear hung.
+
+For long jobs:
+
+- validate before starting;
+- update progress at sensible intervals;
+- expose a cancel flag where the workflow allows it;
+- chunk work instead of repainting on every item;
+- move CPU-heavy independent work outside ExtendScript when that fits the product architecture.
+
+app.scheduleTask can help defer or chunk script work, but it is a scheduling primitive, not a general concurrency model. It also introduces lifecycle and global-state concerns because scheduled code must remain resolvable later.
+
+## Errors and cleanup
+
+UI callbacks must not leave controls permanently disabled after an exception.
+
+~~~jsx
+button.enabled = false;
+
+try {
+    var result = Commands.run();
+    status.text = result.message;
+} catch (e) {
+    status.text = "Error: " + e.toString();
+} finally {
+    button.enabled = true;
+}
+~~~
+
+For batch tools, prefer a status area or aggregated error report over an alert for every recoverable validation issue.
+
+## Persistence
+
+Do not make transient widget state the only source of truth for important product state.
+
+Separate:
+
+- UI state: selected tab, temporary text, expanded sections;
+- project state: data that legitimately belongs in the AE project;
+- user preferences: explicit settings layer;
+- secrets or licensing credentials: never embedded in JSX source.
+
+## Migration rule
+
+A ScriptUI tool is migration-ready when its AE operations can run without ScriptUI objects being present.
+
+If command functions accept plain input and return plain output, the same command layer can later sit behind:
+
+- a CEP evalScript dispatcher;
+- a JSX test harness;
+- a future UXP or other host adapter.
+
+## Verification boundary
+
+This chapter documents architecture and common ScriptUI patterns. Exact layout and event behavior is host/platform dependent and must be verified on the AE/OS versions claimed by the product.
 
 
 ---
@@ -3707,53 +3987,218 @@ After Effects scripting API отображает UI/project hierarchy в объ�
 
 # CEP development
 
-CEP panel — HTML/CSS/JS extension, интегрируемая в Creative Cloud host.
+CEP is Adobe's legacy HTML/CSS/JavaScript extension runtime for Creative Cloud desktop hosts. In After Effects it remains a practical production panel technology in October 2026, but Adobe has announced a phased transition to UXP.
 
-## Core pieces
+The correct architecture is neither "rewrite everything immediately" nor "assume CEP will live forever". Keep the shell replaceable.
 
-Типичный bundle:
+## Runtime model
 
-```text
+A CEP extension has two JavaScript worlds:
+
+~~~text
+CEP HTML/JS engine
+    |
+    | CSInterface.evalScript(...)
+    v
+host ExtendScript engine
+    |
+    v
+After Effects scripting DOM
+~~~
+
+The CEP browser DOM is not the AE scripting DOM. The host scripting engine is reached through the CEP bridge.
+
+## Core bundle
+
+Typical source layout:
+
+~~~text
 MyPanel/
-├── CSXS/manifest.xml
+├── CSXS/
+│   └── manifest.xml
 ├── index.html
 ├── js/
+│   ├── CSInterface.js
+│   ├── bridge.js
+│   └── app.js
 ├── css/
-└── jsx/        # host-side ExtendScript bridge
-```
+└── jsx/
+    ├── bootstrap.jsx
+    └── dispatcher.jsx
+~~~
 
-Host id After Effects в CEP manifests: `AEFT`.
+After Effects host ID in CEP manifests is AEFT.
+
+Keep bridge.js and dispatcher.jsx small and explicit. Business logic should not be scattered across DOM handlers and executable evalScript strings.
+
+## Panel -> AE
+
+CEP uses CSInterface.evalScript to execute ExtendScript in the host.
+
+A production panel should centralize that bridge and send structured commands rather than constructing ad-hoc script text throughout the UI.
+
+Never concatenate user input directly into executable ExtendScript.
+
+## AE -> panel
+
+ExtendScript cannot directly manipulate the CEP HTML DOM. CEP events provide the normal notification mechanism.
+
+Conceptually:
+
+~~~text
+ExtendScript/native side
+    -> CSXS / PlugPlug event
+    -> CSInterface.addEventListener(...)
+    -> panel state update
+~~~
+
+Use events for small notifications and invalidation. If a large state snapshot is required, notify once and request the normalized state rather than emitting hundreds of tiny mutation events.
+
+## Main-thread boundary
+
+Adobe's CEP 12 cookbook documents that scripts invoked by evalScript run in the host application's ExtendScript engine on the host main thread. CEP events also depend on host main-thread scheduling.
+
+Consequences:
+
+- do not make one enormous evalScript request;
+- do not poll AE dozens of times per animation frame;
+- batch related reads and writes;
+- keep large binary or CPU-heavy data out of string-based JSX messaging;
+- split long host work into meaningful chunks;
+- return compact structured results.
+
+The callback is asynchronous from the panel API perspective. The host operation itself is still host-side synchronous scripting.
 
 ## Extension folders
 
-macOS:
-- system: `/Library/Application Support/Adobe/CEP/extensions`
-- user: `~/Library/Application Support/Adobe/CEP/extensions`
+macOS system:
 
-Windows:
-- system: `C:\Program Files (x86)\Common Files\Adobe\CEP\extensions`
-- user: `%AppData%\Roaming\Adobe\CEP\extensions`
+    /Library/Application Support/Adobe/CEP/extensions
 
-## Unsigned dev mode
+macOS user:
 
-CEP development commonly uses `PlayerDebugMode` under the corresponding `CSXS.<major>` preference/registry key. Версию CSXS нельзя копировать вслепую: она должна соответствовать CEP runtime host-а.
+    ~/Library/Application Support/Adobe/CEP/extensions
 
-## Debugging
+Windows system:
 
-CEP resources include:
-- `.debug` file with host/port mapping;
-- CSXS logs;
-- CEPHtmlEngine logs;
-- browser devtools connection.
+    C:\Program Files (x86)\Common Files\Adobe\CEP\extensions
+
+Windows user:
+
+    %AppData%\Roaming\Adobe\CEP\extensions
+
+These are CEP extension locations, not native .plugin/.aex locations.
+
+## Unsigned development mode
+
+CEP development commonly uses PlayerDebugMode under the matching CSXS major-version preference or registry key.
+
+Do not copy a random CSXS.9, CSXS.11 or CSXS.12 command from an old tutorial. The key must match the CEP runtime used by the host under test.
+
+Debug mode is a development convenience, not a shipping trust model.
+
+## Debugging layers
+
+Useful layers:
+
+1. browser devtools for HTML/JS;
+2. .debug host/port configuration where applicable;
+3. CSXS / CEP logs;
+4. ExtendScript-side error envelope and logging;
+5. AE host behavior.
+
+A blank panel can result from manifest mismatch, CEP runtime policy, JS startup failure, missing JSX or a broken bridge. Debug the layers independently.
+
+## Packaging
+
+Adobe's CEP resources include ZXPSignCMD and ZXP packaging/signing documentation.
+
+A release pipeline should distinguish source from the signed artifact:
+
+~~~text
+source
+→ production build
+→ manifest/version validation
+→ package
+→ sign
+→ clean install test
+→ archive checksums
+~~~
+
+Do not modify a signed package after signing.
 
 ## Security
 
-Не считать CEP panel доверенным просто потому, что он локальный:
-- validate messages crossing UI ↔ JSX/native bridge;
-- no arbitrary `eval` of remote content;
-- escape paths/arguments;
-- secrets not in frontend source;
-- sign/package release artifact.
+Treat the panel UI as an input boundary.
+
+- validate messages crossing UI -> JSX/native;
+- never concatenate remote/user text into executable source;
+- never eval downloaded code;
+- allowlist helper/native commands;
+- normalize and validate paths;
+- keep secrets out of frontend source;
+- define network policy;
+- treat downloaded code differently from downloaded data.
+
+Node/CEF capabilities vary by CEP runtime and configuration. Core business logic should not depend on an accidental global that exists in only one host/runtime combination.
+
+## Production protocol
+
+Request example:
+
+~~~json
+{
+  "protocol": 1,
+  "requestId": "42",
+  "command": "renameSelected",
+  "payload": {"name": "Hero"}
+}
+~~~
+
+Success:
+
+~~~json
+{
+  "ok": true,
+  "requestId": "42",
+  "result": {"changed": 3}
+}
+~~~
+
+Failure:
+
+~~~json
+{
+  "ok": false,
+  "requestId": "42",
+  "error": {
+    "code": "NO_COMP",
+    "message": "No active composition"
+  }
+}
+~~~
+
+Localized human text must not be the only machine-readable error contract.
+
+## Transition status — 2026-10-01
+
+Adobe announced on 2026-09-24 that:
+
+- After Effects UXP public beta is planned by November 2026;
+- new CEP Marketplace submissions for AE stop and CEP becomes disabled-by-default in December 2028;
+- CEP retirement across flagship Creative Cloud desktop apps begins at the end of 2029;
+- ExtendScript itself is not part of that CEP retirement announcement.
+
+Therefore the correct 2026 strategy is to isolate CEP-specific code so the shell can be replaced when the actual After Effects UXP API surface is available and verified.
+
+See:
+
+- 02-UXP-TRANSITION.md
+- ../15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md
+
+## Verification boundary
+
+CEP architecture and the dated migration plan are source-reviewed. This Bible does not yet claim a CEP panel host run across the full support matrix.
 
 
 ---
@@ -3762,44 +4207,127 @@ CEP resources include:
 
 # UXP transition for After Effects
 
-## Published Adobe timeline snapshot
+This is a dated migration plan, not an assumption that After Effects already exposes the same UXP API surface as Photoshop, Premiere or Media Encoder.
 
-As announced 2026-09-24:
-- After Effects UXP public beta: planned by **November 2026**;
-- AE/Illustrator/Media Encoder: stop accepting new CEP marketplace submissions and move CEP disabled-by-default together in **December 2028**;
-- overall CEP retirement: **end of 2029**.
+## Adobe timeline snapshot — 2026-10-01
 
-Timelines can change; re-check Adobe announcement/release docs before product planning.
+Adobe's 2026-09-24 developer announcement states:
 
-## What to do before AE UXP beta
+- After Effects UXP public beta: planned by November 2026;
+- AE, Illustrator and Media Encoder stop accepting new CEP Marketplace submissions and move CEP disabled-by-default in December 2028;
+- Adobe plans at least two years from a host's UXP public beta before removing CEP from new versions;
+- CEP retirement across flagship Creative Cloud desktop apps begins at the end of 2029;
+- ExtendScript is not affected by that CEP retirement announcement.
 
-1. Separate domain/business logic from CEP APIs.
-2. Wrap filesystem/network/storage behind interfaces.
-3. Put all `evalScript` calls in one bridge module.
-4. Use typed/versioned command payloads.
-5. Remove implicit Node globals from core logic.
-6. Add contract tests for bridge commands.
-7. Maintain UI components with minimal CEP-specific code.
+These dates are planning inputs, not immutable API contracts. Re-check Adobe's host-specific UXP documentation before release decisions.
 
-## Migration readiness scorecard
+## Do not assume cross-host parity
 
-Good:
+A UXP feature existing in Photoshop, Premiere or Media Encoder does not prove that the same API exists in After Effects.
 
-```text
-React/UI → CommandBus → AeBridge interface
-                         ├─ CepAeBridge
-                         └─ FutureUxpAeBridge
-```
+Before migrating a feature, verify AE-specific support for:
 
-Bad:
+- project/items/compositions/layers/properties;
+- render queue;
+- filesystem;
+- networking;
+- persistent storage;
+- dialogs and panels;
+- events and notifications;
+- native/hybrid bridge;
+- packaging and Marketplace rules.
 
-```text
-button onclick → window.cep + fs + evalScript + business rule + DOM mutation
-```
+The beta is evidence only for the APIs the beta actually exposes.
 
-## Rule after beta launches
+## Architecture before migration
 
-Не мигрировать по announcement alone. Сначала проверить, что AE UXP beta/GA покрывает конкретно ваши requirements: host DOM/API, filesystem, networking, native bridge, packaging, marketplace/distribution.
+Make the shell replaceable now:
+
+~~~text
+UI components
+      ↓
+Command / domain layer
+      ↓
+AeBridge interface
+   ┌───────────────┐
+   │               │
+CepAeBridge   FutureUxpAeBridge
+   │               │
+ExtendScript   AE UXP APIs / supported bridge
+~~~
+
+The domain layer should not import window.cep, CSInterface, Node filesystem modules or UXP APIs directly.
+
+## Work to do before AE UXP beta
+
+1. Put every evalScript call behind one bridge.
+2. Use versioned command/response payloads.
+3. Separate filesystem/network/storage adapters.
+4. Remove business logic from DOM event handlers.
+5. Keep pure transforms as plain JavaScript data logic where possible.
+6. Add contract tests for bridge commands and error envelopes.
+7. Inventory every CEP-only capability used by the product.
+8. Record performance-sensitive flows that cannot tolerate extra serialization.
+
+This work is useful even if Adobe changes the rollout dates.
+
+## Migration inventory
+
+Maintain a product table:
+
+| Capability | CEP implementation | Required in AE UXP | Blocking? | Verified |
+|---|---|---|---|---|
+| project edits | ExtendScript dispatcher | project API or supported script bridge | yes | pending |
+| filesystem | Node/CEP adapter | AE UXP filesystem path | yes | pending |
+| web auth | browser/network adapter | AE UXP network/webview pattern | maybe | pending |
+| native compute | helper/native bridge | supported hybrid/native path | yes for heavy tools | pending |
+
+Do not mark a row supported based on generic UXP documentation. Record the exact AE host/version that was tested.
+
+## Hybrid/native products
+
+For products with C++ effects, AEGPs or helpers, the migration is larger than swapping UI widgets.
+
+Keep the contract between UI and native code:
+
+- explicit;
+- versioned;
+- small;
+- independent of CEP DOM types;
+- independent of UXP object instances.
+
+A good command protocol can survive multiple panel runtimes.
+
+## After the beta becomes available
+
+Migration sequence:
+
+~~~text
+AE UXP beta available
+→ inventory required APIs
+→ build a thin proof for each blocker
+→ compare behavior and performance
+→ decide dual-runtime support window
+→ package/test clean installs
+→ only then migrate production users
+~~~
+
+Do not migrate because of the announcement alone. Also do not wait until CEP becomes disabled-by-default before starting proofs.
+
+## Distribution transition
+
+Plan for a period where the product may ship:
+
+- a CEP package for older supported AE versions;
+- a UXP package for newer versions;
+- the same native plug-in binaries where compatible;
+- one product/versioning policy across both shells.
+
+Logs and support reports should identify which shell and protocol version produced the failure.
+
+## Verification boundary
+
+The dates in this chapter are based on Adobe's 2026-09-24 announcement. As of this snapshot the After Effects UXP public beta is still future work. No AE UXP capability is marked verified until it is actually available and tested.
 
 
 ---
