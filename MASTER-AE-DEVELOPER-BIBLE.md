@@ -7201,128 +7201,249 @@ Source review подтверждает API-контракт, но не подт�
 
 <!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md -->
 
-# Keyframe recipes
+# Keyframes: чтение, изменение, batch insert, interpolation
 
-**Suites:** `AEGP_KeyframeSuite3+`, `AEGP_StreamSuite`  
-**Confidence:** SDK-verified + official `Easy Cheese` pattern.
+**Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
+**Suites in that SDK:** `AEGP_KeyframeSuite5` + `AEGP_StreamSuite6`; для hierarchy/separated dimensions дополнительно `AEGP_DynamicStreamSuite4`.
+**Verification level:** SDK source-reviewed. Существующий recipe ранее проходил syntax/type baseline, но эта редакционная итерация не является новым native build или host test.
 
-## Узнать число keyframes
+Keyframe API работает поверх конкретного `AEGP_StreamRefH`. Поэтому правильная операция начинается не с индекса ключа, а с доказанного stream context, его типа, dimensionality и временного пространства.
+
+## 1. Ноль keyframes не означает constant property
+
+`AEGP_GetStreamNumKFs` возвращает:
+
+- `AEGP_NumKF_NO_DATA (-1)` для `AEGP_StreamType_NO_DATA`;
+- `0`, если keyframes нет;
+- положительное число keyframes.
+
+Header отдельно предупреждает: при `0` keyframes stream всё ещё может иметь expression. Для вопроса «меняется ли результат во времени?» используйте также `AEGP_IsStreamTimevarying`, который учитывает expressions.
 
 ```cpp
 A_long count = 0;
-ERR(suites.KeyframeSuite3()->AEGP_GetStreamNumKFs(
+ERR(suites.KeyframeSuite5()->AEGP_GetStreamNumKFs(
     streamH, &count));
 ```
 
----
+Не превращайте `count == 0` в утверждение «значение константно».
 
-## Время keyframe
+## 2. Keyframe index — позиция в текущем наборе, а не вечный ID
+
+`AEGP_GetKeyframeTime` принимает `AEGP_KeyframeIndex` и `AEGP_LTimeMode`. После вставки или удаления набор индексов может измениться. Для долгой операции сохраняйте осмысленное время/собственную identity и заново проверяйте нужный keyframe перед mutation.
 
 ```cpp
 A_Time t{};
-ERR(suites.KeyframeSuite3()->AEGP_GetKeyframeTime(
+ERR(suites.KeyframeSuite5()->AEGP_GetKeyframeTime(
     streamH,
     key_index,
     AEGP_LTimeMode_CompTime,
     &t));
 ```
 
----
+Layer time и comp time — разные пространства. Не смешивайте индекс ключа, UI time и raw `A_Time` без явного mode.
 
-## Добавить один keyframe
+## 3. InsertKeyframe: существующий key в том же времени не дублируется
+
+SDK 25.6 прямо говорит, что `AEGP_InsertKeyframe` оставляет stream unchanged, если keyframe уже существует в указанном времени, и возвращает соответствующий index.
 
 ```cpp
 A_Time t{1, 1};
-A_long key_index = 0;
+AEGP_KeyframeIndex index = 0;
 
-ERR(suites.KeyframeSuite3()->AEGP_InsertKeyframe(
+ERR(suites.KeyframeSuite5()->AEGP_InsertKeyframe(
     streamH,
     AEGP_LTimeMode_CompTime,
     &t,
-    &key_index));
+    &index));
 ```
 
-После этого задать value через Keyframe Suite.
+После этого значение задаётся через Keyframe Suite. Сам insert не является универсальной операцией «создать новый уникальный ключ любой ценой».
 
----
+## 4. Полученное keyframe value имеет ownership
 
-## Правильный batch insert
-
-Официальный guide отдельно предупреждает: одиночные inserts могут быть дорогими для undo. Для серии keyframes использовать begin/end cookie.
+`AEGP_GetNewKeyframeValue` возвращает `AEGP_StreamValue2`, который нужно освободить через `AEGP_DisposeStreamValue`.
 
 ```cpp
-AEGP_AddKeyframesInfoH addH = nullptr;
-ERR(suites.KeyframeSuite3()->AEGP_StartAddKeyframes(
-    streamH, &addH));
+AEGP_StreamValue2 value{};
+A_Boolean have_valueB = FALSE;
 
-A_long idx0 = 0;
-A_Time t0{0, 1};
-ERR(suites.KeyframeSuite3()->AEGP_AddKeyframes(
-    addH, AEGP_LTimeMode_CompTime, &t0, &idx0));
+ERR(suites.KeyframeSuite5()->AEGP_GetNewKeyframeValue(
+    plugin_id, streamH, index, &value));
 
-AEGP_StreamValue2 v0{};
-// v0 must be valid for stream type;
-// safest pattern is derive correctly-typed value via StreamSuite.
-ERR(suites.KeyframeSuite3()->AEGP_SetAddKeyframe(
-    addH, idx0, &v0));
+if (!err) {
+    have_valueB = TRUE;
+    // modify the union member matching AEGP_StreamType
+    ERR(suites.KeyframeSuite5()->AEGP_SetKeyframeValue(
+        streamH, index, &value));
+}
 
-// ... more keys ...
-
-ERR(suites.KeyframeSuite3()->AEGP_EndAddKeyframes(
-    TRUE,   // commit
-    addH));
-addH = nullptr;
+if (have_valueB) {
+    ERR2(suites.StreamSuite6()->AEGP_DisposeStreamValue(&value));
+}
 ```
 
-Если операция прерывается — `EndAddKeyframes(FALSE, addH)` для отмены transaction по контракту suite.
+`AEGP_SetKeyframeValue` не принимает ownership входного value. Cleanup остаётся обязанностью caller.
 
----
+Официальный `Easy_Cheese` показывает тот же lifetime pattern на старых suite generations: получает keyframe value, изменяет marker и освобождает value через Stream Suite. Копировать нужно ownership pattern, а не старые типы/версии API.
 
-## Production pattern: derive typed value
+## 5. Тип и dimensionality проверяются до interpolation/ease
 
-Не строить `AEGP_StreamValue2` вслепую:
+Перед редактированием:
 
 ```text
 GetStreamType
-→ GetNewStreamValue at nearby/current time
-→ modify correct union member
-→ SetAddKeyframe / SetKeyframeValue
-→ DisposeStreamValue
+→ GetStreamValueDimensionality
+→ GetStreamTemporalDimensionality
+→ GetValidInterpolations
+→ только затем interpolation/ease/tangent операции
 ```
 
-Так `streamH`/type-specific data корректно заполнены.
+`AEGP_GetValidInterpolations` находится в Stream Suite. SDK 25.6 перечисляет LINEAR, BEZIER, HOLD и CUSTOM mask. Нельзя предполагать, что любой stream принимает любой тип interpolation.
 
----
+`AEGP_GetStreamTemporalDimensionality` определяет допустимый диапазон `dimensionL` для temporal ease: **0..temporal_dim-1**.
 
-## Интерполяция и ease
+## 6. Interpolation, ease, tangents и flags — разные слои поведения
 
-После вставки:
+Keyframe Suite5 предоставляет отдельные функции:
+
+- `Get/SetKeyframeInterpolation` — in/out interpolation;
+- `Get/SetKeyframeTemporalEase` — speed/influence по temporal dimension;
+- `Get/SetKeyframeSpatialTangents` — spatial tangents;
+- `Get/SetKeyframeFlags` — continuous/autobezier/roving flags;
+- `Get/SetKeyframeLabelColorIndex` — label color utilities, добавленные в Suite5.
+
+Это не одна «Bezier настройка». Например, spatial tangent имеет смысл только для подходящего spatial stream, а temporal ease индексируется по temporal dimensionality.
+
+`AEGP_SetKeyframeFlag` устанавливает **один flag за вызов** через `(flag, true_falseB)`. Не передавайте произвольную комбинацию как будто это set-all-flags API.
+
+`Easy_Cheese` демонстрирует изменение temporal ease и затем BEZIER interpolation. Это sample behavior, не доказательство, что BEZIER валиден для каждого stream.
+
+## 7. Spatial tangents: values тоже нужно dispose
+
+`AEGP_GetNewKeyframeSpatialTangents` может вернуть два `AEGP_StreamValue2`. Каждый реально полученный value подчиняется тому же cleanup contract через `AEGP_DisposeStreamValue`.
+
+Не используйте spatial tangent API только потому, что value dimensionality > 1; сначала проверьте stream properties/type.
+
+## 8. Batch insert: один transaction на серию ключей
+
+Для серии keyframes используйте:
 
 ```text
-GetValidInterpolations
-→ SetKeyframeInterpolation
-→ SetKeyframeTemporalEase
-→ optional spatial tangents / flags
+AEGP_StartAddKeyframes
+→ AEGP_AddKeyframes
+→ AEGP_SetAddKeyframe
+→ ...
+→ AEGP_EndAddKeyframes(TRUE/FALSE)
 ```
 
-Сначала проверять поддерживаемые interpolation flags — не каждая property поддерживает spatial/ease одинаково.
-
----
-
-## Удаление
+Пример:
 
 ```cpp
-ERR(suites.KeyframeSuite3()->AEGP_DeleteKeyframe(
-    streamH, key_index));
+AEGP_AddKeyframesInfoH addH = nullptr;
+ERR(suites.KeyframeSuite5()->AEGP_StartAddKeyframes(
+    streamH, &addH));
+
+for (...) {
+    A_long index = 0;
+    ERR(suites.KeyframeSuite5()->AEGP_AddKeyframes(
+        addH, AEGP_LTimeMode_CompTime, &times[i], &index));
+
+    if (!err) {
+        ERR(suites.KeyframeSuite5()->AEGP_SetAddKeyframe(
+            addH, index, &values[i]));
+    }
+}
+
+if (addH) {
+    const A_Boolean commitB = err ? FALSE : TRUE;
+    A_Err end_err = suites.KeyframeSuite5()->AEGP_EndAddKeyframes(
+        commitB, addH);
+    if (!err) err = end_err;
+}
 ```
 
-Удаление сдвигает subsequent indices. При массовом delete идти с конца к началу либо каждый раз re-query.
+`EndAddKeyframes(FALSE, ...)` — explicit non-commit path batch API. Он не заменяет глобальную Undo-модель команды: если операция одновременно меняет другие части проекта, проектируйте общий undo scope отдельно.
 
----
+Существующий `Bible_AddOneDKeyframes` использует этот pattern и производит value через `AEGP_GetNewStreamValue`, а не вручную заполняет неизвестный union. Это хороший defensive pattern, но runtime correctness самого recipe остаётся host-pending.
 
-## Undo
+## 9. Delete и mutation во время обхода
 
-Batch keyframe edit обычно всё равно следует помещать в один `AEGP_StartUndoGroup` / `AEGP_EndUndoGroup` на уровне пользовательской команды.
+`AEGP_DeleteKeyframe` undoable и принимает текущий index. При массовом удалении безопаснее:
+
+- сначала определить набор целей;
+- удалять с конца к началу **или** заново получать count/time/index после structural mutation;
+- не сохранять список индексов и затем менять начало массива ключей, ожидая, что остальные позиции останутся прежними.
+
+Это рекомендация по positional index semantics, а не отдельная гарантия о внутренней реализации AE.
+
+## 10. Separated dimensions — критическая ловушка
+
+`AEGP_DynamicStreamSuite4` прямо предупреждает: когда leader property разделён на followers, простые value APIs могут работать через leader, но **keyframe-index APIs вроде `AEGP_GetNewKeyframeValue` на leader работать не будут**.
+
+Правильный путь:
+
+```text
+IsSeparationLeader
+→ AreDimensionsSeparated
+→ GetSeparationFollower(dim)
+→ keyframe API на конкретном follower
+→ DisposeStream(follower)
+```
+
+Это особенно важно для Position и любых будущих separable properties. Не хардкодьте только текущий UI случай.
+
+## 11. Expressions и keyframes существуют одновременно
+
+Expression и keyframes — не взаимоисключающие состояния. Поэтому:
+
+- `GetStreamNumKFs` отвечает про keys;
+- `IsStreamTimevarying` учитывает expression;
+- `GetNewStreamValue(pre_expressionB)` выбирает evaluation stage;
+- keyframe value APIs работают с сохранёнными key values, а не с произвольным post-expression sample.
+
+Если инструмент копирует анимацию, отдельно решите, копирует ли он keys, expression, оба слоя или только evaluated result.
+
+## 12. Labels в Suite5
+
+SDK 25.6 `AEGP_KeyframeSuite5` добавляет `GetKeyframeLabelColorIndex` и `SetKeyframeLabelColorIndex`. Это отдельная metadata operation; она не меняет interpolation или value.
+
+Не требуйте Suite5, если ваш backward-compatible код реально использует только более старый subset. Но baseline Bible для SDK 25.6 должен описывать доступное current generation честно.
+
+## 13. Official samples: полезны как паттерны, но они legacy-versioned
+
+`Easy_Cheese.cpp` использует `StreamSuite2` и `KeyframeSuite3`, хотя тот же SDK 25.6 предоставляет `StreamSuite6` и `KeyframeSuite5`. Sample сохраняет ценность для:
+
+- expression ownership;
+- stream property inspection;
+- keyframe value cleanup;
+- ease/interpolation sequence;
+- menu/hook workflow.
+
+Но новый код не должен механически закрепляться на старой suite generation только потому, что sample исторический.
+
+## 14. Host acceptance matrix
+
+Для keyframer-примера нужны минимум:
+
+- 1D static → animated;
+- existing key at same time;
+- insert/delete multiple keys;
+- linear/hold/bezier where valid;
+- temporal ease per dimension;
+- spatial tangent case;
+- expression + keyframes;
+- separated dimensions/followers;
+- label color where supported;
+- undo/redo;
+- save/reopen;
+- error injection + cleanup;
+- repeated execution without leaked refs/values.
+
+До этих проверок chapter/source review имеет статус DOCUMENTED/SDK-reviewed, а не host-verified.
+
+## Source record
+
+Точные hashes, source ranges, sample-version discrepancies и recipe review: [Streams/keyframes SDK 25.6 review](17-NATIVE-SUITE-COOKBOOK/../18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md).
 
 
 ---
