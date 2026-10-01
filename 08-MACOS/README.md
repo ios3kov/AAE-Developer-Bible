@@ -154,7 +154,7 @@ portable tests
 - [Environment matrix](../00-START-HERE/02-ENVIRONMENT-MATRIX.md)
 - [Build system strategy](../01-ARCHITECTURE/06-BUILD-SYSTEM.md)
 - [Testing](../10-TESTING/README.md)
-- [Distribution](../11-DISTRIBUTION/README.md)
+- [Distribution](../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
 
 ## Evidence boundary
 
