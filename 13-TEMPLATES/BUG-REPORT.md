@@ -1,50 +1,57 @@
 # Bug report template
 
+## Identity
+
+- Bug ID:
+- Title:
+- Reporter:
+- Date/time:
+- Severity:
+- Regression: yes / no / unknown
+- First affected build:
+- Last known good build:
+
 ## Summary
 
 One sentence describing the observable failure.
 
-## Impact
+## Product artifact
 
-- severity:
-- user workflow blocked:
-- data/project corruption risk:
-- crash/hang:
-- workaround:
-
-## Artifact identity
-
-- plug-in version:
-- internal build:
-- git SHA if internal:
-- binary SHA-256:
-- installer/package version:
-- panel/native protocol version if relevant:
+- Plug-in version:
+- Build number:
+- Git SHA:
+- Binary/package SHA-256:
+- Install path:
+- Installer version:
+- Panel/helper version if applicable:
+- Protocol/schema version if relevant:
 
 ## Environment
 
 - After Effects version/build:
-- AE Beta/GA:
+- Beta/GA:
 - OS version/build:
 - CPU architecture:
 - CPU:
-- GPU:
-- GPU driver:
 - RAM:
-- MFR on/off:
-- GPU backend:
-- project bit depth:
-- render mode: preview / render queue / aerender
-- install path:
+- GPU:
+- GPU driver/runtime:
+- Project bit depth:
+- MFR: on / off
+- GPU backend: CPU / backend name
+- Render path: preview / render queue / aerender / other
+
+## Preconditions
+
+- Project/fixture:
+- Source media:
+- Required preferences:
+- Required account/license state:
+- Fresh launch required: yes / no
+- Cache state:
+- Other setup:
 
 ## Reproduction
-
-Preconditions:
-
-1.
-2.
-
-Steps:
 
 1.
 2.
@@ -54,80 +61,116 @@ Frequency:
 
 - [ ] always
 - [ ] often
-- [ ] rare
-- [ ] happened once
+- [ ] intermittent
+- [ ] once
 
-Approximate rate if known:
+Approximate rate if intermittent:
 
 ## Expected
 
-State the measurable/observable expected behavior.
+Describe measurable expected behavior.
 
 ## Actual
 
-State the exact observed behavior.
+Describe measurable actual behavior.
 
-## First failing version
+Do not replace this section with only a screenshot.
 
-- last known good:
-- first known bad:
-- unknown:
+## Scope/isolation
 
-## Isolation
+Tested:
 
-- [ ] reproduces after AE restart
-- [ ] reproduces in minimal project
-- [ ] reproduces with MFR off
-- [ ] reproduces with GPU off
-- [ ] reproduces after cache purge
-- [ ] reproduces after clean plug-in reinstall
-- [ ] compared with known-good/Adobe sample where relevant
+- [ ] fresh AE launch
+- [ ] clean project
+- [ ] minimal fixture
+- [ ] MFR off
+- [ ] MFR on
+- [ ] CPU path
+- [ ] GPU path
+- [ ] another supported AE version
+- [ ] another machine
+- [ ] known-good previous product build
+- [ ] known-good Adobe/sample baseline where relevant
 
-Result of isolation:
+Results:
 
 ## Artifacts
 
-- minimal project:
+Attach or reference:
+
+- project/minimal project:
 - source media:
 - rendered output:
-- golden/diff report:
-- plug-in log:
+- expected output:
+- pixel diff:
+- product log:
 - AE log:
-- macOS .ips / Windows dump:
-- thread sample if hang:
+- crash report/dump:
+- thread dump for hang:
 - installer log:
 - screenshot/video:
-- symbol archive reference:
+- profiler trace:
 
-## Crash/hang
+## Crash/hang details
 
 If crash:
 
+- exception/signal:
 - crashing module:
 - top symbolized frames:
-- exception/code:
-- dSYM/PDB match confirmed: yes/no
+- matching dSYM/PDB confirmed: yes / no
+- dump/report ID:
 
 If hang:
 
-- timeout duration:
-- thread dump/sample attached: yes/no
+- timeout threshold:
+- thread/process sample:
 - last known operation/request ID:
 
-## Privacy
+## State/lifetime clues
 
-- project/media safe to share: yes/no
-- redactions required:
-- dump contains sensitive data warning acknowledged:
+- occurs after save/reopen:
+- occurs after panel reload:
+- occurs after cancel:
+- occurs only on repeated runs:
+- occurs only after cache warmup:
+- occurs only after project mutation:
+- possible stale request/generation:
+- possible resource acquire/release imbalance:
 
-## Investigation notes
+## Regression range
 
-Facts only. Separate observed evidence from hypotheses.
+Last known good:
 
-## Resolution
+First known bad:
 
-- root cause:
-- fix commit:
-- regression test:
-- affected versions:
-- release containing fix:
+Candidate commits/change area:
+
+## Root cause
+
+Fill only after evidence:
+
+## Fix
+
+- Commit/PR:
+- Why the fix addresses the root cause:
+- Compatibility/migration impact:
+
+## Verification
+
+Required retest:
+
+- [ ] original reproduction
+- [ ] minimal reproduction
+- [ ] regression fixture added
+- [ ] neighboring edge cases
+- [ ] MFR/GPU combination if relevant
+- [ ] save/reopen if state-related
+- [ ] old project fixture if migration-related
+- [ ] clean install if load/installer-related
+
+Evidence/result:
+
+## Closure rule
+
+Close only when the original failure is reproduced or sufficiently characterized, the root cause/fix is recorded, and the relevant regression test passes on the claimed environment.

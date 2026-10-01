@@ -1,90 +1,98 @@
 # Compatibility matrix template
 
-## Product artifact
+## Product identity
 
-- product version:
-- build:
-- git SHA:
-- binary/package hashes:
-- AE SDK:
-- protocol/schema versions:
+- Product/version:
+- Build:
+- Git SHA:
+- Candidate/package hash:
+- Date:
+- Owner:
 
 ## Status vocabulary
 
-Use:
+Use only:
 
-- PASS — required test executed and passed;
-- FAIL — executed and failed;
-- BLOCKED — named dependency/environment unavailable;
-- NOT_RUN — required but not executed;
-- LAB — exploratory/beta observation only.
+- PASS — required scenario executed and evidence retained;
+- FAIL — required scenario executed and failed;
+- BLOCKED — environment/dependency prevented execution;
+- NOT RUN — no evidence;
+- UNSUPPORTED — product policy does not support this cell;
+- LAB — beta/experimental observation, not production support.
 
-Do not use a blank cell to mean both unsupported and untested.
+Do not use blank cells as PASS.
 
 ## Host/platform matrix
 
-| AE exact version/build | OS exact version | CPU arch | Install/load | CPU render | GPU backend | MFR | Save/reopen | Installer | Status/evidence |
-|---|---|---|---|---|---|---|---|---|---|
-| | macOS | arm64 | | | | | | | |
-| | macOS | x86_64 | | | | | | | |
-| | Windows | x64 | | | | | | | |
-| | Windows | ARM64 | | | | | | | |
-
-Add rows for every claimed AE/OS combination.
-
-## Bit depth matrix
-
-| Environment ID | 8-bpc | 16-bpc | 32-bpc | Alpha | HDR | Evidence |
-|---|---|---|---|---|---|---|
-| | | | | | | |
-
-## Feature matrix
-
-| Environment ID | SmartFX ROI | MFR | CPU fallback | GPU | CEP/UXP panel | AEGP | Notes |
+| AE version/build | Release channel | macOS arm64 | macOS x86_64 | Windows x64 | Windows ARM64 | Evidence ID | Notes |
 |---|---|---|---|---|---|---|---|
-| | | | | | | | |
+| | GA | | | | | | |
+| | GA | | | | | | |
+| | Beta | LAB | LAB | LAB | LAB | | beta evidence only |
+
+## Capability matrix
+
+For each supported platform/host cell:
+
+| Capability | CPU | GPU | MFR off | MFR on | Save/reopen | Evidence ID | Notes |
+|---|---|---|---|---|---|---|---|
+| basic render | | | | | | | |
+| 8-bpc | | | | | | | |
+| 16-bpc | | | | | | | |
+| 32-bpc | | | | | | | |
+| alpha | | | | | | | |
+| ROI/origin | | | | | | | |
+| old project migration | | | | | | | |
+| cancel/error path | | | | | | | |
+
+Remove rows not claimed by the product; do not leave them implicitly supported.
+
+## Panel/scripting matrix if shipped
+
+| Scenario | Status | Evidence ID | Notes |
+|---|---|---|---|
+| panel fresh install/open | | | |
+| host bridge handshake | | | |
+| command success | | | |
+| structured error | | | |
+| stale response ignored | | | |
+| panel reload | | | |
+| AE restart | | | |
+| component version mismatch | | | |
 
 ## Installer matrix
 
-| Platform | Fresh | N-1 -> N | Uninstall | Reinstall | AE running | No AE | Evidence |
-|---|---|---|---|---|---|---|---|
-| macOS | | | | | | | |
-| Windows x64 | | | | | | | |
-| Windows ARM64 | | | | | | | |
-
-## Project migration
-
-| Fixture | Created with product | Created with AE | Open | Render | Save/reopen | Evidence |
+| Platform | Fresh install | Upgrade N-1 → N | Uninstall | Reinstall | Failure rollback | Evidence ID |
 |---|---|---|---|---|---|---|
-| legacy-1 | | | | | | |
+| macOS | | | | | | |
+| Windows x64 | | | | | | |
+| Windows ARM64 if claimed | | | | | | |
 
-## Beta
+## Environment record
 
-Beta rows are LAB until the corresponding GA environment is tested.
+For every PASS/FAIL evidence record store:
 
-Example:
+- exact AE version/build;
+- exact OS version/build;
+- CPU architecture;
+- GPU/driver where relevant;
+- binary/package hash;
+- fixture hash/version;
+- test command or manual procedure;
+- observed result.
 
-| AE exact version/build | OS | Arch | Status |
-|---|---|---|---|
-| 27.x Beta | | | LAB |
+## Release support statement
 
-Never turn a beta-only observation into a production support claim.
+### Tested
 
-## Unsupported combinations
+List only matrix cells with PASS evidence:
 
-List explicitly:
+### Unsupported
 
-- combination:
-- reason:
-- behavior expected from installer/plug-in:
-- user-facing message/documentation:
+### Known limitations
 
-## Release conclusion
+### Not tested / pending
 
-Supported matrix for this exact artifact:
+## Stop rule
 
-Unsupported:
-
-Blocked/not run:
-
-Evidence root/location:
+A public support claim must map to at least one PASS cell for the required scenario. If evidence is missing, either run the test or narrow the claim.

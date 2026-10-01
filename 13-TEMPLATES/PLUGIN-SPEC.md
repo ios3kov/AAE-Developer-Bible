@@ -1,28 +1,24 @@
 # Plug-in specification template
 
-## Product
+## 1. Product identity
 
-- name:
-- target version:
-- owner:
-- repository:
-- product type/status:
+- Name:
+- Codename:
+- Version target:
+- Owner:
+- Repository:
+- Primary user:
+- Release channel:
 
-## Problem
+## 2. Problem
 
 What artist/user problem is solved?
 
 What is explicitly out of scope?
 
-## Success criteria
+## 3. Extension architecture
 
-Measurable criteria:
-
-1.
-2.
-3.
-
-## Extension type
+Select all shipped components:
 
 - [ ] Effect
 - [ ] AEGP
@@ -32,257 +28,251 @@ Measurable criteria:
 - [ ] ExtendScript
 - [ ] ScriptUI
 - [ ] CEP
-- [ ] UXP
-- [ ] External helper
+- [ ] UXP when AE support is verified
+- [ ] Helper/service
 - [ ] Hybrid
 
-Why is this type required?
+Why is each component needed?
 
-Which simpler type was considered and rejected?
+~~~text
+UI
+→ automation/bridge
+→ native/core
+→ After Effects
+~~~
 
-## Public support matrix
+Document the actual flow.
+
+## 4. Support matrix
 
 ### After Effects
 
-- minimum supported:
-- newest GA tested:
-- beta/lab:
-- unsupported versions:
+- Minimum supported:
+- Newest tested GA:
+- Beta observations:
+- Unsupported:
 
 ### macOS
 
-- minimum OS:
+- Minimum OS:
 - arm64:
 - x86_64:
-- GPU requirements:
+- Rosetta behavior if relevant:
+- GPU backends:
 
 ### Windows
 
-- minimum OS:
+- Minimum OS:
 - x64:
 - ARM64:
-- GPU requirements:
+- GPU backends:
 
-Do not write "all versions" without a real matrix.
+Every tested claim must eventually map to a compatibility-matrix evidence record.
 
-## SDK / toolchain
+## 5. SDK/toolchain baseline
 
-- AE SDK exact version/build:
-- macOS Xcode/Clang:
-- Windows Visual Studio/MSVC:
-- C++ standard:
-- external SDKs:
+- Adobe SDK:
+- Xcode:
+- macOS SDK/deployment target:
+- Visual Studio:
+- MSVC toolset:
+- Windows SDK:
+- C++ language level:
+- Third-party dependency lock/version policy:
 
-## Registration / identity
+## 6. Entry/registration
 
-- plug-in kind:
+For native component:
+
+- plug-in family/kind:
 - entry point:
-- PiPL/resource source:
-- match name:
+- PiPL architecture declarations:
 - category/display name:
-- version fields:
+- stable match name:
+- suite generations required:
+- fallback if a suite is absent:
 
-## Render
+## 7. Render contract
 
 - 8-bpc:
 - 16-bpc:
 - 32-bpc:
-- alpha behavior:
+- alpha semantics:
 - SmartFX:
-- ROI:
+- ROI/origin behavior:
+- temporal dependencies:
 - auxiliary channels:
-- MFR:
-- GPU backends:
+- audio if any:
 - CPU fallback:
-- audio if applicable:
 
-## Render invariants
+## 8. MFR/threading
 
-- coordinate/origin assumptions:
-- rowbytes policy:
-- color-space assumptions:
-- deterministic expectations:
-- numerical tolerance:
-
-## State and ownership
-
-### Global
-
-- global_data:
-- mutable/immutable:
-- setup/setdown owner:
-
-### Instance/sequence
-
-- sequence_data:
-- schema version:
-- flatten/migration:
-- MFR access rules:
-
-### Caches
-
-- cache key:
-- owner:
-- eviction:
-- invalidation:
-- thread safety:
-
-### Borrowed host objects
-
-List host-owned references and lifetime limits.
-
-## UI
-
-- standard parameters:
-- custom Drawbot:
-- ScriptUI:
-- panel:
-- CEP/UXP:
-- accessibility/localization requirements:
-
-## Communication
-
-- panel/script/native topology:
-- protocol version:
-- request envelope:
-- error envelope:
-- cancellation:
-- stale-response policy:
-- large-data/data-plane transport:
-- helper IPC/authentication:
-
-## Threading
-
-- callbacks that may be concurrent:
-- worker-thread responsibilities:
-- host-thread-only operations:
+- MFR claimed:
+- mutable globals:
+- global_data writes:
+- sequence_data use:
+- Compute Cache:
+- thread-local/frame-local scratch:
 - locks:
-- third-party thread-safety assumptions:
+- third-party thread-safety evidence:
+- host calls made while locks held:
+- cancellation behavior:
 
-## Persistence / project compatibility
+## 9. GPU
 
-- parameter ID policy:
-- sequence schema:
-- old project fixtures:
-- migration rules:
-- downgrade expectation:
+- backends:
+- capability flags:
+- gpu_data owner/lifetime:
+- setup/setdown:
+- CPU oracle:
+- comparison tolerance:
+- fallback:
+- device-loss/error policy:
 
-## Filesystem / network
+## 10. Persistent state
 
-- paths read/written:
-- user data location:
-- temp/cache location:
+- parameter IDs:
+- parameter semantics:
+- sequence/arbitrary data schema:
+- current schema version:
+- migration from:
+- corrupt/unknown version behavior:
+- cache vs persistent truth:
+
+Never use compiler-dependent raw C++ objects as a persistence format.
+
+## 11. Communication/protocol
+
+For panel/native/helper products:
+
+- protocol version:
+- minimum compatible version:
+- request ID:
+- generation/stale-response rule:
+- error envelope:
+- max message size:
+- command allowlist:
+- control plane:
+- data plane:
+- cancellation:
+- timeout/liveness:
+
+## 12. UI
+
+- standard effect params:
+- custom effect UI/Drawbot:
+- native panel:
+- ScriptUI:
+- CEP:
+- future UXP migration boundary:
+- localization:
+- accessibility/key navigation:
+
+## 13. Files/network/security
+
+- filesystem access:
 - network endpoints:
-- offline behavior:
-
-## Licensing/security
-
-- entitlement model:
-- render-farm/headless policy:
+- downloaded data:
+- downloaded executable code:
+- helper IPC:
 - secrets:
-- token storage:
-- failure states:
-- telemetry/privacy:
+- update trust/signature policy:
+- telemetry/privacy policy:
 
-## Dependencies
+## 14. Licensing
 
-| Dependency | Version | License | mac arm64 | mac x86_64 | Win x64 | Win ARM64 |
-|---|---|---|---|---|---|---|
-| | | | | | | |
+- entitlement states:
+- offline policy:
+- server outage behavior:
+- render farm/headless policy:
+- render hot-path dependency: must be none unless explicitly justified and safe
+- user-facing recovery:
 
-## Performance budget
+## 15. Performance budget
+
+Define target workloads before optimization.
 
 - target frame/resolution:
-- cold first-frame budget:
-- warm-frame/render budget:
+- target median:
+- p95:
+- memory peak:
+- cache budget:
 - panel latency:
-- memory budget:
-- MFR scaling target:
-- GPU crossover/target:
+- regression threshold:
 
-## Failure behavior
+## 16. Failure behavior
 
-Define behavior for:
+Define expected behavior for:
 
+- unsupported host;
+- missing suite;
 - unsupported GPU;
 - allocation failure;
-- cancel;
-- corrupted persisted state;
-- missing native/helper component;
-- protocol mismatch;
-- network/server down;
-- invalid license;
-- installer upgrade failure.
+- corrupt project state;
+- missing helper;
+- component version mismatch;
+- network unavailable;
+- license unavailable;
+- cancellation;
+- AE shutdown during work.
 
-## Build/distribution
+## 17. Build/distribution
 
 ### macOS
 
 - architectures:
-- development signing:
 - Developer ID identity:
 - notarization:
-- installer/package:
+- package:
 - install path policy:
-- dSYM retention:
+- dSYM archive:
 
 ### Windows
 
 - architectures:
 - Authenticode:
-- installer:
-- registry path policy:
-- PDB retention:
+- package/installer:
+- install path/registry policy:
+- PDB archive:
 
-## Test plan
+## 18. Test plan
 
-### Unit/contract
-
-- pure core:
-- schema/protocol:
-- error handling:
-
-### Render
-
-- golden fixtures:
-- BPC:
-- alpha/HDR:
+- pure unit:
+- adapter/contract:
+- native compile/link:
+- PiPL/resource:
+- golden render:
+- bit depths:
+- alpha:
 - ROI/origins:
-- CPU/GPU:
-
-### Concurrency
-
-- MFR:
-- cancel:
-- stress repetitions:
-
-### Host
-
-- AE matrix:
+- MFR stress:
+- GPU equivalence:
 - save/reopen:
-- panel lifecycle:
+- migration:
+- panel/bridge:
+- installer fresh/upgrade/uninstall:
+- cross-version/platform:
+- crash/recovery:
+- performance:
 
-### Distribution
+## 19. Acceptance criteria
 
-- fresh install:
-- upgrade:
-- uninstall:
-- clean-machine trust/signing:
+A capability is accepted only when:
 
-## Acceptance evidence
+~~~text
+claim
+→ named test
+→ exact artifact/environment
+→ observable assertion
+→ retained evidence
+~~~
 
-Link/ID for each required capability:
+List release-blocking gates here.
 
-| Capability | Test ID | Required environments | Status |
+## 20. Open risks / unknowns
+
+| Risk/unknown | Evidence needed | Owner | Blocking? |
 |---|---|---|---|
-| | | | NOT_RUN |
+| | | | |
 
-## Release blockers
-
-1.
-2.
-
-## Open questions
-
-1.
-2.
+Do not hide unknowns inside optimistic support statements.

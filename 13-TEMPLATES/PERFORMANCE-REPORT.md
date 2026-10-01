@@ -1,122 +1,142 @@
 # Performance report template
 
-## Candidate
+## Decision
 
-- product version:
-- build:
-- git SHA:
-- binary SHA-256:
-- compiler/toolchain:
-- AE SDK:
+- Report ID:
+- Date:
+- Candidate:
+- Baseline:
+- Owner:
+- Goal:
+- Predefined regression/improvement threshold:
 
-## Baseline
+## Build identity
 
-- product version:
-- build:
-- binary SHA-256:
+### Baseline
+
+- Product version/build:
+- Git SHA:
+- Binary hash:
+
+### Candidate
+
+- Product version/build:
+- Git SHA:
+- Binary hash:
 
 ## Environment
 
-- After Effects exact build:
-- OS:
+- After Effects version/build:
+- OS version/build:
 - CPU:
-- CPU architecture:
 - RAM:
 - GPU:
-- GPU driver:
-- power/thermal mode notes:
+- Driver/runtime:
+- Power mode:
+- Thermal notes:
+- Toolchain if relevant:
 
 ## Scenario
 
-- fixture/project:
-- fixture hash/version:
-- resolution:
-- duration/frames:
-- bit depth:
-- working space if relevant:
+- Project/fixture:
+- Fixture hash/version:
+- Resolution:
+- Duration/frames:
+- BPC:
 - MFR:
 - GPU backend:
-- cache state: cold/warm
-- repetitions:
+- ROI/render path:
+- Cache state:
+- Warmup procedure:
 
-## Correctness prerequisite
+## Method
 
-- golden fixture:
-- comparison metric:
-- tolerance:
-- candidate correctness: PASS / FAIL
-- diff artifact:
-
-If FAIL, performance result cannot approve release.
+- Number of warmup runs:
+- Number of measured runs:
+- Timing source/tool:
+- Outlier policy defined before run:
+- Other processes controlled:
+- Same environment for baseline/candidate: yes / no
 
 ## Results
 
-| Metric | Baseline | Candidate | Delta | Threshold | Result |
+| Metric | Baseline | Candidate | Delta | Threshold | Pass |
 |---|---:|---:|---:|---:|---|
-| cold first frame | | | | | |
-| warm median frame | | | | | |
+| Cold/first frame | | | | | |
+| Warm median frame | | | | | |
 | p95 frame | | | | | |
-| p99 frame | | | | | |
-| full render | | | | | |
-| peak memory | | | | | |
-| steady retained memory | | | | | |
+| Full render | | | | | |
+| Peak memory | | | | | |
+| Retained memory after run | | | | | |
 | CPU utilization | | | | | |
-| lock wait | | | | | |
-| GPU transfer | | | | | |
-| GPU compute | | | | | |
-| cache hit rate | | | | | |
+| Lock wait | | | | | |
+| GPU upload/prep | | | | | |
+| GPU kernel | | | | | |
+| GPU sync/readback | | | | | |
 
-## Raw sample summary
+Use only metrics relevant to the feature.
 
-- sample count:
-- min:
-- median:
-- p95:
-- max:
-- standard deviation/noise estimate:
+## Raw evidence
 
-Raw results location:
+- Raw samples:
+- Profiler trace:
+- Benchmark command:
+- Logs:
+- Chart/report artifact:
 
-## MFR scaling
+## Correctness gate
 
-| Mode/workers | Wall time | Speedup | Peak memory | Notes |
-|---|---:|---:|---:|---|
-| off | | 1.0x | | |
-| on | | | | |
+Performance result is invalid unless correctness still passes.
 
-## GPU breakdown
+- Golden fixture:
+- Expected/tolerance:
+- Max diff:
+- RMS/mean diff:
+- Alpha diff:
+- Pixels above tolerance:
+- NaN/Inf:
+- Result: PASS / FAIL
 
-| Stage | Baseline | Candidate |
-|---|---:|---:|
-| setup/buffer acquisition | | |
-| upload | | |
-| kernel/compute | | |
-| sync | | |
-| download/conversion | | |
+## MFR notes
 
-## Profiling evidence
+- MFR off result:
+- MFR on result:
+- Scaling:
+- Peak memory change:
+- Global serialization observed:
+- Race/stability test reference:
 
-- profiler:
-- trace:
-- allocation report:
-- lock/contention report:
-- GPU trace:
+## GPU notes
 
-## Interpretation
+- CPU baseline:
+- GPU backend:
+- Upload:
+- Kernel:
+- Sync:
+- Download:
+- Crossover resolution/workload:
+- CPU fallback verified:
 
-What changed and why?
+## Analysis
 
-Separate measured facts from hypothesis.
+What changed and which measured stage explains it?
+
+Do not infer cause from total time alone when a profiler can separate stages.
 
 ## Decision
 
-- [ ] accept
-- [ ] accept with documented tradeoff
-- [ ] investigate
-- [ ] reject
+Choose one:
 
-Reason:
+- [ ] accept optimization
+- [ ] reject optimization
+- [ ] investigate further
+- [ ] acceptable regression approved for another product reason
 
-Approved by:
+Rationale:
 
-Date:
+## Follow-up
+
+- Regression test/update:
+- Performance budget update:
+- New risk introduced:
+- Next measurement:

@@ -2,122 +2,137 @@
 
 # Product X.Y.Z
 
-Build:
-
 Release date:
+
+Build:
 
 ## Highlights
 
-Short user-facing summary.
+Short user-facing summary of the release.
 
 ## Added
 
--
+- 
 
 ## Changed
 
--
+- 
 
 ## Fixed
 
--
+- 
+
+Each fix should be written in user-observable terms. Internal issue IDs may be added in parentheses.
 
 ## Performance
 
-Only include measured claims.
+State only measured changes.
 
-Example:
+Good:
 
-> Reduced render time by 18% on fixture X, AE Y, machine Z.
+- Reduced median render time by X% on the named fixture/environment.
 
-Avoid "much faster" without a defined measurement.
+Avoid:
+
+- Much faster.
+
+If performance evidence is internal, keep the report ID available to support/release engineering.
 
 ## Compatibility
 
-### Tested
+### Tested After Effects
 
-- After Effects:
-- macOS:
-- Windows:
-- CPU architectures:
-- GPU backends:
-- MFR:
-- bit depths:
-
-### No longer supported
-
--
-
-### Lab / not production-supported
-
--
-
-Do not present beta-only checks as production support.
-
-## Project compatibility
-
-- old projects:
-- sequence/schema migration:
-- downgrade behavior:
-- parameter changes:
-
-## Panel / protocol compatibility
-
-- CEP/UXP shell:
-- native component minimum:
-- protocol version:
-- action if mixed versions are installed:
-
-## Installation
+- 
 
 ### macOS
 
-- package:
-- install location policy:
-- signing/notarization:
+- OS versions:
+- arm64:
+- x86_64:
+- GPU notes:
 
 ### Windows
 
-- package:
-- install location policy:
-- signing:
+- OS versions:
+- x64:
+- ARM64:
+- GPU notes:
 
-## Upgrade notes
+Do not list a platform as tested if its matrix cell is NOT RUN.
 
-- from supported previous versions:
-- restart AE required:
-- user settings/presets preserved:
-- special migration:
+## Project/data compatibility
+
+- Opens projects from:
+- State/schema migration:
+- Downgrade warning:
+- Project changes that older product versions cannot understand:
+
+## Panel/protocol compatibility
+
+If applicable:
+
+- panel version:
+- native version:
+- protocol:
+- helper version:
+- minimum compatible component versions:
+
+## Installation / upgrade notes
+
+- Fresh install:
+- Upgrade from:
+- Restart AE required:
+- Old files automatically removed:
+- Manual action:
+- Rollback notes:
 
 ## Known issues
 
-1.
+For each issue:
 
-Include workaround and affected environments when known.
+- affected environment;
+- symptom;
+- workaround if safe;
+- data-loss/crash risk;
+- tracking/support reference.
 
-## Security / licensing changes
+Do not hide a release-blocking defect in known issues.
 
-Only if relevant:
+## Security / licensing
 
--
+Only if relevant to the release:
+
+- security fixes:
+- changed network endpoints:
+- licensing/offline policy changes:
+- updater/signing changes:
+
+Avoid disclosing secrets or exploit details that create unnecessary risk before a fix is broadly available.
 
 ## Checksums
 
-- macOS package SHA-256:
-- Windows x64 package SHA-256:
-- Windows ARM64 package SHA-256:
+List the actual published artifact hashes:
 
-## Build provenance
+~~~text
+macOS package SHA-256:
+Windows x64 package SHA-256:
+Windows ARM64 package SHA-256:
+~~~
 
-For support/internal release record:
+## Support
 
-- git tag/SHA:
-- AE SDK:
-- toolchain:
-- evidence/report location:
+- Documentation:
+- Support contact/process:
+- Diagnostic information to include:
 
-## Rollback
+## Internal release evidence
 
-Last known supported release:
+Not necessarily published to users:
 
-Rollback caveats:
+- release commit/tag:
+- artifact manifest:
+- compatibility matrix:
+- test run/evidence IDs:
+- symbols archive:
+- signing/notarization record:
+- rollback artifact:
