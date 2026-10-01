@@ -188,6 +188,14 @@ def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def source_identity_error(source: dict) -> str | None:
+    if not source.get("git_sha"):
+        return "source Git SHA is unavailable"
+    if source.get("dirty") is not False:
+        return "source working tree is dirty or its state is unknown"
+    return None
+
+
 def run_checks(
     examples: Path,
     compiler: str,
@@ -312,6 +320,11 @@ def main(argv=None):
         default="auto",
     )
     parser.add_argument("--report", type=Path)
+    parser.add_argument(
+        "--require-clean",
+        action="store_true",
+        help="Fail evidence acceptance unless the Bible source tree is a known clean Git commit",
+    )
     args = parser.parse_args(argv)
 
     style = compiler_style(args.compiler, args.compiler_style)
@@ -329,6 +342,12 @@ def main(argv=None):
             encoding="utf-8",
         )
         print(f"report={args.report}")
+
+    if args.require_clean:
+        identity_error = source_identity_error(report["source"])
+        if identity_error:
+            print(f"error: {identity_error}")
+            return 2
 
     summary = report["summary"]
     print(
