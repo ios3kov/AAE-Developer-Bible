@@ -1,100 +1,254 @@
 # Render Queue recipes
 
-**Suites:** `AEGP_RenderQueueSuite1`, `AEGP_RQItemSuite4`, `AEGP_OutputModuleSuite4`  
-**Confidence:** SDK-verified + `QueueBert` sample-derived.
+**Primary Bible baseline:** Adobe After Effects SDK **25.6 build 61**.
 
-## Добавить comp в queue
+**Current SDK families:** `AEGP_RenderQueueSuite1`, `AEGP_RQItemSuite4`, `AEGP_OutputModuleSuite4`.
+
+The existing Bible C++ recipe intentionally uses the older-compatible `RQItemSuite3` subset; both Suite3 and current Suite4 use **`AEGP_RenderItemStatusType`**, not `A_Boolean`, for render-item state.
+
+## Queue state vs item state
+
+These are different state machines.
+
+Queue state:
+
+- STOPPED;
+- PAUSED;
+- RENDERING.
+
+Item state includes values such as:
+
+- NEEDS_OUTPUT;
+- UNQUEUED;
+- QUEUED;
+- USER_STOPPED;
+- ERR_STOPPED;
+- DONE.
+
+Do not pass queue-state constants to item APIs or vice versa.
+
+## Add composition
 
 ```cpp
 ERR(suites.RenderQueueSuite1()->AEGP_AddCompToRenderQueue(
     compH,
-    output_path_utf8_or_host_expected_path));
+    initial_path_utf8));
 ```
 
-После add **старые Render Queue references могут стать invalid**. Re-query queue.
+Important: changing queue composition/order invalidates existing `AEGP_RQItemRefH` references.
 
----
-
-## Получить queue items
+After add/remove/reorder:
 
 ```text
-GetNumRQItems
-→ GetRQItemByIndex / GetNextRQItem
-→ GetCompFromRQItem
-→ GetRenderState / SetRenderState
-```
-
-Используйте именно indexing semantics вашей версии/sample; не переносите undocumented community assumptions между версиями.
-
----
-
-## Output modules
-
-```text
-RQItem
-→ GetNumOutputModulesForRQItem
-→ GetOutputModuleByIndex
-→ SetOutputFilePath
-→ configure enabled outputs / channels / crop / stretch / sound
-```
-
-После add/remove output module re-query references/indices.
-
----
-
-## Установить output path
-
-```cpp
-ERR(suites.OutputModuleSuite4()->AEGP_SetOutputFilePath(
-    rq_item_refH,
-    output_module_refH,
-    utf16_pathZ));
-```
-
-`AEGP_SetOutputFilePath` принимает NULL-terminated UTF-16 path (`A_UTF16Char*`). `AEGP_GetOutputFilePath` возвращает `AEGP_MemHandle`, который надо освободить через Memory Suite.
-
----
-
-## Запустить queue
-
-Сначала item должен иметь допустимый output path и быть включён для рендера:
-
-```cpp
-ERR(suites.RQItemSuite4()->AEGP_SetRenderState(
-    rq_itemH,
-    TRUE));
-
-ERR(suites.RenderQueueSuite1()->AEGP_SetRenderQueueState(
-    AEGP_RenderQueueState_RENDERING));
-```
-
-`AEGP_SetRenderState` принимает `A_Boolean`, а не enum статуса render item.
-
-Host может передать управление render pipeline и UI; команда не должна ожидать «обычный синхронный цикл» после старта.
-
----
-
-## Invalidation rule
-
-Официальный SDK guide отдельно предупреждает:
-
-- `AddCompToRenderQueue` или пользовательский add/remove инвалидирует RQ item references;
-- add/remove output module инвалидирует output-module references для item.
-
-Production code:
-
-```text
-mutation
-→ drop old refs
+drop old RQ refs
 → query count again
 → fetch fresh refs
 ```
 
----
+## Find queue items
 
-## Для сложных preset/template операций
+Current RQItemSuite4 supports item enumeration/state access. A compatibility source recipe may use Suite3 when it needs only older members.
 
-Некоторые render settings/output module template actions проще/надёжнее делаются через scripting (`applyTemplate`) поверх native controller. Hybrid допустим, если:
-- boundary документирован;
-- script failure возвращается как structured error;
-- native core не зависит от UI language strings.
+Do not cast Suite3 ↔ Suite4.
+
+## Output modules
+
+Pattern:
+
+```text
+RQ item
+→ GetNumOutputModulesForRQItem
+→ GetOutputModuleByIndex
+→ configure path/channels/crop/stretch/etc.
+```
+
+Adding/removing/reordering output modules invalidates output-module refs according to the relevant contract.
+
+Re-query after structural changes.
+
+## Output path
+
+`AEGP_SetOutputFilePath` uses UTF-16 path in the current reviewed output-module contract.
+
+`AEGP_GetOutputFilePath` returns Memory Suite handle requiring the matching free path.
+
+Do not retain pointer after unlock/free.
+
+## Queue must be stopped for item state edit
+
+Current RQItemSuite4 header says `AEGP_SetRenderState` errors if Render Queue state is not STOPPED.
+
+Do not silently stop user's render merely because your tool wants to edit an item.
+
+Better:
+
+```text
+queue not STOPPED
+→ report command unavailable/busy
+```
+
+unless product explicitly owns queue operation and user asked for stop/reconfigure.
+
+## Set item to QUEUED correctly
+
+Correct semantic call:
+
+```cpp
+ERR(rq_items->AEGP_SetRenderState(
+    rq_itemH,
+    AEGP_RenderItemStatus_QUEUED));
+```
+
+Then read back state when command semantics depend on it.
+
+## Historical TRUE bug
+
+An earlier Bible recipe and Adobe QueueBert sample used:
+
+```cpp
+AEGP_SetRenderState(rq_itemH, TRUE)
+```
+
+This is wrong for the reviewed enum contract.
+
+In the SDK baseline:
+
+```text
+TRUE == 1
+AEGP_RenderItemStatus_UNQUEUED == 1
+AEGP_RenderItemStatus_QUEUED == 2
+```
+
+So `TRUE` requests UNQUEUED, not QUEUED.
+
+The Bible C++ recipe was corrected to named `AEGP_RenderItemStatus_QUEUED` + readback.
+
+## Current Suite4 vs recipe Suite3
+
+Why chapter says Suite4 while code uses Suite3:
+
+- SDK 25.6 current header exposes `AEGP_RQItemSuite4`;
+- existing source recipe uses members already present in Suite3;
+- Suite3 also has enum-typed SetRenderState;
+- recipe remains a compatibility-shaped source example, not current-suite authority.
+
+New product code should choose suite generation deliberately from target host/support policy.
+
+## Output module is more than filename
+
+Output config may include:
+
+- video/audio enabled;
+- RGB/RGBA/alpha;
+- crop;
+- stretch;
+- post-render action;
+- format/template-specific settings.
+
+File extension alone does not define output module format.
+
+## Post-render actions
+
+Output module may perform project-side actions such as import/replace/proxy workflows.
+
+Treat these as project mutations, not harmless file settings.
+
+## Prepare vs start queue
+
+Separate two commands:
+
+### Prepare our item
+
+```text
+validate comp/path
+→ add item
+→ reacquire refs
+→ configure output
+→ set QUEUED
+→ read back
+```
+
+### Start global queue
+
+```text
+inspect queue/user intent
+→ ensure other queued items are acceptable
+→ set queue state RENDERING
+```
+
+Starting queue is global. It can render items your tool did not create.
+
+Do not make it an implicit side effect of preview/export preparation.
+
+## Invalidation
+
+Two separate invalidation layers:
+
+| Mutation | Invalidated |
+|---|---|
+| queue item add/remove/reorder | RQ item refs |
+| output module add/remove/reorder | output-module refs for item |
+
+Stored numeric index is also not durable identity after reorder.
+
+## Partial failure
+
+Example:
+
+```text
+AddCompToRenderQueue succeeds
+→ output path configuration fails
+```
+
+The queue may already contain a new item.
+
+Returning error does not mean “nothing changed”.
+
+Define product policy:
+
+- leave item and report;
+- rollback only the item you created;
+- mark unqueued/needs output;
+- ask user.
+
+Do not delete unrelated queue items during cleanup.
+
+## Unicode/path conversion
+
+`AddCompToRenderQueue` and output-path APIs do not necessarily use identical string types.
+
+Use deliberate UTF conversion. Do not pointer-cast UTF-8/UTF-16.
+
+## Hybrid scripting
+
+Some template/preset operations may be more practical through scripting (`applyTemplate`) controlled by native/panel orchestration.
+
+Hybrid is acceptable when:
+
+- command boundary documented;
+- script errors structured;
+- native logic does not depend on localized UI strings.
+
+## Product workflow
+
+1. Verify queue is editable.
+2. Validate comp/path.
+3. Add own item.
+4. Drop stale refs.
+5. Re-query item/output module.
+6. Configure complete output contract.
+7. Set named QUEUED enum.
+8. Read back state/config if required.
+9. Start global queue only on explicit user intent.
+
+## Related chapters
+
+- [Project/render automation](../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md)
+- [Rendered frames](10-RENDER-FRAMES.md)
+- [Memory/undo](12-MEMORY-UNDO-PERSISTENCE.md)
+- [SDK 25.6 project/render review](../18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md)
+- [Corrected C++ recipe](code/RenderQueueRecipes.cpp)
+
+## Evidence boundary
+
+Suite4 baseline and enum/invalidation rules are source-reviewed against SDK 25.6. The corrected source example does not claim a particular queue runtime run.
