@@ -911,7 +911,7 @@ Bible itself does not need to build every combination listed in examples. When B
 - [macOS](00-START-HERE/../08-MACOS/README.md)
 - [Windows](00-START-HERE/../09-WINDOWS/README.md)
 - [Testing](00-START-HERE/../10-TESTING/README.md)
-- [Distribution](00-START-HERE/../11-DISTRIBUTION/README.md)
+- [Distribution](00-START-HERE/../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
 
 
 ---
@@ -1946,7 +1946,7 @@ Avoid:
 - [PiPL and loading](01-ARCHITECTURE/03-PIPL-AND-LOADING.md)
 - [SDK diff policy](01-ARCHITECTURE/../18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md)
 - [Compatibility matrix template](01-ARCHITECTURE/../13-TEMPLATES/COMPATIBILITY-MATRIX.md)
-- [Distribution](01-ARCHITECTURE/../11-DISTRIBUTION/README.md)
+- [Distribution](01-ARCHITECTURE/../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
 
 ## Evidence boundary
 
@@ -8261,7 +8261,7 @@ portable tests
 - [Environment matrix](08-MACOS/../00-START-HERE/02-ENVIRONMENT-MATRIX.md)
 - [Build system strategy](08-MACOS/../01-ARCHITECTURE/06-BUILD-SYSTEM.md)
 - [Testing](08-MACOS/../10-TESTING/README.md)
-- [Distribution](08-MACOS/../11-DISTRIBUTION/README.md)
+- [Distribution](08-MACOS/../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
 
 ## Evidence boundary
 
@@ -8895,7 +8895,7 @@ This chapter documents a Windows debugging method. Bible does not need to build 
 ## Related chapters
 
 - [Visual Studio setup](09-WINDOWS/01-VISUAL-STUDIO-SETUP.md)
-- [Windows ARM64](09-WINDOWS/02-ARM64.md)
+- [Windows ARM64](09-WINDOWS/02-X64-ARM64.md)
 - [Testing](09-WINDOWS/../10-TESTING/README.md)
 - [Crash diagnostics](09-WINDOWS/../10-TESTING/05-CRASH-DIAGNOSTICS.md)
 - [Host call boundary](09-WINDOWS/../19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md)
@@ -9043,9 +9043,9 @@ Bible документирует метод и не обязана строит�
 
 - [GPU effects](09-WINDOWS/../02-EFFECT-PLUGINS/05-GPU.md)
 - [Windows debugging](09-WINDOWS/03-DEBUGGING.md)
-- [Windows ARM64](09-WINDOWS/02-ARM64.md)
+- [Windows ARM64](09-WINDOWS/02-X64-ARM64.md)
 - [CPU/GPU equivalence recipe](09-WINDOWS/../12-RECIPES/04-CPU-GPU-EQUIVALENCE.md)
-- [Distribution](09-WINDOWS/../11-DISTRIBUTION/README.md)
+- [Distribution](09-WINDOWS/../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
 
 ## Evidence boundary
 
@@ -9982,7 +9982,7 @@ Host smoke может быть отдельным product lane; Bible не об�
 - [Environment matrix](09-WINDOWS/../00-START-HERE/02-ENVIRONMENT-MATRIX.md)
 - [Build system strategy](09-WINDOWS/../01-ARCHITECTURE/06-BUILD-SYSTEM.md)
 - [Testing](09-WINDOWS/../10-TESTING/README.md)
-- [Distribution](09-WINDOWS/../11-DISTRIBUTION/README.md)
+- [Distribution](09-WINDOWS/../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
 
 ## Evidence boundary
 
@@ -15431,7 +15431,7 @@ Published suite лучше, когда нужен повторяемый сер�
 
 - [Plug-in → Plug-in через PICA](14-NATIVE-INTEGRATIONS/../15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md)
 - [Effect ↔ AEGP generic bridge](14-NATIVE-INTEGRATIONS/../15-COMMUNICATION/03-AEGP-TO-EFFECT.md)
-- [PICA shared-suite template](14-NATIVE-INTEGRATIONS/../16-WORKING-TEMPLATES/pica-shared-suite)
+- [PICA shared-suite template](14-NATIVE-INTEGRATIONS/../16-WORKING-TEMPLATES/pica-shared-suite/README.md)
 - [Memory/lifetime](14-NATIVE-INTEGRATIONS/../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md)
 - [Threading boundaries](14-NATIVE-INTEGRATIONS/../15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
 
@@ -17835,7 +17835,7 @@ AEGP сначала должен получить `AEGP_EffectRefH`, вызва�
 - save/reopen, если protocol влияет на persistent state;
 - отсутствие render-cache stale behavior.
 
-Связанный шаблон: [effect-aegp-generic-bridge](15-COMMUNICATION/../16-WORKING-TEMPLATES/effect-aegp-generic-bridge).
+Связанный шаблон: [effect-aegp-generic-bridge](15-COMMUNICATION/../16-WORKING-TEMPLATES/effect-aegp-generic-bridge/README.md).
 
 
 ---
@@ -17980,7 +17980,7 @@ protocol/result error
 - AE restart;
 - заявленный concurrency mode.
 
-Шаблон: [pica-shared-suite](15-COMMUNICATION/../16-WORKING-TEMPLATES/pica-shared-suite).
+Шаблон: [pica-shared-suite](15-COMMUNICATION/../16-WORKING-TEMPLATES/pica-shared-suite/README.md).
 
 
 ---
