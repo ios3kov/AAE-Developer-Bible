@@ -31,7 +31,7 @@ private:
 class AegpEffectRefOwner final {
 public:
     AegpEffectRefOwner() = default;
-    AegpEffectRefOwner(const AEGP_EffectSuite4* suite, AEGP_EffectRefH h) : suite_(suite), h_(h) {}
+    AegpEffectRefOwner(const AEGP_EffectSuite5* suite, AEGP_EffectRefH h) : suite_(suite), h_(h) {}
     ~AegpEffectRefOwner() { reset(); }
     AegpEffectRefOwner(const AegpEffectRefOwner&) = delete;
     AegpEffectRefOwner& operator=(const AegpEffectRefOwner&) = delete;
@@ -47,7 +47,7 @@ public:
         h_ = h;
     }
 private:
-    const AEGP_EffectSuite4* suite_ = nullptr;
+    const AEGP_EffectSuite5* suite_ = nullptr;
     AEGP_EffectRefH h_ = nullptr;
 };
 
