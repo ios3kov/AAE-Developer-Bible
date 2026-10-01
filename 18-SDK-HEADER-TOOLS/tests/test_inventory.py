@@ -21,5 +21,19 @@ class InventoryTest(unittest.TestCase):
         self.assertEqual({'AEGP_DoThing','AEGP_GetThing','PF_TestCallback','AEIO_InitInSpecFromFile'},funcs)
         self.assertEqual(4,data['function_count'])
 
+    def test_callback_typedef_fields_are_resolved(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "artisan.h"
+            path.write_text(
+                "typedef int (*PR_RenderFunc)(int); "
+                "typedef struct { PR_RenderFunc render_func; } PR_ArtisanEntryPoints;"
+            )
+            data = mod.inventory([str(path)])
+            table = next(t for t in data["tables"] if t["name"] == "PR_ArtisanEntryPoints")
+            self.assertEqual([f["name"] for f in table["functions"]], ["render_func"])
+            self.assertEqual(table["functions"][0]["signature"], "int (*render_func)(int);")
+            self.assertFalse(data["unparsed_candidate_tables"])
+            self.assertFalse(data["partial_candidate_tables"])
+
 if __name__=='__main__':
     unittest.main()
