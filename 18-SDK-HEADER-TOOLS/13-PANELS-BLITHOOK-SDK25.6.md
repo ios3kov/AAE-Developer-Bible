@@ -35,7 +35,7 @@ Panelator integrates Window menu command with ToggleVisibility/IsShown and popul
 
 ### Panelator lifetime finding
 
-Reviewed `Panelator.cpp` allocates global `Panelator` with `new` and registers command/update/create hooks, but does not show a destructor/unregister/death-hook teardown path in that source. This is a source limitation, **not a measured leak/crash**. Production native-panel example still needs explicit create/destroy/unregister/shutdown acceptance.
+Reviewed `Panelator.cpp` allocates global `Panelator` with `new` and registers command/update/create hooks, but does not show a destructor/unregister/death-hook teardown path in that source. This is a source limitation, **not a measured leak/crash**. A concrete native-panel product should define create/destroy/unregister/shutdown behavior explicitly. The source review itself does not claim those runtime results.
 
 ### Identity recommendation
 
@@ -72,3 +72,42 @@ EMP sample MyBlit returns success with no pixel work; death is a cleanup comment
 | macOS/Windows host matrix | NOT RUN |
 
 Next editorial work can cover shared PICA suite providers and legacy/native boundaries; runtime/product evidence remains separate from Bible editorial readiness.
+
+## Later Panels / BlitHook production-guidance update — 2026-10-01
+
+A later logical block completed the production-architecture layer without changing the SDK 25.6 source baseline.
+
+### Native Panels
+
+The later pass adds/reconciles:
+
+- global registration state versus per-panel controller/model versus platform child-view state;
+- host-owned `AEGP_PanelH` / `AEGP_PlatformViewRef` versus product-owned child UI;
+- create-hook partial-failure rollback;
+- conservative child-destroy → worker-stop → unregister → global-teardown order;
+- stable match-name identity separated from localized title and transient NSView/HWND;
+- panel recreation/state recovery;
+- worker → host/UI-safe handoff with generation rejection;
+- resize/dock/workspace/HiDPI state as transient view state;
+- product-validation wording consistent with `EDITORIAL-GUIDE.md`.
+
+No Panelator source evidence was found that proves a complete teardown/unregister sequence; that limitation remains preserved.
+
+### BlitHook
+
+The later pass adds/reconciles:
+
+- callback pixel pointer treated as borrowed unless a stronger verified lifetime contract exists;
+- safe synchronous-copy/staging architecture for post-callback consumers;
+- row-aware copy and overflow/size validation;
+- explicit blank-frame handling;
+- bounded queue/backpressure/drop policy;
+- copied view-coordinate metadata;
+- display/color boundary versus effect/render/export pixels;
+- async flag/receipt/completion preserved as an under-qualified protocol path rather than inventing pointer lifetime;
+- worker/IPC ownership and death-hook shutdown order;
+- product-validation wording rather than mandatory Bible host testing.
+
+The staging/backpressure design is a conservative product architecture recommendation. It is **not** presented as an Adobe-documented asynchronous BlitHook contract.
+
+**Evidence level after this pass:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
