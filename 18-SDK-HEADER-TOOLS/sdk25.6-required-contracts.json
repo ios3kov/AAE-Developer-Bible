@@ -67,8 +67,8 @@
       ]
     },
     {
-      "name": "AEGP_EffectSuite4",
-      "area": "effects/generic bridge",
+      "name": "AEGP_EffectSuite5",
+      "area": "effects/generic bridge (SDK 25.6 current)",
       "required_functions": [
         "AEGP_GetNextInstalledEffect",
         "AEGP_GetEffectMatchName",
