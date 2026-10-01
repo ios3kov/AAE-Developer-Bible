@@ -163,6 +163,16 @@ Completed as one workspace/display-lifecycle block:
 - asynchronous BlitHook behavior remains deliberately unclaimed beyond verified source contract;
 - template/reference/source-review and communication evidence language aligned with `EDITORIAL-GUIDE.md`.
 
+### PICA / Effect↔AEGP / legacy boundaries
+
+Completed as one native-service/bridge/migration block:
+
+- PICA ABI identity, provider/consumer lifetime, version adapters, shutdown and suite-name ownership clarified;
+- Effect↔AEGP generic bridge aligned to current `EffectSuite5`, late target resolution and size/versioned synchronous payload semantics;
+- render dependency and persistent-state boundaries clarified;
+- legacy current-generation typo fixed and migration guidance split into source modernization versus behavior/project compatibility;
+- templates/references/source-review evidence wording aligned with `EDITORIAL-GUIDE.md`.
+
 ## Current editorial TODO
 
 1. Sweep every main chapter for completeness against the editorial checklist.
