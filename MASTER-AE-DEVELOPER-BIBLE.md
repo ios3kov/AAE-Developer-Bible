@@ -12758,6 +12758,18 @@ See [verification commands and results](VERIFICATION.md) and [coverage matrix](F
 
 # Verification — v1.1
 
+## Memory/lifetime and MFR chapter review (2026-10-01)
+
+Expanded [memory, resource lifetime and errors](01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) and [MFR/thread safety](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md) from the supplied SDK 25.6 build 61. The [third source-review record](18-SDK-HEADER-TOOLS/07-MEMORY-MFR-SDK25.6.md) identifies ten source files by SHA-256 and records exact declaration/comment/sample ranges.
+
+Reviewed contracts include PF versus AEGP memory families, borrowed versus owned worlds, suite references, host-managed sequence handle locks, the two flatten selectors, pre-render deletion, auxiliary versus SmartFX checkin, error-preserving cleanup, read-only MFR sequence access, mutable per-render-thread copies, and Compute Cache key/value/receipt lifetime. The non-waiting compute option is explicitly distinguished from cached-only lookup.
+
+Source discrepancies are retained: general versus conditional sequence-setup threading descriptions, PF_HandleSuite1's version macro evaluating to 2, the bool error variables in a schematic Compute Cache comment, and PathMaster's cross-platform warning. Architectural recommendations are labelled separately from SDK guarantees.
+
+Also reviewed the existing PicaSuiteRef, AegpOwners and HostCallbackGuard at snapshot `fcfb0e32c14916b55c2bcdbe414d3d1b3f524eeb`. Their borrowed suite dependencies, discarded cleanup errors and scope limits are documented; their implementation is unchanged. This is not the cross-project reuse audit required by stage 3A.
+
+**Verification level: source review and documentation only.** The source TAR hash was recomputed and matched the previously recorded value. No new native implementation, exact-SDK compiler run, loaded binary, leak test, MFR stress, GPU comparison or AE render was performed. Existing portable regression and strict documentation results must be read from the committed revision's Validate run, not inferred from this paragraph. Full plan gates remain open as recorded in COMPLETION-CHECKLIST.
+
 ## Parameter/UI and color/pixel chapter review (2026-09-30)
 
 Expanded [parameters and UI](02-EFFECT-PLUGINS/02-PARAMETERS-UI.md) and [pixels, color and alpha](02-EFFECT-PLUGINS/06-COLOR-PIXELS.md) from the supplied SDK 25.6 build 61. The [second source-review record](18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md) records hashes for 15 source files, exact declaration/sample line ranges and unresolved source discrepancies.
@@ -12787,7 +12799,7 @@ That iteration expanded Effect anatomy and SmartFX and added an auxiliary-channe
 - Full SDK index: 70 headers, 230 recognized tables, 3537 parsed functions. **Incomplete**: unsupported declarations produce diagnostics and a nonzero exit code. These counts are exploratory, not coverage claims.
 - Native linking, PiPL packaging, AE loading/rendering, MFR stress and Windows compilation: **not verified**.
 
-The 13 recorded translation-unit checks include two forwarding entry files and a foundation-header probe. These historical results are not repeated by the two editorial reviews above.
+The 13 recorded translation-unit checks include two forwarding entry files and a foundation-header probe. These historical results are not repeated by the editorial reviews above.
 
 `scripts/materialize_sdk_examples.py` provides exact local sample shells for all six gaps. `scripts/host_cycle.py` installs a built bundle and optionally invokes `aerender`, but intentionally reports UI load/unload and MFR stress as pending.
 
@@ -12818,7 +12830,7 @@ This is a **syntax/type** check. It deliberately does not call it a plugin build
 ## Required next host checks
 
 1. Minimal Gain: load, parameter UI, gain 0/1/4, 8/16-bpc and transparent pixels.
-2. SmartFX Copy: compare input/output at 8/16/32-bpc, partial/empty ROI, odd sizes, nonzero origins and cancellation. Keep MFR off until concurrent-frame tests pass.
+2. SmartFX Copy: compare input/output at 8/16/32-bpc, partial/empty ROI, odd sizes, nonzero origins and cancellation. Keep MFR off in the delivery build until concurrent-frame tests pass; use a separately identified enabled test build for those tests.
 3. MenuTool: successful command execution, menu updates, failed initialization and shutdown.
 4. Recipes: disposable project operations, undo, stream/keyframe ownership and render receipt cleanup.
 5. Record AE build, SDK, OS/architecture, sample base and actual observed result before upgrading a status to host-verified.
