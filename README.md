@@ -1,20 +1,49 @@
 # AE Developer Bible
 
-**Практическая библия разработчика инструментов, скриптов, панелей и нативных plug-in'ов для Adobe After Effects.**
+**Практическая библия по разработке инструментов, скриптов, панелей и нативных plug-in'ов для Adobe After Effects.**
 
-Research snapshot: **2026-09-30**  
-Status: **v1.1 — SDK syntax-checked baseline and reproducible documentation**  
-Completion gates: **Gates 1–3A closed; Gate 4 exact-SDK verification is current, host/release gates remain open.**
+Research snapshot: **2026-10-01**  
+Status: **working editorial edition — real SDK 25.6 contract-reviewed knowledge base**
 
-## Проверенность v1.1
+## Цель
 
-Исправлены реальные ошибки компиляции шаблонов; 13 translation-unit checks проходят с Adobe SDK 25.6 на macOS arm64. SmartFX реализует pass-through; MFR выключен до host stress tests. SDK tooling проверяет индексируемые объявления и имена символов, а не полную ABI-совместимость. Неполный разбор headers теперь завершает проверку ошибкой.
+AE Developer Bible — это **база знаний**, а не отдельный программный продукт и не набор плагинов, которые репозиторий обязан собрать и прогнать внутри After Effects.
 
-См. [результаты и команды проверок](VERIFICATION.md) и [фактическое покрытие](FINAL-COVERAGE-AUDIT.md). AEIO, Artisan и native panel пока представлены руководствами. Нативные примеры не имеют статуса host-verified.
+Она должна отвечать разработчику на практические вопросы:
 
-Сборка сайта: `python3 -m pip install -r requirements-docs.txt`, затем `python3 scripts/build_docs.py` и `mkdocs build --strict`.
+- какой тип расширения выбрать;
+- как устроены Effect / AEGP / AEIO / Artisan / scripting / panels;
+- какие lifecycle, suite, ownership, threading и ABI-контракты действуют;
+- как проектировать CPU/GPU/MFR, UI и hybrid-архитектуру;
+- как собирать, отлаживать, тестировать, подписывать и распространять продукт;
+- какие ошибки встречаются в официальных samples, старых API и реальных проектах;
+- какие решения являются документированными фактами, наблюдениями, реконструкцией или рекомендациями.
 
-Эта база отвечает не на вопрос «что есть в API», а на вопрос **«как правильно спроектировать, собрать, отладить, протестировать и выпустить инструмент для After Effects»**.
+**Готовность Bible определяется полнотой, точностью, практичностью и согласованностью документации.**
+
+Компиляция всех C++-фрагментов, сборка всех примеров, запуск каждого примера в AE, Windows build, signing/notarization и exhaustive host matrix **не являются условиями готовности самой Bible**. Эти действия описываются как процессы, которые должен применять разработчик своего продукта.
+
+## Источники истины
+
+Для version-sensitive native API приоритет такой:
+
+1. фактические headers нужного Adobe SDK;
+2. официальные SDK samples и комментарии;
+3. официальная документация Adobe и platform vendors;
+4. датированные исследовательские наблюдения;
+5. реконструкция и архитектурные рекомендации — только с явной маркировкой.
+
+Для текущей редакции реальный Adobe After Effects SDK **25.6 build 61** сверён по обязательному контрактному baseline: **35/35 required contracts** и **39/39 cookbook call-sites** разрешаются в нужных suite generations. Это проверка точности документации и source examples, а не требование собрать Bible как приложение.
+
+## Как читать уровни доказательности
+
+- **DOCUMENTED** — утверждение опирается на опубликованный контракт/документацию.
+- **SDK-CONTRACT-REVIEWED** — version-sensitive утверждение сверено с фактическим SDK header/sample.
+- **SOURCE EXAMPLE** — пример показывает форму решения и integration pattern; это не обещание готового бинарника.
+- **PROJECT-REPORTED / RUNTIME-OBSERVED** — сохранён конкретный результат реального проекта/запуска с указанной границей применимости.
+- **RECONSTRUCTED** — вывод восстановлен по evidence и не выдаётся за публичный контракт.
+
+Отсутствие runtime evidence у source example означает только **«Bible не заявляет этот runtime result»**, а не «Bible обязана теперь собрать и протестировать этот пример».
 
 ## Главный принцип
 
@@ -32,20 +61,20 @@ Completion gates: **Gates 1–3A closed; Gate 4 exact-SDK verification is curren
 
 ## Что читать сначала
 
-1. [`00-START-HERE/00-DECISION-TREE.md`](00-START-HERE/00-DECISION-TREE.md)
-2. [`00-START-HERE/01-EXTENSION-TYPES.md`](00-START-HERE/01-EXTENSION-TYPES.md)
-3. Затем ветку своей платформы:
-   - [`08-MACOS/README.md`](08-MACOS/README.md)
-   - [`09-WINDOWS/README.md`](09-WINDOWS/README.md)
-4. Для C++ effect plug-in — [`02-EFFECT-PLUGINS/README.md`](02-EFFECT-PLUGINS/README.md)
-5. Перед релизом — [`11-DISTRIBUTION/03-RELEASE-CHECKLIST.md`](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
+1. [Decision tree](00-START-HERE/00-DECISION-TREE.md)
+2. [Extension types](00-START-HERE/01-EXTENSION-TYPES.md)
+3. Ветка своей платформы:
+   - [macOS](08-MACOS/README.md)
+   - [Windows](09-WINDOWS/README.md)
+4. Для C++ effect plug-in — [Effect plug-ins](02-EFFECT-PLUGINS/README.md)
+5. Для production/release процесса — [Distribution](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
 
 ## Структура
 
-```text
+~~~text
 00-START-HERE/       выбор архитектуры и технологии
-01-ARCHITECTURE/     общая архитектура SDK, lifecycle, PiPL, ABI
-02-EFFECT-PLUGINS/   эффекты, SmartFX, MFR, GPU, UI, color
+01-ARCHITECTURE/     lifecycle, PiPL, ABI, memory, performance
+02-EFFECT-PLUGINS/   effects, SmartFX, MFR, GPU, UI, color, audio
 03-AEGP/             глубокая интеграция с AE
 04-AEIO/             import/export
 05-ARTISAN/          custom 3D renderer
@@ -55,82 +84,67 @@ Completion gates: **Gates 1–3A closed; Gate 4 exact-SDK verification is curren
 09-WINDOWS/          Visual Studio, x64/ARM64, debug, signing
 10-TESTING/          correctness, MFR, GPU/CPU, perf, crashes
 11-DISTRIBUTION/     versioning, packaging, release
-12-RECIPES/          практические пошаговые сценарии
-13-TEMPLATES/        шаблоны ТЗ, bug report, compatibility matrix
-14-NATIVE-INTEGRATIONS/ полный taxonomy нативных C++ integration types
-15-COMMUNICATION/      как AE, plug-ins, scripts и panels общаются
-16-WORKING-TEMPLATES/  рабочие drop-in C++/JSX/CEP шаблоны
-17-NATIVE-SUITE-COOKBOOK/ suite-by-suite native recipes + C++ drop-ins
-18-SDK-HEADER-TOOLS/     generate/verify/diff exact native SDK contracts
-19-NATIVE-CODE-FOUNDATION/ reusable suite/ownership/undo ABI helpers
-20-REFERENCE-IMPLEMENTATIONS/ native-first copyable reference implementations
-21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/ installed-effect evidence/reconstruction atlas
-22-PROJECT-CASE-STUDIES/ lessons and reuse audit from real AE projects
-```
+12-RECIPES/          практические сценарии
+13-TEMPLATES/        bug/spec/compatibility/release templates
+14-NATIVE-INTEGRATIONS/ taxonomy native integration types
+15-COMMUNICATION/    AE, plug-ins, scripts и panels
+16-WORKING-TEMPLATES/ source-shaped integration examples
+17-NATIVE-SUITE-COOKBOOK/ suite-by-suite recipes
+18-SDK-HEADER-TOOLS/ exact SDK contract inventory/audit helpers
+19-NATIVE-CODE-FOUNDATION/ ownership/undo/ABI helpers
+20-REFERENCE-IMPLEMENTATIONS/ reference source maps
+21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/ research atlas
+22-PROJECT-CASE-STUDIES/ real-project lessons
+~~~
 
+## Что означает «готовая редакция»
 
-## Финальный слой v1.0
+Редакция готова, когда:
 
-- Добавлен `20-REFERENCE-IMPLEMENTATIONS`: native-first карта copyable implementations для Effect, SmartFX/MFR, Custom UI/Drawbot, AEGP, Keyframer, native panels, AEIO, Artisan, Effect↔AEGP, PICA и ScriptUI.
-- Добавлен `FINAL-COVERAGE-AUDIT.md`, который напрямую сопоставляет требования библии с конкретными разделами.
-- Уточнён статус примеров: `drop-in`, `sample-derived`, `host-test-required`. Нативный пример не называется host-verified без реальной загрузки в After Effects.
+- основные типы разработки и ключевые workflows покрыты;
+- version-sensitive native claims сверены с выбранным SDK baseline;
+- публичные, SDK-derived, observed и reconstructed утверждения разделены;
+- рецепты и source examples не противоречат объясняющим главам;
+- неизвестные и ограничения указаны прямо;
+- platform/build/test/release guidance полна как инструкция;
+- источники и provenance сохранены;
+- навигация, ссылки, generated MASTER/manifest и docs build согласованы.
 
-## Новое в v0.4
-
-- Добавлен header-derived API inventory: локальный Adobe SDK автоматически превращается в точный Suite/FunctionBlock → function → signature index.
-- Генератор охватывает AEGP, PF/Effect, AEIO function blocks, Artisan/PR entry points, Drawbot и другие native function tables.
-- Добавлены `verify_recipe_symbols.py` и `diff_sdk_inventory.py`: проверка cookbook calls против конкретного SDK и diff двух SDK versions.
-- Добавлены отдельные launchers для macOS (`run-macos.sh`) и Windows (`run-windows.ps1`).
-- Добавлен native C++ foundation: PICA suite acquire/release, move-only owners для stream/effect/frame/memory handles, undo scope и exception boundary.
-- Python tooling проходит unit test; C++ foundation проходит strict C++17 compile (`-Wall -Wextra -Werror`) против синтетического ABI-stub.
-- Это не заменяет compile/load test с реальным Adobe SDK + After Effects host.
-
-## Новое в v0.3
-
-- Suite-by-suite native cookbook: project/items/comps/layers/effects/streams/keyframes/masks/text/render/render queue/guides.
-- Добавлен function map по основным AEGP suites: какой вызов за что отвечает.
-- Добавлены новые compile-shaped C++ drop-ins для project traversal, comp/layer, effect/stream, keyframes, frame checkout и render queue.
-- Добавлен `14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md`: зафиксированы ошибки/опечатки публичного HTML guide и правило «headers are source of truth».
-- Введены уровни доверия `SDK-verified`, `sample-derived`, `host-test-required`.
-- Исправлены найденные при перепроверке сигнатур ошибки до релиза v0.3 (`CreateComp` framerate, mask API, render-queue state, LayerID type).
-
-## Новое в v0.2
-
-- Полная taxonomy нативных integration types: Effect, AEGP, Keyframer, native panel, AEIO, Artisan, Interactive Artisan, BlitHook, shared PICA suites и legacy paths.
-- Отдельная карта внутренней коммуникации: selectors, hooks, PICA, generic Effect calls, scripting и CEP bridge.
-- Working templates: Minimal Gain Effect, AEGP menu tool, Effect↔AEGP message protocol, PICA shared-suite ABI, standalone JSX и CEP JSON bridge.
-- Зафиксировано правило: C++ templates graft-ятся в официальный SDK sample, чтобы не ломать PiPL/platform build plumbing.
+См. [completion plan](COMPLETION-PLAN.md), [editorial checklist](COMPLETION-CHECKLIST.md) и [coverage matrix](FINAL-COVERAGE-AUDIT.md).
 
 ## Состояние UXP / CEP на дату снимка
 
-Adobe 24 сентября 2026 объявила расширение UXP на After Effects. **Public beta UXP для After Effects заявлена к ноябрю 2026**, поэтому на дату этой базы UXP нельзя считать стабильным production-путём для AE. CEP остаётся рабочим legacy-путём, но Adobe объявила его постепенный вывод; полный retirement заявлен к концу 2029.
+Adobe 24 сентября 2026 объявила расширение UXP на After Effects. Public beta UXP для After Effects заявлена к ноябрю 2026. На дату этой редакции это **датированный planning fact**, а не уже проверенный AE UXP API.
 
-Практическое правило на сегодня:
+Практическое правило текущей редакции:
 
-- новый тяжёлый render/effect код → **C++ SDK**;
-- новая панель, которую надо выпустить прямо сейчас → **CEP**, но архитектуру отделять от UI, чтобы облегчить UXP migration;
-- не зашивать бизнес-логику в CEP DOM/Node-код без слоя абстракции.
+- heavy render/effect code → C++ SDK;
+- production panel сейчас → CEP с отделённой business logic;
+- UXP учитывать как migration target;
+- не путать будущий roadmap с доступным контрактом.
 
 ## Что эта база не делает
 
 - Не перепечатывает Adobe SDK Guide.
-- Не подменяет headers и sample projects из официального SDK.
-- Не обещает бинарную совместимость без тестирования.
-- Не считает внутренние/недокументированные API допустимым production-контрактом.
+- Не подменяет лицензированные SDK headers и samples.
+- Не обещает, что source example является готовым коммерческим бинарником.
+- Не превращает отсутствие собственного host-run в дефект документации.
+- Не считает внутренние/недокументированные API production-контрактом.
+- Не требует собрать все описанные технологии, чтобы доказать существование или правильность их документированных контрактов.
 
 ## Golden rules
 
-1. Для native-разработки **стартуй от ближайшего Adobe sample**, а не с пустого Xcode/Visual Studio проекта.
-2. Один `.r`/PiPL источник — для macOS и Windows.
-3. Никогда не выпускай MFR-флаг, пока render path не доказанно thread-safe.
-4. Не держи mutex, вызывая обратно host API.
-5. Не позволяй C++ exception пересечь `extern "C"` entry point.
-6. Результат CPU и GPU должен быть визуально/численно эквивалентен в пределах заранее заданной tolerance.
-7. Каждый заявленный AE version и architecture — отдельная строка test matrix.
-8. Signing/notarization — часть build pipeline, а не ручной финальный ритуал.
-9. Любая оптимизация принимается только после profiling и regression test.
-10. «Работает у разработчика» ≠ «готово к релизу».
+1. Для native-разработки начинайте от ближайшего Adobe sample.
+2. Exact headers целевого SDK важнее старого sample или HTML-описания сигнатуры.
+3. Ownership и lifetime всегда документируйте рядом с handle/ref.
+4. MFR требует thread-safe render path; флаг сам по себе ничего не доказывает.
+5. Не держите mutex, вызывая обратно host API.
+6. Не позволяйте C++ exception пересечь C ABI boundary.
+7. CPU/GPU equivalence и release matrices относятся к продуктовой проверке разработчика.
+8. Signing/notarization/AuthentiCode — часть release workflow продукта.
+9. Оптимизируйте после profiling и с regression criteria.
+10. Разделяйте факт, наблюдение, реконструкцию и рекомендацию.
 
 ## Источники
 
-См. [`SOURCES.md`](SOURCES.md). Источники разделены на canonical/official, community-maintained Adobe SDK guides и secondary references.
+См. [SOURCES.md](SOURCES.md). Источники разделены на official/canonical, SDK source review, community-maintained guides и secondary/research evidence.
