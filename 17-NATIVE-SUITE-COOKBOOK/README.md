@@ -62,4 +62,4 @@ Return A_Err
 
 ## Version discipline
 
-Главы `05-STREAMS-PROPERTIES.md` и `06-KEYFRAMES.md` перепроверены по supplied SDK 25.6: `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`, `AEGP_KeyframeSuite5`. Более поздние API (например отдельные notes из 26.5) не должны молча становиться baseline 25.6. Источник: `18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md`.
+Главы `05-STREAMS-PROPERTIES.md` и `06-KEYFRAMES.md` перепроверены по supplied SDK 25.6: `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`, `AEGP_KeyframeSuite5`. Главы `07-MASKS.md`, `08-TEXT-MARKERS.md`, `09-FOOTAGE-IMPORT.md` также приведены к baseline 25.6: `MaskSuite6`, `MaskOutlineSuite3`, `TextDocumentSuite1`, `MarkerSuite3`, `FootageSuite5`, `ItemSuite9`, `CompSuite12`, `LayerSuite9`. Более поздние API не должны молча становиться baseline 25.6. Источники: `18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md` и `11-MASK-TEXT-FOOTAGE-SDK25.6.md`.
