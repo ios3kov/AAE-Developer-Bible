@@ -182,7 +182,7 @@ This is a **syntax/type** check. It deliberately does not call it a plugin build
 1. Minimal Gain: load, parameter UI, gain 0/1/4, 8/16-bpc and transparent pixels.
 2. SmartFX Copy: compare input/output at 8/16/32-bpc, partial/empty ROI, odd sizes, nonzero origins and cancellation. Keep MFR off in the delivery build until concurrent-frame tests pass; use a separately identified enabled test build for those tests.
 3. MenuTool: successful command execution, menu updates, failed initialization and shutdown.
-4. Recipes: disposable project operations, undo, stream/keyframe ownership and render receipt cleanup. Correct and test the queue-status argument noted above; a syntax-only check is insufficient.
+4. Recipes: disposable project operations, undo, stream/keyframe ownership and render receipt cleanup. The render-queue Boolean/enum source defect is corrected to named `QUEUED` plus readback; actual queue behavior remains host-test-required.
 5. Record AE build, SDK, OS/architecture, sample base and actual observed result before upgrading a status to host-verified.
 
 
@@ -204,3 +204,24 @@ Added [After Effects host verification](10-TESTING/06-HOST-VERIFICATION.md), [te
 These chapters deliberately prevent compiler checks, screenshots, manual developer-folder installs or one-platform results from being promoted into broader compatibility claims.
 
 **Verification level: documentation/process definition only.** No new AE host run, release-candidate install, upgrade/uninstall, signing/notarization, Authenticode verification, MFR stress or cross-platform execution was performed by this editorial update. Existing completion-plan gates remain open until the named evidence is actually collected.
+
+
+## Safe tooling Gate 2 verification (2026-10-01)
+
+`scripts/host_cycle.py` was changed from destructive replace-and-report behavior to a fail-closed transaction:
+
+- source/destination collision is rejected;
+- an existing installed plug-in is moved to a temporary backup before replacement;
+- copy/install failure restores the previous installation;
+- render failure, timeout or missing expected output rolls the installation back;
+- non-zero `aerender` exit is a command failure;
+- render timeout is explicit and reported;
+- machine-readable output separates build/install/load/render/MFR states.
+
+`scripts/materialize_sdk_examples.py` now validates the complete requested materialization plan before mutation, rejects source/destination overlap, checks expected sample source identity, stages copies transactionally and preserves the licensed source tree.
+
+Portable regression coverage lives in `scripts/test_safe_tools.py`. It covers successful replacement, forced install-copy failure and restoration, non-zero render, timeout, missing output, path collision, materializer overlap, source preservation and partial-sample rejection.
+
+**Evidence:** GitHub Actions Validate run `36839553520` on commit `22095cd86a7460f241215f5252de65327824a892` completed successfully. The safe-tool step, SDK-header parser tests, C++ foundation test, generated-documentation check and `mkdocs build --strict` all passed.
+
+This closes Completion Gate 2 only. It does not establish AE host loading, render correctness, signing, installer acceptance or Windows native compilation.
