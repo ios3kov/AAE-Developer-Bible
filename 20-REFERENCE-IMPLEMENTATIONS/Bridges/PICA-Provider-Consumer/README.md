@@ -98,7 +98,7 @@ Document each function/service as one of:
 
 Consumer follows the most conservative contract if unspecified.
 
-## Tests
+## Product validation cases
 
 - provider missing;
 - correct version;
@@ -111,6 +111,20 @@ Consumer follows the most conservative contract if unspecified.
 - concurrency mode;
 - restart.
 
+## Suite-name lifetime
+
+`PicaSuiteRef` stores the suite-name pointer so it can call matching `ReleaseSuite` later.
+
+Therefore the name storage must outlive the acquisition. Prefer a static suite-name literal or equivalent stable product-owned storage.
+
+## Shutdown boundary
+
+Published table lifetime and backing service-state lifetime are separate.
+
+Do not destroy service state merely because your own initializer is ending, and do not infer hot-unload safety from suite reference counting alone.
+
+If a product supports dynamic provider restart/replacement, that requires its own explicit lifecycle/protocol evidence.
+
 ## Verification boundary
 
-Sweetie/Checkout prove a provider/consumer pattern in the SDK, not this product ABI in the host. The Bible shared suite remains runtime result not claimed until provider and consumer are compiled and exercised together.
+Sweetie/Checkout establish the SDK provider/consumer pattern, not a runtime result for the Bible template. The reference remains RUNTIME-NOT-CLAIMED unless separate runtime evidence exists; product compilation/host execution is not a Bible editorial-completion requirement.
