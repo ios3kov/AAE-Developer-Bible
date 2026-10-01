@@ -151,4 +151,4 @@ GitHub Validate проверяет итоговый committed documentation tree
 
 ## Следующий редакционный блок
 
-После streams/keyframes логично сверить masks, text/markers и footage/import ownership, после чего вернуться к обязательным plan gates: reuse audit, exact compiler и host-verified reference examples.
+После streams/keyframes логично сверить masks, text/markers и footage/import ownership и продолжить редакционный coverage sweep. Compiler/host evidence для отдельных examples остаётся optional evidence, а не completion gate.
