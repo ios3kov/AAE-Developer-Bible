@@ -2,7 +2,7 @@
 
 Date: **2026-09-30**. Build: **ACX-INPUT-20260930-01**.
 
-**This is an input-fixture milestone, not a new AE acceptance runner. Do not install the candidate mapping or rerun the old Mega Probe.** Gate 8 remains OPEN. Original AEP, captured reports and existing results are unchanged.
+**This is an input-fixture milestone, not a new AE acceptance runner. Do not install the candidate mapping or rerun the old Mega Probe.** The atlas investigation remains ongoing; this does not block core Bible editorial readiness. Original AEP, captured reports and existing results are unchanged.
 
 ## Decision and sources
 
