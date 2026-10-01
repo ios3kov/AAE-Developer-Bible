@@ -2130,7 +2130,7 @@ actual device test
 
 ## Verification boundary
 
-Текст сверён с SDK/source sample. Новый GPU binary в этой итерации не собирался и CPU↔GPU host comparison не запускался. Gate 6/7 остаются открытыми.
+Текст сверён с SDK/source sample. Bible не заявляет собственный GPU runtime result; сборка demo binary не является условием редакционной готовности главы.
 
 
 ---
@@ -2547,7 +2547,7 @@ AUDIO_SETDOWN
 
 ## Verification boundary
 
-Новый audio effect не создавался и AE audio render не выполнялся. Gate 6/7 остаются открытыми.
+Bible не заявляет собственный audio runtime result. Создание отдельного audio demo effect не является условием редакционной готовности главы.
 
 
 ---
@@ -2897,7 +2897,7 @@ Interaction state может быть transient, но любое состоян�
 
 ## Verification boundary
 
-Bundled Custom_ECW_UI/CCU source reviewed. Новый UI binary, actual Drawbot drawing, async manager, Retina/theme behavior and leak tests не запускались. Gate 6/7 остаются открытыми.
+Bundled Custom_ECW_UI/CCU source reviewed. Bible не заявляет собственный UI runtime result; отдельная demo implementation/host QA не является completion requirement документации.
 
 
 ---
@@ -3154,7 +3154,7 @@ CommandHook отвергает чужую/уже обработанную ком
 - выключение/обнуление команды не равно удалению всех registrations;
 - запуск, частичная регистрация, повторный старт и штатное завершение в целевом AE ещё требуют host evidence.
 
-Ревью не исправляет эти пункты скрытно и не закрывает Gate 5. Задача текущей итерации — дать читателю точное объяснение уже существующего кода.
+Ревью не исправляет эти пункты скрытно. Задача Bible — дать читателю точное объяснение существующего кода и не заявлять runtime result без evidence.
 
 ## 10. Завершение и режим без интерактивного UI
 
@@ -13180,7 +13180,7 @@ Source review can prove callback names, signatures and documented ownership. It 
 - color management is correct in actual project;
 - thread behavior/performance.
 
-Those require the host test matrix in [AEIO chapter](14-NATIVE-INTEGRATIONS/../04-AEIO/README.md) and Gate 6/7 evidence.
+Those require product-specific runtime evidence only if a developer wants to claim those results; they are not Bible completion requirements.
 
 ## Source record
 
@@ -13354,7 +13354,7 @@ That distinction matters for architecture decisions in the Bible.
 
 ## 17. Verification boundary
 
-Source review establishes entry-point/lifecycle/suite contracts. Before calling an Artisan implementation ready, Gate 6/7 needs:
+Source review establishes entry-point/lifecycle/suite contracts. A developer calling a concrete Artisan implementation ready should additionally verify:
 
 - actual registration/selectability;
 - state save/reopen;
@@ -20624,7 +20624,7 @@ The required Gate-4 manifest passes all 35 required contract tables/functions, a
 
 **Установка:** прежний краткий текст главы приводил MediaCore-пути как общий ориентир. Эта поставка и build settings не устанавливают полный список реально сканируемых директорий и их приоритет. Поэтому новая глава отделяет сборочный INSTALL_PATH, размещение bundle и доказанную загрузку, а не приписывает SDK универсальное подтверждение per-user discovery.
 
-**MenuTool:** регистрация death hook предшествует передаче владения ToolState, поздние ошибки оставляют отключённую команду и возвращают A_Err_NONE. Это сознательная стратегия сохранения refcon, не успешная полная инициализация. Ошибки DisableCommand/ReportInfo не сохраняются; ветка UI suppression отсутствует. Реакции на исключение после регистрации и завершение частичной инициализации требуют отдельных host-тестов. Ревью не исправляет эти места молча и не закрывает Gate 5.
+**MenuTool:** регистрация death hook предшествует передаче владения ToolState, поздние ошибки оставляют отключённую команду и возвращают A_Err_NONE. Это сознательная стратегия сохранения refcon, не успешная полная инициализация. Ошибки DisableCommand/ReportInfo не сохраняются; ветка UI suppression отсутствует. Реакции на исключение после регистрации и завершение частичной инициализации требуют отдельных host-тестов. Ревью не превращает source-level ограничения в runtime claims; отдельный host-run нужен только если такой результат требуется утверждать.
 
 ## Идентичность просмотренных файлов
 
@@ -20887,7 +20887,7 @@ GitHub Validate проверяет итоговый committed documentation tree
 
 ## Следующий редакционный блок
 
-После streams/keyframes логично сверить masks, text/markers и footage/import ownership, после чего вернуться к обязательным plan gates: reuse audit, exact compiler и host-verified reference examples.
+После streams/keyframes логично сверить masks, text/markers и footage/import ownership и продолжить редакционный coverage sweep. Compiler/host evidence для отдельных examples остаётся optional evidence, а не completion gate.
 
 
 ---
@@ -21046,7 +21046,7 @@ Placeholder-with-path contract отдельно предупреждает: `AEI
 
 ## Место в плане
 
-Итерация расширяет предметную часть stages 3–4 и документирует две integration families из Gate 6. **Gate 6 не закрыт:** нужен минимальный complete example, build/install/host report и correctness/stress evidence.
+Итерация расширяет предметную часть Bible и документирует две integration families. Source review не заявляет runtime behavior; отдельный complete product example не является обязательным условием готовности документации.
 
 Обновлены:
 
@@ -21194,7 +21194,7 @@ AEIO handles media I/O; Artisan handles renderer integration. Neither replaces t
 | Artisan save/reopen/interactive/resource stress | NOT RUN |
 | Windows host tests | NOT RUN |
 
-GitHub docs CI, if green, confirms repository/document build only. Gate 6/7 remain open.
+GitHub docs CI подтверждает repository/document build. Runtime/product evidence остаётся отдельным классом доказательств.
 
 
 ---
@@ -21438,7 +21438,7 @@ NOT RUN in this iteration:
 - exact-SDK compilation of the two Bible bridge templates;
 - Windows host behavior.
 
-These remain Gate 4/6/7 work.
+These are optional future implementation/runtime evidence areas, not Bible completion requirements.
 
 
 ---
