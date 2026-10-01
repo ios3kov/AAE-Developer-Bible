@@ -81,3 +81,6 @@ Do not cast or suppress a native mismatch to keep the validation lane green.
 ## Verification boundary
 
 Windows compiler/link/sign/install/host acceptance remains separate. A header PASS must never be copied into the compatibility matrix as Windows PASS.
+
+
+For the exact PASS/FAIL evidence contract, see [Gate 4 — exact SDK acceptance runbook](../18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
