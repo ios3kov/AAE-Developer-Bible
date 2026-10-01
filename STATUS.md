@@ -59,7 +59,7 @@ Earlier source findings remain in the linked records: ten-file memory/MFR review
 
 This is documentation and SDK source-review work within the agreed subject matter of [the completion plan](COMPLETION-PLAN.md). It does not complete stages 3–4 or bypass outstanding safety, reuse-audit, compiler and host gates. **Native readout-adapter development remains paused; the deliverable is the Bible, not a separate testing product.** No new user AE run is requested.
 
-**The scripting/panels communication → macOS/Windows build → distribution editorial block is now written. Next editorial block: testing/release-evidence chapters and cross-checking recipes/templates against the expanded contracts**, while preserving the exact-SDK baseline. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
+**The scripting/panels communication → macOS/Windows build → distribution block and the testing/release-evidence block are now written. Next editorial block: cross-checking recipes/templates against the expanded contracts and removing contradictions between guidance and executable examples**, while preserving the exact-SDK baseline. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
 
 ## Earlier baseline evidence
 
