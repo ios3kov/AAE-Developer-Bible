@@ -23,9 +23,9 @@ AEGP (After Effects General Plug-in) — интеграция с приложе�
 
 Текст сверяется с declarations и samples; архитектурные рекомендации помечены отдельно. Source review не равен native build, удачная компиляция не равна загрузке, а успешный initializer не равен готовности всех функций.
 
-[COMPLETION-CHECKLIST](../COMPLETION-CHECKLIST.md) сохраняет отдельную приёмку MenuTool: сборка/регистрация, отсутствие дублей меню, действие команды, update hook, ошибки и завершение. Редакционное обновление этих пунктов не закрывает. Следующая тема написания — streams и ключевые кадры; это порядок чтения/написания, не закрытие более ранних gates.
+[COMPLETION-CHECKLIST](../COMPLETION-CHECKLIST.md) сохраняет отдельную приёмку MenuTool: сборка/регистрация, отсутствие дублей меню, действие команды, update hook, ошибки и завершение. Редакционное обновление этих пунктов не закрывает. Следующий редакционный блок — AEIO и Artisan; это порядок чтения/написания, не закрытие более ранних gates.
 
 
 ## Текущий редакционный статус
 
-Streams/properties и keyframes теперь сверены с supplied SDK 25.6. Исправлено смешение более позднего `StreamSuite7` с baseline 25.6: текущие families здесь — `StreamSuite6`, `DynamicStreamSuite4`, `KeyframeSuite5`. Host execution этих cookbook операций всё ещё требует отдельной приёмки по `COMPLETION-CHECKLIST.md`.
+Streams/properties, keyframes, masks, text/markers и footage/import теперь сверены с supplied SDK 25.6. Исправлены утечки later-SDK generations: baseline здесь использует `StreamSuite6`, `DynamicStreamSuite4`, `KeyframeSuite5` и `CompSuite12`. [Сверка masks/text/footage](../18-SDK-HEADER-TOOLS/11-MASK-TEXT-FOOTAGE-SDK25.6.md) отдельно фиксирует ownership MaskRef, Text/Marker MemHandle и переход владения FootageH при adoption. Host execution этих cookbook операций всё ещё требует отдельной приёмки по `COMPLETION-CHECKLIST.md`.
