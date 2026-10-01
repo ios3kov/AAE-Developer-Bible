@@ -190,6 +190,24 @@ Checked and reconciled as one logical block:
 - related threading/data-ownership validation wording aligned with `EDITORIAL-GUIDE.md`;
 - SDK source-review provenance preserved with a later consistency note.
 
+### PICA / Effect↔AEGP / legacy boundaries block — completed 2026-10-01
+
+Checked and reconciled as one logical block:
+
+- PICA provider/consumer baseline anchored to `SPBasicSuite`, `SPSuitesSuite`, Sweetie and Checkout;
+- stable suite name + public version documented as ABI identity;
+- suite-name pointer lifetime in `PicaSuiteRef` made explicit;
+- provider table lifetime separated from backing service-state lifetime;
+- multi-version negotiation uses explicit adapters rather than table casting;
+- refcounting no longer implied to provide generic hot-unload/hot-replacement safety;
+- acquisition/service/domain/cleanup errors separated;
+- current Effect↔AEGP path fixed on `EffectSuite5 + PF_Cmd_COMPLETELY_GENERAL`;
+- EffectRef freshness, layer-time conversion, payload size/version evolution, reentrancy and persistence boundaries expanded;
+- PICA/generic-call references/templates use product-validation / RUNTIME-NOT-CLAIMED language;
+- legacy chapter corrected from stale EffectSuite4 current claim to EffectSuite5;
+- legacy migration distinguishes source modernization from behavior/project compatibility;
+- SDK source-review provenance preserved with a later consistency note.
+
 ## E. Recipes and reference source
 
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
