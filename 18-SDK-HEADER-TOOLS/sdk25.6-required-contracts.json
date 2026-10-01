@@ -212,8 +212,8 @@
       "area": "Drawbot resources"
     },
     {
-      "name": "DRAWBOT_SurfaceSuite1",
-      "area": "Drawbot surface"
+      "name": "DRAWBOT_SurfaceSuite2",
+      "area": "Drawbot surface (SDK 25.6 current)"
     },
     {
       "name": "DRAWBOT_PathSuite1",
