@@ -2,6 +2,8 @@
 
 Updated: **2026-10-01**
 
+Canonical writing rules: [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). This file contains the roadmap, not a second rulebook.
+
 ## Цель
 
 AE Developer Bible должна стать **полной, точной и практической базой знаний по разработке для Adobe After Effects**.
