@@ -326,7 +326,7 @@ This chapter documents a Windows debugging method. Bible does not need to build 
 ## Related chapters
 
 - [Visual Studio setup](01-VISUAL-STUDIO-SETUP.md)
-- [Windows ARM64](02-ARM64.md)
+- [Windows ARM64](02-X64-ARM64.md)
 - [Testing](../10-TESTING/README.md)
 - [Crash diagnostics](../10-TESTING/05-CRASH-DIAGNOSTICS.md)
 - [Host call boundary](../19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md)
