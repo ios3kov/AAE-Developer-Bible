@@ -6970,7 +6970,7 @@ Use the exact candidate SDK.
 
 A successful run means only the tool's implemented checks passed, for example:
 
-- supported header declarations parsed without unresolved diagnostics;
+- supported header declarations parsed without unresolved **required-contract** diagnostics; unrelated diagnostics remain recorded;
 - inventory schema/version validation passed;
 - cookbook/reference suite symbols resolved against that inventory;
 - the current Bible native C++ translation units passed MSVC C++17 syntax/type checks;
@@ -20364,6 +20364,23 @@ SHA-256 TAR: `eee39a787ab09226a5a08c27496335faf79cbe52dd96f19cf795e48af09e2df6`.
 Текст SDK содержит исторические комментарии и предупреждения. Они читаются в контексте настоящих declarations и конкретного примера; любые обнаруженные расхождения фиксируются, а не исправляются в исходнике молча. Этот обзор охватывает перечисленные главы, не весь SDK.
 
 
+## Gate 4 rerun — 2026-10-01
+
+The same SDK bytes were supplied again and rechecked. The Zstandard stream decompresses byte-for-byte to the supplied TAR; TAR SHA-256: `eee39a787ab09226a5a08c27496335faf79cbe52dd96f19cf795e48af09e2df6`.
+
+After extending the inventory parser to resolve callback typedef fields, the exact same SDK now yields:
+
+- 140 headers;
+- 233 tables;
+- 3,560 function entries;
+- 0 unparsed candidate tables;
+- 4 retained non-required partial diagnostics.
+
+The previous 230/3,537 counts were parser-coverage counts, not a different SDK snapshot.
+
+The required Gate-4 manifest passes all 35 required contract tables/functions, and the current cookbook passes 39/39 call-site suite-generation checks. See [the Gate 4 run record](18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md).
+
+
 ---
 
 <!-- SOURCE: 18-SDK-HEADER-TOOLS/06-PARAMETERS-PIXELS-SDK25.6.md -->
@@ -27712,7 +27729,7 @@ Do not infer absence of all AE notification mechanisms from one negative probe. 
 
 **Status: OPEN. Portable tooling is hardened; fresh licensed-SDK compiler evidence is still required after the current source changes.**
 
-- [ ] Required SDK 25.6 contract families parse without unresolved required declarations. A fail-closed required-table/function manifest now exists; fresh exact-SDK inventory run remains required.
+- [x] Required SDK 25.6 contract families parse without unresolved required declarations. Exact SDK run on 2026-10-01: 35 required tables/functions, 0 missing; 39 cookbook call-sites, 0 unknown. Four non-required partial diagnostics remain visible.
 - [x] Parser diagnostics cannot masquerade as ABI/signature validation. Inventory diagnostics, unsupported schema and malformed declarations are rejected by downstream verification.
 - [ ] Recipes are checked by real compilation against the declared SDK. Historical macOS SDK 25.6 syntax evidence exists, but current recipe sources must be recompiled.
 - [ ] Native source set compiles with strict warnings on the current revision. Historical macOS baseline does not automatically transfer after source changes.
@@ -28543,7 +28560,7 @@ Earlier source findings remain in the linked records: ten-file memory/MFR review
 
 This work remains within the agreed subject matter of [the completion plan](COMPLETION-PLAN.md). Safe-tooling Gate 2 is now closed by portable regression evidence; stages 3–4, the reuse audit, native compiler expansion and AE host gates remain open. **Native readout-adapter development remains paused; the deliverable is the Bible, not a separate testing product.** No new user AE run is requested.
 
-**The scripting/panels communication → macOS/Windows build → distribution and testing/release-evidence blocks are written. Cross-checking reconciled the CEP command schema, corrected the render-queue enum recipe, strengthened the native generic-bridge ABI checks, and Gates 2–3 are closed with CI evidence. Gate 3A reuse audit is closed with an independent FSTR portable rerun. Gate 4 portable tooling now enforces inventory schema, parser diagnostics, required SDK 25.6 tables/functions, exact SuiteHandler generations, compiler-report identity and macOS/Windows runner syntax. Gate 4 remains open until the current revision is rerun against the licensed SDK 25.6 and MSVC/Windows evidence exists. The Gate 4 acceptance runbook now defines the exact one-command macOS/Windows evidence flow and requires clean Git/source hashes**, while preserving the exact-SDK baseline. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
+**The scripting/panels communication → macOS/Windows build → distribution and testing/release-evidence blocks are written. Cross-checking reconciled the CEP command schema, corrected the render-queue enum recipe, strengthened the native generic-bridge ABI checks, and Gates 2–3 are closed with CI evidence. Gate 3A reuse audit is closed with an independent FSTR portable rerun. Gate 4 portable tooling now enforces inventory schema, parser diagnostics, required SDK 25.6 tables/functions, exact SuiteHandler generations, compiler-report identity and macOS/Windows runner syntax. Gate 4 required-contract preflight against the supplied SDK 25.6 is now PASS: 35/35 required contracts and 39/39 cookbook call-sites resolve on the source-equivalent audit snapshot. Gate 4 remains open for real macOS Clang/Xcode syntax/type acceptance on the current native source and for MSVC/Windows evidence. The Gate 4 acceptance runbook now defines the exact one-command macOS/Windows evidence flow and requires clean Git/source hashes**, while preserving the exact-SDK baseline. This writing order does not close earlier acceptance gates; their criteria remain in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md). SDK headers, binaries and complete Adobe sample sources are not published in this repository.
 
 ## Earlier baseline evidence
 
@@ -28853,3 +28870,33 @@ The current validation lane also compiles the standalone Effect↔AEGP and PICA 
 Compiler reports now include Bible Git SHA/dirty state and SHA-256 for each translation unit. The acceptance platform runners use `--require-clean`; a dirty/unknown source tree cannot be promoted to Gate-4 compiler evidence.
 
 See [Gate 4 — exact SDK acceptance runbook](18-SDK-HEADER-TOOLS/16-GATE4-ACCEPTANCE-RUNBOOK.md).
+
+
+## Real SDK 25.6 Gate 4 required-contract preflight (2026-10-01)
+
+The user supplied Adobe After Effects SDK 25.6 build 61 again. The two supplied representations were validated before use:
+
+- `ae25.6_61.64bit.AfterEffectsSDK.tar.zstd`: POSIX TAR, SHA-256 `eee39a787ab09226a5a08c27496335faf79cbe52dd96f19cf795e48af09e2df6`;
+- `ae25.6_61.64bit.AfterEffectsSDK.tar.zstd.zip`: Zstandard stream, SHA-256 `e02fa2b488c3cceb238866b648eb9a2526d308a260744367915a2f173663c36c`.
+
+Decompressing the Zstandard stream produced a TAR byte-identical to the first file.
+
+The exact committed Bible source was exported from audit commit `81dd429ef22ab6912f095768f9a15e61a9b5c941`, which differs from main/base `0e7630574729dfe9e99eebc7be2e89e70fe44b0e` only by the source-export workflow file. Product/source/test content is unchanged.
+
+Exact-header result:
+
+- 140 headers scanned;
+- 233 contract tables;
+- 3,560 function entries;
+- 0 unparsed candidate tables;
+- 4 retained partial diagnostics: `PF_InteractCallbacks`, `PF_UtilCallbacks`, `AE_FIM_ImportCallbacks`, `SPPluginsSuite`;
+- 35 required SDK 25.6 contracts: **0 missing**;
+- 39 cookbook call-sites: **0 unknown** and exact SuiteHandler generations resolved.
+
+The increase from the historical 230 tables / 3,537 functions is a parser improvement: callback typedef fields such as `PR_ArtisanEntryPoints` are now indexed. The SDK bytes did not change. The Drawbot manifest was also corrected to the SDK 25.6 current `DRAWBOT_SurfaceSuite2`.
+
+A Linux-container compiler experiment against the exact headers was also run only to test the platform boundary. All 13 translation units stop at the Adobe SDK's `AEConfig.h` “unrecognized AE platform” gate; this is expected on Linux and is not macOS compiler evidence.
+
+**Gate 4 consequence:** required-contract parsing is now PASS. Real current-source compilation on macOS/Xcode and Windows/MSVC remains NOT RUN and keeps Gate 4 open.
+
+Full record: [18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md](18-SDK-HEADER-TOOLS/17-GATE4-SDK25.6-RUN-2026-10-01.md).
