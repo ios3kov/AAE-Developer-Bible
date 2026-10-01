@@ -17661,13 +17661,13 @@ That may be intentional or a sample typo; source alone does not establish desire
 
 Artie calls RegisterArtisan and then RegisterDeathHook. Like other AEGP registrations, there is no basis here to assume generic rollback/unregister of already registered renderer on a later initialization failure.
 
-A robust product should design partial-init state explicitly and host-test failure injection.
+A robust product should design partial-init state explicitly. If it claims recovery from such failures, that behavior needs product-specific runtime evidence.
 
 ## 15. Interactive registration is a separate contract
 
 `AEGP_RegisterInteractiveArtisan` has the same parameter shape but interactive Canvas/query behavior adds separate runtime obligations.
 
-Do not register interactive variant unless interactive callbacks/buffers are actually implemented and tested.
+Do not register the interactive variant unless the product actually implements the interactive callback/buffer/query contract. Runtime support claims require product-specific evidence.
 
 ## 16. Relation to independent render engine idea
 
@@ -17677,7 +17677,52 @@ Thus it may be a foundation for a custom 3D renderer, but **не являетс�
 
 That distinction matters for architecture decisions in the Bible.
 
-## 17. Verification boundary
+## 17. Render-context ownership graph
+
+A production implementation should make ownership visible:
+
+~~~text
+PR_RenderContextH              borrowed host context
+  ↓
+LayerContext / QueryContext    borrowed host contexts
+  ↓
+Canvas texture                 DisposeTexture
+WorldH                         cleanup per call/World Suite contract
+RenderReceiptH                 DisposeRenderReceipt
+  ↓
+normalized product scene       product-owned
+  ↓
+renderer/GPU resources         product-owned
+~~~
+
+Never attach borrowed render/query/layer context handles directly to long-lived product caches.
+
+## 18. Instance persistence boundary
+
+`FlattenInstance` should produce platform-independent state and leave the source live instance intact.
+
+On setup from flat data:
+
+- validate size/version;
+- migrate known schemas;
+- reject/recover malformed data deliberately;
+- recreate runtime-only resources;
+- never deserialize raw pointers or host refs.
+
+## 19. Interactive/final separation
+
+Interactive Canvas state is view/session state. Final render state is composition/render state.
+
+Keep separate:
+
+- viewport/display settings;
+- interactive buffers;
+- persistent renderer options;
+- final frame scene/cache state.
+
+Do not persist transient viewport handles inside instance data.
+
+## 20. Verification boundary
 
 Source review establishes entry-point/lifecycle/suite contracts. A developer calling a concrete Artisan implementation ready should additionally verify:
 
@@ -20613,7 +20658,7 @@ This guide preserves the registration and lifecycle contract without fabricating
 
 # Artisan registration working guide
 
-Status: **registration contract guide / full renderer requires the target SDK Artie sample**.
+Status: **registration/source guide; SDK 25.6 contract-reviewed; runtime result not claimed**.
 
 ## Registration shape
 
@@ -20697,9 +20742,9 @@ For unsupported features define:
 
 Do not silently render a materially wrong scene and call it success.
 
-## Test milestone
+## Product validation milestone
 
-A meaningful first Artisan acceptance fixture should include:
+If a concrete product claims renderer behavior, useful runtime cases include:
 
 - renderer appears/selects;
 - one simple scene renders;
@@ -20712,9 +20757,27 @@ A meaningful first Artisan acceptance fixture should include:
 
 Expand fixtures as supported scene features grow.
 
+## Persistence/state boundary
+
+Registration source should make the state model visible:
+
+~~~text
+GlobalData
+→ InstanceData
+→ RenderData
+~~~
+
+If instance settings persist, define a versioned flat representation separately from live runtime resources.
+
+Do not store Canvas/RenderContext pointers in persistent instance data.
+
+## Resource cleanup boundary
+
+A render path may acquire textures, worlds and receipts from different APIs. Track each cleanup obligation independently; a generic renderer-resource deleter is not enough.
+
 ## Verification boundary
 
-This file documents the safe registration/startup boundary. It deliberately does not pretend a registrar stub is a complete Artisan.
+This file documents the registration/startup/source boundary. It deliberately does not pretend a registrar stub is a complete Artisan, and Bible does not require host execution of this guide for editorial completion.
 
 
 ---
@@ -29918,7 +29981,7 @@ This is a source/workspace plan based on the licensed SDK samples. Registration 
 
 # Artisan reference workspace
 
-Status: **SDK sample workspace: Artie / runtime result not claimed**.
+Status: **Artie sample-derived workspace plan / RUNTIME-NOT-CLAIMED**.
 
 Artisan replaces/customizes parts of After Effects 3D rendering and carries a substantially larger host contract than a normal effect.
 
@@ -29997,9 +30060,9 @@ Do not infer renderer thread safety from Effect MFR rules; Artisan has its own c
 
 If external GPU/renderer work is used, keep host object access on documented paths and define cancellation/device teardown explicitly.
 
-## Failure behavior
+## Product failure-validation cases
 
-Test:
+If a concrete product claims recovery/support, useful cases include:
 
 - unsupported scene feature;
 - resource allocation failure;
@@ -30011,9 +30074,21 @@ Test:
 
 A renderer failure must not corrupt the AE project.
 
+## Persistence/cache separation
+
+When adapting Artie, separate:
+
+- versioned instance settings;
+- runtime scene cache;
+- frame-local render data;
+- interactive viewport state;
+- backend/GPU resources.
+
+Do not flatten runtime cache/backend handles into project data.
+
 ## Verification boundary
 
-The Bible deliberately does not provide a registrar stub and label it a renderer. This entry becomes an implementation only when a meaningful Artie-derived render path is compiled, loaded and validated with scene fixtures.
+The Bible deliberately does not provide a registrar stub and label it a renderer. This is a source/workspace plan; runtime support belongs to a concrete product's evidence. Bible editorial completion does not require building the reference workspace.
 
 
 ---
