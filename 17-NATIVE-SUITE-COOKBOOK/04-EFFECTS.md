@@ -1,126 +1,277 @@
 # Effect recipes
 
-**Suite:** `AEGP_EffectSuite4` (compatibility-oriented documented contract)  
-**Confidence:** SDK-verified + sample/community sanity check.
+**Primary Bible baseline:** Adobe After Effects SDK **25.6 build 61**.
 
-## Перечислить effects на layer
+**Current suite:** `AEGP_EffectSuite5`.
+
+Existing Bible source examples may use the older `AEGP_EffectSuite4` subset for compatibility. Do not treat that source dependency as the current SDK generation and never cast suite tables between generations.
+
+## Layer effect refs are owned references
+
+Current header explicitly marks the `AEGP_EffectRefH` returned by `AEGP_GetLayerEffectByIndex` as:
+
+> MUST dispose with `AEGP_DisposeEffect`
+
+Pattern:
 
 ```cpp
 A_long count = 0;
-ERR(suites.EffectSuite4()->AEGP_GetLayerNumEffects(layerH, &count));
+ERR(suites.EffectSuite5()->AEGP_GetLayerNumEffects(layerH, &count));
 
 for (A_long i = 0; i < count && !err; ++i) {
     AEGP_EffectRefH effectH = nullptr;
-    ERR(suites.EffectSuite4()->AEGP_GetLayerEffectByIndex(
+    ERR(suites.EffectSuite5()->AEGP_GetLayerEffectByIndex(
         plugin_id, layerH, i, &effectH));
 
-    // use effectH
+    // inspect/use effectH
 
-    ERR2(suites.EffectSuite4()->AEGP_DisposeEffect(effectH));
+    ERR2(suites.EffectSuite5()->AEGP_DisposeEffect(effectH));
 }
 ```
 
-`AEGP_EffectRefH` из `GetLayerEffectByIndex` — disposable reference.
+Do not store the raw effect ref as long-lived product identity.
 
----
+## Effect order/index is not durable identity
 
-## Найти installed effect по match name
+Effect stack can change through:
 
-```cpp
-#include <cstring>
+- add;
+- delete;
+- reorder;
+- user edits;
+- other tools/scripts.
 
-A_Err FindInstalledEffect(
-    SPBasicSuite* pica,
-    const char* wanted_match_name,
-    AEGP_InstalledEffectKey* out_key)
-{
-    A_Err err = A_Err_NONE;
-    AEGP_SuiteHandler suites(pica);
+If product needs long-lived target identity, store a product-level description and re-resolve current effect instance.
 
-    AEGP_InstalledEffectKey key = AEGP_InstalledEffectKey_NONE;
-    ERR(suites.EffectSuite4()->AEGP_GetNextInstalledEffect(
-        AEGP_InstalledEffectKey_NONE, &key));
+## Installed-effect enumeration
 
-    while (!err && key != AEGP_InstalledEffectKey_NONE) {
-        A_char match_name[AEGP_MAX_EFFECT_MATCH_NAME_SIZE] = {};
-        ERR(suites.EffectSuite4()->AEGP_GetEffectMatchName(key, match_name));
+Installed-effect key is an enumeration handle/key from current host context.
 
-        if (!err && std::strcmp(match_name, wanted_match_name) == 0) {
-            *out_key = key;
-            return A_Err_NONE;
-        }
+Do not hardcode it between AE sessions.
 
-        AEGP_InstalledEffectKey next = AEGP_InstalledEffectKey_NONE;
-        ERR(suites.EffectSuite4()->AEGP_GetNextInstalledEffect(key, &next));
-        key = next;
-    }
-    return err ? err : A_Err_GENERIC;
-}
+Pattern:
+
+```text
+GetNextInstalledEffect(NONE)
+→ key
+→ GetEffectMatchName
+→ compare stable match name
+→ next
 ```
 
-Использовать **match name**, не локализованный display name.
+Use **match name**, not localized display name.
 
----
+## Current EffectSuite5
 
-## Применить effect
+SDK 25.6 current header exposes `AEGP_EffectSuite5`.
+
+It includes the familiar effect enumeration/apply/delete/generic-call operations plus newer table members relative to historical generations.
+
+New current-baseline prose should cite Suite5. Compatibility source can keep Suite4 when it intentionally needs only that older public surface.
+
+## Find installed effect by match name
+
+Conceptual helper:
+
+```text
+wanted match name
+→ enumerate installed keys
+→ GetEffectMatchName
+→ exact match
+→ return current key
+```
+
+If no effect exists, report a product-level “required effect unavailable” result rather than using arbitrary first match/display string.
+
+## Apply effect
+
+Current header explicitly marks the returned `AEGP_EffectRefH` from `AEGP_ApplyEffect` as **MUST BE DISPOSED with `AEGP_DisposeEffect`**.
 
 ```cpp
-AEGP_InstalledEffectKey key = AEGP_InstalledEffectKey_NONE;
-ERR(FindInstalledEffect(pica, "ADBE Gaussian Blur 2", &key));
-
 AEGP_EffectRefH effectH = nullptr;
-ERR(suites.EffectSuite4()->AEGP_ApplyEffect(
+ERR(suites.EffectSuite5()->AEGP_ApplyEffect(
     plugin_id,
     layerH,
-    key,
+    installed_key,
     &effectH));
 
-// use effectH...
-ERR2(suites.EffectSuite4()->AEGP_DisposeEffect(effectH));
+// configure/inspect effect
+
+ERR2(suites.EffectSuite5()->AEGP_DisposeEffect(effectH));
 ```
 
-Не хардкодить installed key между AE sessions. Installed effect key — host enumeration result, не ваш permanent identifier.
+Dispose releases the reference; it does not mean “remove effect from layer”.
 
----
+## Delete effect
 
-## Удалить effect
+`AEGP_DeleteLayerEffect(effect_refH)` is undoable.
 
-```cpp
-ERR(suites.EffectSuite4()->AEGP_DeleteLayerEffect(effectH));
-effectH = nullptr;
+Important ownership point:
+
+- refs returned by Get/Apply are explicitly caller-disposable;
+- DeleteLayerEffect comment does **not** say it transfers/consumes ownership of the reference.
+
+Therefore do not invent a new ownership rule such as “delete means never dispose the ref”. Keep reference cleanup according to the acquisition contract and do not use the deleted effect ref for further effect operations.
+
+Use an ownership wrapper/cleanup path rather than simply setting the variable to null and leaking the acquired reference.
+
+## Reorder effect
+
+Effect Suite can reorder an effect instance in the stack.
+
+After reorder:
+
+- numeric effect indices change;
+- cached index→effect mapping is stale;
+- re-query if subsequent logic depends on stack order.
+
+## Effect flags
+
+Effect flags can expose host state such as active/missing/audio-related status.
+
+Do not treat flags as persistent identity.
+
+Use them as current host-state observation.
+
+## Installed key from layer effect
+
+Current effect instance can be mapped back to installed effect key.
+
+Useful when product needs to identify which registered effect implementation owns an instance.
+
+Still prefer match name for product-level readable/stable identification when appropriate.
+
+## Parameter access
+
+`AEGP_GetEffectParamUnionByIndex` can return parameter-definition metadata, but current header explicitly warns not to use the value from that ParamDef union as the actual parameter value.
+
+Actual values belong to stream/property APIs.
+
+Do not mix Effect Suite metadata inspection with Stream Suite value ownership.
+
+## Effect parameter streams
+
+Typical path:
+
+```text
+EffectRefH
+→ parameter/stream lookup
+→ owned StreamRefH
+→ read/write StreamValue
+→ dispose value/ref
 ```
 
-Не `DisposeEffect` после successful delete, если delete уже уничтожил referenced effect; следовать точному ownership контракту SDK/sample вашей версии.
+See [Streams/properties](05-STREAMS-PROPERTIES.md).
 
----
+## AEGP → Effect generic call
 
-## AEGP → ваш Effect plug-in
+Current EffectSuite5 retains `AEGP_EffectCallGeneric`.
 
-Если Effect специально поддерживает generic command:
+Pattern:
 
-```cpp
-MyBridgeMessage msg{};
-msg.version = 1;
-msg.op = MyBridgeOp::Ping;
-
-A_Time t{0, 1};
-
-ERR(suites.EffectSuite4()->AEGP_EffectCallGeneric(
-    plugin_id,
-    effectH,
-    &t,
-    PF_Cmd_COMPLETELY_GENERAL,
-    &msg));
+```text
+AEGP owns fresh EffectRefH
+→ versioned POD message
+→ AEGP_EffectCallGeneric
+→ host dispatch
+→ PF_Cmd_COMPLETELY_GENERAL
+→ effect validates size/version/op
+→ response/error
 ```
 
-Effect принимает это в `PF_Cmd_COMPLETELY_GENERAL`.
+Message should use:
 
-Обязательно:
+- fixed-width fields;
+- explicit size/version;
+- clear ownership;
+- no STL/string/vector ABI;
+- no borrowed host pointers.
 
-- ABI version;
-- `struct_size`;
-- fixed-width integer fields;
-- никаких STL/string/vector через binary boundary;
-- ownership явно в протоколе.
+## Generic-call time
 
-См. `16-WORKING-TEMPLATES/effect-aegp-generic-bridge/`.
+Header says generic-call `A_Time` uses the timebase of the layer to which the effect is applied.
+
+Do not silently pass comp time without conversion/intent.
+
+## Mutation and Undo
+
+Apply/delete/reorder are project mutations.
+
+Wrap semantic user command in appropriate undo group.
+
+Validate targets before opening destructive sequence where practical.
+
+## Stale effect refs
+
+Do not retain `AEGP_EffectRefH` through long UI workflows.
+
+Safe pattern:
+
+```text
+store layer identity + effect match/position/product identity
+→ on command: resolve fresh layer
+→ enumerate/resolve current effect
+→ use owned EffectRefH
+→ DisposeEffect
+```
+
+## Missing effects
+
+An effect instance/registration may be missing/unavailable.
+
+Product should distinguish:
+
+- required installed effect absent;
+- project contains missing effect;
+- match name changed/misconfigured;
+- effect disabled/flag state.
+
+Do not collapse all of these into “effect not found”.
+
+## Failure modes
+
+Handle:
+
+- layer deleted;
+- stack changed;
+- installed effect unavailable;
+- ApplyEffect failed after other mutations;
+- generic protocol mismatch;
+- parameter stream unavailable;
+- cleanup/dispose error.
+
+## Product workflow: apply and configure
+
+```text
+resolve fresh LayerH
+→ find installed effect by match name
+→ StartUndoGroup
+→ ApplyEffect
+→ configure via stream APIs
+→ dispose stream values/refs
+→ DisposeEffect ref
+→ EndUndoGroup
+→ re-query state
+```
+
+## Current Suite5 vs older Suite4 source examples
+
+Why older Bible C++ may still say `EffectSuite4()`:
+
+- it uses a compatibility subset;
+- SDK 25.6 still contains historical generations via SuiteHandler support;
+- source dependency is not the definition of current header generation.
+
+New Bible baseline manifest now pins `AEGP_EffectSuite5`.
+
+## Related chapters
+
+- [Layers](03-LAYERS.md)
+- [Streams/properties](05-STREAMS-PROPERTIES.md)
+- [Communication: AEGP → Effect](../15-COMMUNICATION/03-AEGP-TO-EFFECT.md)
+- [Effect↔AEGP bridge template](../16-WORKING-TEMPLATES/effect-aegp-generic-bridge/README.md)
+- [Lifetime/threading](14-LIFETIME-THREADING.md)
+
+## Evidence boundary
+
+`AEGP_EffectSuite5` current generation and explicit ref-disposal markers are read directly from SDK 25.6 headers. Runtime behavior of one product/effect stack is not claimed by this source recipe.
