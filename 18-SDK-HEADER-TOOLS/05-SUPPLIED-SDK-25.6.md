@@ -76,3 +76,20 @@ SHA-256 TAR: `eee39a787ab09226a5a08c27496335faf79cbe52dd96f19cf795e48af09e2df6`.
 Проверки документации выполняются существующим GitHub Validate после фиксации. Их итог относится к конкретному commit/Actions run, а не к Adobe host. Исторические 13 translation-unit проверок из [VERIFICATION](../VERIFICATION.md) сохранены как ранее записанный baseline; новая поставка не превращает их автоматически в повторённый результат.
 
 Текст SDK содержит исторические комментарии и предупреждения. Они читаются в контексте настоящих declarations и конкретного примера; любые обнаруженные расхождения фиксируются, а не исправляются в исходнике молча. Этот обзор охватывает перечисленные главы, не весь SDK.
+
+
+## Gate 4 rerun — 2026-10-01
+
+The same SDK bytes were supplied again and rechecked. The Zstandard stream decompresses byte-for-byte to the supplied TAR; TAR SHA-256: `eee39a787ab09226a5a08c27496335faf79cbe52dd96f19cf795e48af09e2df6`.
+
+After extending the inventory parser to resolve callback typedef fields, the exact same SDK now yields:
+
+- 140 headers;
+- 233 tables;
+- 3,560 function entries;
+- 0 unparsed candidate tables;
+- 4 retained non-required partial diagnostics.
+
+The previous 230/3,537 counts were parser-coverage counts, not a different SDK snapshot.
+
+The required Gate-4 manifest passes all 35 required contract tables/functions, and the current cookbook passes 39/39 call-site suite-generation checks. See [the Gate 4 run record](17-GATE4-SDK25.6-RUN-2026-10-01.md).
