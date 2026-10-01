@@ -1585,69 +1585,180 @@ Header описывает multi-checkout pattern: сначала запроси�
 
 # GPU effects
 
-GPU path — не отдельный продукт, а оптимизированный backend того же математического эффекта.
+Обновлено **2026-10-01** по Adobe After Effects SDK **25.6 build 61**. GPU — не отдельный тип plug-in: это backend Effect API, который должен сохранять ту же визуальную семантику, что CPU path.
 
-## Сначала CPU reference
+Source review: [GPU, audio and Custom UI / Drawbot](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md).
+
+## 1. GPU support — не один флаг
+
+В SDK 25.6 GPU-возможность складывается из нескольких стадий:
+
+```text
+GLOBAL_SETUP
+  declare PF_OutFlag2_SUPPORTS_GPU_RENDER_F32
+  (+ DirectX flag where applicable)
+        ↓
+GPU_DEVICE_SETUP
+  create per-device state
+        ↓
+SMART_PRE_RENDER
+  decide whether THIS frame/context can use GPU
+  set PF_RenderOutputFlag_GPU_RENDER_POSSIBLE
+        ↓
+SMART_RENDER_GPU
+  render with GPU worlds
+        ↓
+GPU_DEVICE_SETDOWN
+  dispose per-device state
+```
+
+То есть глобальная capability не означает, что каждый кадр будет GPU-rendered.
+
+## 2. Framework и device identity приходят от host
+
+`PF_GPU_Framework` в этой поставке содержит NONE, OPENCL, METAL, CUDA и DIRECTX. Setup/render extras передают framework и device index.
+
+Не выбирайте «первую GPU в системе» самостоятельно, если host уже передал конкретный device context.
+
+`PF_GPUDeviceInfo` содержит platform/device/context/queue pointers. Они host-owned. Не уничтожайте их через native API платформы как свои объекты.
+
+## 3. Per-device state
+
+`PF_GPUDeviceSetupOutput::gpu_data` — effect-owned pointer, который потом приходит в setdown с требованием effect dispose.
+
+Хорошая модель:
+
+```text
+one immutable/global algorithm description
++ per-device compiled kernels/pipelines
++ per-render transient buffers
+```
+
+Не храните один CUDA/Metal/OpenCL/DirectX context как глобальный singleton без привязки к device index.
+
+Bundled `SDK_Invert_ProcAmp` создаёт framework-specific state в GPU_DEVICE_SETUP и маршрутизирует отдельный SMART_RENDER_GPU path.
+
+## 4. PF_GPUDeviceSuite1: ownership
+
+Текущий suite документирует пары:
+
+- AllocateDeviceMemory → FreeDeviceMemory;
+- AllocateHostMemory → FreeHostMemory;
+- CreateGPUWorld → DisposeGPUWorld.
+
+Только созданные самим plug-in GPU worlds plug-in имеет право Dispose.
+
+Suite comments рекомендуют device allocations делать через host suite; purge рассматривается как emergency path, а не обычный allocator.
+
+## 5. Exclusive device access
+
+Suite имеет Acquire/ReleaseExclusiveDeviceAccess. Но comment отдельно говорит, что для full GPU plug-ins с отдельным GPU render entry point exclusive access уже удерживается host.
+
+Не добавляйте лишний lock вокруг любого GPU selector «на всякий случай». Сначала определить, какой execution model используется.
+
+## 6. Pixel format GPU path
+
+Bundled sample проверяет `PF_PixelFormat_GPU_BGRA128` в GPU Smart Render и использует 16 bytes/pixel.
+
+Из этого можно говорить о конкретном sample path, но не о том, что любой GPU effect обязан принимать только этот формат во всех будущих SDK.
+
+Нужно проверять актуальный pixel-format contract для каждого supported SDK/host.
+
+## 7. Pre-render решает применимость GPU
+
+Sample выставляет:
+
+```text
+PF_RenderOutputFlag_GPU_RENDER_POSSIBLE
+```
+
+в pre-render.
+
+В production этот флаг должен зависеть от реальной возможности выполнить текущий кадр:
+
+- текущие параметры;
+- доступный backend;
+- поддерживаемый pixel format;
+- нужные resources;
+- известные fallback conditions.
+
+Не заявляйте GPU possible, если далее обязательно вернёте unsupported path.
+
+## 8. CPU reference обязателен
 
 CPU implementation должна быть:
+
 - правильной;
 - deterministic;
-- тестируемой;
-- достаточно простой, чтобы служить oracle для GPU comparison.
+- отдельно тестируемой;
+- достаточно простой, чтобы служить oracle для GPU.
 
-## Build dependencies из актуального SDK Guide
+GPU backend не должен тихо иметь другую clamp, alpha или HDR policy.
 
-Adobe's GPU sample `SDK_Invert_ProcAmp` требует дополнительные зависимости.
+## 9. CPU ↔ GPU correctness
 
-### macOS
+До benchmark определить tolerance и сравнивать минимум:
 
-Guide указывает Boost для processing GPU kernel files в sample project. Конкретный path задаётся через Xcode custom path/environment настройки sample-а.
-
-### Windows
-
-Guide на 2025/2026 указывает:
-- Boost;
-- CUDA SDK версии, совместимой с используемым AE build;
-- DirectX Shader Compiler (DXC).
-
-Не фиксировать CUDA version навечно в библии продукта: проверять SDK Guide/release notes для каждого supported AE generation.
-
-## DirectX
-
-Если используется DirectX rendering path:
-- нужный capability flag должен быть заявлен;
-- PiPL должен соответствовать runtime flags;
-- generated DirectX assets должны быть установлены рядом/в ожидаемом runtime layout;
-- обязателен CPU fallback.
-
-## CUDA
-
-Adobe рекомендует Driver API для лучшей driver compatibility. Если используется Runtime API, осознанно выбрать static/dynamic strategy и контролировать deployment runtime libraries.
-
-## GPU correctness
-
-Сравнивать CPU ↔ GPU:
-- 8/16/32-bpc;
-- alpha 0/1/partial;
-- HDR/negative float values;
-- tiny images, odd widths, nontrivial rowbytes;
-- extreme parameters;
+- 32-bpc float основной GPU path;
+- alpha 0 / partial / 1;
+- negative и >1 HDR values;
+- extreme params;
+- tiny/odd dimensions;
+- non-zero origins/ROI;
 - edge pixels;
-- multiple GPUs / unsupported GPU fallback where possible.
+- repeated renders;
+- MFR on/off там, где feature поддерживается;
+- fallback when backend/device unavailable.
 
-Tolerance должна быть указана **до** теста, а не подобрана после расхождения.
+Не подбирайте tolerance после того, как увидели расхождение.
 
-## GPU performance
+## 10. Backend-specific compilation
+
+Bundled sample содержит CUDA, OpenCL, DirectX и Metal branches, но source presence не означает, что все они собираются в любой конфигурации.
+
+Для каждой shipping platform нужно отдельно фиксировать:
+
+```text
+toolchain
+kernel source/binary generation
+runtime dependency
+host framework selection
+artifact contents
+actual device test
+```
+
+## 11. Device loss / allocation failure
+
+Минимальный error-path test:
+
+- setup compilation failure;
+- GPU allocation failure;
+- unsupported framework;
+- unsupported pixel format;
+- intermediate world creation failure;
+- render cancellation;
+- setdown after partial setup.
+
+Каждый успешно созданный resource должен иметь определённый release path даже после поздней ошибки.
+
+## 12. Performance measurement
 
 Профилировать отдельно:
-- upload/download;
-- kernel dispatch;
+
+- CPU preparation;
+- host↔device transfer;
+- kernel compile/warmup;
+- dispatch;
 - kernel time;
 - intermediate allocations;
 - synchronization;
-- shader compilation/cache warmup.
+- readback.
 
-На маленьком кадре CPU может быть быстрее. Backend selection может учитывать workload size, но не должен менять визуальную семантику.
+«GPU быстрее» без размера кадра, backend, device, warm/cold state и transfer cost — не benchmark.
+
+## Verification boundary
+
+Текст сверён с SDK/source sample. Новый GPU binary в этой итерации не собирался и CPU↔GPU host comparison не запускался. Gate 6/7 остаются открытыми.
 
 
 ---
@@ -1871,21 +1982,200 @@ Host-owned input/output не освобождаются как самостоя�
 
 # Audio effects
 
-After Effects SDK имеет отдельные audio selectors/data structures. Audio path нельзя проектировать как «те же pixels, только samples».
+Обновлено **2026-10-01** по Adobe After Effects SDK **25.6 build 61**.
 
-## Checklist
+В присланной поставке audio contract объявлен в `AE_Effect.h`, но source search не нашёл bundled C/C++ effect sample, который реально dispatch-ит `PF_Cmd_AUDIO_RENDER`. Поэтому эта глава отделяет **documented contract** от DSP-рекомендаций и не притворяется проверенным reference implementation.
 
-- sample rate/channel assumptions;
-- buffer length and requested range;
-- float/range semantics;
-- latency/stateful processing;
-- random access / non-linear timeline requests;
-- thread safety;
-- silence/empty input;
-- project sample-rate changes;
-- determinism after seeks.
+Source review: [GPU, audio and Custom UI / Drawbot](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md).
 
-Если алгоритм имеет history (filter/delay), нельзя полагаться на то, что host будет вызывать samples строго последовательно от начала к концу.
+## 1. Audio — отдельный selector path
+
+SDK определяет:
+
+- `PF_Cmd_AUDIO_SETUP`;
+- `PF_Cmd_AUDIO_RENDER`;
+- `PF_Cmd_AUDIO_SETDOWN`.
+
+Это не «PF_Cmd_RENDER, только dataP указывает на samples».
+
+Для audio commands `PF_InData` и `PF_OutData` имеют отдельные sample ranges/worlds.
+
+## 2. Как объявить тип audio effect
+
+В Global Setup есть отдельные semantics flags:
+
+### AUDIO_EFFECT_TOO
+
+Effect обрабатывает video и также фильтрует audio.
+
+### AUDIO_EFFECT_ONLY
+
+Effect только audio.
+
+### AUDIO_FLOAT_ONLY
+
+Просит только `PF_SIGNED_FLOAT`; требует один из двух audio-effect flags выше.
+
+### AUDIO_IIR
+
+Output текущего времени зависит от предыдущего output. Это принципиальное отличие stateful filter от stateless block transform.
+
+### I_SYNTHESIZE_AUDIO
+
+Effect может генерировать звук даже из silence.
+
+Нельзя включать эти flags «для совместимости»: они описывают реальную семантику host scheduling.
+
+## 3. PF_SoundWorld
+
+В 25.6 SoundWorld содержит:
+
+```text
+format info:
+  rate
+  mono/stereo
+  PCM/float format
+  sample size
+
+num_samples
+data pointer
+```
+
+Declared formats включают unsigned PCM, signed PCM и signed float; sample-size enum содержит 1/2/4 bytes; channel enum — mono/stereo.
+
+Это формат буфера, а не high-level audio file format.
+
+## 4. Audio checkout
+
+Interact callback family включает:
+
+```text
+checkout_layer_audio(...)
+checkin_layer_audio(...)
+get_audio_data(...)
+```
+
+Checkout запрашивает:
+
+- parameter/layer index;
+- start time;
+- duration;
+- time scale;
+- rate;
+- bytes/sample;
+- channels;
+- signedness.
+
+Полученный layer audio нужно checkin по соответствующему API.
+
+Нельзя сохранять raw audio pointer за пределами его documented lifetime.
+
+## 5. Random access важнее привычного streaming мышления
+
+After Effects — timeline host. Нельзя предполагать:
+
+```text
+sample 0
+then sample 1
+then sample 2
+...
+```
+
+Host может:
+
+- прыгать во времени;
+- повторно запрашивать диапазон;
+- отменять расчёт;
+- менять preview/render order.
+
+Stateless DSP должен зависеть только от declared input range/parameters.
+
+Для stateful IIR/delay нужен отдельный design под host scheduling. Сам флаг AUDIO_IIR не является реализацией history management.
+
+## 6. Setup / render / setdown responsibility
+
+Рекомендуемое разделение:
+
+```text
+AUDIO_SETUP
+  derive requested range / format policy
+  prepare command-local or lifecycle state
+
+AUDIO_RENDER
+  validate format/range
+  process exactly requested samples
+  report produced range/world
+
+AUDIO_SETDOWN
+  release audio-command resources
+```
+
+Точные поля надо брать из target SDK при реализации. Эта глава не заменяет compiler-checked sample.
+
+## 7. Numerical policy
+
+До кода определить:
+
+- float scale;
+- clipping/saturation;
+- NaN/Inf handling для float;
+- integer conversion/rounding;
+- mono↔stereo policy;
+- silence representation;
+- denormal/subnormal policy;
+- deterministic behavior after seeks.
+
+Не переносите pixel clamp rules в audio автоматически.
+
+## 8. Stateful DSP
+
+Для filter/delay/reverb задайте явно:
+
+- сколько history нужно;
+- от какого timeline interval оно зависит;
+- как переживается random seek;
+- что происходит при parameter change;
+- какой state persistent, какой per-request;
+- как state синхронизируется при concurrent requests.
+
+Если алгоритм может быть рассчитан из расширенного input window без hidden previous-output state, это часто проще для deterministic host integration. Но конкретная стратегия зависит от API и алгоритма.
+
+## 9. Test matrix
+
+Минимум:
+
+- mono/stereo;
+- declared sample rates;
+- each supported sample format;
+- silence;
+- impulse;
+- sine with known amplitude/frequency;
+- empty/short range;
+- odd sample counts;
+- random seeks;
+- repeated same range;
+- parameter automation around block boundary;
+- cancellation;
+- save/reopen if persistent state exists.
+
+Для IIR отдельно сравнивать sequential и non-linear timeline requests.
+
+## 10. Что SDK 25.6 здесь не подтверждает
+
+В поставке не найден bundled audio effect implementation, поэтому source review **не подтверждает**:
+
+- конкретный AUDIO_SETUP field algorithm;
+- production IIR state strategy;
+- actual host block size;
+- sequencing guarantees;
+- sample-perfect behavior after seek;
+- MFR/audio relationship.
+
+Эти пункты требуют compiler/host fixture.
+
+## Verification boundary
+
+Новый audio effect не создавался и AE audio render не выполнялся. Gate 6/7 остаются открытыми.
 
 
 ---
@@ -2039,6 +2329,203 @@ component(c) = pixel(x, y) + c * component_size
 Полученный SDK подтверждает имена suite/callbacks, поля descriptors/chunks, FourCC `UBT1`/`UST2`/`FLT4`, наличие `DPAA` и правило checkin. Это **сверка интерфейса по исходнику**, а не доказательство вызова определённой функции в ранее записанном рендере.
 
 SDK не содержит здесь исходный алгоритм `Aux_Channel_Extract`; из этой главы не следует полное восстановление его UNCP-ветки, AA или CPU/GPU/MFR-поведения. Такие неизвестные остаются в [исследовательском атласе](02-EFFECT-PLUGINS/../21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/README.md). Разработку отдельного считывателя не продолжаем в рамках этой редакционной задачи.
+
+
+---
+
+<!-- SOURCE: 02-EFFECT-PLUGINS/09-CUSTOM-UI-DRAWBOT.md -->
+
+# Custom UI and Drawbot
+
+Обновлено **2026-10-01** по Adobe After Effects SDK **25.6 build 61**.
+
+Custom UI — часть Effect API. Drawbot — host drawing abstraction, используемая внутри event-driven UI. Это не отдельная HTML/panel technology.
+
+Source review: [GPU, audio and Custom UI / Drawbot](02-EFFECT-PLUGINS/../18-SDK-HEADER-TOOLS/15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md).
+
+## 1. Когда нужен Custom UI
+
+Используйте native standard parameters, пока задача решается slider/checkbox/color/popup/layer control.
+
+Custom UI нужен для:
+
+- overlay handles;
+- custom visualization;
+- специализированного control внутри Effect Controls;
+- drawing в Layer/Comp view;
+- interaction, которой нет в стандартном parameter widget.
+
+Rich application UI с asset browser/accounts/web content — отдельная panel architecture.
+
+## 2. Три части контракта
+
+Custom UI требует согласования трёх вещей:
+
+```text
+GLOBAL_SETUP
+  PF_OutFlag_CUSTOM_UI
+        ↓
+register_ui(PF_CustomUIInfo)
+  declare contexts/events/size
+        ↓
+PF_Cmd_EVENT
+  handle PF_EventExtra
+```
+
+Одного `PF_Cmd_EVENT` case недостаточно.
+
+## 3. Event lifecycle
+
+SDK 25.6 перечисляет:
+
+- NEW_CONTEXT;
+- ACTIVATE;
+- DO_CLICK;
+- DRAG;
+- DRAW;
+- DEACTIVATE;
+- CLOSE_CONTEXT;
+- IDLE;
+- ADJUST_CURSOR;
+- KEYDOWN;
+- MOUSE_EXITED.
+
+`PF_EventExtra` содержит event type, type-specific union, context/window information, callbacks и in/out flags.
+
+Не читайте поле union, не соответствующее текущему `e_type`.
+
+## 4. Handled event
+
+Если plug-in обработал event, выставляйте соответствующий event output flag только после успешной обработки.
+
+Bundled `Custom_ECW_UI` помечает draw/click paths `PF_EO_HANDLED_EVENT`.
+
+Не ставьте handled заранее, если затем возвращается ошибка или событие не было обработано.
+
+## 5. Drawbot drawing reference
+
+В draw event текущий custom-UI suite позволяет получить drawing reference из event context.
+
+Далее Drawbot:
+
+```text
+DrawRef
+  -> borrowed SupplierRef
+  -> borrowed SurfaceRef
+
+Supplier
+  -> created Brush/Pen/Path/Font...
+     -> ReleaseObject required
+```
+
+Главная ownership-ошибка: supplier/surface, полученные через DrawRef, **не освобождаются как созданные объекты**. А созданные brush/path/font нужно release.
+
+Bundled sample прямо комментирует это различие.
+
+## 6. Acquire/release Drawbot suites
+
+`Custom_ECW_UI`:
+
+1. acquires Drawbot suite set;
+2. acquires effect custom-UI suite to get drawing reference;
+3. gets supplier/surface;
+4. creates draw resources;
+5. draws;
+6. releases created objects;
+7. releases acquired suites.
+
+C++ helper/scoper можно использовать только если его lifetime совпадает с event scope.
+
+Не кешируйте event drawing references между contexts без explicit guarantee.
+
+## 7. Coordinates
+
+Custom UI имеет разные window contexts. Coordinate conversion нужно делать через event/host callbacks, а не считать screen/layer/comp coordinates одинаковыми.
+
+HiDPI/Retina support означает избегать hard-coded physical-pixel assumptions. Размер линии/handle и hit testing должны тестироваться на scale changes.
+
+## 8. Invalidation и redraw
+
+Redraw request и render request — разные операции.
+
+`PF_OutFlag_REFRESH_UI` просит перерисовку UI.
+
+`PF_OutFlag_FORCE_RERENDER` влияет на render invalidation и имеет дополнительные sequence-data требования в современном threading model.
+
+Не используйте FORCE_RERENDER как универсальный «обновить интерфейс».
+
+## 9. Async custom UI
+
+SDK 25.6 документирует `PF_OutFlag2_CUSTOM_UI_ASYNC_MANAGER`.
+
+Header прямо предупреждает: после разделения UI/render threads кадры для custom UI не следует синхронно рендерить из UI thread. Async manager:
+
+- отслеживает async frame requests;
+- повторно вызывает DRAW при готовности;
+- может отменять устаревшие requests при scrub/project changes.
+
+Это означает, что UI code должен уметь рисовать **текущее доступное состояние**, а не блокировать интерфейс до готовности кадра.
+
+В текущей Bible нет host-verified async-manager example — не скрываем этот пробел.
+
+## 10. Input interaction
+
+DO_CLICK и DRAG — разные event phases. Cursor adjustment — отдельный event.
+
+Рекомендуемый state machine:
+
+```text
+DO_CLICK
+  validate hit
+  capture interaction state
+
+DRAG
+  derive new value from current pointer
+  update supported parameter/state
+  request redraw/rerender appropriately
+
+release/end
+  finish transient state
+```
+
+Не выполняйте тяжелый render в drag handler.
+
+## 11. UI state vs render state
+
+Interaction state может быть transient, но любое состояние, влияющее на final pixels, должно участвовать в project/render dependency model.
+
+Не храните важный render parameter только в widget/global variable.
+
+## 12. Drawbot resource safety
+
+На каждом error path:
+
+- release objects already created;
+- release suite acquisitions;
+- preserve original error unless cleanup failure is the only error;
+- do not release borrowed supplier/surface.
+
+Для сложного UI лучше RAII wrappers, но wrappers должны кодировать **разные ownership classes**, а не один generic delete.
+
+## 13. Test matrix
+
+- Effect Controls draw;
+- Comp/Layer overlay, если заявлено;
+- click/drag;
+- cursor;
+- context open/close;
+- parameter automation while UI open;
+- zoom/pan;
+- HiDPI/Retina;
+- theme/background variants;
+- project switch/close;
+- repeated open/close;
+- async rendered-frame cancellation;
+- error injection/resource leak check.
+
+## Verification boundary
+
+Bundled Custom_ECW_UI/CCU source reviewed. Новый UI binary, actual Drawbot drawing, async manager, Retina/theme behavior and leak tests не запускались. Gate 6/7 остаются открытыми.
 
 
 ---
