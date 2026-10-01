@@ -22271,7 +22271,7 @@ Undo grouping does not make these failures transactional automatically.
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Suites in that SDK:** `AEGP_MaskSuite6`, `AEGP_MaskOutlineSuite3`, `AEGP_StreamSuite6`, `AEGP_KeyframeSuite5`, `AEGP_DynamicStreamSuite4`.
-**Verification level:** SDK source-reviewed; host mutation/render tests remain pending.
+**Evidence level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
 
 Mask в AEGP состоит из двух уровней: metadata самого mask object и animatable streams (outline/opacity/feather/expansion). Не пытайтесь хранить всю маску как один C++ объект с одним lifetime.
 
@@ -22428,9 +22428,9 @@ Suite3 отдельно имеет get/set/create/delete feather points. Feather
 
 Это source finding, не измеренная утечка в host. Новая production-реализация должна следовать current header и проверяться leak/lifecycle test-ом.
 
-## 11. Host acceptance matrix
+## 11. Product validation guidance
 
-Минимальные реальные тесты:
+Если конкретный product заявляет runtime support для mask editing, полезно проверить:
 
 - layer без masks / с несколькими masks;
 - create + undo/redo;
@@ -22445,7 +22445,65 @@ Suite3 отдельно имеет get/set/create/delete feather points. Feather
 - save/reopen;
 - repeated execution + leak diagnostics.
 
-До этого глава имеет уровень SDK source review, не host-verified.
+Это product runtime evidence. Для Bible глава завершена на уровне SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED, если отдельного runtime record нет.
+
+## 12. Recommended mask workflow
+
+Для команды create/edit mask:
+
+~~~text
+resolve fresh LayerH
+→ query current mask count / target identity
+→ StartUndoGroup for semantic user command
+→ GetLayerMaskByIndex or CreateNewMask
+→ treat MaskRefH as caller-disposable reference
+→ get outline/opacity/feather/expansion streams as needed
+→ inspect stream type/keyframe/expression policy
+→ mutate metadata and/or stream values
+→ dispose StreamValue
+→ dispose StreamRef
+→ dispose MaskRef
+→ EndUndoGroup
+→ re-query after structural changes
+~~~
+
+Не храните mask index как долговременный ID: create/delete/reorder меняют positional meaning.
+
+Если product использует mask ID, документируйте scope его стабильности отдельно и не обещайте save/reopen/import guarantees, которых header не даёт.
+
+## 13. Failure and invalidation cases
+
+Обработайте отдельно:
+
+- layer удалён;
+- mask index устарел;
+- mask удалён после получения ref;
+- outline stream unavailable/changed;
+- stream animated/expression-driven, а command рассчитан на static value;
+- vertex/feather indices сдвинулись после structural edit;
+- cleanup stream value/ref/mask ref вернул ошибку;
+- undo start/end failure;
+- mixed command частично изменил metadata и geometry.
+
+После vertex create/delete заново считывайте topology перед дальнейшими index-based edits.
+
+## 14. Anti-patterns
+
+Не делайте:
+
+- `DeleteMaskFromLayer` вместо `DisposeMask`;
+- один raw `AEGP_MaskRefH` в долгоживущем UI model;
+- outline pointer после `DisposeStreamValue`;
+- blind `SetStreamValue` на animated/expression-driven outline;
+- reuse старых vertex/feather indices после structural edit;
+- копирование старых Projector suite generations как current 25.6 API.
+
+## Related chapters
+
+- [Streams / properties](17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md)
+- [Keyframes](17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md)
+- [Lifetime / threading](17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md)
+- [Undo / memory / persistence](17-NATIVE-SUITE-COOKBOOK/12-MEMORY-UNDO-PERSISTENCE.md)
 
 ## Source record
 
@@ -22460,7 +22518,7 @@ Suite3 отдельно имеет get/set/create/delete feather points. Feather
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Suites in that SDK:** `AEGP_TextDocumentSuite1`, `AEGP_MarkerSuite3`, `AEGP_StreamSuite6`, `AEGP_KeyframeSuite5`.
-**Verification level:** SDK source-reviewed; no new AE host mutation test in this editorial iteration.
+**Evidence level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
 
 Text и marker в AEGP связаны со streams, но их payload lifetimes разные. Text Document хранится в special stream value; marker — payload keyframe в marker stream.
 
@@ -22602,7 +22660,9 @@ Insert/find keyframe
 
 Не смешивайте marker duration с длиной keyframe interval: keyframe задаёт anchor time, duration — часть marker payload.
 
-## 12. Host acceptance matrix
+## 12. Product validation guidance
+
+If a concrete product claims text/marker editing behavior, useful runtime cases include:
 
 Text:
 
@@ -22626,7 +22686,89 @@ Markers:
 - duplicate marker;
 - repeated batch edits + cleanup.
 
-До этих тестов документация source-reviewed, но не host-verified.
+These are product runtime/support checks. Bible itself remains SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED unless a separate runtime record exists.
+
+## 13. Recommended text workflow
+
+~~~text
+resolve fresh text LayerH
+→ acquire SOURCE_TEXT StreamRefH
+→ verify TEXT_DOCUMENT stream type
+→ choose static stream write vs keyframe path
+→ GetNewStreamValue / GetNewKeyframeValue
+→ obtain text_documentH inside value
+→ optional GetNewText → copy UTF-16 → free MemHandle
+→ SetText(character count, not byte count)
+→ SetStreamValue / SetKeyframeValue
+→ DisposeStreamValue
+→ DisposeStream
+~~~
+
+Do not persist `AEGP_TextDocumentH` or the locked UTF-16 pointer beyond the lifetime of the value/memory handle that owns it.
+
+## 14. Recommended marker workflow
+
+For an existing marker key:
+
+~~~text
+resolve marker stream
+→ resolve keyframe time/index
+→ GetNewKeyframeValue
+→ use value.val.markerP
+→ edit strings/flags/cue params/duration/label
+→ SetKeyframeValue
+→ DisposeStreamValue
+~~~
+
+For a newly-created standalone marker:
+
+~~~text
+NewMarker
+→ caller owns marker
+→ build payload
+→ transfer/adopt only through a documented value/container path
+→ otherwise DisposeMarker
+~~~
+
+Do not combine `DisposeMarker` and `DisposeStreamValue` for the same payload unless the exact ownership transition is documented.
+
+## 15. Failure and invalidation cases
+
+Text:
+
+- layer/property disappeared;
+- Source Text is keyframed but command assumes static;
+- expression policy conflicts with direct editing;
+- UTF-16 length/count wrong;
+- GetNewText handle acquired but later operation fails;
+- stream value cleanup fails after primary error.
+
+Markers:
+
+- marker stream/key index changed;
+- cue param index shifted after insert/delete;
+- two returned cue-param MemHandles require independent cleanup;
+- standalone marker ownership is ambiguous;
+- marker value write fails after payload mutation;
+- duration/label/flag operation unsupported by product policy.
+
+## 16. Anti-patterns
+
+Avoid:
+
+- `strlen()` on UTF-16 text;
+- keeping `text_documentH` after disposing the containing stream value;
+- using localized text/property names as durable identity;
+- treating marker duration as timeline interval identity;
+- assuming `InsertCuePointParam` writes the key/value;
+- guessing ownership from Mangler's historical sample shortcut.
+
+## Related chapters
+
+- [Streams / properties](17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md)
+- [Keyframes](17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md)
+- [Memory / Undo / Persistent Data](17-NATIVE-SUITE-COOKBOOK/12-MEMORY-UNDO-PERSISTENCE.md)
+- [Lifetime / threading](17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md)
 
 ## Source record
 
@@ -22641,7 +22783,7 @@ Markers:
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Current suite generations in that SDK:** `AEGP_FootageSuite5`, `AEGP_ItemSuite9`, `AEGP_CompSuite12`, `AEGP_LayerSuite9`.
-**Verification level:** SDK source-reviewed; exact host import/load/render acceptance remains pending.
+**Evidence level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
 
 Предыдущая версия главы смешивала baseline 25.6 с более поздним `CompSuite13`. Для supplied SDK 25.6 current declaration — `CompSuite12`. Это исправлено здесь.
 
@@ -22665,7 +22807,7 @@ UTF-16 path + optional layered/sequence options
 
 Это не `AEGP_NewFootage`. Нужен **AEIO/File Import** path. Footage Suite просит host импортировать уже поддерживаемый тип; она не реализует decoder.
 
-См. `04-AEIO/` и native integration chapters.
+См. [AEIO](17-NATIVE-SUITE-COOKBOOK/../04-AEIO/README.md) и [AEIO native integration](17-NATIVE-SUITE-COOKBOOK/../14-NATIVE-INTEGRATIONS/08-AEIO.md).
 
 ## 2. Ownership AEGP_FootageH меняется при adoption
 
@@ -22861,7 +23003,9 @@ Projector создаёт layered PSD footage, ordinary footage, proxy и мен�
 
 Слишком короткий helper обычно скрывает один из этих contracts.
 
-## 14. Host acceptance matrix
+## 14. Product validation guidance
+
+If a concrete product claims footage/import behavior, useful runtime cases include:
 
 - still file;
 - numbered sequence;
@@ -22878,7 +23022,96 @@ Projector создаёт layered PSD footage, ordinary footage, proxy и мен�
 - multi-file/auxiliary footage inventory;
 - repeated import without duplicate ownership errors.
 
-Exact import flags/behavior считаются host-verified только после выполнения этих сценариев в named AE build.
+These cases establish product runtime/support evidence. Bible does not require running them to document the SDK contract accurately.
+
+## 15. Recommended import/adoption workflow
+
+For host-supported media:
+
+~~~text
+normalize UTF-16 path + import options
+→ NewFootage
+→ plugin owns FootageH
+→ validate destination/project context
+→ AddFootageToProject / SetProxy / Replace
+→ on success: ownership transfers to project
+→ on failure: plugin still disposes FootageH
+→ use returned ItemH / project-owned footage only through project APIs
+~~~
+
+Implement the ownership transition explicitly. A small state object/RAII wrapper can represent:
+
+~~~text
+OwnedByPlugin
+→ AdoptedByProject
+~~~
+
+and release its cleanup obligation only after successful adoption.
+
+## 16. Interpretation workflow
+
+Treat interpretation as a distinct project mutation:
+
+~~~text
+import/adopt footage
+→ obtain ItemH
+→ GetFootageInterpretation
+→ modify only intended fields
+→ SetFootageInterpretation
+→ preserve unrelated interpretation settings
+~~~
+
+Do not hide interpretation changes inside a generic "import file" helper unless that is part of the product contract.
+
+## 17. Failure and rollback cases
+
+Plan for:
+
+- invalid/missing path;
+- unsupported media;
+- NewFootage failed;
+- NewFootage succeeded but adoption failed;
+- proxy/replace failed after caller acquired new footage;
+- destination folder/item invalidated;
+- sequence range/options malformed;
+- placeholder path/file-type mismatch;
+- interpretation mutation failed;
+- path MemHandle acquired but later read/copy failed;
+- project changed during async path preparation.
+
+Most important ownership rule:
+
+> after `NewFootage`, failure before successful adoption still leaves a caller-owned resource to dispose.
+
+## 18. Path and identity policy
+
+Do not keep a returned path pointer beyond MemorySuite lock lifetime.
+
+For long-lived product state store copied path/config data, not locked MemHandle pointers or detached host handles.
+
+Do not treat path alone as permanent project-item identity; relink/replace/proxy workflows can change file associations.
+
+## 19. Anti-patterns
+
+Avoid:
+
+- passing Boolean `FALSE` where `AEGP_InterpretationStyle` is expected;
+- disposing footage already adopted by project;
+- forgetting disposal when adoption fails;
+- disposing project-owned footage returned from Item APIs;
+- assuming `GetFootageNumFiles` describes semantic Z-depth/Object-ID channels;
+- treating Footage Suite as custom decoder API instead of using AEIO;
+- hiding interpretation mutation inside unrelated import logic;
+- copying sample suite generations without checking current headers.
+
+## Related chapters
+
+- [Project / items](17-NATIVE-SUITE-COOKBOOK/01-PROJECT-ITEMS.md)
+- [Compositions](17-NATIVE-SUITE-COOKBOOK/02-COMPOSITIONS.md)
+- [Layers](17-NATIVE-SUITE-COOKBOOK/03-LAYERS.md)
+- [Memory / Undo / Persistent Data](17-NATIVE-SUITE-COOKBOOK/12-MEMORY-UNDO-PERSISTENCE.md)
+- [AEIO](17-NATIVE-SUITE-COOKBOOK/../04-AEIO/README.md)
+- [AEIO native integration](17-NATIVE-SUITE-COOKBOOK/../14-NATIVE-INTEGRATIONS/08-AEIO.md)
 
 ## Source record
 
