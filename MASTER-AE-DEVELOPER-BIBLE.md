@@ -6867,40 +6867,67 @@ AEGP modules не гарантируют порядок загрузки. Не a
 
 <!-- SOURCE: 15-COMMUNICATION/03-AEGP-TO-EFFECT.md -->
 
-# AEGP -> Effect
+# AEGP → Effect: generic call
 
-Есть documented direct path для согласованной пары AEGP + Effect.
+Обновлено **2026-10-01** по присланному **SDK 25.6 build 61**. Это documented direct call path между AEGP и конкретным экземпляром Effect. Он не заменяет render dependency graph и не является общим IPC.
 
-## Generic call
+Подробная сверка: [SDK 25.6 — PICA, Effect↔AEGP и legacy boundaries](15-COMMUNICATION/../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md).
 
-AEGP Effect Suite предоставляет `AEGP_EffectCallGeneric()`. Подготовленный effect получает `PF_Cmd_COMPLETELY_GENERAL`; `extra` указывает на payload, который договорились понимать обе стороны.
+## 1. Текущий контракт SDK 25.6
+
+В `AEGP_EffectSuite4` функция имеет смысловую форму:
 
 ```text
-AEGP
-  |
-  | AEGP_EffectCallGeneric(effect_ref, payload)
-  v
-AE
-  |
-  | PF_Cmd_COMPLETELY_GENERAL
-  v
-EffectMain(..., extra=payload)
+AEGP_EffectCallGeneric(
+    plugin_id,
+    effect_ref,
+    layer_time,
+    effect_command,
+    effect_extra)
 ```
 
-## Для чего подходит
+Комментарий прямо говорит: чтобы получить старое поведение, нужно передать `PF_Cmd_COMPLETELY_GENERAL` как `effect_command`.
 
-- команда «invalidate/reload internal resource»;
-- запрос/передача small control state;
-- handshake между двумя модулями одного продукта;
-- действия, не являющиеся скрытым render dependency.
+Effect API определяет `PF_Cmd_COMPLETELY_GENERAL` как команду для общих вызовов через AEGP.
 
-## Для чего НЕ подходит
+Источник: `Headers/AE_GeneralPlug.h:2162–2168`, `Headers/AE_Effect.h:1228–1236`.
 
-Не использовать generic call как обход dependency graph, чтобы render зависел от неописанного внешнего state. Это ведёт к cache invalidation bugs.
+## 2. Version boundary: старый sample и текущий header различаются
 
-## Protocol design
+Bundled `ProjDumper` вызывает старую `EffectSuite2` форму:
 
-Payload должен иметь explicit version + size + opcode:
+```text
+EffectCallGeneric(plugin_id, effect_ref, time, extra)
+```
+
+То есть без отдельного `PF_Cmd` аргумента.
+
+Это полезный исторический pattern, но **не сигнатура SDK 25.6 для нового кода**. В новой реализации нельзя копировать старую строку вызова буквально; нужно компилировать против текущего header.
+
+Источник: `AEGP/ProjDumper/ProjDumper.cpp:142–168`.
+
+## 3. Effect side
+
+Bundled `Shifter` обрабатывает `PF_Cmd_COMPLETELY_GENERAL` в своём dispatcher и получает payload через `extra`.
+
+В sample payload трактуется как C-string и копируется в return message. Это демонстрация связи, а не production protocol:
+
+- нет size/version header;
+- sample предполагает ожидаемый payload type;
+- это не контракт для binary-compatible сложных структур;
+- sample не устанавливает право хранить `extra` после возврата команды.
+
+Источник: `Effect/Shifter/Shifter.cpp:317–327,555–617`.
+
+## 4. Время вызова
+
+Текущий header указывает, что `timePT` использует **timebase слоя, на котором находится effect**. Поэтому comp-time значение нельзя бездумно передавать как layer-time.
+
+Если вызывающая логика живёт в comp time, сначала используйте документированный механизм преобразования времени, а не собственную догадку о start-time/stretch.
+
+## 5. Хороший payload contract
+
+Для пары модулей одного продукта payload должен быть self-describing:
 
 ```cpp
 struct BridgeMessageV1 {
@@ -6909,43 +6936,235 @@ struct BridgeMessageV1 {
     uint32_t opcode;
     uint32_t flags;
     uint64_t request_id;
+    int32_t result_code;
 };
 ```
 
-Никогда не передавать STL objects/`std::string` через module boundary как ABI contract.
+Перед чтением расширения effect проверяет минимум `size` и `version`.
 
-См. `16-WORKING-TEMPLATES/effect-aegp-generic-bridge/`.
+Не передавайте через ABI:
+
+- `std::string`;
+- STL containers;
+- exceptions;
+- указатели на object graph с неизвестным lifetime;
+- platform-specific class instances без общего binary contract.
+
+## 6. Синхронный call не даёт права сохранить pointer
+
+API передаёт `void* effect_extraPV` на время вызова. В просмотренном контракте нет обещания, что Effect может сохранить этот pointer и использовать позже.
+
+Поэтому безопасная модель по умолчанию:
+
+```text
+caller builds payload
+→ generic call
+→ effect reads/writes payload synchronously
+→ call returns
+→ payload may cease to exist
+```
+
+Если нужен долгоживущий обмен, используйте собственный versioned service/handle protocol, а не скрытое сохранение raw pointer.
+
+## 7. Для чего подходит
+
+- ping/handshake;
+- invalidate/reload control resource;
+- маленькая команда конкретному effect instance;
+- синхронный запрос/ответ;
+- диагностическая команда между модулями одного продукта.
+
+## 8. Для чего не подходит
+
+Generic call не должен становиться скрытой render dependency:
+
+```text
+AEGP changed hidden state
+→ renderer depends on it
+→ AE dependency/cache graph об этом не знает
+→ stale frame / inconsistent render
+```
+
+Render-affecting state должен быть выражен поддержанными параметрами/dependencies/cache identity механизмами.
+
+Также generic call не заменяет published suite, когда нужен многофункциональный service для нескольких consumers.
+
+## 9. Lifetime target effect
+
+AEGP сначала должен получить `AEGP_EffectRefH`, вызвать операцию и затем освободить ref правильным API. Generic call не передаёт ownership effect-ref в Effect.
+
+Не кешируйте старый `AEGP_EffectRefH` как вечный идентификатор без отдельной гарантии host API.
+
+## 10. Error model
+
+Есть минимум два уровня результата:
+
+1. `A_Err` самого AEGP call;
+2. результат вашего protocol внутри payload.
+
+Не смешивайте их. Ошибка доставки/host call и «команда дошла, но provider отказал» — разные состояния.
+
+## 11. Приёмка собственного bridge
+
+Проверять:
+
+- target effect отсутствует;
+- wrong protocol version;
+- short payload;
+- unknown opcode;
+- valid request/response;
+- target effect disabled/reordered/removed;
+- правильное layer-time значение;
+- repeated calls;
+- save/reopen, если protocol влияет на persistent state;
+- отсутствие render-cache stale behavior.
+
+Связанный шаблон: [effect-aegp-generic-bridge](15-COMMUNICATION/../16-WORKING-TEMPLATES/effect-aegp-generic-bridge).
 
 
 ---
 
 <!-- SOURCE: 15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md -->
 
-# Plug-in -> Plug-in через published PICA suite
+# Plug-in → Plug-in через published PICA suite
 
-Если несколько native modules должны использовать общую службу, предпочтительный in-process contract — versioned suite.
+Обновлено **2026-10-01** по SDK 25.6. Для повторяемого in-process service это основной versioned function-table pattern из поставки.
+
+См. также [главу о PICA suites](15-COMMUNICATION/../14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md) и [source review](15-COMMUNICATION/../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md).
 
 ## Provider
 
-AEGP/native provider публикует структуру function pointers под стабильным suite name/version.
+Adobe sample `Sweetie`:
+
+1. создаёт function table со static lifetime;
+2. получает `SPSuitesSuite`;
+3. добавляет suite в runtime suite list;
+4. освобождает только acquisition самого `SPSuitesSuite`.
+
+Ключевые поля публикации:
+
+```text
+suite list
+provider/host reference
+suite name
+public API version
+internal version
+function-table pointer
+returned suite reference
+```
+
+Source: `AEGP/Sweetie/Sweetie.cpp:23–78`, `Headers/SP/SPSuites.h:116–136`.
 
 ## Consumer
 
-Effect/AEGP делает `AcquireSuite(name, version, ...)`, вызывает функции и `ReleaseSuite`.
+Consumer получает exact name/version через `SPBasicSuite::AcquireSuite`, использует table и обязан сделать matching `ReleaseSuite`.
+
+`Checkout` показывает optional dependency: если Sweetie не загружен, sample не считает это фатальной ошибкой для самого effect.
+
+Source: `Headers/SP/SPBasic.h:80–101`, `Effect/Checkout/Checkout.cpp:45–68`.
 
 ## ABI rules
 
-- C-compatible structs/function pointers;
-- fixed-width primitive types where possible;
-- caller-owned / callee-owned memory documented explicitly;
-- no C++ exceptions across boundary;
-- no STL types across boundary;
-- version every incompatible change;
-- old suite version сохранять, пока поддерживаются старые consumers.
+- versioned function table;
+- stable unique name;
+- plain C-shaped data;
+- fixed-width primitive types;
+- calling convention согласован между provider/consumer;
+- no exceptions across boundary;
+- no STL ABI;
+- каждый pointer имеет documented ownership/lifetime;
+- size/version проверяются до чтения расширенной структуры;
+- incompatible change получает новую public suite version.
 
-## Failure mode
+## Public version ≠ internal version
 
-Consumer обязан нормально переживать `suite unavailable`: disable optional feature или показать понятную ошибку, а не dereference null pointer.
+`SPBasicSuite` acquire использует public version. Низкоуровневый `SPSuitesSuite` различает public API version и internal version.
+
+Не используйте internal version как клиентский feature number, если он не является частью вашего публичного договора.
+
+## Optional vs required dependency
+
+**Optional service:**
+
+```text
+suite missing
+→ feature disabled
+→ plug-in remains usable
+```
+
+**Required service:**
+
+```text
+suite missing
+→ initialization fails explicitly
+→ clear diagnostic
+```
+
+Нельзя просто dereference null suite pointer.
+
+## Load order
+
+Consumer не должен считать наличие provider доказанным только потому, что оба bundle лежат в одной папке.
+
+Если feature optional — acquire-on-use или graceful startup path.
+
+Если feature required — проверяйте acquisition и выдавайте конкретную ошибку. Сам sample Checkout демонстрирует отсутствие provider как реальный сценарий.
+
+## Lifetime
+
+Нельзя:
+
+- хранить table pointer после `ReleaseSuite`;
+- хранить borrowed buffer provider после документированного срока;
+- считать адрес function pointer постоянным ID;
+- предполагать, что опубликованный suite автоматически поддерживает hot replacement.
+
+Sweetie не демонстрирует generic unregister/replacement workflow.
+
+## Threading
+
+Suite availability не означает thread safety.
+
+Provider API должен отдельно объявить:
+
+```text
+main-thread-only
+render-thread-safe
+serialized internally
+reentrant / non-reentrant
+may call host / must not call host
+```
+
+Без этого contract consumer обязан выбирать консервативный путь.
+
+## Error model
+
+Рекомендуемая схема:
+
+```text
+transport/acquire error
+service function error
+protocol/result error
+```
+
+Это три разные категории.
+
+## Testing
+
+Минимум:
+
+- provider missing;
+- wrong version;
+- correct version;
+- repeated acquire/release;
+- two consumers;
+- provider function error;
+- malformed sizes;
+- consumer early-return cleanup;
+- AE restart;
+- заявленный concurrency mode.
+
+Шаблон: [pica-shared-suite](15-COMMUNICATION/../16-WORKING-TEMPLATES/pica-shared-suite).
 
 
 ---
