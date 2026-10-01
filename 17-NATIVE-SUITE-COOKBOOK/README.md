@@ -31,7 +31,7 @@
 - **SDK source-reviewed** — declaration/ownership statement сверены с конкретным supplied SDK snapshot; это не runtime result.
 - **sample-derived** — pattern найден в официальном sample-проекте Adobe; sample может использовать старую suite generation.
 - **syntax/type baseline** — отдельный recorded compiler check для конкретного source snapshot.
-- **host-test-required** — поведение ещё должно быть проверено внутри указанного After Effects build.
+- **runtime-not-claimed** — Bible описывает source/API pattern, но не утверждает конкретный host-observed результат.
 
 > Supplied SDK 25.6 используется для source review и локальной проверки контрактов, но Adobe headers не публикуются в репозитории. Recorded compiler baseline и host acceptance — отдельные evidence levels. C++ куски остаются drop-in кодом для официального SDK sample, а не «самодельным SDK».
 
