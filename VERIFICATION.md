@@ -1,5 +1,15 @@
 # Verification — v1.1
 
+## PICA providers, Effect↔AEGP and legacy-boundary chapter review (2026-10-01)
+
+Expanded [PICA suites](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md), [AEGP → Effect](15-COMMUNICATION/03-AEGP-TO-EFFECT.md), [Plug-in → Plug-in PICA](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md), [legacy/native boundaries](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) and the two existing bridge-template READMEs from the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md) records 13 SDK/source hashes and exact ranges.
+
+Reviewed contracts include SPBasic public-version acquire/release reference counting; SPSuites public/internal version separation and AddSuite publication; Sweetie’s static DuckSuite provider; Checkout’s optional acquire/use/release consumer; current EffectSuite4 generic-call command/time arguments; PF_Cmd_COMPLETELY_GENERAL dispatch; and the old ProjDumper/Shifter workflow. The review also records that bundled Commando’s initializer signature differs from the current AEGP_PluginInitFuncPrototype and therefore must not be copied as the 25.6 reference signature.
+
+Source limits are explicit: Sweetie does not demonstrate generic suite unpublish/hot replacement; suite refcount does not prove thread safety; the current Bible SharedSuite header is C++-oriented despite its C-shaped ABI; old bundled sample suite generations remain pattern evidence rather than current signatures.
+
+**Verification level: SDK source review and documentation.** The SDK TAR SHA-256 was recalculated and matched the accepted archive. No new provider/consumer host load, wrong-version acquisition run, suite unload/reload test, generic call, layer-time host test, concurrency stress, exact-SDK compile of the Bible bridge templates or Windows host run was performed. Gate 4/6/7 remain open.
+
 ## Native panels and BlitHook chapter review (2026-10-01)
 
 Rewrote [native dockable panels](14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md) and [BlitHook](14-NATIVE-INTEGRATIONS/10-BLITHOOK.md) from the supplied SDK 25.6 build 61. The [source-review record](18-SDK-HEADER-TOOLS/13-PANELS-BLITHOOK-SDK25.6.md) records ten source hashes and the reviewed Panelator/EMP contracts.
