@@ -161,7 +161,7 @@ That distinction matters for architecture decisions in the Bible.
 
 ## 17. Verification boundary
 
-Source review establishes entry-point/lifecycle/suite contracts. Before calling an Artisan implementation ready, Gate 6/7 needs:
+Source review establishes entry-point/lifecycle/suite contracts. A developer calling a concrete Artisan implementation ready should additionally verify:
 
 - actual registration/selectability;
 - state save/reopen;
