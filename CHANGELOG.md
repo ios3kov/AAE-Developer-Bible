@@ -7,6 +7,8 @@
 - Expanded practical recipes and bug/compatibility/performance/spec/release templates.
 - Reconciled the CEP working template with the communication protocol field and corrected ScriptUI/JSX verification wording.
 - Serialized/retried generated-doc updates to prevent non-fast-forward failures during rapid documentation pushes.
+- Closed Completion Gate 2 with transactional install/materialization safety and CI regression evidence.
+- Closed Completion Gate 3 after exposing section 21, reconciling readiness summaries and explicitly superseding the false 3D Channel Extract standalone-absence/HOST-BUILTIN conclusion.
 
 - Expanded ExtendScript object-model and ScriptUI chapters with reference invalidation, stable targeting, command boundaries and long-operation rules.
 - Expanded CEP communication into a versioned request/response protocol with main-thread scheduling, stale-response, path, large-data and security boundaries.
