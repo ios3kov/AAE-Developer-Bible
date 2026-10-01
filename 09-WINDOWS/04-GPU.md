@@ -138,7 +138,7 @@ Bible документирует метод и не обязана строит�
 - [Windows debugging](03-DEBUGGING.md)
 - [Windows ARM64](02-ARM64.md)
 - [CPU/GPU equivalence recipe](../12-RECIPES/04-CPU-GPU-EQUIVALENCE.md)
-- [Distribution](../11-DISTRIBUTION/README.md)
+- [Distribution](../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
 
 ## Evidence boundary
 
