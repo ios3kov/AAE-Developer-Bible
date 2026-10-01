@@ -82,6 +82,19 @@ First completeness wave expanded and normalized:
 
 These chapters now explicitly separate product validation guidance from Bible editorial evidence.
 
+### Cookbook project/render block — completed 2026-10-01
+
+Checked and reconciled as one logical block:
+
+- compositions: SDK 25.6 baseline `CompSuite12`; later `CompSuite13` remains explicitly version-gated;
+- layers: `LayerSuite9` + `CompSuite12`, stable-ID/invalidation guidance;
+- render frames: current `RenderSuite5`/RenderOptions4/World3; older recipe `RenderSuite4` is explicitly compatibility-shaped source;
+- render queue: current `RQItemSuite4` + OutputModule4; older recipe `RQItemSuite3` is explicit compatibility source;
+- render-item state uses named `AEGP_RenderItemStatus_QUEUED`, not Boolean `TRUE`;
+- required-contract manifest matches the same current SDK generations.
+
+No compiler/host run is required for this editorial block; runtime results are not claimed.
+
 ## E. Recipes and reference source
 
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
