@@ -143,13 +143,13 @@ That may be intentional or a sample typo; source alone does not establish desire
 
 Artie calls RegisterArtisan and then RegisterDeathHook. Like other AEGP registrations, there is no basis here to assume generic rollback/unregister of already registered renderer on a later initialization failure.
 
-A robust product should design partial-init state explicitly and host-test failure injection.
+A robust product should design partial-init state explicitly. If it claims recovery from such failures, that behavior needs product-specific runtime evidence.
 
 ## 15. Interactive registration is a separate contract
 
 `AEGP_RegisterInteractiveArtisan` has the same parameter shape but interactive Canvas/query behavior adds separate runtime obligations.
 
-Do not register interactive variant unless interactive callbacks/buffers are actually implemented and tested.
+Do not register the interactive variant unless the product actually implements the interactive callback/buffer/query contract. Runtime support claims require product-specific evidence.
 
 ## 16. Relation to independent render engine idea
 
@@ -159,7 +159,52 @@ Thus it may be a foundation for a custom 3D renderer, but **не являетс�
 
 That distinction matters for architecture decisions in the Bible.
 
-## 17. Verification boundary
+## 17. Render-context ownership graph
+
+A production implementation should make ownership visible:
+
+~~~text
+PR_RenderContextH              borrowed host context
+  ↓
+LayerContext / QueryContext    borrowed host contexts
+  ↓
+Canvas texture                 DisposeTexture
+WorldH                         cleanup per call/World Suite contract
+RenderReceiptH                 DisposeRenderReceipt
+  ↓
+normalized product scene       product-owned
+  ↓
+renderer/GPU resources         product-owned
+~~~
+
+Never attach borrowed render/query/layer context handles directly to long-lived product caches.
+
+## 18. Instance persistence boundary
+
+`FlattenInstance` should produce platform-independent state and leave the source live instance intact.
+
+On setup from flat data:
+
+- validate size/version;
+- migrate known schemas;
+- reject/recover malformed data deliberately;
+- recreate runtime-only resources;
+- never deserialize raw pointers or host refs.
+
+## 19. Interactive/final separation
+
+Interactive Canvas state is view/session state. Final render state is composition/render state.
+
+Keep separate:
+
+- viewport/display settings;
+- interactive buffers;
+- persistent renderer options;
+- final frame scene/cache state.
+
+Do not persist transient viewport handles inside instance data.
+
+## 20. Verification boundary
 
 Source review establishes entry-point/lifecycle/suite contracts. A developer calling a concrete Artisan implementation ready should additionally verify:
 
