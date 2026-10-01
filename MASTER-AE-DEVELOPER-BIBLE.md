@@ -8691,8 +8691,8 @@ Families:
 
 # Native Suite Cookbook
 
-**Edition:** v0.3  
-**Target snapshot:** After Effects 26.5 SDK, 2026-09-30
+**Edition:** v1.1 documentation line  
+**Primary acceptance baseline:** After Effects / SDK 25.6 for the current Bible plan. Later-version notes are explicitly version-gated.
 
 Этот раздел — практический слой над AEGP/native API: **какую suite брать, какой handle получить, кто им владеет, что надо dispose-ить и в каком порядке вызывать функции**.
 
@@ -8719,11 +8719,12 @@ Families:
 
 ## Уровни доверия
 
-- **SDK-verified** — имя и shape вызова сверены с публичным AE SDK Guide / 26.5 notes.
-- **sample-derived** — порядок работы соответствует официальным sample-проектам Adobe.
-- **host-test-required** — архитектура корректная, но бинарная проверка требует установленного proprietary SDK + конкретного AE host.
+- **SDK source-reviewed** — declaration/ownership statement сверены с конкретным supplied SDK snapshot; это не runtime result.
+- **sample-derived** — pattern найден в официальном sample-проекте Adobe; sample может использовать старую suite generation.
+- **syntax/type baseline** — отдельный recorded compiler check для конкретного source snapshot.
+- **host-test-required** — поведение ещё должно быть проверено внутри указанного After Effects build.
 
-> В этой песочнице нет proprietary Adobe SDK headers и After Effects host, поэтому здесь **не заявляется бинарный host-test**. C++ куски специально оформлены как drop-in код для официального SDK sample, а не как «самодельный SDK».
+> Supplied SDK 25.6 используется для source review и локальной проверки контрактов, но Adobe headers не публикуются в репозитории. Recorded compiler baseline и host acceptance — отдельные evidence levels. C++ куски остаются drop-in кодом для официального SDK sample, а не «самодельным SDK».
 
 ## Базовый pipeline AEGP
 
@@ -8748,6 +8749,11 @@ Return A_Err
 ## Главное правило
 
 Не хранить в долгоживущем состоянии `AEGP_StreamRefH`, `AEGP_EffectRefH`, RQ/output-module refs и подобные ссылки без явной гарантии API. Структурное изменение проекта часто делает их невалидными. Долговременно хранить лучше **stable IDs / match names / собственные данные**, а handles получать заново.
+
+
+## Version discipline
+
+Главы `05-STREAMS-PROPERTIES.md` и `06-KEYFRAMES.md` перепроверены по supplied SDK 25.6: `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`, `AEGP_KeyframeSuite5`. Более поздние API (например отдельные notes из 26.5) не должны молча становиться baseline 25.6. Источник: `18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md`.
 
 
 ---
