@@ -1,6 +1,6 @@
 # AEGP keyframer reference
 
-Status: **sample-derived / host-test-required**.
+Status: **sample-derived source reference / runtime not claimed**.
 
 KeyframeRecipes.cpp forwards to the canonical cookbook implementation in 17-NATIVE-SUITE-COOKBOOK/code. Compile the forwarding file or canonical implementation, not both.
 
@@ -93,4 +93,4 @@ Every owned stream/batch/resource still needs its matching cleanup path.
 
 ## Verification boundary
 
-The recipe shape has been checked against the supplied SDK source contracts. It remains host-test-required until a real project operation is compiled and exercised in the declared After Effects versions.
+The recipe shape has been checked against the supplied SDK source contracts. Bible does not claim a runtime result for this reference. A developer may validate it in the target product/environment as needed.
