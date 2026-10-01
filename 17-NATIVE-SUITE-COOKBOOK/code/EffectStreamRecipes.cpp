@@ -20,12 +20,12 @@ A_Err Bible_FindInstalledEffect(
     *keyP = AEGP_InstalledEffectKey_NONE;
 
     AEGP_InstalledEffectKey key = AEGP_InstalledEffectKey_NONE;
-    ERR(suites.EffectSuite4()->AEGP_GetNextInstalledEffect(
+    ERR(suites.EffectSuite5()->AEGP_GetNextInstalledEffect(
         AEGP_InstalledEffectKey_NONE, &key));
 
     while (!err && key != AEGP_InstalledEffectKey_NONE) {
         A_char current[AEGP_MAX_EFFECT_MATCH_NAME_SIZE] = {};
-        ERR(suites.EffectSuite4()->AEGP_GetEffectMatchName(
+        ERR(suites.EffectSuite5()->AEGP_GetEffectMatchName(
             key, current));
 
         if (!err && std::strcmp(current, match_nameZ) == 0) {
@@ -34,7 +34,7 @@ A_Err Bible_FindInstalledEffect(
         }
 
         AEGP_InstalledEffectKey next = AEGP_InstalledEffectKey_NONE;
-        ERR(suites.EffectSuite4()->AEGP_GetNextInstalledEffect(
+        ERR(suites.EffectSuite5()->AEGP_GetNextInstalledEffect(
             key, &next));
         key = next;
     }
@@ -57,12 +57,12 @@ A_Err Bible_ApplyEffect(
 
     AEGP_EffectRefH effectH = nullptr;
     if (!err) {
-        ERR(suites.EffectSuite4()->AEGP_ApplyEffect(
+        ERR(suites.EffectSuite5()->AEGP_ApplyEffect(
             plugin_id, layerH, key, &effectH));
     }
 
     if (effectH) {
-        const A_Err cleanup = suites.EffectSuite4()->AEGP_DisposeEffect(effectH);
+        const A_Err cleanup = suites.EffectSuite5()->AEGP_DisposeEffect(effectH);
         if (!err) err = cleanup;
     }
     return err;
