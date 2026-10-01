@@ -297,6 +297,12 @@ Compiler reports now include Bible Git SHA/dirty state and SHA-256 for each tran
 See [SDK contract audit runbook](18-SDK-HEADER-TOOLS/16-SDK-CONTRACT-AUDIT-RUNBOOK.md).
 
 
+### Current-suite manifest correction
+
+A later cookbook consistency sweep corrected the required SDK baseline entries from compatibility generations to the current SDK 25.6 header generations: `RQItemSuite4` and `RenderSuite5`. The source recipes may still intentionally use older Suite3/Suite4 subsets.
+
+The exact-header contract audit was repeated after that manifest change and remained **35/35 required contracts, 39/39 cookbook call-sites, 0 unknown**. This was a source-contract audit only.
+
 ## Real SDK 25.6 required-contract audit (2026-10-01)
 
 The user supplied Adobe After Effects SDK 25.6 build 61 again. The two supplied representations were validated before use:
