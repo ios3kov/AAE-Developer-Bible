@@ -26576,6 +26576,31 @@ Optional future implementation evidence may include compiler or host runs for sp
 The four non-required parser diagnostics remain visible and may be improved later, but they do not silently weaken the required-contract acceptance surface.
 
 
+## Post-sweep current-suite correction
+
+During the editorial cookbook sweep, two required-contract manifest entries were corrected from compatibility-suite generations to the **current SDK 25.6 header generations**:
+
+- `AEGP_RQItemSuite3` → `AEGP_RQItemSuite4`;
+- `AEGP_RenderSuite4` → `AEGP_RenderSuite5`.
+
+The existing C++ recipes may still use the older compatible Suite3/Suite4 subsets; that source usage is documented separately and is not used as the definition of the current SDK baseline.
+
+The required-contract audit was repeated against the same SDK archive after the manifest correction:
+
+~~~text
+headers=140
+tables=233
+functions=3560
+required_tables=35
+missing=0
+call_sites=39
+unknown=0
+diagnostics=4
+~~~
+
+The four diagnostics remain the same non-required partial tables. No compile or host run was involved in this correction.
+
+
 ---
 
 <!-- SOURCE: 18-SDK-HEADER-TOOLS/README.md -->
@@ -33353,6 +33378,12 @@ Compiler reports now include Bible Git SHA/dirty state and SHA-256 for each tran
 
 See [SDK contract audit runbook](18-SDK-HEADER-TOOLS/16-SDK-CONTRACT-AUDIT-RUNBOOK.md).
 
+
+### Current-suite manifest correction
+
+A later cookbook consistency sweep corrected the required SDK baseline entries from compatibility generations to the current SDK 25.6 header generations: `RQItemSuite4` and `RenderSuite5`. The source recipes may still intentionally use older Suite3/Suite4 subsets.
+
+The exact-header contract audit was repeated after that manifest change and remained **35/35 required contracts, 39/39 cookbook call-sites, 0 unknown**. This was a source-contract audit only.
 
 ## Real SDK 25.6 required-contract audit (2026-10-01)
 
