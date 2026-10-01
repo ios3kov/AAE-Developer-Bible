@@ -17,7 +17,7 @@ Use the exact candidate SDK.
 
 A successful run means only the tool's implemented checks passed, for example:
 
-- supported header declarations parsed without unresolved diagnostics;
+- supported header declarations parsed without unresolved **required-contract** diagnostics; unrelated diagnostics remain recorded;
 - inventory schema/version validation passed;
 - cookbook/reference suite symbols resolved against that inventory;
 - the current Bible native C++ translation units passed MSVC C++17 syntax/type checks;
