@@ -4,7 +4,7 @@
 
 Research snapshot: **2026-09-30**  
 Status: **v1.1 — SDK syntax-checked baseline and reproducible documentation**  
-Completion gates: **Gate 1 and Gate 2 closed; later documentation/reuse/compiler/host/release gates remain open.**
+Completion gates: **Gates 1–3 closed; Gate 3A reuse audit and later compiler/host/release gates remain open.**
 
 ## Проверенность v1.1
 
