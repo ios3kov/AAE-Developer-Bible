@@ -23,6 +23,9 @@
 - Added release artifact identity, installer ownership, upgrade/rollback and staged update guidance.
 - Updated STATUS and VERIFICATION without claiming new host/build verification.
 - Added explicit host-verification evidence ladder, durable test-record format and clean-machine release acceptance chapters.
+- Corrected the cookbook render-queue status call from Boolean `TRUE` to named `AEGP_RenderItemStatus_QUEUED` plus state readback.
+- Strengthened the Effect↔AEGP protocol ABI with standard-layout/trivially-copyable, width, size and field-offset assertions.
+- Closed Completion Gate 2: transactional plug-in replacement, backup/rollback, aerender failure/timeout/output gates, safe SDK sample materialization and CI regression coverage.
 
 ## v1.1 — 2026-09-30
 
