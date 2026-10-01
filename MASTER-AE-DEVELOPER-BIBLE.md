@@ -17030,7 +17030,7 @@ The suite generations and lifecycle rules above are SDK-contract-reviewed agains
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Public contract:** `AE_GeneralPlugPanels.h`, `AEGP_PanelSuite1`, sample `Panelator`.
-**Verification level:** SDK source-reviewed; no new native panel build/load/dock test in this editorial iteration.
+**Evidence level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
 
 AEGP Workspace Panel — native panel tab, который After Effects может создать и встроить в workspace. Это **не Effect custom UI**, не CEP/UXP panel и не arbitrary floating OS window.
 
@@ -17199,23 +17199,247 @@ Panelator source действительно разделяет:
 - heavy pure compute → worker;
 - результат → безопасный UI invalidation.
 
-## 14. Host acceptance matrix
+## 14. Panel state model
 
-- registration once / no duplicate tab;
+A production native panel should separate at least four state scopes:
+
+~~~text
+module/global registration state
+→ panel factory/create-hook state
+→ per-panel controller/model state
+→ platform child-view/widget state
+~~~
+
+These scopes do not necessarily begin/end together.
+
+### Global registration state
+
+Owns:
+
+- stable match name;
+- AEGP command IDs;
+- hook registration bookkeeping;
+- product services shared by panel instances.
+
+It must outlive callbacks that depend on it.
+
+### Per-panel state
+
+Owns:
+
+- controller/model;
+- current normalized UI projection;
+- product-owned child views/widgets;
+- pending request/generation state.
+
+It should not become the only source of project truth.
+
+### Host-owned panel/container state
+
+`AEGP_PanelH` and `AEGP_PlatformViewRef` are host-side context/containers.
+
+Treat the host container as borrowed according to panel lifetime; do not destroy the host workspace container as though the product created it.
+
+### Product-owned child UI
+
+Cocoa/Win32 child controls/views created by the plug-in are product-owned unless the platform/container contract transfers ownership.
+
+Document parent/child destruction order explicitly.
+
+## 15. Create failure rollback
+
+CreatePanelHook can fail after partial product initialization.
+
+Recommended pattern:
+
+~~~text
+validate arguments
+→ allocate controller/model
+→ create platform child UI
+→ connect callbacks
+→ fill PanelFunctions1
+→ publish panel refcon
+→ success
+~~~
+
+On failure:
+
+- destroy only product-owned child UI already created;
+- release product-owned controller/model state;
+- do not destroy host-owned container/panel objects;
+- do not publish a partially initialized refcon.
+
+Create failure should not leave a callable platform callback pointing to freed product state.
+
+## 16. Destroy / unregister order
+
+Because the source review does not prove Panelator teardown semantics, use a conservative product design:
+
+~~~text
+stop new product work
+→ invalidate panel generation/callback targets
+→ destroy product-owned child UI/controller state
+→ ensure no worker can call the panel
+→ unregister panel factory when appropriate
+→ release global panel services
+~~~
+
+Do not unregister code while live platform callbacks can still enter unloaded/freed state.
+
+`AEGP_UnRegisterCreatePanelHook` removes the create-hook registration; it is not proof that existing native child views are destroyed for you.
+
+## 17. Panel identity and workspace persistence
+
+Separate:
+
+~~~text
+stable match name
+≠ localized visible title
+≠ HWND / NSView pointer
+≠ current workspace position
+~~~
+
+The stable match name is the product identity used by panel APIs/workspace persistence.
+
+Do not derive persistent identity from:
+
+- localized title;
+- current platform handle;
+- translated string table value;
+- transient panel refcon address.
+
+Visible title may change without changing panel identity.
+
+## 18. UI model vs project model
+
+Recommended architecture:
+
+~~~text
+native widgets
+→ panel controller
+→ semantic command
+→ AEGP/project service
+→ normalized result/snapshot
+→ UI projection
+~~~
+
+Panel widget state is a projection.
+
+For project-changing commands:
+
+- resolve current project targets late;
+- validate current IDs/state;
+- mutate on supported host path;
+- return a fresh result/snapshot.
+
+Do not keep long-lived opaque AEGP refs simply because the panel remains open.
+
+## 19. Worker handoff
+
+Heavy compute may run outside the UI thread only on product-owned/pure data.
+
+~~~text
+panel event
+→ immutable request
+→ worker
+→ result + generation
+→ host/UI-safe handoff
+→ discard if stale
+~~~
+
+Do not retain borrowed `NSView*`, `HWND`, panel handle or project ref on a worker unless the exact contract explicitly permits it.
+
+## 20. Resize / HiDPI / platform lifecycle
+
+Native panel UI must treat geometry as platform/view state.
+
+Plan for:
+
+- repeated resize;
+- dock/undock;
+- workspace switch;
+- DPI/scale changes;
+- child-view recreation;
+- hidden/not-frontmost panel;
+- multiple monitor configurations.
+
+Do not cache pixel dimensions as permanent layout truth.
+
+Use logical/layout units appropriate to the platform implementation and recompute render/layout resources when scale/size changes.
+
+## 21. Flyout/menu command model
+
+Flyout command IDs should be stable within the panel implementation and mapped to semantic actions.
+
+Avoid direct project mutation inside low-level platform menu plumbing.
+
+Better:
+
+~~~text
+flyout command ID
+→ controller action
+→ validate current project state
+→ AEGP service mutation
+→ refresh projection
+~~~
+
+Respect caller-provided flyout capacity/count rules.
+
+## 22. Panel recreation
+
+A panel can conceptually be recreated while project/product state survives.
+
+Therefore:
+
+- persistent user settings belong in product config;
+- project truth belongs in AE/project data;
+- long-running background task belongs in a service with explicit lifecycle;
+- widget objects belong only to the current panel instance.
+
+Reopening a panel should reconstruct view state from current product/project state rather than relying on old pointers.
+
+## 23. Product validation guidance
+
+If a concrete native-panel product claims these behaviors, useful runtime cases include:
+
+- registration once / no duplicate identity;
 - Window menu toggle/checkmark;
 - create/close/recreate;
 - dock/undock/resize;
 - snap sizes;
 - flyout commands;
-- title localization without identity change;
+- localized title with stable match name;
 - workspace save/reopen;
 - multiple workspaces;
+- project close/open while panel exists;
+- worker completion after panel recreation;
 - application shutdown;
-- exception/failure during panel creation;
+- failure during panel creation;
 - macOS and Windows event/drawing behavior;
 - HiDPI/Retina/scaling.
 
-До этих проверок Panelator-derived chapter имеет source-reviewed status, не host-verified.
+These establish product support evidence. Bible remains SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED unless a separate runtime record exists.
+
+## 24. Anti-patterns
+
+Avoid:
+
+- using display title as panel identity;
+- destroying the host-owned container;
+- storing project truth only in widget state;
+- project mutation from arbitrary worker callbacks;
+- keeping stale AEGP refs for the entire panel lifetime;
+- unregistering while platform callbacks can still enter product code;
+- assuming close/reopen returns the same platform view pointer;
+- copying Panelator lifetime omissions as production teardown policy.
+
+## Related chapters
+
+- [Panel architecture](14-NATIVE-INTEGRATIONS/../07-PANELS/README.md)
+- [AEGP tools](14-NATIVE-INTEGRATIONS/05-AEGP-TOOLS.md)
+- [Threading boundaries](14-NATIVE-INTEGRATIONS/../15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
+- [Data ownership](14-NATIVE-INTEGRATIONS/../15-COMMUNICATION/09-DATA-OWNERSHIP.md)
+- [Native/script/panel communication](14-NATIVE-INTEGRATIONS/../15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md)
 
 ## Source record
 
@@ -17749,7 +17973,7 @@ Source review establishes entry-point/lifecycle/suite contracts. A developer cal
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Public header in supplied SDK:** `AE_Hook.h`, hook protocol major/minor **3.0**.
 **Bundled sample:** `GP/EMP` (External Monitor Preview).
-**Verification level:** SDK source-reviewed; no new display-hook host run.
+**Evidence level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
 
 BlitHook получает pixel buffer в момент, когда After Effects передаёт изображение display/monitoring pipeline. Это legacy/general-hook integration path, а не Effect/AEGP/AEIO/Artisan callback.
 
@@ -17919,23 +18143,255 @@ Not appropriate as primary mechanism for:
 
 Use Render Suite/aerender/AEIO/Effect/Artisan according to actual task.
 
-## 14. Host acceptance matrix
+## 14. Borrowed buffer lifetime
+
+The callback receives a host pixel buffer pointer.
+
+Without an explicit ownership/lifetime guarantee beyond the callback:
+
+~~~text
+BlitHook receives pixels
+→ inspect/copy synchronously
+→ return
+→ original host pointer is no longer product-owned state
+~~~
+
+Do not place the raw host `pixelsPV` pointer into a worker queue.
+
+If downstream processing needs the frame after return, copy into product-owned staging memory before the callback ends.
+
+## 15. Staging buffer design
+
+For an external monitor/streamer, use a bounded staging model:
+
+~~~text
+BlitHook
+→ validate metadata
+→ acquire/reuse product staging slot
+→ bounded row-aware copy
+→ enqueue product-owned frame descriptor
+→ return immediately
+→ worker/IPC consumes copy
+~~~
+
+Frame descriptor should contain copied metadata, not borrowed pointers:
+
+- width/height;
+- pixel format/depth;
+- copied row layout;
+- view origin/rect;
+- timestamp/generation if product defines one;
+- product-owned buffer handle/index.
+
+## 16. Backpressure
+
+Display pipeline must not grow an unbounded queue.
+
+Choose product policy explicitly:
+
+- drop newest;
+- drop oldest;
+- keep latest only;
+- bounded wait with strict latency budget.
+
+For preview/monitoring, keeping the latest frame is often more useful than preserving every stale frame, but this is product policy, not an Adobe guarantee.
+
+Record dropped-frame counters so performance failures are visible.
+
+## 17. Row copy discipline
+
+Copy rows using source `row_bytesL` and explicit pixel metadata.
+
+Do not assume:
+
+~~~text
+source row bytes == width * packed pixel size
+~~~
+
+If product staging uses tightly packed rows, copy each source row into the product layout deliberately.
+
+Validate arithmetic before allocation:
+
+- width/height;
+- row bytes;
+- plane/channel bytes;
+- total copy size;
+- integer overflow.
+
+## 18. Blank frame semantics
+
+`pix_bufP0 == NULL` means blank frame.
+
+A product must define what blank means downstream:
+
+- clear external monitor;
+- publish explicit blank-frame message;
+- drop previous frame and show black;
+- keep last frame only if product UX explicitly chooses that behavior.
+
+Do not accidentally reuse the previous pixels because no new buffer arrived.
+
+## 19. View coordinates
+
+Copied pixels and display placement are separate data.
+
+A worker/consumer that ignores:
+
+- full frame size;
+- buffer origin;
+- visible view rectangle
+
+can place a correct pixel block at the wrong location.
+
+Preserve the coordinate metadata with the staged frame when downstream display depends on it.
+
+## 20. Color/display boundary
+
+BlitHook observes the display pipeline.
+
+Therefore downstream consumer must not infer:
+
+- scene-linear values;
+- pre-display color;
+- exact Effect world semantics;
+- encoded file values.
+
+If product requires color-managed external monitoring, define the intended display/color contract explicitly and qualify it against the actual host/display path.
+
+Do not use BlitHook as a golden pixel oracle for effect math by default.
+
+## 21. Synchronous path
+
+For a simple/safe implementation:
+
+~~~text
+callback
+→ validate
+→ bounded copy/cheap consume
+→ return success
+~~~
+
+This keeps ownership obvious.
+
+Expensive encode/network/GPU processing happens after the product owns a copy.
+
+## 22. Asynchronous protocol boundary
+
+The header exposes asynchronous flag + receipt + completion callback, but the supplied sample does not establish the complete pointer/receipt timing model.
+
+Bible therefore does not invent it.
+
+If a concrete product implements asynchronous completion, its design must be derived from verified protocol details and explicitly define:
+
+- which data must be copied;
+- receipt lifetime;
+- completion exactly-once behavior;
+- cancel/shutdown interaction;
+- callback-after-shutdown prevention.
+
+Until qualified, prefer the synchronous-copy model.
+
+## 23. Worker / IPC ownership
+
+After staging:
+
+~~~text
+product owns frame copy
+→ worker or helper owns/borrows according to product protocol
+→ release slot/buffer after consumer completion/drop
+~~~
+
+Cross-process transport passes copied bytes/shared-memory ownership metadata, never AE process pointers.
+
+## 24. Shutdown / death hook
+
+Recommended order:
+
+~~~text
+mark shutting_down
+→ stop accepting/enqueueing new product work
+→ wake/cancel worker/transport
+→ prevent late UI/IPC callbacks into AE
+→ drain/drop queued product-owned frames by policy
+→ join/stop worker with bounded policy
+→ free staging buffers
+→ return from death hook
+~~~
+
+Death hook is `void`; do not throw.
+
+Do not wait indefinitely for remote/network consumers during AE shutdown.
+
+## 25. Reentrancy and state
+
+Keep callback state minimal:
+
+- atomic/locked shutdown flag;
+- bounded queue;
+- product-owned buffer pool;
+- counters/diagnostics.
+
+Do not traverse/mutate AE project from the blit callback.
+
+Do not hold a global product mutex while calling opaque host APIs elsewhere if worker/panel paths can re-enter.
+
+## 26. Performance budget
+
+A display hook has a latency budget.
+
+Measure:
+
+- callback copy time;
+- staging allocation/reuse;
+- queue contention;
+- dropped frames;
+- consumer latency;
+- preview FPS with hook disabled/enabled.
+
+A functionally correct hook that blocks display playback is not a useful monitor architecture.
+
+## 27. Product validation guidance
+
+If a concrete BlitHook product claims these behaviors, useful runtime cases include:
 
 - callback registration/load;
 - blank-frame null buffer;
 - 32/64/128 depth;
-- ARGB/BGRA handling;
+- ARGB/BGRA handling for the supported host versions;
 - non-tight rowbytes;
-- region origin/view rect;
+- view origin/rect;
 - rendering/non-rendering flags;
-- repeated preview playback;
-- scrub/cache hits;
-- external consumer backpressure;
-- app shutdown;
-- async path only if implemented from verified contract;
-- macOS + Windows.
+- repeated playback/scrub/cache hits;
+- queue saturation/drop policy;
+- consumer disconnect;
+- shutdown with pending frames;
+- macOS + Windows where claimed;
+- async path only when based on qualified protocol details.
 
-Measure preview FPS/latency with hook enabled and disabled. A display hook that is correct but causes dropped frames is not production-ready.
+Measure preview latency/FPS and dropped-frame behavior.
+
+These establish product support evidence. Bible remains SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED unless a separate runtime record exists.
+
+## 28. Anti-patterns
+
+Avoid:
+
+- enqueueing raw `pixelsPV` for later use;
+- assuming tight RGBA rows;
+- treating null buffer as “reuse previous frame” accidentally;
+- blocking network/video encode inside hook;
+- unbounded frame queues;
+- treating rendering flag as final-render guarantee;
+- using BlitHook for deterministic offline render/export;
+- inventing async pointer lifetime from the existence of the async flag.
+
+## Related chapters
+
+- [Host call flows](14-NATIVE-INTEGRATIONS/02-HOST-CALL-FLOWS.md)
+- [Threading boundaries](14-NATIVE-INTEGRATIONS/../15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
+- [Data ownership](14-NATIVE-INTEGRATIONS/../15-COMMUNICATION/09-DATA-OWNERSHIP.md)
+- [Performance architecture](14-NATIVE-INTEGRATIONS/../01-ARCHITECTURE/05-PERFORMANCE-ARCHITECTURE.md)
+- [Render frames](14-NATIVE-INTEGRATIONS/../17-NATIVE-SUITE-COOKBOOK/10-RENDER-FRAMES.md)
 
 ## Source record
 
