@@ -254,3 +254,13 @@ For a hybrid product, record tests for:
 - clean reinstall/upgrade.
 
 Source-level architecture is not host verification. The actual bridge must still be exercised inside supported AE builds.
+
+
+## Project case-study lessons
+
+The [FSTR Line / AE Hot Loader reuse audit](../22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md) provides two practical boundaries:
+
+- FSTR Line supports the snapshot → guarded command → Host Adapter pattern, request coalescing and generation-based stale-response rejection as reusable architecture. Its original AE synchronization limitation remains scoped to that project.
+- AE Hot Loader supports request/version correlation and main-thread ownership as useful bridge principles, but its text-file bridge is a PoC-specific transport and its private `ML::LoadPlugins` path remains research-only.
+
+Do not import a private loader path into an ordinary panel/native recipe just because the control-plane pattern is reusable.
