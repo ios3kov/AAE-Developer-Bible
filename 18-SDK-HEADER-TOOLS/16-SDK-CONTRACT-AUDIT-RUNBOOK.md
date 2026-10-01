@@ -86,6 +86,6 @@ Real SDK 25.6 audit:
 - 0 required parser diagnostics;
 - 4 non-required partial diagnostics retained.
 
-See [the exact SDK record](17-GATE4-SDK25.6-RUN-2026-10-01.md).
+See [the exact SDK record](17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md).
 
 For the current edition, this closes the **SDK contract-accuracy editorial requirement**. No whole-repository macOS/Windows build is required.
