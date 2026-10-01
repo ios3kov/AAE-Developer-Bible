@@ -125,3 +125,17 @@ See:
 - 04-PERFORMANCE.md
 - 05-CRASH-DIAGNOSTICS.md
 - 06-EVIDENCE-AND-ACCEPTANCE.md
+
+
+## Read order
+
+1. `01-TEST-MATRIX.md`
+2. `02-RENDER-CORRECTNESS.md`
+3. `03-MFR-STRESS.md`
+4. `04-PERFORMANCE.md`
+5. `05-CRASH-DIAGNOSTICS.md`
+6. `06-HOST-VERIFICATION.md`
+7. `07-TEST-EVIDENCE.md`
+8. `08-CLEAN-MACHINE-ACCEPTANCE.md`
+
+The final three chapters define the evidence boundary between "compiled", "loaded", "behavior verified" and "release verified".
