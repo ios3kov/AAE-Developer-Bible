@@ -2,7 +2,7 @@
 
 This is the code-level follow-up to the initial case-study extraction in [README.md](README.md).
 
-The purpose is narrow: identify reusable engineering patterns before Gates 5–6 create or expand reference examples. It does **not** promote either source product to a Bible host-verified reference.
+The purpose is narrow: identify reusable engineering patterns before project patterns are reused in Bible reference material. It does **not** promote either source product to a Bible host-verified reference.
 
 ## Audit baseline
 
@@ -407,7 +407,7 @@ This conflicts with Bible Gate 2. The Bible safe tooling requires staging, backu
 | HL-03 | **RESEARCH ONLY / DO NOT TRANSFER** | private AE loader ABI, version-sensitive and unsupported |
 | HL installer | **DO NOT TRANSFER** | destructive replacement/quarantine behavior violates Gate 2 |
 
-# Portable-test status for Gate 3A
+# Portable-test status for reuse-audit milestone
 
 ## FSTR Line
 
@@ -443,7 +443,7 @@ Private loader work has no destination in supported example gates.
 
 # Independent FSTR portable rerun
 
-To remove the final Gate 3A ambiguity, a dedicated audit branch was created directly from the pinned snapshot:
+To remove the final reuse-audit milestone ambiguity, a dedicated audit branch was created directly from the pinned snapshot:
 
 - base snapshot: `c69e3663de59dc44cbdef18042891f6dd1ce5ee6`;
 - audit branch: `audit/bible-reuse-2026-10-01`;
@@ -459,12 +459,12 @@ Passed steps:
 - `npm run check:cep` — CEP build + ExtendScript static checks;
 - `git diff --check`.
 
-This is portable source/build evidence only. It is not an After Effects host test and does not close any Gate 5–7 runtime requirement.
+This is portable source/build evidence only. It is not an After Effects host test and does not create runtime evidence for Bible source examples.
 
-# Gate 3A conclusion
+# reuse-audit milestone conclusion
 
 The candidate code/test/build mapping, original evidence review, independent FSTR portable rerun, provenance review, transfer decisions, target-chapter links and Bible-side acceptance requirements are complete.
 
-**Gate 3A acceptance is met.**
+**reuse-audit milestone acceptance is met.**
 
 No source-project host result is promoted into Bible host verification. FSTR SYNC-001 remains a source-project limitation, and AE Hot Loader's private loader remains research-only.
