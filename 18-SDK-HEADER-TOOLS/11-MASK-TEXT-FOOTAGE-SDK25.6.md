@@ -136,3 +136,32 @@ Placeholder-with-path contract отдельно предупреждает: `AEI
 | Windows host checks | NOT RUN |
 
 Следующий editorial block после этого может охватить AEIO/Artisan или оставшиеся Cookbook families; editorial readiness определяется полнотой и согласованностью документации.
+
+## Later cookbook consistency update — 2026-10-01
+
+A later editorial block completed the production-guidance layer around the already-reviewed SDK 25.6 contracts.
+
+The exact suite baseline did **not** change:
+
+- `AEGP_MaskSuite6`;
+- `AEGP_MaskOutlineSuite3`;
+- `AEGP_TextDocumentSuite1`;
+- `AEGP_MarkerSuite3`;
+- `AEGP_FootageSuite5`;
+- `AEGP_ItemSuite9`;
+- `AEGP_CompSuite12`;
+- `AEGP_LayerSuite9`.
+
+The later pass added/reconciled:
+
+- mask create/edit/dispose workflow, structural invalidation, vertex/feather-index hazards and anti-patterns;
+- text Source Text workflow, UTF-16 MemorySuite lifetime and static-vs-keyframed write path;
+- marker keyframe/value workflow versus standalone `NewMarker` ownership;
+- footage explicit `OwnedByPlugin → AdoptedByProject` transition and failure rollback;
+- footage interpretation as a separate undoable mutation rather than an implicit side effect of import;
+- Footage Suite versus AEIO boundary for host-supported media versus new file formats;
+- product-validation guidance replacing old “host acceptance pending” wording.
+
+The original source hashes/findings above remain provenance for the SDK review and are not rewritten retroactively.
+
+**Evidence level after this pass:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new AE runtime result is asserted.
