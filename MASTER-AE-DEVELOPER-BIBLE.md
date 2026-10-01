@@ -6848,7 +6848,7 @@ Primary acceptance/source-review baseline: **After Effects SDK 25.6 build 61**. 
 - [`11-LEGACY-NATIVE.md`](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) — deprecated/legacy.
 - [`12-AEGP-SUITES-CATALOG.md`](14-NATIVE-INTEGRATIONS/12-AEGP-SUITES-CATALOG.md) — полный AEGP suite map 26.5.
 
-Sources: supplied Adobe After Effects SDK 25.6 build 61 headers/samples plus the maintained C++ SDK Guide for context. Exact 25.6 AEIO/Artisan source review: [`12-AEIO-ARTISAN-SDK25.6.md`](14-NATIVE-INTEGRATIONS/../18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md). Later SDK history remains a separate compatibility source.
+Sources: supplied Adobe After Effects SDK 25.6 build 61 headers/samples plus the maintained C++ SDK Guide for context. Exact source reviews include [`12-AEIO-ARTISAN-SDK25.6.md`](14-NATIVE-INTEGRATIONS/../18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md), [`13-PANELS-BLITHOOK-SDK25.6.md`](14-NATIVE-INTEGRATIONS/../18-SDK-HEADER-TOOLS/13-PANELS-BLITHOOK-SDK25.6.md) and [`14-PICA-BRIDGES-LEGACY-SDK25.6.md`](14-NATIVE-INTEGRATIONS/../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md). Later SDK history remains a separate compatibility source.
 
 - [`13-DOCS-ERRATA.md`](14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md) — known public-doc mismatches and verification policy.
 
@@ -7496,6 +7496,10 @@ struct MsgHeader {
 - [`07-NATIVE-TO-SCRIPT-PANEL.md`](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md)
 - [`08-THREADING-BOUNDARIES.md`](15-COMMUNICATION/08-THREADING-BOUNDARIES.md)
 - [`09-DATA-OWNERSHIP.md`](15-COMMUNICATION/09-DATA-OWNERSHIP.md)
+
+## SDK 25.6 bridge review
+
+The native bridge chapters 03/04 were rechecked against `AEGP_EffectSuite4`, `SPBasicSuite`, `SPSuitesSuite`, Sweetie, Checkout, ProjDumper and Shifter. See [the source-review record](15-COMMUNICATION/../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md). Source review does not equal host verification.
 
 
 ---
