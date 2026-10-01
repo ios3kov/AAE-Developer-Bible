@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Check SDK call-site symbol names only. Real compilation validates types/suites."""
+"""Check SDK call-site symbol names and SuiteHandler generations.
+
+This remains a source-level preflight. Real C/C++ compilation validates types and
+calling conventions; After Effects host execution validates runtime availability
+and semantics.
+"""
 from __future__ import annotations
 
 import argparse
@@ -9,7 +14,14 @@ import re
 import sys
 
 SCHEMA_VERSION = 1
-CALL_RE = re.compile(r"(?:->|\.)\s*(?P<name>(?:AEGP|PF|AEIO|PR|DRAWBOT)_[A-Za-z0-9_]+)\s*\(")
+
+CALL_RE = re.compile(
+    r"(?:->|\.)\s*(?P<name>(?:AEGP|PF|AEIO|PR|DRAWBOT)_[A-Za-z0-9_]+)\s*\("
+)
+SUITE_HANDLER_CALL_RE = re.compile(
+    r"\b(?P<accessor>[A-Za-z_][A-Za-z0-9_]*Suite\d+)\s*\(\s*\)"
+    r"\s*->\s*(?P<name>(?:AEGP|PF|AEIO|PR|DRAWBOT)_[A-Za-z0-9_]+)\s*\("
+)
 COMMENT_OR_STRING = re.compile(
     r'//[^\n]*|/\*.*?\*/|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',
     re.S,
@@ -68,7 +80,9 @@ def validate_inventory(data):
                 or not isinstance(function.get("signature"), str)
                 or not function["signature"]
             ):
-                raise ValueError(f"Inventory table {table['name']} has malformed function entry")
+                raise ValueError(
+                    f"Inventory table {table['name']} has malformed function entry"
+                )
             normalized.append((function["name"], function["signature"]))
 
         previous = seen.get(table["name"])
@@ -79,16 +93,47 @@ def validate_inventory(data):
     return tables
 
 
+def _expected_table(accessor: str, function_name: str) -> str:
+    family = function_name.split("_", 1)[0]
+    return f"{family}_{accessor}"
+
+
 def verify(data, files):
     tables = validate_inventory(data)
-    known = {f["name"] for table in tables for f in table["functions"]}
+    table_functions = {
+        table["name"]: {function["name"] for function in table["functions"]}
+        for table in tables
+    }
+    known = {name for names in table_functions.values() for name in names}
 
     unknown = []
     checked = 0
+
     for path in files:
         text = path.read_text("utf-8")
         text = COMMENT_OR_STRING.sub(lambda m: "\n" * m[0].count("\n") + " ", text)
+
+        suite_spans = []
+        for match in SUITE_HANDLER_CALL_RE.finditer(text):
+            checked += 1
+            suite_spans.append(match.span())
+
+            expected_table = _expected_table(match["accessor"], match["name"])
+            functions = table_functions.get(expected_table)
+
+            if functions is None or match["name"] not in functions:
+                unknown.append(
+                    (
+                        str(path),
+                        text.count("\n", 0, match.start()) + 1,
+                        f"{match['name']} [expected {expected_table}]",
+                    )
+                )
+
         for match in CALL_RE.finditer(text):
+            if any(start <= match.start() < end for start, end in suite_spans):
+                continue
+
             checked += 1
             if match["name"] not in known:
                 unknown.append(
@@ -117,7 +162,10 @@ def main(argv=None):
         print(f"error: {exc}", file=sys.stderr)
         return 2
 
-    print(f"call_sites={checked} unknown={len(unknown)} (symbol names only)")
+    print(
+        f"call_sites={checked} unknown={len(unknown)} "
+        "(symbol names + SuiteHandler generation preflight only)"
+    )
     for path, line, name in unknown:
         print(f"UNKNOWN {path}:{line}: {name}")
     return 1 if unknown else 0
