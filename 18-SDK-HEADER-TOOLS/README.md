@@ -2,7 +2,7 @@
 
 Это fail-closed preflight для локального SDK: declaration inventory + symbol-name checks + отдельный real-compiler syntax/type driver. Regex inventory сам по себе не является signature/ABI proof; типы проверяет `scripts/check_native.py`.
 
-Главное правило: точный контракт сборки задают headers целевого SDK. Regex parser поддерживает ограниченные формы объявлений. Неполный разбор таблицы теперь сохраняет диагностику и возвращает ошибку; `--allow-incomplete` разрешает только исследовательский индекс. Реальный SDK 25.6 содержит неподдерживаемые объявления, поэтому полного inventory пока нет.
+Главное правило: точный контракт сборки задают headers целевого SDK. Regex parser поддерживает ограниченные формы объявлений. Он сохраняет все diagnostics; `--allow-incomplete` позволяет только записать полный inventory для следующего required-contract gate и сам по себе никогда не означает PASS. Реальный SDK 25.6 сейчас даёт четыре видимых non-required partial diagnostics, а обязательный Gate-4 baseline проходит полностью.
 
 ## Что генерируется
 
@@ -105,10 +105,10 @@ cd 18-SDK-HEADER-TOOLS
 
 Оба runner'а выполняют:
 
-1. inventory exact headers;
-2. отказ при parser diagnostics;
-3. schema/version validation;
-4. cookbook symbol-name preflight;
+1. inventory exact headers с сохранением всех diagnostics;
+2. schema/version validation;
+3. required-contract gate: diagnostics в обязательных tables/functions блокируют run;
+4. cookbook symbol-name + exact SuiteHandler-generation preflight;
 5. C++17 compiler syntax/type checks;
 6. запись `generated/local-sdk/native-compile-report.json`.
 
@@ -132,7 +132,7 @@ It pins contract-table generations used by the reviewed chapters and native exam
 - a required table is absent;
 - a required function is absent from its pinned table;
 - the inventory schema is unsupported;
-- parser diagnostics make the inventory incomplete.
+- parser diagnostics affecting required contracts make the acceptance lane fail; unrelated diagnostics remain visible and non-silent.
 
 This prevents a parser run from becoming green merely because it returned *some* tables.
 
@@ -142,3 +142,10 @@ The manifest is **necessary, not sufficient** evidence. Real compiler and host g
 ## Gate 4 acceptance
 
 The exact acceptance criteria and evidence-retention rules are in [Gate 4 — exact SDK acceptance runbook](16-GATE4-ACCEPTANCE-RUNBOOK.md).
+
+
+## Real SDK 25.6 preflight evidence
+
+See [Gate 4 — exact SDK 25.6 required-contract preflight — 2026-10-01](17-GATE4-SDK25.6-RUN-2026-10-01.md).
+
+Current exact-header result: **35/35 required contracts PASS, 39/39 cookbook call-sites resolved, 0 required parser diagnostics**. Four non-required partial diagnostics remain explicitly recorded.
