@@ -2,10 +2,12 @@
 
 ## Editorial progress — 2026-10-01
 
-- Closed Gate 3A reuse audit: exact FSTR/AE Hot Loader file+commit mapping, transfer decisions, provenance review and independent FSTR portable rerun.
-- Hardened Gate 4 tooling with inventory schema guards, required SDK 25.6 tables/functions, exact SuiteHandler-generation checks and compiler-report provenance.
-- Added cross-platform Gate 4 runners for Clang/MSVC, clean-Git evidence requirements, strict portable native protocol-header compilation and an exact-SDK acceptance runbook.
-- Re-ran Gate 4 against the supplied Adobe SDK 25.6: 35/35 required contracts and 39/39 cookbook call-sites pass; corrected Drawbot Surface v2 and added callback-typedef parsing for Artisan/related entry tables.
+- **Editorial model correction:** AE Developer Bible is a knowledge base, not a plug-in QA program. The former mandatory build/host completion-gate model is superseded; compiler/host runs remain evidence for specific claims, not requirements for Bible completion.
+
+- Completed the cross-project reuse audit: exact FSTR/AE Hot Loader file+commit mapping, transfer decisions, provenance review and independent FSTR portable rerun.
+- Hardened SDK contract-audit tooling with inventory schema guards, required SDK 25.6 tables/functions, exact SuiteHandler-generation checks and compiler-report provenance.
+- Added optional cross-platform compiler helpers for Clang/MSVC, clean-Git evidence requirements, strict portable native protocol-header compilation and an exact-SDK acceptance runbook.
+- Re-ran the SDK contract audit against the supplied Adobe SDK 25.6: 35/35 required contracts and 39/39 cookbook call-sites pass; corrected Drawbot Surface v2 and added callback-typedef parsing for Artisan/related entry tables.
 - Preserved four non-required parser diagnostics explicitly instead of treating them as hidden success; current macOS/MSVC compiler acceptance remains open.
 
 - Expanded the full testing section with explicit build/host/release evidence layers, richer matrices, render/ROI correctness, MFR stress, performance and crash diagnostics.
