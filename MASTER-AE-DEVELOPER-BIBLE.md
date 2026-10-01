@@ -14904,24 +14904,149 @@ Adobe сама рекомендует стартовать от ближайше
 
 <!-- SOURCE: 16-WORKING-TEMPLATES/aegp-menu-command/README.md -->
 
-# AEGP menu command template
+# AEGP menu command working template
 
-Status: **drop-in pattern** for current AEGP sample project.
+Status: **drop-in source pattern / host verification pending**.
 
-Start from an official AEGP sample such as Persisto/Projector. Keep its PiPL/project/export plumbing; use this file as the architecture for entry registration + command/update hooks.
+MenuTool.cpp is intended to replace the implementation layer inside an official AEGP sample project from the exact target SDK.
 
-The example intentionally performs a harmless operation: reports info to the user. Replace `DoWork()` with project mutation inside an undo group.
+Keep the Adobe project, PiPL/resource/export plumbing and SDK utility files.
+
+## What this source implements
+
+The template contains:
+
+- product state stored through the AEGP global refcon;
+- command ID acquisition;
+- Window-menu insertion;
+- command hook;
+- update-menu hook;
+- death hook;
+- exception containment around host callbacks;
+- partial-initialization policy.
+
+Default command behavior only reports that the tool is alive.
+
+## Initialization order
+
+The source deliberately resolves suite access before installing callbacks where possible.
+
+Then:
+
+~~~text
+register death hook
+→ publish global refcon/state
+→ get unique command
+→ insert menu command
+→ register command hook
+→ register update-menu hook
+~~~
+
+This order matters because AE does not provide a generic rollback/unregister path for every hook after partial registration.
+
+## Partial initialization
+
+If initialization fails after the death hook/global state is already live, the source does not delete state and return an arbitrary failure that could leave registered callbacks pointing at freed memory.
+
+Instead it:
+
+- keeps the state resident;
+- disables/zeros the command;
+- reports initialization failure;
+- lets DeathHook own final state cleanup.
+
+This is a deliberate safety policy, not proof that every failure mode is recoverable.
+
+## Command hook
+
+The callback ignores:
+
+- missing state;
+- zero command;
+- commands already handled;
+- unrelated command IDs.
+
+It marks the command handled only after DoWork succeeds.
+
+When replacing DoWork with project mutation, validate all target objects before starting edits.
+
+## Update hook
+
+Current behavior enables the command.
+
+A real product should compute command availability quickly from current host state.
+
+Do not perform expensive work, network calls or project mutation from the update-menu hook.
+
+## Death hook
+
+DeathHook deletes ToolState.
+
+Therefore no other product worker/callback may use ToolState after shutdown begins.
+
+If the real product owns workers/helpers/resources, extend shutdown order before deleting state.
+
+## Adding project mutation
+
+Recommended pattern:
+
+~~~text
+CommandHook
+→ validate project/selection
+→ acquire required suites/resources
+→ AegpUndoScope
+→ mutate
+→ release owners
+→ return result
+~~~
+
+Use the ownership and undo helpers in 19-NATIVE-CODE-FOUNDATION where their exact contracts fit.
+
+## SDK version boundary
+
+The supplied SDK review found historical AEGP initializer signatures that differ from the current 25.6 header.
+
+Do not copy an old sample initializer declaration literally into a new SDK project.
+
+Compile against the exact target header.
+
+## Tests before calling it working
+
+- command appears once;
+- restart does not duplicate;
+- update hook state works;
+- command executes;
+- unrelated commands ignored;
+- no-project/invalid-selection path;
+- undo/redo for real mutations;
+- partial initialization failure;
+- shutdown/death cleanup;
+- repeated AE restart.
+
+## Verification boundary
+
+The source has architecture and safety intent, but it is not a standalone build. Host PASS requires grafting it into the exact SDK AEGP project, compiling/linking and exercising it in After Effects.
 
 
 ---
 
 <!-- SOURCE: 16-WORKING-TEMPLATES/aeio-registration/README.md -->
 
-# AEIO registration skeleton
+# AEIO registration working guide
 
-Status: **registration contract template**. Start from the current official `IO`/`FBIO` SDK sample because `AEIO_FunctionBlock` contains many version-specific callbacks.
+Status: **registration contract guide / complete AEIO still requires the official IO/FBIO sample**.
 
-```cpp
+## Why this is not a standalone implementation
+
+AEIO registration installs a function block with many callbacks. Exact revision and required callbacks are SDK-version-sensitive.
+
+A copied registration function without a valid callback table is not a working importer/exporter.
+
+## Registration shape
+
+Conceptually:
+
+~~~cpp
 A_Err RegisterMyIO(
     AEGP_SuiteHandler& suites,
     AEGP_PluginID plugin_id,
@@ -14929,30 +15054,121 @@ A_Err RegisterMyIO(
     AEIO_ModuleInfo* module_info,
     AEIO_FunctionBlock4* funcs)
 {
-    // Fill module_info: signature, file type/description/capabilities.
-    // Fill funcs: verify/init/info/frame/audio/output callbacks.
     return suites.RegisterSuite5()->AEGP_RegisterIO(
         plugin_id,
         refcon,
         module_info,
         funcs);
 }
-```
+~~~
 
-For optional operations where the current SDK permits it, return `AEIO_Err_USE_DFLT_CALLBACK` and let AE do its default processing.
+The concrete supplied-25.6 review uses AEIO_ModuleInfo and AEIO_FunctionBlock4. Recheck target headers.
 
-Why this template does not fabricate the whole callback table: exact function-block revision and required callbacks are SDK-version-sensitive. A “complete” table copied from an old SDK is less useful than the current official `IO` sample.
+## Module metadata
+
+Fill only values supported by the actual implementation:
+
+- stable signature/identity;
+- file type/description;
+- input/output capabilities;
+- extension/type mapping where relevant.
+
+Do not advertise audio/output/auxiliary capability before callbacks work.
+
+## Callback table
+
+Build the callback table from the exact SDK sample.
+
+For an importer, implement a narrow vertical slice first:
+
+~~~text
+verify/sniff
+→ create input spec
+→ report basic info
+→ retrieve one frame
+→ dispose spec
+~~~
+
+Then add random seeking, metadata, audio and advanced features.
+
+For an exporter:
+
+~~~text
+create output spec
+→ validate settings
+→ open
+→ write one frame
+→ close/finalize
+→ dispose
+~~~
+
+Then add long sequence/audio/cancel/failure handling.
+
+## Default callback behavior
+
+Where the exact SDK contract explicitly permits AEIO_Err_USE_DFLT_CALLBACK, returning it can delegate optional behavior to After Effects.
+
+Do not use it for a callback that the registered module actually promises to implement.
+
+## Private state
+
+Any per-file/spec private data needs:
+
+- owner;
+- initialization state;
+- cleanup;
+- failure cleanup;
+- thread policy;
+- persistence/reopen behavior if applicable.
+
+Do not store raw callback-scoped pointers in the spec state.
+
+## Untrusted media
+
+File input is untrusted.
+
+Validate:
+
+- header size;
+- offsets;
+- counts;
+- dimensions;
+- allocation arithmetic;
+- file bounds;
+- decompression limits.
+
+A malformed file must fail cleanly instead of corrupting AE memory.
+
+## Testing milestone
+
+Do not label the AEIO working until at least one meaningful format path passes:
+
+- fresh import/export;
+- deterministic frame data;
+- repeated/random frame request;
+- cancellation;
+- malformed input/output failure;
+- project save/reopen;
+- cleanup/leak checks.
+
+## Verification boundary
+
+This guide preserves the registration contract without fabricating a stale full callback table. The exact SDK sample remains the project/function-block source of truth.
 
 
 ---
 
 <!-- SOURCE: 16-WORKING-TEMPLATES/artisan-registration/README.md -->
 
-# Artisan registration skeleton
+# Artisan registration working guide
 
-Status: **registration contract template**. Start from the current SDK `Artie` sample.
+Status: **registration contract guide / full renderer requires the target SDK Artie sample**.
 
-```cpp
+## Registration shape
+
+Conceptually:
+
+~~~cpp
 A_Err RegisterMyArtisan(
     AEGP_SuiteHandler& suites,
     AEGP_PluginID plugin_id,
@@ -14960,19 +15176,94 @@ A_Err RegisterMyArtisan(
     PR_ArtisanEntryPoints* entry_points)
 {
     return suites.RegisterSuite5()->AEGP_RegisterArtisan(
-        /* api version */      ARTISAN_API_VERSION,
-        /* plugin version */   MY_ARTISAN_VERSION,
+        ARTISAN_API_VERSION,
+        MY_ARTISAN_VERSION,
         plugin_id,
         refcon,
         "com.myco.renderer",
         "My Renderer",
         entry_points);
 }
-```
+~~~
 
-`render_func` is the fundamental required behavior; other Artisan callbacks depend on the current `PR_ArtisanEntryPoints` contract.
+Use exact constants/types from the SDK you compile. Do not invent API-version numbers.
 
-Do not substitute guessed constants for `ARTISAN_API_VERSION`/your version. Use the exact definitions from the SDK headers/sample you compile against.
+## Why the Artie sample is required
+
+Artisan has a large renderer lifecycle:
+
+- registration;
+- global renderer state;
+- renderer instance;
+- frame/render state;
+- scene/canvas access;
+- render callbacks;
+- teardown.
+
+A registrar that never renders a scene is not a reference renderer.
+
+## First milestone
+
+Keep the official Artie registration/function-table plumbing and make one minimal deterministic render path work unchanged.
+
+Only then replace renderer behavior incrementally.
+
+## Entry-point table
+
+render_func is fundamental, but the real required/optional callback set is defined by the target PR_ArtisanEntryPoints contract.
+
+Do not copy a function table from another SDK generation without checking layout/signatures.
+
+## State ownership
+
+Explicitly separate:
+
+~~~text
+global product renderer state
+instance state
+frame/render state
+borrowed AE scene/canvas objects
+product caches
+~~~
+
+Destroy in the reverse order of ownership and before host APIs disappear.
+
+## Stable renderer identity
+
+Use a stable renderer identifier distinct from the user-visible localized renderer name.
+
+Changing identity can affect project/workspace compatibility and discovery.
+
+## Feature scope
+
+Before implementation list which scene features are supported.
+
+For unsupported features define:
+
+- fallback;
+- explicit limitation;
+- safe failure.
+
+Do not silently render a materially wrong scene and call it success.
+
+## Test milestone
+
+A meaningful first Artisan acceptance fixture should include:
+
+- renderer appears/selects;
+- one simple scene renders;
+- repeat same frame deterministically;
+- camera transform change affects output;
+- project save/reopen;
+- renderer switch away/back;
+- cancel;
+- shutdown.
+
+Expand fixtures as supported scene features grow.
+
+## Verification boundary
+
+This file documents the safe registration/startup boundary. It deliberately does not pretend a registrar stub is a complete Artisan.
 
 
 ---
@@ -15133,28 +15424,151 @@ This example assumes the effect command is already on the correct SDK callback p
 
 <!-- SOURCE: 16-WORKING-TEMPLATES/effect-basic/README.md -->
 
-# Minimal Gain effect — drop-in for SDK Skeleton
+# Minimal Gain effect — working template
 
-Status: **source implementation / SDK 25.6 macOS syntax-checked / host-test pending**. Requires C++17, SDK utility sources and the sample's PiPL/build configuration.
+Status: **source implementation / SDK 25.6 macOS syntax-checked / host-test pending**.
 
-## Base
+Requires C++17, the SDK utility sources and the official sample project/PiPL build configuration.
 
-Copy the official SDK `Skeleton` sample first. Keep its Xcode/Visual Studio project, PiPL `.r`, `entry.h`, SDK utils and build steps.
+## Base project
 
-Replace the effect implementation with `EffectMain.cpp`, then update PiPL display/match/category strings consistently.
+Copy the target SDK Skeleton sample first.
+
+Keep:
+
+- Xcode/Visual Studio project;
+- entry.h and SDK utilities;
+- PiPL .r source and Windows conversion step;
+- platform architecture settings;
+- output bundle/aex layout.
+
+Replace the effect implementation with EffectMain.cpp and synchronize product identity in both source and PiPL.
 
 ## Behavior
 
-- one float Gain parameter;
-- 8-bpc and 16-bpc processing;
-- uses host Iterate suites;
-- catches exceptions at C ABI boundary;
-- no global mutable render state;
-- MFR flag deliberately **not** claimed until tested.
+The source implements:
 
-## Why not hand-create project files
+- About;
+- GlobalSetup;
+- one floating Gain parameter;
+- classic Render;
+- 8-bpc processing;
+- 16-bpc processing;
+- alpha pass-through;
+- host Iterate suites;
+- C ABI exception containment.
 
-Windows PiPL resource generation and platform SDK settings are easy to get subtly wrong. Adobe recommends cloning Skeleton rather than reconstructing the build.
+It intentionally does not claim:
+
+- 32-bpc float;
+- SmartFX;
+- MFR;
+- GPU;
+- custom UI.
+
+Those capabilities must be implemented and tested before flags are added.
+
+## Parameter contract
+
+Param index:
+
+~~~text
+0 input
+1 Gain
+~~~
+
+Gain uses a stable disk ID of 1 in this example.
+
+Once real projects exist, parameter IDs/meaning become persistence compatibility data. Do not reuse an old disk ID for a new semantic.
+
+## Render semantics
+
+For each pixel:
+
+~~~text
+alpha = input alpha
+RGB = clamp(input RGB × gain, channel range)
+~~~
+
+8-bit and 16-bit paths use the corresponding host iteration suites and channel maxima.
+
+The code intentionally avoids raw rowbytes loops in this first template.
+
+## Why alpha is not multiplied
+
+Gain here means RGB gain while preserving alpha.
+
+That is a product semantic decision for this template, not a universal AE rule.
+
+If your actual effect changes alpha, define and test that behavior explicitly.
+
+## Threading state
+
+Render uses only callback-local GainInfo plus immutable function code. There is no mutable render global in this file.
+
+Still, MFR is deliberately not declared. Final thread safety also depends on every dependency and future product change.
+
+Follow 12-RECIPES/02-MFR-MIGRATION.md before enabling threaded rendering.
+
+## 32-bpc path
+
+PF_OutFlag_DEEP_COLOR_AWARE covers the implemented deep-color 16-bit path here; it is not a claim of 32-bpc float support.
+
+Add a separate float path and the appropriate current-SDK capability only after exact float semantics and tests exist.
+
+## Error boundary
+
+EffectMain catches PF_Err and unknown C++ exceptions before they leave the exported callback.
+
+For a product codebase, consider the shared HostCallbackGuard policy from 19-NATIVE-CODE-FOUNDATION so callback error mapping is consistent.
+
+## First host fixture
+
+Create a deterministic source containing:
+
+- black;
+- mid-gray;
+- white;
+- primary colors;
+- partial alpha.
+
+Test Gain:
+
+- 0;
+- 0.5;
+- 1;
+- 2;
+- 4.
+
+Verify RGB values/clamping and unchanged alpha at 8 and 16 bpc.
+
+## Save/reopen
+
+Apply the effect, change Gain, save, restart AE and reopen.
+
+Confirm:
+
+- effect resolves by identity;
+- parameter value survives;
+- output matches pre-save result.
+
+## Extension order
+
+~~~text
+host load/basic render
+→ 8/16 correctness
+→ 32-bpc if required
+→ SmartFX/ROI
+→ MFR
+→ GPU
+→ custom UI
+~~~
+
+Do not turn the minimal template into every feature at once.
+
+## Verification boundary
+
+Syntax/type checking is not load/render evidence. Record actual build/install/host results in VERIFICATION/evidence before changing host-test pending to PASS.
 
 
 ---
@@ -15163,54 +15577,208 @@ Windows PiPL resource generation and platform SDK settings are easy to get subtl
 
 # Standalone JSX tool
 
-Status: **source supplied / After Effects host test pending**.
+Status: **complete source example / After Effects host test pending**.
 
-rename-selected-layers.jsx is a complete Script-menu source example.
+rename-selected-layers.jsx is intentionally small enough to audit as one complete Script-menu command.
 
-Integration:
+## Behavior
 
-1. place it in the appropriate After Effects Scripts folder for the target installation/user setup;
-2. restart AE if required by that script location;
-3. open a composition;
-4. select one or more layers;
-5. run the script.
+The command:
 
-Pattern demonstrated:
+1. requires an open project;
+2. requires active item to be a composition;
+3. requires at least one selected layer;
+4. opens one undo group;
+5. prefixes selected layer names with Bible_index_;
+6. always ends the undo group through finally;
+7. catches top-level errors and reports them.
 
-- validate project/composition/selection before mutation;
-- open one undo group only around the mutation;
-- keep the command logic independent of persistent global state;
-- contain errors at the script entry boundary.
+## Why validation happens first
 
-The source is intended to be directly runnable, but the repository does not call it host-verified until an actual AE/OS execution is recorded.
+The script validates project, composition and selection before opening the undo group.
+
+This reduces empty undo entries and partial work.
+
+For a more complex command, do as much non-mutating validation as possible before the first edit.
+
+## Undo boundary
+
+~~~text
+validate
+→ beginUndoGroup
+→ all related mutations
+→ finally endUndoGroup
+~~~
+
+Undo group is user history, not automatic rollback after an exception.
+
+A production command with multiple failure-prone mutations may still need explicit cleanup.
+
+## Selection references
+
+The source reads selectedLayers once and immediately performs a simple rename that does not restructure the layer collection.
+
+For structural operations such as add/remove/reorder, do not assume every stored host reference remains valid. Reacquire where required.
+
+## Naming collision
+
+This example intentionally demonstrates mechanics, not a production naming policy.
+
+Repeated execution adds another prefix.
+
+A real renamer should define:
+
+- idempotency;
+- duplicate names;
+- numbering;
+- localization;
+- illegal/path-sensitive characters if names leave AE;
+- undo expectation.
+
+## Installation
+
+Use the Scripts location appropriate to the target AE installation/user policy.
+
+If you want a dockable ScriptUI panel instead of a one-shot script, use 20-REFERENCE-IMPLEMENTATIONS/Scripts/ScriptUI-Panel.
+
+## Test cases
+
+- no project;
+- active footage/folder instead of comp;
+- comp with no selection;
+- one selected layer;
+- many selected layers;
+- Unicode names;
+- repeated execution;
+- undo;
+- redo;
+- save/reopen.
+
+## Turning this into a reusable command
+
+Separate:
+
+~~~text
+UI/entry wrapper
+→ renameSelectedLayers command
+→ AE scripting DOM
+→ plain result
+~~~
+
+Then the same command logic can be called from ScriptUI or a CEP dispatcher without copying mutation logic.
+
+## Verification boundary
+
+The source is directly runnable in principle, but the repository only records host verification after the exact AE/OS run and expected project changes are captured.
 
 
 ---
 
 <!-- SOURCE: 16-WORKING-TEMPLATES/keyframer-batch/README.md -->
 
-# Keyframer batch pattern
+# Keyframer batch working pattern
 
-Status: **API recipe** for an AEGP based on the official `Easy Cheese` sample.
+Status: **API recipe / host-test-required**.
 
-For many keyframes, do not call independent insert operations in a loop if the batch API fits. Use the Keyframe Suite transaction pattern:
+Use this inside an AEGP based on the exact SDK sample such as Easy Cheese, with suite generations checked against target headers.
 
-```text
-AEGP_StartUndoGroup
-  AEGP_StartAddKeyframes(stream)
-    for each desired time/value:
-      AEGP_AddKeyframes(...time... -> new_index)
-      AEGP_SetAddKeyframe(...new_index, value...)
-  AEGP_EndAddKeyframes(...)
-AEGP_EndUndoGroup
-```
+## Goal
 
-This avoids repeatedly pushing the whole stream through undo/update machinery and is the correct architectural starting point for a Keyframe Assistant tool.
+For many keyframes, use the Keyframe Suite batch-add transaction rather than independent insert/update work for every key when the batch API matches the operation.
 
-Before modifying:
-- verify the selected stream is keyframe-able;
-- read expression state if it matters to the product;
-- avoid retaining stream handles across structural project changes.
+Conceptual flow:
+
+~~~text
+validate stream
+→ start user undo group
+→ StartAddKeyframes(stream)
+→ for each desired key:
+    AddKeyframes(time → new index)
+    SetAddKeyframe(index, value)
+    configure interpolation/ease when needed
+→ EndAddKeyframes
+→ release temporary values/refs
+→ end undo group
+~~~
+
+## Preconditions
+
+Before opening the batch:
+
+- stream ref is valid;
+- stream can accept keyframes;
+- value type/dimension is known;
+- target times are in the correct timebase;
+- expression/separated-dimension behavior is understood;
+- desired duplicate-time policy is defined.
+
+## Value ownership
+
+AEGP stream values and keyframe values can have type-specific ownership.
+
+Do not memcpy arbitrary value unions into long-lived storage without understanding the current SDK contract.
+
+Release any host-owned/allocated value data with the matching API.
+
+## Batch error path
+
+A real wrapper must decide what happens when operation N fails after earlier keys were staged.
+
+Keep:
+
+- batch handle/state ownership;
+- stream ref cleanup;
+- undo end;
+- primary error;
+- cleanup errors where they matter.
+
+Do not early-return from the loop and leak the batch transaction.
+
+## Existing keyframes
+
+Define whether the command:
+
+- inserts alongside existing keys;
+- replaces at matching times;
+- clears a range first;
+- updates values only.
+
+Do not let the behavior emerge accidentally from host duplicate-time semantics.
+
+## Interpolation/ease
+
+If the product promises interpolation/easing, add explicit host tests for:
+
+- linear;
+- hold;
+- bezier where supported;
+- temporal ease arrays/dimensions;
+- spatial tangents for spatial streams;
+- roving/continuous flags where relevant.
+
+A key value alone is not the whole keyframe state.
+
+## Undo
+
+The complete user operation should generally be one undo group.
+
+Test Undo and Redo in AE, not only function return codes.
+
+## Stress fixture
+
+Generate a known number of keys, for example hundreds or thousands, then verify:
+
+- final key count;
+- times;
+- values;
+- interpolation;
+- performance;
+- undo;
+- save/reopen.
+
+## Verification boundary
+
+This template documents the transaction shape. Exact KeyframeSuite signatures, value ownership and stream generations must come from the SDK compiled by the product, and host behavior remains pending until tested.
 
 
 ---
