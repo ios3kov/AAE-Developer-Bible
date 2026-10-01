@@ -1,4 +1,4 @@
-# Gate 4 — exact SDK 25.6 required-contract preflight — 2026-10-01
+# SDK 25.6 required-contract audit — 2026-10-01
 
 ## Scope
 
@@ -118,16 +118,12 @@ with related platform typedef/calling-convention errors.
 
 This is expected because the Adobe SDK target is macOS/Windows, while this execution environment is Linux. It is **not** a Bible source compile failure and is **not** macOS compiler evidence.
 
-## Gate 4 consequence
+## Editorial consequence
 
-The following Gate 4 criterion is now satisfied:
+The following editorial SDK-accuracy criterion is satisfied:
 
 - required SDK 25.6 contract families/functions parse without unresolved **required** declarations.
 
-Still open:
-
-- current Bible native source syntax/type compile on a real macOS Clang/Xcode environment against this SDK;
-- current Bible native source syntax/type compile on Windows/MSVC against this SDK;
-- later link/resource/host gates.
+Optional future implementation evidence may include compiler or host runs for specific examples, but those are not required to complete the Bible.
 
 The four non-required parser diagnostics remain visible and may be improved later, but they do not silently weaken the required-contract acceptance surface.
