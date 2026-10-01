@@ -149,7 +149,7 @@ Current stub tests cover:
 - frame receipt checkin;
 - memory handle free.
 
-Still required in product integration:
+For a concrete product, additional runtime evidence may cover:
 
 - host error paths;
 - actual suite lifetime;
@@ -158,6 +158,10 @@ Still required in product integration:
 - shutdown ordering;
 - leak diagnostics.
 
+These are product-evidence concerns, not conditions for Bible editorial completion.
+
 ## Verification boundary
 
 RAII proves deterministic local cleanup only when the ownership assumption and suite lifetime are correct.
+
+It does not prove that a host ref remains valid or that cleanup is legal from the current thread/context.
