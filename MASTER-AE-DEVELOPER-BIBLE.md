@@ -780,6 +780,13 @@ source revision → build configuration → produced artifact + hash
 Далее: [инициализация AEGP, hooks и suites](01-ARCHITECTURE/../03-AEGP/01-HOOKS-SUITES.md). Точные исходники этой главы перечислены в [записи сверки](01-ARCHITECTURE/../18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md); непроведённые host-проверки остаются открытыми.
 
 
+## Private loader boundary
+
+The [AE Hot Loader case study](01-ARCHITECTURE/../22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md) records a successful AE 25.6 ARM64 experiment using the internal `ML::LoadPlugins` path to late-load a new diagnostic effect bundle. That result is intentionally **not** converted into a supported loading recipe here.
+
+Public PiPL/registration/loading guidance in this chapter remains based on the documented SDK/sample model. Private loader ABI, image-relative offsets and version-specific host internals belong to research case studies unless separately supported and revalidated for the exact AE build.
+
+
 ---
 
 <!-- SOURCE: 01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md -->
@@ -5222,6 +5229,13 @@ sudo touch "/Library/Application Support/Adobe/After Effects (Beta)/developer-mo
 Без exact `.dSYM` shipped build symbolication может быть бесполезна.
 
 
+## Loaded-image identity lesson
+
+The [AE Hot Loader reuse audit](08-MACOS/../22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md) preserves a concrete debugging lesson: installation intent is not proof of the module AE actually loaded. When diagnosing path/version mismatches, record the **real loaded image path and identity** before reasoning from an installer destination.
+
+The source project used macOS dyld enumeration for an experiment. Treat that as a platform diagnostic technique, not a cross-platform After Effects SDK contract.
+
+
 ---
 
 <!-- SOURCE: 08-MACOS/04-GPU.md -->
@@ -8983,6 +8997,11 @@ See:
 8. `08-CLEAN-MACHINE-ACCEPTANCE.md`
 
 The final three chapters define the evidence boundary between "compiled", "loaded", "behavior verified" and "release verified".
+
+
+## FakeHostAdapter case study
+
+The [reuse audit](10-TESTING/../22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md) records a useful pattern from FSTR Line: a fake host should implement the **same snapshot/command contract and validation rules** as the real adapter. It is valuable for stale-revision, wrong-target and pure-state tests, but its PASS must never be promoted to AE host evidence.
 
 
 ---
@@ -15281,6 +15300,16 @@ For a hybrid product, record tests for:
 - clean reinstall/upgrade.
 
 Source-level architecture is not host verification. The actual bridge must still be exercised inside supported AE builds.
+
+
+## Project case-study lessons
+
+The [FSTR Line / AE Hot Loader reuse audit](15-COMMUNICATION/../22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md) provides two practical boundaries:
+
+- FSTR Line supports the snapshot → guarded command → Host Adapter pattern, request coalescing and generation-based stale-response rejection as reusable architecture. Its original AE synchronization limitation remains scoped to that project.
+- AE Hot Loader supports request/version correlation and main-thread ownership as useful bridge principles, but its text-file bridge is a PoC-specific transport and its private `ML::LoadPlugins` path remains research-only.
+
+Do not import a private loader path into an ordinary panel/native recipe just because the control-plane pattern is reusable.
 
 
 ---
@@ -26440,11 +26469,11 @@ The master list includes bundled entries that Adobe itself lists (for example Mo
 # Практические кейсы — FSTR Line и AE Hot Loader
 
 Дата включения в Bible: **2026-09-30**.  
-Статус: **первичное извлечение из проектных документов; аудит переносимого кода и повторные host-тесты открыты**.
+Статус: **code-level reuse audit выполнен; независимый rerun FSTR portable snapshot tests остаётся открыт; host acceptance остаётся в Gates 4–7**.
 
 Незавершённый продукт может содержать полезные отдельные решения и отрицательные результаты. Здесь сохраняются именно они, а не обещание готовности всего продукта.
 
-Этот раздел реализует дополнительный этап **3A** из [плана](22-PROJECT-CASE-STUDIES/../COMPLETION-PLAN.md) и [чеклиста](22-PROJECT-CASE-STUDIES/../COMPLETION-CHECKLIST.md). Перед созданием новых примеров в этапах 5–6 проверяем, какие наработки уже есть в двух проектах. Исправление безопасной установки из этапа 2 остаётся ближайшим приоритетом.
+Этот раздел реализует дополнительный этап **3A** из [плана](22-PROJECT-CASE-STUDIES/../COMPLETION-PLAN.md) и [чеклиста](22-PROJECT-CASE-STUDIES/../COMPLETION-CHECKLIST.md). Текущая code-level запись: [Reuse audit — 2026-10-01](22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md). Перед созданием новых примеров в этапах 5–6 проверяем, какие наработки уже есть в двух проектах. Safe tooling Gate 2 и documentation Gate 3 уже закрыты; текущий незакрытый пункт 3A — независимый portable rerun выбранного FSTR snapshot.
 
 ## Зафиксированные источники
 
