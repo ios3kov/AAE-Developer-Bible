@@ -182,3 +182,19 @@ This is what makes future SDK diffs possible.
 ## Stop rule
 
 Never make code compile by weakening a native contract you have not understood.
+
+## Worked source comparison — 2026-10-02
+
+Сначала задайте target, затем выбирайте источник. При [внешнем review](../EXTERNAL-SOURCES-REVIEW-2026-10-02.md) обнаружилось, что secondary KB current-25.6 matrix и текущий web guide не задают один и тот же набор generations:
+
+| Контракт | Secondary KB объявляет current 25.6 | Web guide heading | Exact supplied SDK 25.6 |
+|---|---|---|---|
+| Comp | Suite11 | Suite13 | Suite12 |
+| Effect | Suite4 | Suite4 | Suite5 |
+| Stream | Suite5 | Suite7 | Suite6 |
+| Keyframe | Suite4 | Suite3 | Suite5 |
+| Marker | Suite2 | Suite2 | Suite3 |
+
+Опора последнего столбца — сохранённые [exact-SDK audit](17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md) и source reviews. Web headings взяты из [закреплённого guide](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/aegp-suites.md); secondary matrix — из [закреплённого KB](https://github.com/pushREC/after-effects-sdk-kb/blob/0a0fa05ba9d229344986e15cd15968c42640cc90/wave-3/02-aegp-suite-versions.md).
+
+Это не доказывает отсутствия старых compatibility suites. Это показывает, почему слово «current» без target SDK вводит в заблуждение. Для baseline 25.6 используйте найденный в его headers тип и version macro; later API требует отдельной source/host boundary. Таблица не является новой compile/host проверкой.

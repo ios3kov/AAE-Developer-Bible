@@ -591,3 +591,15 @@ Validation for this documentation change: generated docs rebuilt; `build_docs.py
 **Local validation: PASS** — generated docs/manifest rebuilt; `build_docs.py --check`, `mkdocs build --strict`, `git diff --check`; exact coverage/uniqueness check для 127 core rows; новые ledger anchors проверены в generated HTML. Все ранее записанные source hashes/commit IDs в изменённых ledger/source records сохранены; dated SDK/reuse records получили только additive context. GitHub Validate и Regenerate docs проверяются отдельно по фактически опубликованному source SHA; старые зелёные runs не используются вместо них.
 
 **Evidence boundary:** documentation/process consistency only. Новая exact-SDK compilation, linked plug-in, AE execution, MFR/GPU acceptance, signing/install или независимое повторение проектных runtime результатов — NOT RUN. Подтверждённые CEP defects, navigation omissions и macOS alias-path tooling regression остаются в блоках 2–4.
+
+**Published verification:** commit `7d1d900e285ed38097bd74abd1ce0c02cae5a19d` — [Validate 37041854081](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37041854081) PASS; [Regenerate docs 37041854119](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37041854119) PASS. Эти runs подтверждают блок 1 на этом SHA, не последующие изменения.
+
+## External-source review and scoped transfer (2026-10-02)
+
+Входной Bible HEAD: `7d1d900e285ed38097bd74abd1ce0c02cae5a19d`. По дополнительному поручению пользователя выполнен [targeted review четырёх источников](EXTERNAL-SOURCES-REVIEW-2026-10-02.md). Отчёт сохраняет exact repository snapshots, выбранные прочитанные разделы, six native baseline discrepancies, metadata limitations и source-transfer decisions. Existing SDK records использованы как историческая опора; новой проверки supplied SDK bytes не было.
+
+Добавлены original import preflight helper, indexed-property/undocumented-API правила, CEP manifest/library/JSX diagnostic chain, worked SDK-source comparison и dated UXP published-docs note. Upstream `Project.importFile` example действительно не проходит syntax checking из-за недостающей скобки; Bible helper проходит `node --check`. Это syntax-only проверка, не запуск ExtendScript или AE.
+
+Локальные проверки документации: **PASS** — regeneration, `build_docs.py --check`, `mkdocs build --strict`, `git diff --check`; существование 10 использованных immutable source paths; 127 unique core tracker rows; наличие нового review и ledger anchor в generated HTML. Syntax-only helper/upstream checks описаны выше. GitHub runs оцениваются отдельно по опубликованному source SHA. Внешние collection-wide/compiler/runtime claims не заявлены; native build, AE script execution, CEP install и UXP host proof — NOT RUN.
+
+После завершения и публикации этого этапа работа остановлена по просьбе пользователя. Следующий основной блок — CEP protocol/failure paths; он не начат. Source/version/license и остальные scripting recipes остаются открытыми в блоках 5 и 10.

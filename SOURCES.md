@@ -2,9 +2,11 @@
 
 Research snapshot: 2026-10-01.
 
-## Кандидат для сравнительного review — 2026-10-02
+## Внешний source review — 2026-10-02
 
-[After Effects SDK Knowledge Base — pushREC](https://github.com/pushREC/after-effects-sdk-kb/blob/main/README.md). При поиске аналогов прочитан README: он перечисляет C++ SDK, SmartFX/GPU/MFR, AEGP/AEIO/Artisan и scripting; CEP development явно исключён из его scope. Это свидетельство наличия близкого публичного ресурса, а не подтверждение технической полноты или корректности его содержимого. Source/code не копировались. Сравнение глав, version-sensitive claims и provenance назначено в блок 5; до него этот кандидат не используется как API authority.
+[Отчёт](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) закрепляет snapshots C++ SDK Guide, Scripting Guide, Adobe CEP Resources и вторичного [After Effects SDK Knowledge Base](https://github.com/pushREC/after-effects-sdk-kb/tree/0a0fa05ba9d229344986e15cd15968c42640cc90). Проверены происхождение, metadata и выбранные API-разделы. KB current-25.6 matrix расходится с существующими exact-SDK records, поэтому он остаётся указателем на темы, а не native ABI authority.
+
+Из ближних к первоисточнику guides добавлены bounded scripting/CEP workflows и правило version-specific чтения; исключены undocumented импортные members из обычного recipe. Guides также содержат исторические headings и отдельный malformed source example. Только проверенные claim/source pairs переносятся в core; коллекции не объявляются полностью валидированными.
 
 ## Tier A — Adobe / platform vendor
 

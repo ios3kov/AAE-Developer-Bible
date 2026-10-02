@@ -183,6 +183,7 @@
 ## Audit and completion roadmap — 2026-10-02
 
 - [Редакционный аудит](EDITORIAL-AUDIT-2026-10-02.md)
+- [Проверка внешних источников](EXTERNAL-SOURCES-REVIEW-2026-10-02.md)
 - [План завершения](COMPLETION-PLAN.md)
 - [Поглавный трекер — 127 core pages](CHAPTER-COMPLETION-TRACKER.md)
 - [ElasticGridFX transfer plan](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md)

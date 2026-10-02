@@ -6188,6 +6188,8 @@ a = fx.property(aIndex); // reacquire after structural mutation
 
 Treat host objects as host-owned references, not immortal JavaScript objects.
 
+`numProperties` описывает indexed children, а не все доступные свойства слоя. Часть свойств доступна по имени/match name. Поэтому обычный цикл `1..numProperties` не является полным обозревателем всего layer API: сначала определите нужные roots и область обхода. Источник: [PropertyGroup в закреплённом Scripting Guide](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/propertygroup.md).
+
 ## Undo groups are not database transactions
 
 For user-triggered mutations, group related operations:
@@ -6229,6 +6231,39 @@ Before a destructive or cast-like assumption, verify:
 - cancel leaves the project in a deliberate state.
 
 For batch tools, validate as much as possible before the first project mutation.
+
+## Import preflight: один файл как footage
+
+Сначала проверьте входной File и допустимый тип импорта. Только затем меняйте проект. Авторский helper ниже получает уже выбранный File; он не открывает диалог и не создаёт проект.
+
+~~~jsx
+function importFootageFile(inputFile) {
+    if (!app.project) {
+        throw new Error("Open a project first.");
+    }
+    if (!(inputFile instanceof File) || !inputFile.exists) {
+        throw new Error("Select an existing file.");
+    }
+
+    var options = new ImportOptions(inputFile);
+    if (!options.canImportAs(ImportAsType.FOOTAGE)) {
+        throw new Error("This file cannot be imported as footage.");
+    }
+    options.importAs = ImportAsType.FOOTAGE;
+    options.sequence = false;
+
+    app.beginUndoGroup("Import footage file");
+    try {
+        return app.project.importFile(options);
+    } finally {
+        app.endUndoGroup();
+    }
+}
+~~~
+
+Контракт: [ImportOptions](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/importoptions.md) и [Project.importFile](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/general/project.md). Проверка `canImportAs` не гарантирует успешного чтения: импорт всё равно может завершиться ошибкой. `finally` закрывает undo group, а не выполняет rollback.
+
+Ожидаемые сценарии продукта: отсутствующий файл и недопустимый тип отказывают до mutation; допустимый файл добавляется как отдельный item; повторный вызов не обещает deduplication. Для sequence нужен отдельный сценарий. Уровень примера — **SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED**; выполнение в AE здесь не записано.
 
 ## Command layer instead of UI-driven scripting
 
@@ -6275,6 +6310,10 @@ Use app.version only when behavior cannot be detected directly.
 
 A compatibility statement should name AE versions actually tested, not merely versions whose API documentation contains the method.
 
+Проверяйте также provenance самого member. В [ImportOptions reference](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/importoptions.md) `rangeStart`, `rangeEnd`, `isFileNameNumbered()` явно отмечены как officially undocumented. Feature detection показывает наличие member, а не устойчивый поддерживаемый контракт. Исследовательские API требуют отдельной opt-in policy и ограничения версий продукта.
+
+Актуальный Scripting Guide включает более поздние API, включая 26.5. Используйте его per-member version notes; native SDK baseline 25.6 не является общей версией всех scripting возможностей. Дата этого source review: **2026-10-02**, [область проверки](06-SCRIPTING/../EXTERNAL-SOURCES-REVIEW-2026-10-02.md).
+
 ## Boundary with expressions
 
 Scripts mutate project state and perform automation. Expressions are evaluated as part of property evaluation and should not be used as a substitute for project orchestration.
@@ -6286,7 +6325,7 @@ See:
 
 ## Verification boundary
 
-This chapter is documentation of the public scripting model and safe architecture patterns. It does not claim that every fragment has been executed in every supported AE version. Host execution remains a separate acceptance gate.
+This chapter documents the scripting model, provenance limits and architecture patterns. It does not claim that its fragments have been executed in every supported AE version. Product-specific runtime assertions need separately identified host evidence.
 
 
 ---
@@ -6908,6 +6947,19 @@ After Effects host ID in CEP manifests is AEFT.
 
 Keep bridge.js and dispatcher.jsx small and explicit. Business logic should not be scattered across DOM handlers and executable evalScript strings.
 
+## Сверка manifest и bootstrap по первоисточнику
+
+Не смешивайте версии: `ExtensionManifest Version` описывает schema, `HostList` — целевой AE, `RequiredRuntime Name="CSXS"` — CEP runtime; product version задаётся отдельно. [CEP 12 Cookbook](https://github.com/Adobe-CEP/CEP-Resources/blob/ab5e4e3e53a42fad08e1225a22a991bb1ffe73f6/CEP_12.x/Documentation/CEP%2012%20HTML%20Extension%20Cookbook.md) сопоставляет `AEFT` 25.0 с CEP 12, но содержит и старые manifest examples. Их числа не являются готовой support matrix вашего продукта.
+
+Проверяйте по слоям:
+
+1. Manifest допускает нужный host/runtime и содержит путь к HTML entry.
+2. HTML загружает подходящий `CSInterface.js`; `Vulcan.js` нужен при использовании его API. `CEPEngine_extensions.js` встроен в CEP engine, подключать копию как обычный HTML script не требуется.
+3. Host JSX загружен через manifest `ScriptPath` либо явный `evalScript`/`$.evalFile` bootstrap; путь относится к фактической установленной extension.
+4. Малый read-only вызов подтверждает достижимость dispatcher; только после этого проверяется command protocol.
+
+Источники: тот же Cookbook и [Adobe CEP README](https://github.com/Adobe-CEP/CEP-Resources/blob/ab5e4e3e53a42fad08e1225a22a991bb1ffe73f6/README.md), проверены **2026-10-02**. Здесь описан diagnostic workflow без заявления о установленной extension. JSON/polyfill bootstrap и контролируемые protocol failures остаются отдельной задачей [блока 2](07-PANELS/../COMPLETION-PLAN.md).
+
 ## Panel -> AE
 
 CEP uses CSInterface.evalScript to execute ExtendScript in the host.
@@ -7098,6 +7150,18 @@ Adobe's 2026-09-24 developer announcement states:
 
 These dates are planning inputs, not immutable API contracts. Re-check Adobe's host-specific UXP documentation before release decisions.
 
+## Published documentation — проверка 2026-10-02
+
+[Официальная AE UXP страница](https://developer.adobe.com/after-effects/uxp/) и [After Effects API Reference](https://developer.adobe.com/after-effects/uxp/after-effects-api/) уже доступны. Старая заметка стороннего KB от апреля 2026 о неналичии этой страницы больше не описывает текущий web state.
+
+| Наблюдение | Что оно позволяет утверждать |
+|---|---|
+| Announcement: public beta by November 2026 | Датированный план Adobe |
+| AE-specific documentation опубликована и содержит Min Version notes | Можно изучать описанные контракты с их member/version boundaries |
+| Конкретный host/build действительно исполнил API | Нужен отдельный runtime record; в Bible сейчас NOT RUN |
+
+Наличие страницы не подтверждает GA, доступность beta в пользовательской установке или поддержку всех перечисленных APIs. Landing page сама относит развитие документации к beta. Заимствовать из Premiere/Photoshop пропущенные возможности нельзя. [Область внешнего review](07-PANELS/../EXTERNAL-SOURCES-REVIEW-2026-10-02.md) сохранена отдельно.
+
 ## Do not assume cross-host parity
 
 A UXP feature existing in Photoshop, Premiere or Media Encoder does not prove that the same API exists in After Effects.
@@ -7204,7 +7268,7 @@ Logs and support reports should identify which shell and protocol version produc
 
 ## Verification boundary
 
-The dates in this chapter are based on Adobe's 2026-09-24 announcement. As of this snapshot the After Effects UXP public beta is still future work. No AE UXP capability is marked verified until it is actually available and tested.
+The timeline is based on Adobe's 2026-09-24 announcement; AE-specific published documentation was checked on 2026-10-02. Public beta/GA availability in a concrete installation and host execution were not verified. No runtime capability is marked PASS from publication alone.
 
 
 ---
@@ -27715,6 +27779,22 @@ This is what makes future SDK diffs possible.
 
 Never make code compile by weakening a native contract you have not understood.
 
+## Worked source comparison — 2026-10-02
+
+Сначала задайте target, затем выбирайте источник. При [внешнем review](18-SDK-HEADER-TOOLS/../EXTERNAL-SOURCES-REVIEW-2026-10-02.md) обнаружилось, что secondary KB current-25.6 matrix и текущий web guide не задают один и тот же набор generations:
+
+| Контракт | Secondary KB объявляет current 25.6 | Web guide heading | Exact supplied SDK 25.6 |
+|---|---|---|---|
+| Comp | Suite11 | Suite13 | Suite12 |
+| Effect | Suite4 | Suite4 | Suite5 |
+| Stream | Suite5 | Suite7 | Suite6 |
+| Keyframe | Suite4 | Suite3 | Suite5 |
+| Marker | Suite2 | Suite2 | Suite3 |
+
+Опора последнего столбца — сохранённые [exact-SDK audit](18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md) и source reviews. Web headings взяты из [закреплённого guide](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/aegp-suites.md); secondary matrix — из [закреплённого KB](https://github.com/pushREC/after-effects-sdk-kb/blob/0a0fa05ba9d229344986e15cd15968c42640cc90/wave-3/02-aegp-suite-versions.md).
+
+Это не доказывает отсутствия старых compatibility suites. Это показывает, почему слово «current» без target SDK вводит в заблуждение. Для baseline 25.6 используйте найденный в его headers тип и version macro; later API требует отдельной source/host boundary. Таблица не является новой compile/host проверкой.
+
 
 ---
 
@@ -35207,6 +35287,15 @@ No source-project host result is promoted into Bible host verification. FSTR SYN
 
 # Changelog
 
+## External-source review and scoped additions — 2026-10-02
+
+- Pinned and reviewed selected material from the public SDK Knowledge Base, C++ SDK Guide, Scripting Guide and official Adobe CEP Resources.
+- Rejected secondary current-25.6 matrix claims that conflict with retained exact-SDK records; recorded provenance gaps and later/legacy web-guide boundaries.
+- Added an original import-preflight helper, indexed-property/undocumented-API guidance, CEP bootstrap diagnostic steps and a worked native source comparison.
+- Refreshed AE UXP published-documentation status without inferring host beta/GA availability; preserved the official dated migration timeline.
+- Reproduced a malformed upstream import example with syntax-only checking; Bible's helper passes syntax checking. AE execution remains NOT RUN.
+- Recorded the user's requested stop; remaining completion blocks stay open.
+
 ## Completion block 1 — 2026-10-02
 
 - Reconciled active chapter/reference evidence labels with the editorial policy; reader-product validation scenarios remain scoped to their product claims.
@@ -35332,6 +35421,10 @@ No source-project host result is promoted into Bible host verification. FSTR SYN
 Согласованы текущие evidence labels в Effect anatomy/SmartFX/MFR, macOS setup, Cookbook и связанных reference guides; снято приписывание исторического compiler PASS нынешнему коду. Dated SDK reviews и reuse audit получили пояснения исторического процесса. Эти исправления закрывают findings блока 1, но не практические дополнения строк ниже.
 
 В следующих блоках обновлять оси каждой затронутой строки отдельно. Для полного закрытия строки все применимые оси должны стать C или обоснованным L, а результат — ссылаться на dated verification entry. Блок 16 проверяет весь набор перед freeze.
+
+## Частичные дополнения после внешнего review
+
+[Targeted review](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) добавил import preflight/provenance в Object model, manifest/library/bootstrap diagnostic steps в CEP, published-docs boundary в UXP и worked native-source comparison в Header-first. Соответствующие главы сохраняют E/R для остальных practical/version/recipe результатов. После этого этапа работа остановлена по просьбе пользователя; следующие блоки не выполнялись.
 
 ## 00-START-HERE
 
@@ -35602,6 +35695,7 @@ Bible готова как редакция, когда читатель може
 - [x] Non-required parser limitations сохраняются явно.
 - [x] Historical sample/header discrepancies документируются как version boundaries.
 - [ ] Перед freeze редакции повторно проверить датированные внешние roadmap/platform facts.
+- [x] Targeted external-source review: четыре закреплённых источника, selected API/version/provenance findings и bounded transfer в core — 2026-10-02.
 
 ## C. Evidence vocabulary
 
@@ -35836,6 +35930,8 @@ Checked and reconciled as one logical block:
 
 **Блок 2 [плана завершения](COMPLETION-PLAN.md): CEP protocol и failure paths.** Блок 1 выполнен; проверки и scope результата записаны в ledger.
 
+После targeted review внешних источников работа временно остановлена по просьбе пользователя. Дополнения в scripting/CEP/UXP/header-first не закрывают блоки 2, 5 и 10 целиком. Их оставшиеся результаты остаются в поглавном трекере.
+
 ## Audit-based completion plan — 2026-10-02
 
 - [x] [Аудит](EDITORIAL-AUDIT-2026-10-02.md) и 16-block roadmap сохранены.
@@ -35882,6 +35978,8 @@ Checked and reconciled as one logical block:
 **Блок 1: выполнен; результаты проверок — в [ledger](VERIFICATION.md#block-1-editorial-readiness-and-evidence-2026-10-02).** Устранены active legacy gates, scoped исторический compiler result, согласован FSTR rerun status. [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) охватывает 127 core pages. Следующий содержательный блок — **2: CEP protocol и failure paths**; его исправления не входят в блок 1.
 
 Зависимости: блок 1 задаёт общий evidence язык; блоки 2–4 устраняют protocol/navigation/tooling findings; блок 5 задаёт provenance/version таблицу для практических дополнений 6–15. Маршруты блока 3 обновляются по мере появления этих дополнений. Блок 16 принимается после всех обязательных результатов 1–15 и их поглавной сверки. ElasticGridFX lessons выполняются в mapped блоках, а не отдельной необязательной копией материалов.
+
+По дополнительному поручению пользователя выполнен [targeted external source review](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) и небольшой перенос в scripting/CEP/header-first/UXP chapters. Это частичная работа блока 5 и дополнения к блокам 2/10; они не объявляются полностью завершёнными. Следующий основной блок остаётся 2. После этого этапа работа остановлена по просьбе пользователя; следующий блок не начат.
 
 ## Порядок работ
 
@@ -35952,9 +36050,9 @@ Checked and reconciled as one logical block:
 
 Ввести компактную таблицу: claim group → exact source → review date → SDK/AE/OS boundary → evidence class. Добавить прямые source links рядом с версионными утверждениями. SDK baseline, host support, panel runtime и platform policy должны иметь разные колонки.
 
-Сопоставить охват и practical depth с существующими C++/scripting guides и [After Effects SDK Knowledge Base](https://github.com/pushREC/after-effects-sdk-kb). Последний найден при поиске 2026-10-02; пока прочитан только README, качество API-утверждений не проверено. Аналог не принимается за canonical source автоматически. Позиционирование Bible должно опираться на проверяемую пользу, а не утверждение об отсутствии аналогов.
+Предварительное сравнение C++/scripting guides, Adobe CEP и [After Effects SDK Knowledge Base](https://github.com/pushREC/after-effects-sdk-kb) выполнено в [review от 2026-10-02](EXTERNAL-SOURCES-REVIEW-2026-10-02.md). У KB выявлены current-25.6 matrix discrepancies; из проверенных первичных разделов перенесены scoped workflows. Завершить оставшуюся claim/source/version таблицу и practical-depth comparison; полный построчный audit внешних коллекций не выполнен. Позиционирование Bible должно опираться на проверяемую пользу, а не утверждение об отсутствии аналогов.
 
-Перепроверить debugger restrictions, macOS signing/notarization и Windows ARM64 по соответствующим источникам. Roadmap UXP сейчас согласуется с официальным announcement; перед freeze обновить его дату проверки и снова подтвердить actual AE availability. Если новый AE-specific contract недоступен, оставить planning status.
+Перепроверить debugger restrictions, macOS signing/notarization и Windows ARM64 по соответствующим источникам. Announcement UXP и опубликованные AE-specific docs повторно проверены 2026-10-02; actual AE availability/runtime не установлены. Перед freeze перепроверить документы и целевую среду. Отсутствующий или неподтверждённый AE-specific contract остаётся явно ограниченным.
 
 Вынести решение владельца о лицензии собственного текста и примеров отдельным пунктом. После решения добавить LICENSE и сохранить права vendor material. Не выбирать условия за владельца автоматически.
 
@@ -36753,6 +36851,73 @@ This workflow is mandatory for continued development of AE Developer Bible.
 
 ---
 
+<!-- SOURCE: EXTERNAL-SOURCES-REVIEW-2026-10-02.md -->
+
+# Проверка внешних источников — 2026-10-02
+
+Цель — выбрать полезные дополнения к Bible, проверив происхождение, версии и конкретные утверждения. Это targeted source review: проверены metadata/coverage и выбранные API-разделы, а не каждая строка четырёх коллекций. Наличие source link или заявления о полноте не заменяет проверку контракта.
+
+## Закреплённые снимки
+
+| Источник | Проверенный снимок | Что прочитано | Решение |
+|---|---|---|---|
+| [After Effects SDK Knowledge Base](https://github.com/pushREC/after-effects-sdk-kb/tree/0a0fa05ba9d229344986e15cd15968c42640cc90) | `0a0fa05ba9d229344986e15cd15968c42640cc90` | README, source registry, gap analysis; suite/version matrix; Compute Cache signatures; scripting/UXP metadata | Вторичный указатель на темы; его current-version таблицу не переносить |
+| [C++ SDK Guide](https://github.com/docsforadobe/after-effects-plugin-guide/tree/6d9b285d9755d1fbf8ead7680ba49de24f94b547) | `6d9b285d9755d1fbf8ead7680ba49de24f94b547` | Ownership notice; Compute Cache; compatibility; выбранные suite headings | Использовать для объяснения, ABI сверять с exact target SDK |
+| [Scripting Guide](https://github.com/docsforadobe/after-effects-scripting-guide/tree/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc) | `7137a990db4bd8dc9f5869b8ca431c7dfed52bdc` | Ownership notice; PropertyGroup/PropertyBase; ImportOptions; changelog | Использовать по отдельным member/version границам, сохранять undocumented warnings |
+| [Adobe CEP Resources](https://github.com/Adobe-CEP/CEP-Resources/tree/ab5e4e3e53a42fad08e1225a22a991bb1ffe73f6) | `ab5e4e3e53a42fad08e1225a22a991bb1ffe73f6` | README; CEP 12 Cookbook: host matrix, manifest, libraries, JSX loading/main thread | Официальная опора для CEP shell/bridge; старые примеры требуют target-specific настройки |
+
+C++ и scripting repo snapshots включают обновления по 26.5 от 2026-09-10; CEP snapshot — от 2026-02-20. Дата последнего коммита не означает, что каждая страница обновлена или каждый пример выполнен.
+
+## Почему KB нельзя принять за готовый API reference
+
+[Матрица KB](https://github.com/pushREC/after-effects-sdk-kb/blob/0a0fa05ba9d229344986e15cd15968c42640cc90/wave-3/02-aegp-suite-versions.md) представляет следующие значения как текущие для 25.6. Сравнение с уже сохранёнными exact-SDK records Bible даёт расхождения:
+
+| Контракт | В KB | Supplied SDK 25.6 build 61 |
+|---|---|---|
+| Effect protocol | 13.30 | 13.29 |
+| Comp suite | 11 | 12 |
+| Effect suite | 4 | 5 |
+| Stream suite | 5 | 6 |
+| Keyframe suite | 4 | 5 |
+| Marker suite | 2 | 3 |
+
+Опора сравнения: [первая SDK запись](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md), [exact-header audit](18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md), [streams/keyframes review](18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md), [mask/text/footage review](18-SDK-HEADER-TOOLS/11-MASK-TEXT-FOOTAGE-SDK25.6.md). Это не новый запуск against SDK bytes. Старые suite generations могут быть осознанным compatibility выбором; дефект здесь — их обозначение как current baseline.
+
+Дополнительные ограничения provenance: в 37 Markdown files найдено 36 front matters; 25 имеют unknown source marker, 31 — `verified: false`. Общий source registry сохраняет дату проверки 2025-12-27, тогда как README расширен до апреля 2026. Эти markers сами по себе не доказывают ошибочность текста, но не поддерживают blanket claim о проверенной полноте. Локального exact-header/compiler report для его current matrix в рассмотренном материале не установлено.
+
+KB [UXP note](https://github.com/pushREC/after-effects-sdk-kb/blob/0a0fa05ba9d229344986e15cd15968c42640cc90/scripting/UXP-STATUS-NOTE.md) датирован 2026-04-19. Его вывод о неналичии официальной AE UXP страницы нельзя использовать как текущий: 2026-10-02 [страница Adobe](https://developer.adobe.com/after-effects/uxp/) и [AE API reference](https://developer.adobe.com/after-effects/uxp/after-effects-api/) доступны. Это обновление публичной документации; availability установленного host/runtime не проверена.
+
+## Ограничения более близких к первоисточнику guides
+
+C++ web guide одновременно содержит later `CompSuite13`/`StreamSuite7` и исторические headings `EffectSuite4`/`KeyframeSuite3`/`MarkerSuite2`. Поэтому дата обновления сайта не задаёт единую native ABI baseline. Новые declarations не приписываются supplied SDK 25.6; старые headings не отменяют найденные в нём текущие generations. Практический пример добавлен в [Header-first rules](18-SDK-HEADER-TOOLS/04-HEADER-FIRST-RULES.md).
+
+Scripting Guide сохраняет полезные различия между документированным API и исследовательскими дополнениями. Например, [ImportOptions](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/importoptions.md) маркирует `rangeStart`, `rangeEnd`, `isFileNameNumbered()` как officially undocumented. Их наличие в reference и успешный feature probe не превращают их в поддерживаемое обещание Adobe.
+
+В [Project.importFile example](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/general/project.md) также обнаружена недостающая закрывающая скобка. Это дефект конкретного source example, а не опровержение описанного метода. В Bible добавлен собственный helper с отдельной syntax check; исходный пример не копировался.
+
+CEP 12 Cookbook включает образцы manifest для старых CSXS/host versions. Нельзя переносить их номера в новый extension без сверки с целевой средой. Host version, manifest schema, CEP runtime и product version — разные поля.
+
+## Что уже добавлено в core
+
+| Дополнение | Проверенная опора | Назначение / предел |
+|---|---|---|
+| Import preflight: File → ImportOptions → canImportAs → importAs → importFile | Scripting ImportOptions и Project.importFile | [Object model](06-SCRIPTING/01-OBJECT-MODEL.md); авторский SOURCE EXAMPLE, host execution NOT RUN |
+| Indexed groups versus named-only properties; undocumented API policy | Scripting PropertyGroup/ImportOptions warnings | Та же глава; запрет обещать полный обход по numProperties или supported contract по feature detection |
+| Три CEP слоя версий, library/bootstrap diagnostic chain | Official CEP 12 Cookbook / README | [CEP](07-PANELS/01-CEP.md); DOCUMENTED, installation/runtime не заявлены |
+| Worked comparison of secondary matrix/web headings versus exact SDK | Existing SDK records + selected current web headings | [Header-first](18-SDK-HEADER-TOOLS/04-HEADER-FIRST-RULES.md); new native compile не заявлен |
+| Разделение announcement, published UXP docs и actual host proof | Adobe announcement + AE UXP pages accessed 2026-10-02 | [UXP transition](07-PANELS/02-UXP-TRANSITION.md); не подтверждает beta/GA на машине читателя |
+
+Material transferred as original explanation with direct source references; большие фрагменты текста, vendor code/libraries и SDK assets не копировались. Docs for Adobe указывают Adobe copyright; MIT compilation notice KB не принимается за разрешение на произвольное копирование его upstream materials. Выбор лицензии собственного текста Bible остаётся задачей владельца в блоке 5.
+
+## Оставшаяся работа
+
+Блок 5: завершить claim/source/date/version таблицу, проверить остальные критичные version-sensitive факты и получить license decision. Блок 2: согласовать CEP protocol/template, parse/bootstrap failure paths и portable regressions. Блок 10: закончить остальные automation/expression recipes. Внешний обзор не закрывает эти блоки целиком и не заменяет SDK/runtime qualification продукта.
+
+**Evidence:** source/documentation review, preserved exact source snapshots and existing SDK records. Native compilation, script execution in AE, CEP installation, UXP host proof — **NOT RUN**.
+
+
+---
+
 <!-- SOURCE: FINAL-COVERAGE-AUDIT.md -->
 
 # Coverage matrix
@@ -37090,6 +37255,7 @@ See [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md).
 ## Audit and completion roadmap — 2026-10-02
 
 - [Редакционный аудит](EDITORIAL-AUDIT-2026-10-02.md)
+- [Проверка внешних источников](EXTERNAL-SOURCES-REVIEW-2026-10-02.md)
 - [План завершения](COMPLETION-PLAN.md)
 - [Поглавный трекер — 127 core pages](CHAPTER-COMPLETION-TRACKER.md)
 - [ElasticGridFX transfer plan](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md)
@@ -37116,9 +37282,11 @@ The Bible intentionally summarizes rather than republishes SDK documentation. AP
 
 Research snapshot: 2026-10-01.
 
-## Кандидат для сравнительного review — 2026-10-02
+## Внешний source review — 2026-10-02
 
-[After Effects SDK Knowledge Base — pushREC](https://github.com/pushREC/after-effects-sdk-kb/blob/main/README.md). При поиске аналогов прочитан README: он перечисляет C++ SDK, SmartFX/GPU/MFR, AEGP/AEIO/Artisan и scripting; CEP development явно исключён из его scope. Это свидетельство наличия близкого публичного ресурса, а не подтверждение технической полноты или корректности его содержимого. Source/code не копировались. Сравнение глав, version-sensitive claims и provenance назначено в блок 5; до него этот кандидат не используется как API authority.
+[Отчёт](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) закрепляет snapshots C++ SDK Guide, Scripting Guide, Adobe CEP Resources и вторичного [After Effects SDK Knowledge Base](https://github.com/pushREC/after-effects-sdk-kb/tree/0a0fa05ba9d229344986e15cd15968c42640cc90). Проверены происхождение, metadata и выбранные API-разделы. KB current-25.6 matrix расходится с существующими exact-SDK records, поэтому он остаётся указателем на темы, а не native ABI authority.
+
+Из ближних к первоисточнику guides добавлены bounded scripting/CEP workflows и правило version-specific чтения; исключены undocumented импортные members из обычного recipe. Guides также содержат исторические headings и отдельный malformed source example. Только проверенные claim/source pairs переносятся в core; коллекции не объявляются полностью валидированными.
 
 ## Tier A — Adobe / platform vendor
 
@@ -37296,6 +37464,8 @@ All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL
 
 ## План завершения после аудита — 2026-10-02
 
+**Работа временно остановлена по просьбе пользователя после блока 1 и targeted external-source review.** Следующий основной блок не начат; возобновление — по следующему поручению пользователя.
+
 Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). **Блок 1 — единая редакционная готовность и evidence: выполнен.** Следующий содержательный блок: **CEP protocol и failure paths**. Его подтверждённые дефекты пока не исправлены.
 
 Результат блока 1:
@@ -37309,6 +37479,12 @@ All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL
 Локальные документационные проверки **PASS**; результаты GitHub CI читаются отдельно по опубликованному source SHA. Проверки и ограничения фиксируются в [ledger](VERIFICATION.md#block-1-editorial-readiness-and-evidence-2026-10-02). Новая native-компиляция и AE execution не заявляются.
 
 [ElasticGridFX transfer plan](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) добавляет scoped performance/release lessons в существующие блоки. Source snapshot закреплён; перенос в core главы и адаптация tools пока не выполнены. Новые SDK/native/AE результаты не заявляются.
+
+## Внешние источники — завершённый targeted review
+
+[Отчёт от 2026-10-02](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) закрепляет четыре source snapshots и выводы выбранных проверок. У secondary KB current-25.6 matrix выявлены расхождения; web guides также требуют per-member/version чтения. Полная построчная валидация внешних коллекций не заявляется.
+
+В core добавлены import preflight и provenance/invalidation уточнения, CEP manifest/library/bootstrap diagnostic chain, native source comparison и актуальная граница published UXP docs versus actual host proof. Синтаксис собственного import helper проверен; ошибочный upstream example воспроизведён syntax-only проверкой. Новые native/AE/CEP/UXP runtime результаты — NOT RUN. Блоки 2, 5 и 10 закрыты лишь в этих отдельных пунктах, остальные задачи остаются открыты.
 
 ## Current mission
 
@@ -38099,3 +38275,15 @@ Validation for this documentation change: generated docs rebuilt; `build_docs.py
 **Local validation: PASS** — generated docs/manifest rebuilt; `build_docs.py --check`, `mkdocs build --strict`, `git diff --check`; exact coverage/uniqueness check для 127 core rows; новые ledger anchors проверены в generated HTML. Все ранее записанные source hashes/commit IDs в изменённых ledger/source records сохранены; dated SDK/reuse records получили только additive context. GitHub Validate и Regenerate docs проверяются отдельно по фактически опубликованному source SHA; старые зелёные runs не используются вместо них.
 
 **Evidence boundary:** documentation/process consistency only. Новая exact-SDK compilation, linked plug-in, AE execution, MFR/GPU acceptance, signing/install или независимое повторение проектных runtime результатов — NOT RUN. Подтверждённые CEP defects, navigation omissions и macOS alias-path tooling regression остаются в блоках 2–4.
+
+**Published verification:** commit `7d1d900e285ed38097bd74abd1ce0c02cae5a19d` — [Validate 37041854081](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37041854081) PASS; [Regenerate docs 37041854119](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37041854119) PASS. Эти runs подтверждают блок 1 на этом SHA, не последующие изменения.
+
+## External-source review and scoped transfer (2026-10-02)
+
+Входной Bible HEAD: `7d1d900e285ed38097bd74abd1ce0c02cae5a19d`. По дополнительному поручению пользователя выполнен [targeted review четырёх источников](EXTERNAL-SOURCES-REVIEW-2026-10-02.md). Отчёт сохраняет exact repository snapshots, выбранные прочитанные разделы, six native baseline discrepancies, metadata limitations и source-transfer decisions. Existing SDK records использованы как историческая опора; новой проверки supplied SDK bytes не было.
+
+Добавлены original import preflight helper, indexed-property/undocumented-API правила, CEP manifest/library/JSX diagnostic chain, worked SDK-source comparison и dated UXP published-docs note. Upstream `Project.importFile` example действительно не проходит syntax checking из-за недостающей скобки; Bible helper проходит `node --check`. Это syntax-only проверка, не запуск ExtendScript или AE.
+
+Локальные проверки документации: **PASS** — regeneration, `build_docs.py --check`, `mkdocs build --strict`, `git diff --check`; существование 10 использованных immutable source paths; 127 unique core tracker rows; наличие нового review и ledger anchor в generated HTML. Syntax-only helper/upstream checks описаны выше. GitHub runs оцениваются отдельно по опубликованному source SHA. Внешние collection-wide/compiler/runtime claims не заявлены; native build, AE script execution, CEP install и UXP host proof — NOT RUN.
+
+После завершения и публикации этого этапа работа остановлена по просьбе пользователя. Следующий основной блок — CEP protocol/failure paths; он не начат. Source/version/license и остальные scripting recipes остаются открытыми в блоках 5 и 10.

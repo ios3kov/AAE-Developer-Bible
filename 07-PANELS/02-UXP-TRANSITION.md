@@ -14,6 +14,18 @@ Adobe's 2026-09-24 developer announcement states:
 
 These dates are planning inputs, not immutable API contracts. Re-check Adobe's host-specific UXP documentation before release decisions.
 
+## Published documentation — проверка 2026-10-02
+
+[Официальная AE UXP страница](https://developer.adobe.com/after-effects/uxp/) и [After Effects API Reference](https://developer.adobe.com/after-effects/uxp/after-effects-api/) уже доступны. Старая заметка стороннего KB от апреля 2026 о неналичии этой страницы больше не описывает текущий web state.
+
+| Наблюдение | Что оно позволяет утверждать |
+|---|---|
+| Announcement: public beta by November 2026 | Датированный план Adobe |
+| AE-specific documentation опубликована и содержит Min Version notes | Можно изучать описанные контракты с их member/version boundaries |
+| Конкретный host/build действительно исполнил API | Нужен отдельный runtime record; в Bible сейчас NOT RUN |
+
+Наличие страницы не подтверждает GA, доступность beta в пользовательской установке или поддержку всех перечисленных APIs. Landing page сама относит развитие документации к beta. Заимствовать из Premiere/Photoshop пропущенные возможности нельзя. [Область внешнего review](../EXTERNAL-SOURCES-REVIEW-2026-10-02.md) сохранена отдельно.
+
 ## Do not assume cross-host parity
 
 A UXP feature existing in Photoshop, Premiere or Media Encoder does not prove that the same API exists in After Effects.
@@ -120,4 +132,4 @@ Logs and support reports should identify which shell and protocol version produc
 
 ## Verification boundary
 
-The dates in this chapter are based on Adobe's 2026-09-24 announcement. As of this snapshot the After Effects UXP public beta is still future work. No AE UXP capability is marked verified until it is actually available and tested.
+The timeline is based on Adobe's 2026-09-24 announcement; AE-specific published documentation was checked on 2026-10-02. Public beta/GA availability in a concrete installation and host execution were not verified. No runtime capability is marked PASS from publication alone.

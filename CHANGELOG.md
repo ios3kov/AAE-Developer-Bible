@@ -1,5 +1,14 @@
 # Changelog
 
+## External-source review and scoped additions — 2026-10-02
+
+- Pinned and reviewed selected material from the public SDK Knowledge Base, C++ SDK Guide, Scripting Guide and official Adobe CEP Resources.
+- Rejected secondary current-25.6 matrix claims that conflict with retained exact-SDK records; recorded provenance gaps and later/legacy web-guide boundaries.
+- Added an original import-preflight helper, indexed-property/undocumented-API guidance, CEP bootstrap diagnostic steps and a worked native source comparison.
+- Refreshed AE UXP published-documentation status without inferring host beta/GA availability; preserved the official dated migration timeline.
+- Reproduced a malformed upstream import example with syntax-only checking; Bible's helper passes syntax checking. AE execution remains NOT RUN.
+- Recorded the user's requested stop; remaining completion blocks stay open.
+
 ## Completion block 1 — 2026-10-02
 
 - Reconciled active chapter/reference evidence labels with the editorial policy; reader-product validation scenarios remain scoped to their product claims.

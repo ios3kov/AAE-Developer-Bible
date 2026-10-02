@@ -44,6 +44,19 @@ After Effects host ID in CEP manifests is AEFT.
 
 Keep bridge.js and dispatcher.jsx small and explicit. Business logic should not be scattered across DOM handlers and executable evalScript strings.
 
+## Сверка manifest и bootstrap по первоисточнику
+
+Не смешивайте версии: `ExtensionManifest Version` описывает schema, `HostList` — целевой AE, `RequiredRuntime Name="CSXS"` — CEP runtime; product version задаётся отдельно. [CEP 12 Cookbook](https://github.com/Adobe-CEP/CEP-Resources/blob/ab5e4e3e53a42fad08e1225a22a991bb1ffe73f6/CEP_12.x/Documentation/CEP%2012%20HTML%20Extension%20Cookbook.md) сопоставляет `AEFT` 25.0 с CEP 12, но содержит и старые manifest examples. Их числа не являются готовой support matrix вашего продукта.
+
+Проверяйте по слоям:
+
+1. Manifest допускает нужный host/runtime и содержит путь к HTML entry.
+2. HTML загружает подходящий `CSInterface.js`; `Vulcan.js` нужен при использовании его API. `CEPEngine_extensions.js` встроен в CEP engine, подключать копию как обычный HTML script не требуется.
+3. Host JSX загружен через manifest `ScriptPath` либо явный `evalScript`/`$.evalFile` bootstrap; путь относится к фактической установленной extension.
+4. Малый read-only вызов подтверждает достижимость dispatcher; только после этого проверяется command protocol.
+
+Источники: тот же Cookbook и [Adobe CEP README](https://github.com/Adobe-CEP/CEP-Resources/blob/ab5e4e3e53a42fad08e1225a22a991bb1ffe73f6/README.md), проверены **2026-10-02**. Здесь описан diagnostic workflow без заявления о установленной extension. JSON/polyfill bootstrap и контролируемые protocol failures остаются отдельной задачей [блока 2](../COMPLETION-PLAN.md).
+
 ## Panel -> AE
 
 CEP uses CSInterface.evalScript to execute ExtendScript in the host.

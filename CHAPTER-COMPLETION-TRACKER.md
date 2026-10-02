@@ -25,6 +25,10 @@
 
 В следующих блоках обновлять оси каждой затронутой строки отдельно. Для полного закрытия строки все применимые оси должны стать C или обоснованным L, а результат — ссылаться на dated verification entry. Блок 16 проверяет весь набор перед freeze.
 
+## Частичные дополнения после внешнего review
+
+[Targeted review](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) добавил import preflight/provenance в Object model, manifest/library/bootstrap diagnostic steps в CEP, published-docs boundary в UXP и worked native-source comparison в Header-first. Соответствующие главы сохраняют E/R для остальных practical/version/recipe результатов. После этого этапа работа остановлена по просьбе пользователя; следующие блоки не выполнялись.
+
 ## 00-START-HERE
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |

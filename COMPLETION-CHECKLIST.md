@@ -29,6 +29,7 @@ Bible готова как редакция, когда читатель може
 - [x] Non-required parser limitations сохраняются явно.
 - [x] Historical sample/header discrepancies документируются как version boundaries.
 - [ ] Перед freeze редакции повторно проверить датированные внешние roadmap/platform facts.
+- [x] Targeted external-source review: четыре закреплённых источника, selected API/version/provenance findings и bounded transfer в core — 2026-10-02.
 
 ## C. Evidence vocabulary
 
@@ -262,6 +263,8 @@ Checked and reconciled as one logical block:
 ## Current next step
 
 **Блок 2 [плана завершения](COMPLETION-PLAN.md): CEP protocol и failure paths.** Блок 1 выполнен; проверки и scope результата записаны в ledger.
+
+После targeted review внешних источников работа временно остановлена по просьбе пользователя. Дополнения в scripting/CEP/UXP/header-first не закрывают блоки 2, 5 и 10 целиком. Их оставшиеся результаты остаются в поглавном трекере.
 
 ## Audit-based completion plan — 2026-10-02
 

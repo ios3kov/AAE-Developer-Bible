@@ -26,6 +26,8 @@
 
 Зависимости: блок 1 задаёт общий evidence язык; блоки 2–4 устраняют protocol/navigation/tooling findings; блок 5 задаёт provenance/version таблицу для практических дополнений 6–15. Маршруты блока 3 обновляются по мере появления этих дополнений. Блок 16 принимается после всех обязательных результатов 1–15 и их поглавной сверки. ElasticGridFX lessons выполняются в mapped блоках, а не отдельной необязательной копией материалов.
 
+По дополнительному поручению пользователя выполнен [targeted external source review](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) и небольшой перенос в scripting/CEP/header-first/UXP chapters. Это частичная работа блока 5 и дополнения к блокам 2/10; они не объявляются полностью завершёнными. Следующий основной блок остаётся 2. После этого этапа работа остановлена по просьбе пользователя; следующий блок не начат.
+
 ## Порядок работ
 
 План содержит 16 логических блоков. Это рекомендуемый порядок, не обещание, что каждый блок займёт одну сессию. Слишком большой блок можно разделить по самостоятельным результатам. Каждую завершённую тему проверять и отчитывать отдельно в соответствии с EDITORIAL-GUIDE.
@@ -95,9 +97,9 @@
 
 Ввести компактную таблицу: claim group → exact source → review date → SDK/AE/OS boundary → evidence class. Добавить прямые source links рядом с версионными утверждениями. SDK baseline, host support, panel runtime и platform policy должны иметь разные колонки.
 
-Сопоставить охват и practical depth с существующими C++/scripting guides и [After Effects SDK Knowledge Base](https://github.com/pushREC/after-effects-sdk-kb). Последний найден при поиске 2026-10-02; пока прочитан только README, качество API-утверждений не проверено. Аналог не принимается за canonical source автоматически. Позиционирование Bible должно опираться на проверяемую пользу, а не утверждение об отсутствии аналогов.
+Предварительное сравнение C++/scripting guides, Adobe CEP и [After Effects SDK Knowledge Base](https://github.com/pushREC/after-effects-sdk-kb) выполнено в [review от 2026-10-02](EXTERNAL-SOURCES-REVIEW-2026-10-02.md). У KB выявлены current-25.6 matrix discrepancies; из проверенных первичных разделов перенесены scoped workflows. Завершить оставшуюся claim/source/version таблицу и practical-depth comparison; полный построчный audit внешних коллекций не выполнен. Позиционирование Bible должно опираться на проверяемую пользу, а не утверждение об отсутствии аналогов.
 
-Перепроверить debugger restrictions, macOS signing/notarization и Windows ARM64 по соответствующим источникам. Roadmap UXP сейчас согласуется с официальным announcement; перед freeze обновить его дату проверки и снова подтвердить actual AE availability. Если новый AE-specific contract недоступен, оставить planning status.
+Перепроверить debugger restrictions, macOS signing/notarization и Windows ARM64 по соответствующим источникам. Announcement UXP и опубликованные AE-specific docs повторно проверены 2026-10-02; actual AE availability/runtime не установлены. Перед freeze перепроверить документы и целевую среду. Отсутствующий или неподтверждённый AE-specific contract остаётся явно ограниченным.
 
 Вынести решение владельца о лицензии собственного текста и примеров отдельным пунктом. После решения добавить LICENSE и сохранить права vendor material. Не выбирать условия за владельца автоматически.
 

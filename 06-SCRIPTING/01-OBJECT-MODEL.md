@@ -88,6 +88,8 @@ a = fx.property(aIndex); // reacquire after structural mutation
 
 Treat host objects as host-owned references, not immortal JavaScript objects.
 
+`numProperties` описывает indexed children, а не все доступные свойства слоя. Часть свойств доступна по имени/match name. Поэтому обычный цикл `1..numProperties` не является полным обозревателем всего layer API: сначала определите нужные roots и область обхода. Источник: [PropertyGroup в закреплённом Scripting Guide](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/propertygroup.md).
+
 ## Undo groups are not database transactions
 
 For user-triggered mutations, group related operations:
@@ -129,6 +131,39 @@ Before a destructive or cast-like assumption, verify:
 - cancel leaves the project in a deliberate state.
 
 For batch tools, validate as much as possible before the first project mutation.
+
+## Import preflight: один файл как footage
+
+Сначала проверьте входной File и допустимый тип импорта. Только затем меняйте проект. Авторский helper ниже получает уже выбранный File; он не открывает диалог и не создаёт проект.
+
+~~~jsx
+function importFootageFile(inputFile) {
+    if (!app.project) {
+        throw new Error("Open a project first.");
+    }
+    if (!(inputFile instanceof File) || !inputFile.exists) {
+        throw new Error("Select an existing file.");
+    }
+
+    var options = new ImportOptions(inputFile);
+    if (!options.canImportAs(ImportAsType.FOOTAGE)) {
+        throw new Error("This file cannot be imported as footage.");
+    }
+    options.importAs = ImportAsType.FOOTAGE;
+    options.sequence = false;
+
+    app.beginUndoGroup("Import footage file");
+    try {
+        return app.project.importFile(options);
+    } finally {
+        app.endUndoGroup();
+    }
+}
+~~~
+
+Контракт: [ImportOptions](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/importoptions.md) и [Project.importFile](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/general/project.md). Проверка `canImportAs` не гарантирует успешного чтения: импорт всё равно может завершиться ошибкой. `finally` закрывает undo group, а не выполняет rollback.
+
+Ожидаемые сценарии продукта: отсутствующий файл и недопустимый тип отказывают до mutation; допустимый файл добавляется как отдельный item; повторный вызов не обещает deduplication. Для sequence нужен отдельный сценарий. Уровень примера — **SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED**; выполнение в AE здесь не записано.
 
 ## Command layer instead of UI-driven scripting
 
@@ -175,6 +210,10 @@ Use app.version only when behavior cannot be detected directly.
 
 A compatibility statement should name AE versions actually tested, not merely versions whose API documentation contains the method.
 
+Проверяйте также provenance самого member. В [ImportOptions reference](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/importoptions.md) `rangeStart`, `rangeEnd`, `isFileNameNumbered()` явно отмечены как officially undocumented. Feature detection показывает наличие member, а не устойчивый поддерживаемый контракт. Исследовательские API требуют отдельной opt-in policy и ограничения версий продукта.
+
+Актуальный Scripting Guide включает более поздние API, включая 26.5. Используйте его per-member version notes; native SDK baseline 25.6 не является общей версией всех scripting возможностей. Дата этого source review: **2026-10-02**, [область проверки](../EXTERNAL-SOURCES-REVIEW-2026-10-02.md).
+
 ## Boundary with expressions
 
 Scripts mutate project state and perform automation. Expressions are evaluated as part of property evaluation and should not be used as a substitute for project orchestration.
@@ -186,4 +225,4 @@ See:
 
 ## Verification boundary
 
-This chapter is documentation of the public scripting model and safe architecture patterns. It does not claim that every fragment has been executed in every supported AE version. Host execution remains a separate acceptance gate.
+This chapter documents the scripting model, provenance limits and architecture patterns. It does not claim that its fragments have been executed in every supported AE version. Product-specific runtime assertions need separately identified host evidence.

@@ -8,6 +8,8 @@ All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL
 
 ## План завершения после аудита — 2026-10-02
 
+**Работа временно остановлена по просьбе пользователя после блока 1 и targeted external-source review.** Следующий основной блок не начат; возобновление — по следующему поручению пользователя.
+
 Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). **Блок 1 — единая редакционная готовность и evidence: выполнен.** Следующий содержательный блок: **CEP protocol и failure paths**. Его подтверждённые дефекты пока не исправлены.
 
 Результат блока 1:
@@ -21,6 +23,12 @@ All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL
 Локальные документационные проверки **PASS**; результаты GitHub CI читаются отдельно по опубликованному source SHA. Проверки и ограничения фиксируются в [ledger](VERIFICATION.md#block-1-editorial-readiness-and-evidence-2026-10-02). Новая native-компиляция и AE execution не заявляются.
 
 [ElasticGridFX transfer plan](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) добавляет scoped performance/release lessons в существующие блоки. Source snapshot закреплён; перенос в core главы и адаптация tools пока не выполнены. Новые SDK/native/AE результаты не заявляются.
+
+## Внешние источники — завершённый targeted review
+
+[Отчёт от 2026-10-02](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) закрепляет четыре source snapshots и выводы выбранных проверок. У secondary KB current-25.6 matrix выявлены расхождения; web guides также требуют per-member/version чтения. Полная построчная валидация внешних коллекций не заявляется.
+
+В core добавлены import preflight и provenance/invalidation уточнения, CEP manifest/library/bootstrap diagnostic chain, native source comparison и актуальная граница published UXP docs versus actual host proof. Синтаксис собственного import helper проверен; ошибочный upstream example воспроизведён syntax-only проверкой. Новые native/AE/CEP/UXP runtime результаты — NOT RUN. Блоки 2, 5 и 10 закрыты лишь в этих отдельных пунктах, остальные задачи остаются открыты.
 
 ## Current mission
 
