@@ -1,6 +1,6 @@
 # AE Developer Bible — editorial completion checklist
 
-Updated: **2026-10-01**
+Updated: **2026-10-02**
 
 Canonical writing rules: [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). This file tracks progress only.
 
@@ -257,4 +257,16 @@ Checked and reconciled as one logical block:
 
 ## Current next step
 
-**Section-by-section editorial completeness sweep.**
+**Блок 1 [плана завершения](COMPLETION-PLAN.md): единая редакционная готовность и evidence.**
+
+## Audit-based completion plan — 2026-10-02
+
+- [x] [Аудит](EDITORIAL-AUDIT-2026-10-02.md) и 16-block roadmap сохранены.
+- [x] [ElasticGridFX transfer tasks](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) привязаны к immutable source и целевым главам.
+- [ ] Устранить подтверждённые противоречия policy/evidence и CEP examples из аудита.
+- [ ] Исправить core/reference navigation и targeted tooling/CI findings.
+- [ ] Выполнить практические и source-review блоки 5–15; chapter-level progress фиксируется отдельно.
+- [ ] Перенести scoped ElasticGridFX lessons в соответствующих блоках; tool adaptation только после review.
+- [ ] Завершить block 16: editorial review, exact generated identity и freeze.
+
+Исторические отметки выше сохраняют дату и область прежних итераций. Их наличие не закрывает новые findings аудита.

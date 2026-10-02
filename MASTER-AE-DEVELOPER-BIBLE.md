@@ -34495,6 +34495,108 @@ The master list includes bundled entries that Adobe itself lists (for example Mo
 
 ---
 
+<!-- SOURCE: 22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md -->
+
+# План переноса опыта ElasticGridFX в Bible
+
+Дата: **2026-10-02**. Статус: **источники прочитаны; перенос в главы запланирован**. Часть [плана завершения](22-PROJECT-CASE-STUDIES/../COMPLETION-PLAN.md).
+
+Ретроспектива FSTR Stretch 0.9.3-perf.1 полезна как конкретный пример оптимизации native Effect без уменьшения качества и как пример ограниченных performance/release доказательств. Она дополняет core главы практическими случаями, но не устанавливает новые обязательные правила Bible и не подтверждает все продукты или версии AE.
+
+## Источник и identities
+
+Изучен documentation snapshot **`9d0162de64d01ceb41f6a1374a73544729ed0ec2`**:
+
+- [Ретроспектива](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/retrospective-0.9.3-perf.1.md).
+- [Обобщённый project know-how](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/AE_ENGINEERING_KNOWHOW.md).
+- Shipping source: `f611312bd7b76ebe5bc5f2bd8b48b44f50c0c761`.
+- Build ID: `EGFX-6147dc406abc596e7f2d1b60`; embedded version: 0.9.3 Develop Build 2.
+- Package/tag: 0.9.3-perf.1 / v0.9.3-perf.1; release target `cb429e1ffab06cd79cb0873ba8909b2a8369198d`.
+- Outer ZIP SHA-256: `a563f8e14961e19ee0740d5eb063c89e4bbec830ac1053d23fa09de02f2a6d14`.
+- Recorded host: AE25.6x101, macOS26.6.2, M1 Pro, 16 GiB; recorded candidate toolchain: Apple Clang21 / Rust1.98.1, arm64 release profile.
+
+Это identities из источника. В Bible они сохраняются как **PROJECT-REPORTED**, пока нет независимого повторения. Метку PROVEN исходного проекта нельзя автоматически преобразовать в Bible-owned RUNTIME-OBSERVED. Новая загрузка AE, сборка, установка и performance run в этой работе не выполнялись.
+
+## Что добавить
+
+| Урок | Куда добавить | Источник и граница | Проверяемый результат редакционного переноса |
+|---|---|---|---|
+| Сначала определить реально исполняемый render route | Performance architecture, profiling recipe, Effect anatomy | Plane entry points отличались от generic CPU renderer; instrumentation даёт attribution, не обычную скорость AE | Сценарий route → профиль → optimization target; запрет переносить timing другого path |
+| Exact separable-axis/Bicubic caching | SmartFX, pixel/color, MFR/GPU, performance | Axis computations и четыре source rows переиспользуются только для eligible mappings; general/exceptional cases сохраняют прежний path | Схема eligibility/fallback, неизменного порядка arithmetic, call-local scratch и проверок; source example только после отдельного source review |
+| Negative zero, NaN/Inf и нейтральные shortcuts | Pixels/color, render correctness, CPU/GPU equivalence | Первоначальный shortcut был rejected; исправленный candidate прошёл native byte comparisons с отдельной архитектурной областью | Отрицательный пример apparent identity ≠ byte identity; случаи signed zero/nonfinite и границы numerical policy |
+| Matched-toolchain parity control | Render correctness, build systems, compatibility | Старый artifact отличался в 29 channels на шести matrix frames; unchanged source rebuilt с matching toolchain даёт отдельное exact comparison | Две отдельные записи: original-artifact deltas и matched-toolchain comparison; причина старого расхождения не объявляется установленной |
+| Контракт export/decoder входит в identity сравнения | Render correctness, color, performance report | 32-bpc project экспортировался в straight RGBA16 PNG, decode независимый и calibrated | В template поля output precision/alpha/working space/decoder/calibration; encoded equality не называется native HDR/OCIO proof |
+| Раздельные performance метрики | Performance testing, profiling, performance report | Native median ≈12.062×; ordinary AE export ratio of medians ≈1.3507×; Preview — интервалы наблюдения | Заполненный пример с separate metrics, pair counts, median definition, warmup, outliers, cache/order/capture limitations |
+| Viewer resolution и Preview preset — разные состояния | Host verification, Custom UI, performance | Поздний Full readback не подтверждает preset прежней interval series; cache fill не равен first-playable latency | Таблица требуемых readbacks и наблюдений для каждого заявления; unknown preset остаётся unknown |
+| Exit0 не доказывает завершение рендера | Host verification, render automation, crash diagnostics | Launcher exit0 сопровождался 19/60 outputs в прерванном control run | Completion contract: expected frame coverage + decode + process/image identity; отдельные launcher/render/output statuses |
+| MFR requested не означает measured concurrency; non-reproduction не causal fix | MFR stress, crash diagnostics, evidence/acceptance | Исходный crash сохранён; bounded retries не повторили его, причина UNVERIFIED | Incident record отдельно от retry outcomes и user closure; запрещены speculative fixes и broad stability claims без evidence |
+| Native gesture, effect result, Undo и latency — разные доказательства | Custom UI, host verification, bug-report template | Guide displacement и Undo наблюдались в названном сценарии; failed automation delivery исключена; latency не измерена | Functional gesture test с before/after/Undo; separate latency criterion; helper permissions не входят в plugin installation |
+| Downloaded package и фактически loaded binary | macOS installation/debug, clean-machine acceptance, release artifacts | Quarantine retained, outer hash и loaded UUID проверены на существующем Mac; clean environment отдельно USER-REPORTED | Identity chain source → build → package → installed → loaded; controlled reinstall не называется clean-machine test |
+| Save/reopen, animated legacy project и принятие пользователем | Version compatibility, parameters, release notes, case study | Instrumented selected-frame/user-scene checks отдельно от пользовательского сообщения о других средах | Старые project/state/animation fixtures, scoped acceptance и указание, какие raw fixtures не предоставлены |
+
+Целевые главы находятся в [Performance architecture](22-PROJECT-CASE-STUDIES/../01-ARCHITECTURE/05-PERFORMANCE-ARCHITECTURE.md), [SmartFX](22-PROJECT-CASE-STUDIES/../02-EFFECT-PLUGINS/03-SMARTFX.md), [MFR](22-PROJECT-CASE-STUDIES/../02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md), [Pixels/color](22-PROJECT-CASE-STUDIES/../02-EFFECT-PLUGINS/06-COLOR-PIXELS.md), [Custom UI](22-PROJECT-CASE-STUDIES/../02-EFFECT-PLUGINS/09-CUSTOM-UI-DRAWBOT.md), [Testing](22-PROJECT-CASE-STUDIES/../10-TESTING/README.md), [Distribution](22-PROJECT-CASE-STUDIES/../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md), [Profiling recipe](22-PROJECT-CASE-STUDIES/../12-RECIPES/06-PROFILING.md), [Performance report](22-PROJECT-CASE-STUDIES/../13-TEMPLATES/PERFORMANCE-REPORT.md).
+
+## Primary project records для переноса
+
+Все ссылки закреплены на прочитанном snapshot:
+
+- [Optimization/failure history](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/performance-resume-2026-10-01.md).
+- [Native corrected comparison](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/performance-plane-corrected-comparison-2026-10-01.json).
+- [Exceptional-float comparison](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/performance-plane-nonfinite-comparison-2026-10-01.json).
+- [Host matrix and original-artifact limits](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/performance-host-matrix-2026-10-02.json).
+- [Ordinary export samples and limits](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/performance-host-render-2026-10-02.json).
+- [Preview intervals and uncertainties](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/performance-host-preview-intervals-2026-10-02.json).
+- [MFR incomplete-output incident](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/performance-host-mfr-2026-10-02.json).
+- [Bounded retry closure](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/mfr-closure-retry-2026-10-02.json).
+- [Native guide evidence](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/performance-host-guide-2026-10-02.json).
+- [Downloaded-candidate check](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/public-install-project-check-2026-10-02.json).
+- [Project validation](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/postrelease-project-validation-2026-10-02.json).
+- [User-reported release acceptance](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/release-user-acceptance-2026-10-02.json).
+
+Ретроспектива и know-how прочитаны полностью; основные JSON matrix/export/Preview/install/nonfinite/retry records просмотрены для сопоставления полей, scopes и ограничений. Все raw observations, private fixtures и прочие linked records независимо не повторялись. Перед написанием отдельного утверждения в главе читать целиком соответствующий первичный record; нельзя расширять его смысл по одному заголовку ретроспективы.
+
+## Confidence и принятый outcome
+
+Добавить в evidence chapter разделение трёх осей:
+
+1. Статус выполненного теста: PASS/FAIL/BLOCKED/NOT_RUN.
+2. Происхождение/уверенность: DOCUMENTED, SDK-CONTRACT-REVIEWED, PROJECT-REPORTED, RUNTIME-OBSERVED, RECONSTRUCTED; пользовательское сообщение обозначается USER-REPORTED явно.
+3. Решение: accepted/rejected/closed within scope, которое не меняет исходный статус или неустановленную причину отказа.
+
+Так можно сохранить «crash не воспроизведён в шести retries, пользователь закрыл investigation» без ложного вывода «причина устранена».
+
+## Чего не переносить как правило или доказанный факт Bible
+
+- «12× быстрее в AE», universal HDR/OCIO correctness и blanket MFR stability.
+- Exact first-playable/gesture-to-display latency: в источнике нет такого measurement.
+- Приписывание доли wall-time PNG encoding только по его наличию в sampled stack.
+- Общую рекомендацию отказаться от signing/notarization на основании project-specific ad-hoc release policy. Совместимость, техническая возможность установки и политика распространения — разные вопросы.
+- Project rules6.0.0 или central PR16 как автоматически принятую политику Bible; текущий редакционный guide сохраняет свой scope.
+- User projects, media, private crash logs и privileged helper setup как публичный sample.
+- Project PROVEN или user acceptance как независимо полученный Bible PASS.
+
+## Инструменты как кандидаты для adaptation
+
+На source snapshot существуют [render_observation.py](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/tools/render_observation.py), [live_identity.py](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/tools/live_identity.py), [perf_fixture_runner.py](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/tools/perf_fixture_runner.py).
+
+Планировать сначала review, затем решение reuse/adapt/do not transfer. Проверить dependencies, imports install_candidate/build identity utilities, output paths, OS assumptions, AE invocation, timeouts, restoration и licensing. `perf_fixture_runner` имеет execute mode с host calls; наличие inspect mode не делает весь tool read-only. В этой работе tools не запускались и не копировались в Bible.
+
+## Приёмка переноса
+
+- [x] Immutable source snapshot и identities записаны.
+- [x] Уроки сопоставлены с core chapters и блоками общего плана.
+- [x] Отрицательные результаты и ограничения включены в задачи.
+- [ ] Прочитать соответствующие primary records полностью перед написанием каждой темы.
+- [ ] Дополнить core главы в их логических блоках, согласовать recipes/templates.
+- [ ] Написать scoped ElasticGridFX case study после source/performance blocks.
+- [ ] Проверить tool candidates отдельно и записать transfer decision; копирование необязательно.
+- [ ] Проверить links, generated docs и evidence wording после каждого completed block.
+
+Полное повторение performance/release матрицы ElasticGridFX не является условием готовности Bible. Предмет этого дополнения — применимые методы, точная область project evidence и полезные failure examples.
+
+
+---
+
 <!-- SOURCE: 22-PROJECT-CASE-STUDIES/README.md -->
 
 # Практические кейсы — FSTR Line и AE Hot Loader
@@ -34608,6 +34710,11 @@ The master list includes bundled entries that Adobe itself lists (for example Mo
 До использования кода в эталонном примере фиксируем конкретный файл и коммит, проверяем относящиеся к нему тесты и происхождение материалов, записываем решение: переиспользовать / адаптировать / не переносить. Причина отказа тоже остаётся полезным результатом. Завершение обоих продуктов не является условием переноса отдельного проверенного решения.
 
 Результаты исходного проекта не закрывают host-gates Bible автоматически. После адаптации кода нужны собственные проверки на заявленной матрице. Неразрешённый SYNC-001 и исследовательский private loader остаются видимыми ограничениями, а не скрытыми зависимостями практической части.
+
+
+## ElasticGridFX — запланированный кейс
+
+[План переноса 0.9.3-perf.1](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) связывает exact sampling, performance layers, output calibration, bounded MFR investigation и release identity с core chapters. Сейчас зафиксированы источники и задачи; кейс и перенос инструментов ещё не завершены. Project-reported результаты не становятся независимым Bible PASS.
 
 
 ---
@@ -35092,6 +35199,13 @@ No source-project host result is promoted into Bible host verification. FSTR SYN
 
 # Changelog
 
+## Plan and source review — 2026-10-02
+
+- Published the editorial audit and concrete 16-block completion plan; findings remain open until their repair blocks are completed.
+- Added an immutable ElasticGridFX 0.9.3-perf.1 transfer plan: exact sampling, exceptional floats, matched-toolchain parity, output calibration, separate performance metrics, render completion, bounded MFR incidents and artifact identity.
+- Mapped these lessons to core chapters and acceptance criteria; preserved project-reported/user-reported limits. No product code, tools, SDK contracts or AE runtime results were changed.
+- Linked the audit and transfer plan through documentation navigation and reconciled the planning/status/source records.
+
 ## Editorial progress — 2026-10-01
 
 - **Editorial model correction:** AE Developer Bible is a knowledge base, not a plug-in QA program. The former mandatory build/host completion-gate model is superseded; compiler/host runs remain evidence for specific claims, not requirements for Bible completion.
@@ -35178,7 +35292,7 @@ No source-project host result is promoted into Bible host verification. FSTR SYN
 
 # AE Developer Bible — editorial completion checklist
 
-Updated: **2026-10-01**
+Updated: **2026-10-02**
 
 Canonical writing rules: [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). This file tracks progress only.
 
@@ -35435,136 +35549,457 @@ Checked and reconciled as one logical block:
 
 ## Current next step
 
-**Section-by-section editorial completeness sweep.**
+**Блок 1 [плана завершения](COMPLETION-PLAN.md): единая редакционная готовность и evidence.**
+
+## Audit-based completion plan — 2026-10-02
+
+- [x] [Аудит](EDITORIAL-AUDIT-2026-10-02.md) и 16-block roadmap сохранены.
+- [x] [ElasticGridFX transfer tasks](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) привязаны к immutable source и целевым главам.
+- [ ] Устранить подтверждённые противоречия policy/evidence и CEP examples из аудита.
+- [ ] Исправить core/reference navigation и targeted tooling/CI findings.
+- [ ] Выполнить практические и source-review блоки 5–15; chapter-level progress фиксируется отдельно.
+- [ ] Перенести scoped ElasticGridFX lessons в соответствующих блоках; tool adaptation только после review.
+- [ ] Завершить block 16: editorial review, exact generated identity и freeze.
+
+Исторические отметки выше сохраняют дату и область прежних итераций. Их наличие не закрывает новые findings аудита.
 
 
 ---
 
 <!-- SOURCE: COMPLETION-PLAN.md -->
 
-# План доведения AE Developer Bible до готовой редакции
+# План завершения AE Developer Bible
 
-Updated: **2026-10-01**
+Дата: 2 октября 2026 года. Основа: [аудит репозитория](EDITORIAL-AUDIT-2026-10-02.md) на `da625d129a2e508e9b6f24851e3300c1a3846ffa`.
 
-Canonical writing rules: [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). This file contains the roadmap, not a second rulebook.
+Канонические правила: [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). Этот файл задаёт roadmap, а не отдельный rulebook. Native baseline остаётся SDK **25.6 build 61**; ранее сохранённые 35/35 contracts и 39/39 cookbook call-sites не объявляются новой проверкой текущего плана.
 
-## Цель
+Цель — выпустить связную, точную и практически применимую редакцию для разработчика After Effects. Большая часть архитектурного и SDK-материала уже написана. Следует сохранить её, исправить подтверждённые несогласованности и добавить недостающие сквозные операции. Увеличение объёма и обязательная host-QA всех примеров не являются целями этого плана.
 
-AE Developer Bible должна стать **полной, точной и практической базой знаний по разработке для Adobe After Effects**.
+## Какой результат должен получить читатель
 
-Готовая редакция не обязана сама быть набором собранных plug-in binaries. Её задача — дать разработчику правильную архитектуру, version-sensitive контракты, workflows, ограничения, типичные ошибки, recipes и критерии проверки **его собственного продукта**.
+После чтения своего маршрута разработчик должен уметь:
 
-## Что не является условием готовности Bible
+1. Выбрать extension family и объяснить, почему она подходит задаче.
+2. Подготовить среду и найти нужный SDK sample/API.
+3. Повторить конкретную операцию по согласованным главе и source example.
+4. Определить владельца каждого ресурса, срок жизни и cleanup.
+5. Понимать threading, invalidation, failure и version boundaries.
+6. Составить проверку своего продукта с ожидаемым результатом и правильной областью доказательств.
+7. Найти источник любого критичного version-sensitive утверждения.
 
-Для завершения редакции **не требуется**:
+Для каждого core chapter в coverage tracker отмечать отдельно: полнота объяснения, практический сценарий, provenance, согласованность примеров, links. Статусы: complete / needs expansion / needs reconciliation / intentionally limited. Последний статус требует ясного объяснения, а не служит способом скрыть недописанный материал.
 
-- компилировать весь C++ из репозитория;
-- собирать Minimal Gain / SmartFX / MenuTool как отдельный QA-проект;
-- прогонять каждый source example внутри After Effects;
-- делать обязательный Windows build всех примеров;
-- подписывать/notarize/AuthentiCode демонстрационные binaries;
-- завершать весь research atlas встроенных эффектов;
-- превращать source recipes в коммерчески готовые plugins.
+## Порядок работ
 
-Если runtime/build evidence уже существует, Bible сохраняет его и аккуратно ограничивает выводы. Если его нет, Bible просто не заявляет этот runtime result.
+План содержит 16 логических блоков. Это рекомендуемый порядок, не обещание, что каждый блок займёт одну сессию. Слишком большой блок можно разделить по самостоятельным результатам. Каждую завершённую тему проверять и отчитывать отдельно в соответствии с EDITORIAL-GUIDE.
+
+| Очередь | Блок | Приоритет | Основной результат |
+|---|---|---|---|
+| 1 | Единая редакционная готовность и evidence | P1 | Устранены старые gates и unscoped compiler claims |
+| 2 | CEP protocol и failure paths | P1 | Глава, template и проверки используют один контракт |
+| 3 | Навигация и маршруты чтения | P1 | Core/reference доступны через согласованные переходы |
+| 4 | Проверки и генерация документации | P2 | Portable checks и source/generated identity прозрачны |
+| 5 | Источники и таблица версий | P2 | Version-sensitive claims имеют проверяемую опору |
+| 6 | Effect state и arbitrary data | P2 | Понятна эволюция сохраняемого состояния эффекта |
+| 7 | SmartFX пространства и времени | P2 | ROI и temporal dependencies объяснены на сценариях |
+| 8 | MFR, Compute Cache и GPU | P2 | Реализационные схемы согласованы с ownership и fallback |
+| 9 | Custom UI и audio | P2 | Точные bounded walkthroughs без выдуманных guarantees |
+| 10 | Scripting и expression rigs | P2 | Набор законченных automation recipes |
+| 11 | AEGP сквозные операции | P2 | Cookbook становится понятным маршрутом команды |
+| 12 | macOS от sample до пакета | P2 | Конкретный build/debug/distribution маршрут |
+| 13 | Windows от sample до пакета | P2 | Такой же практический уровень с Windows resource chain |
+| 14 | AEIO и Artisan walkthroughs | P2 | Обзоры связаны с exact SDK paths и callbacks |
+| 15 | Проверки продукта, рецепты и templates | P2 | Заполненный учебный пример и единая evidence vocabulary |
+| 16 | Финальная редактура и freeze | P1 перед выпуском | Согласованная редакция с проверенным manifest |
+
+## 1. Единая редакционная готовность и evidence
+
+**Файлы:** EDITORIAL-GUIDE, STATUS, COMPLETION-PLAN/CHECKLIST, VERIFICATION; Effect anatomy/SmartFX/MFR; macOS setup; cookbook VERIFICATION и code README; case studies.
+
+Исправить действующие требования «этап 5», Gates 4–9 и host-gates Bible. Разделить текущие редакционные обязанности, рекомендации QA продукта и исторические записи. В cookbook снять приписывание прежней компиляции текущим файлам; сохранить конкретные даты и исходные identities.
+
+Создать chapter-level tracker в существующей coverage/checklist системе: для каждой core главы записать конкретный пробел, результат и блок этого плана. STATUS должен показывать активный блок и завершённые результаты; план — зависимости; VERIFICATION — факты проверки.
+
+**Готово, когда:** в current guidance одна definition of done; исторический evidence не изменён по смыслу; нет необъяснённых действующих ссылок на отменённые обязательства; compiler/runtime claims привязаны к своим снимкам.
+
+## 2. CEP protocol и failure paths
+
+**Файлы:** `07-PANELS/01-CEP.md`, `15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md`, `12-RECIPES/05-HYBRID-PANEL-NATIVE.md`, `16-WORKING-TEMPLATES/cep-panel-bridge/*`, relevant VERIFICATION.
+
+Выбрать один учебный schema: `protocol/requestId/command/payload` и единые success/error envelopes. Устранить расхождение command/payload либо явно отделить разные примеры. Перенести parse в контролируемую error boundary, проверить тип и обязательные поля. Описать bootstrap error, malformed response, unsupported protocol и command failure. Исправить скрытие `JSON_UNAVAILABLE`.
+
+Разграничить request correlation, stale display rejection, порядок mutating commands и idempotency: отброшенный ответ не отменяет выполненное изменение. Добавить небольшой CEP manifest/bootstrap walkthrough, пути загрузки JSX и зависимость JSON/polyfill с provenance. Не притворяться, что skeleton уже является установленной extension.
+
+**Готово, когда:** глава и template согласованы; portable tests ловят три воспроизведённых отказа, Unicode/escaping и malformed envelopes; mutating command ordering описан; runtime остаётся RUNTIME-NOT-CLAIMED без нового host record.
+
+## 3. Навигация и маршруты чтения
+
+**Файлы:** `mkdocs.yml`, NAVIGATION, README, decision tree, section READMEs.
+
+Классифицировать 41 omitted thematic document: core, reference, SDK evidence, research, archive/generated. Добавить в menu Auxiliary Channels, Drawbot, reference guides и доступ к SDK source-review records; historical aliases допускается не показывать, но причина должна быть явной.
+
+Сделать три маршрута: первый Effect; automation tool/ScriptUI/CEP; native integration/AEGP. В каждом оставить короткую последовательность «читать → повторить → проверить», без пересказа всех глав. Заменить направления в decision tree на реальные ссылки. Проверить работу маршрутов по собранным HTML и полезность search.
+
+**Готово, когда:** каждый core/reference chapter достижим предсказуемо; NAVIGATION и site nav не расходятся; для omissions есть явные решения; новичок может пройти маршрут без угадывания файлов.
+
+## 4. Проверки и генерация документации
+
+**Файлы:** `scripts/check_native.py`, его tests, `scripts/build_docs.py`, workflows, requirements-docs.
+
+Канонизировать SDK root внутри manifest helper и покрыть macOS alias-path regression. Уточнить source-validation и generated-consistency lanes. Проверка source PR может собирать generated docs во временном staging; проверка frozen/generated revision должна запрещать stale MASTER/MANIFEST. Привязать результаты bot-regeneration к source SHA, который они представляют.
+
+Добавить целевые consistency tests: canonical CEP schema, незапланированное исчезновение core pages из nav, неподтверждённые текущие evidence labels. Не заменять редакторский review поиском ключевых слов. Зафиксировать зависимости сборки в разумной воспроизводимой форме; явно ограничить permissions, пересмотреть action pinning и сохранение checkout credentials.
+
+**Готово, когда:** исходный macOS тест проходит без TMPDIR workaround; generated drift обнаруживается в нужном lane; правила CI не создают ложных failures во время допустимой bot-regeneration; CI и отчёт называют точные SHA.
+
+## 5. Источники и таблица версий
+
+**Файлы:** SOURCES, environment/version chapters, SDK records, platform source review, CEP/UXP transition, NOTICE.
+
+Ввести компактную таблицу: claim group → exact source → review date → SDK/AE/OS boundary → evidence class. Добавить прямые source links рядом с версионными утверждениями. SDK baseline, host support, panel runtime и platform policy должны иметь разные колонки.
+
+Перепроверить debugger restrictions, macOS signing/notarization и Windows ARM64 по соответствующим источникам. Roadmap UXP сейчас согласуется с официальным announcement; перед freeze обновить его дату проверки и снова подтвердить actual AE availability. Если новый AE-specific contract недоступен, оставить planning status.
+
+Вынести решение владельца о лицензии собственного текста и примеров отдельным пунктом. После решения добавить LICENSE и сохранить права vendor material. Не выбирать условия за владельца автоматически.
+
+**Готово, когда:** для каждого критичного version-sensitive claim есть локально понятная source/identity граница; старые и later-version API не смешаны; неизвестные опубликованы явно; license decision получено либо неопределённость отмечена перед выпуском.
+
+## 6. Effect state и arbitrary data
+
+**Файлы:** Effect parameters, anatomy, memory/threading, compatibility, новое целевое дополнение об arbitrary data и связанный source example.
+
+Показать выбор parameter stream / arbitrary parameter / sequence state / transient cache. Для arbitrary data разобрать только подтверждённые target-SDK callbacks, ownership, copy/compare/interpolation/flatten/unflatten по фактическому контракту. Дать пример versioned payload без сериализации pointers, runtime locks и platform-sized structs.
+
+Связать disk IDs, изменение схемы, reset, старый проект, duplicate и unknown future version. Добавить одну согласованную таблицу изменения source, PiPL и metadata первого Effect — связать с существующим Minimal Gain.
+
+**Готово, когда:** разработчик может выбрать хранилище и составить migration/failure policy; каждое точное API имя подтверждено; пример маркирован source example и связан с объяснением.
+
+## 7. SmartFX пространства и времени
+
+**Файлы:** SmartFX, pixels/color, recipes, relevant source reference.
+
+Дополнить существующую сильную главу двумя сценариями: spatial filter с halo вокруг ROI и temporal effect с несколькими checkout IDs. Показать входной запрос, доступную область, max result, origin/downsample/pixel aspect и boundary policy на конкретных числах.
+
+Разделить layer/comp/effect time, rational time и выбор соседних samples. Не добавлять motion-blur/time-remap гарантии без источника. Дать ownership/error sequence для pre-render snapshot и отсутствующего layer input. Проверки продукта перечислить отдельно от результатов книги.
+
+**Готово, когда:** два сценария можно разобрать по таблице/схеме без догадок; зависимости видимы хосту; math и exact call shape не смешаны; ROI/cache/alpha объяснения не противоречат друг другу.
+
+## 8. MFR, Compute Cache и GPU
+
+**Файлы:** MFR, GPU, performance architecture, platform GPU guides, CPU/GPU recipe и SDK reference.
+
+Сохранить существующую модель state/receipt. Добавить walkthrough cache key → compute → acquisition → checkin и failure/cancellation. Объяснить content identity, padding/serialization, limits и cache ownership на одном примере.
+
+GPU walkthrough: capability → per-device setup → per-frame eligibility → actual GPU world format → render → synchronization/cleanup → teardown. Дать decision table для fallback и memory/device failures строго по подтверждённым contracts. Сопоставить source paths SDK sample с каждой стадией; оптимизация kernel не является доказательством ускорения AE.
+
+**Готово, когда:** reader видит полный source-level маршрут, границы shared/per-device/per-frame state и тестируемую policy; backend support не выводится только из enum или наличия source branch.
+
+## 9. Custom UI и audio
+
+**Файлы:** Drawbot/audio chapters, `20-REFERENCE-IMPLEMENTATIONS/Effect/CustomUI-Drawbot`, SDK source review.
+
+Для UI дополнить acquisition skeleton одним простым draw path с точной borrowed/owned resource таблицей; click/drag и coordinate conversion связать с параметром, сохраняемым в project. Async manager разобрать как жизненный цикл запроса и cancellation, если exact contracts позволяют; иначе честно дать неполную карту и неизвестные.
+
+Для audio дать конкретный stateless processing example на разрешённом формате и contract map setup/render/setdown. DSP math отделить от неизученного host scheduling. Отсутствие bundled AUDIO_RENDER sample не компенсировать выдуманной implementation.
+
+**Готово, когда:** draw и audio pathways конкретнее общих советов; точные operations sourced; intentionally limited области явно перечислены; никакой runtime claim не появляется без evidence.
+
+## 10. Scripting и expression rigs
+
+**Файлы:** `06-SCRIPTING/*`, `15-COMMUNICATION/05-SCRIPT-TO-AE.md`, JSX/ScriptUI templates, новые recipe страницы по необходимости.
+
+Добавить законченные операции: создать comp и layers; импортировать и настроить footage; поставить keys с interpolation/ease; создать text/mask/marker; настроить render queue с reacquire после изменений; построить небольшой expression rig и проверить resolving/error state.
+
+File/Folder, permissions, Unicode/encoding, settings persistence и scheduled chunks раскрыть отдельными короткими сценариями. Применять ES3-compatible host syntax. В каждом примере определить prerequisites, capabilities, undo boundary, structural invalidation, partial failure и expected output.
+
+**Готово, когда:** хотя бы один полный сценарий существует для каждого заявленного базового automation workflow; все fragments согласованы с scripting guide и версии названы; UI shell отделён от operation layer.
+
+## 11. AEGP сквозные операции
+
+**Файлы:** `03-AEGP/*`, cookbook project/items/comp/layer/render/queue, MenuTool и foundation.
+
+Связать существующие recipes в три walkthroughs: menu command с late target resolution; project mutation с cleanup и undo; frame request с receipt и bounded async lifetime. Подчеркнуть callback/host-safe boundary и state invalidation.
+
+Разделить overview, exact cookbook и reusable source, чтобы один контракт не редактировался независимо в трёх местах. Старые compatible suite generations оставить с причиной и областью; optional newer API не должны переопределять baseline.
+
+**Готово, когда:** пользовательский trigger доведён до результата и cleanup; callback exception boundaries явны; explanations и source совпадают; historical compiler evidence scoped.
+
+## 12. macOS от sample до пакета
+
+**Файлы:** `08-MACOS/*`, first-effect/load-debug recipes, install/signing distribution.
+
+Написать практический маршрут exact sample → project settings → resources → universal slices → development signing → load/debug → symbol archive → release staging. Показать диагностические команды и ожидаемые виды результатов без притворных successful outputs.
+
+Debugger instructions отдельно version-gated. Любую re-sign host процедуру ограничить development copy и объяснить её prerequisites. Distribution: inner-to-outer signing, final artifact, notary submission/log, staple where supported, clean install/rollback, existing plugin preservation.
+
+**Готово, когда:** читатель понимает конкретные файлы/настройки и может локализовать compile/resource/load/signing failure; инструкции не требуют менять рабочую AE installation.
+
+## 13. Windows от sample до пакета
+
+**Файлы:** `09-WINDOWS/*`, load-debug recipes, installer/signing distribution.
+
+Разобрать sample project и PiPL conversion/resource/link chain; include/lib paths, export, CRT/toolset, x64/ARM64 и matching dependencies. Дать команды проверки итогового artifact и диагностики load failures. Разделить architecture compile capability и фактическую host support.
+
+Signing/installer walkthrough включает digest/timestamp/verify, Adobe path discovery, update ownership, locked file, rollback и сохранение PDB. Не обещать native ARM64 host support по успешной сборке.
+
+**Готово, когда:** Windows маршрут столь же конкретен, как macOS, но отражает свои resource/ABI/install contracts; version-sensitive facts проверены.
+
+## 14. AEIO и Artisan walkthroughs
+
+**Файлы:** `04-AEIO`, `05-ARTISAN`, corresponding `14-*` главы и `16/20` guides.
+
+Основной массив здесь уже подробный: не переписывать его целиком. Для каждой family добавить одну последовательность чтения exact SDK sample: регистрация → init → operation → partial failure/cancel → persistence → teardown. Указать где sample кончается и начинается production recommendation.
+
+Уменьшить независимое дублирование overview/deep/reference, оставив явные обязанности страниц и links. Source maps не превращать в требование создать новый importer/renderer для выпуска книги.
+
+**Готово, когда:** callbacks/resources traced по источникам; sample-specific shortcut не выдаётся за контракт; incomplete runtime directions честно ограничены.
+
+## 15. Проверки продукта, рецепты и templates
+
+**Файлы:** `10-TESTING`, `11-DISTRIBUTION`, `12-RECIPES`, `13-TEMPLATES`, source reference READMEs.
+
+Добавить один заполненный учебный комплект: spec → compatibility matrix → correctness fixture → failure report → performance report → release notes. Учебные числа маркировать illustrative, не выдавать за выполненные тесты.
+
+Для performance отдельно описать preparation throughput, actual render throughput, RAM Preview и displayed playback. Для correctness различать effect world, export и display/color pipeline. Метрики и tolerances задавать до измерений.
+
+Все six existing recipes связать с конкретным example/API route. Унифицировать NOT_RUN/BLOCKED и evidence scopes, убрать ненужные повторения общих QA правил.
+
+**Готово, когда:** templates можно заполнить по одному цельному примеру; reader понимает, что и почему проверять; книга не заявляет демонстрационный PASS вместо runtime evidence.
+
+## 16. Финальная редактура и freeze
+
+**Файлы:** все изменённые главы плюс README, STATUS, CHECKLIST, COVERAGE, SOURCES, NAVIGATION, CHANGELOG, MASTER/MANIFEST.
+
+Провести cross-chapter review по tracker. Выравнять русскую объясняющую прозу, не менять API names. Расширить glossary терминами из core chapters. Проверить snippets, source references, code links, anchors, licensing/provenance и маршруты чтения.
+
+Обновить research date и версию только после фактической проверки. Сгенерировать MASTER/MANIFEST на конкретном source SHA, проверить no-drift и strict build. Отчёт freeze должен называть source revision, generated revision при наличии отдельного bot commit, выполненные проверки и intentionally limited topics.
+
+**Готово, когда:** все обязательные acceptance criteria ниже выполнены. Публикация выполняется в рамках отдельного разрешённого действия; этот план сам по себе её не осуществляет.
+
+## Единая приёмка каждого блока
+
+1. Прочитать вместе объясняющие главы, рецепты, source example и evidence records темы.
+2. Закрыть конкретные противоречия и пробелы без расширения scope до нового продукта.
+3. Проверить exact source для новых version-sensitive claims; неизвестное не заменять предположением.
+4. Обновить tracker, STATUS, CHANGELOG и relevant VERIFICATION.
+5. Выполнить generated-doc и strict-link проверки, а при исправлении поведения инструмента — целевые регрессии.
+6. Зафиксировать changes согласно принятому repository workflow; сообщить block, findings, checks, точный HEAD и следующий блок.
+7. Остановиться перед следующей темой, как требует EDITORIAL-GUIDE.
 
 ## Критерии готовой редакции
 
-### 1. Coverage
+- Подтверждённые P1 findings аудита закрыты.
+- Для каждой core главы есть результат chapter-level review; каждый applicable вопрос editorial checklist раскрыт содержательно.
+- Есть сквозной маршрут первого Effect и сквозной маршрут automation/panel tool.
+- Critical version-sensitive claims имеют источник, дату и версионную границу.
+- Chapters/recipes/templates используют согласованные identities, protocols и ownership semantics.
+- Историческая компиляция и runtime observations не приписаны текущим source snapshots.
+- Core/reference навигация полна, archive/generated omissions объяснены.
+- Committed MASTER/MANIFEST воспроизводимы на фиксируемой редакции; strict docs build проходит.
+- Условия использования authored material определены либо нерешённый вопрос владельца явно отражён до публикации.
+- Research appendices не создают скрытых обязательств завершить все built-in effects или исходные проекты.
 
-Покрываются extension selection, native families, scripting/panels, memory/threading, platforms, debugging/testing, packaging/distribution, recipes и templates.
+## Что развивать после основной редакции
 
-### 2. Source accuracy
+Reverse-engineering atlas, новые real-project case studies, host-observed examples, дополнительные SDK generations и готовые sample project bundles полезны, но развиваются отдельными версиями. Полноценный AE UXP guide добавляется после появления доступного AE-specific contract, а не по roadmap других Adobe hosts.
 
-Для native API:
+**Первый рекомендуемый шаг: блок 1.** Он устраняет двусмысленность цели и доказательств, после чего остальные блоки можно дописывать по одной понятной системе готовности.
 
-~~~text
-exact SDK header/sample
-→ Bible explanation
-→ source-shaped recipe/example
-~~~
 
-Текущий baseline: Adobe After Effects SDK **25.6 build 61**.
+## Дополнение из ElasticGridFX
 
-Real SDK audit 2026-10-01:
+Ретроспектива FSTR Stretch **0.9.3-perf.1** изучена на immutable documentation snapshot `9d0162de64d01ceb41f6a1374a73544729ed0ec2`. Shipping source `f611312bd7b76ebe5bc5f2bd8b48b44f50c0c761`, build `EGFX-6147dc406abc596e7f2d1b60` и release target — разные identities.
 
-- 35/35 required contracts;
-- 39/39 cookbook call-sites;
-- 0 required parser diagnostics.
+[План переноса с источниками, ограничениями и критериями](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) является частью этого roadmap. Это запланированное расширение глав, не уже завершённый перенос и не новый runtime PASS.
 
-Это достаточная contract-level проверка редакционной точности текущих native глав. Compiler helpers могут использоваться дополнительно разработчиком, но не являются completion gate Bible.
+| Блок | Что добавить из ретроспективы |
+|---|---|
+| 1 и 5 | Confidence, test status и принятое решение как отдельные оси; source/binary/package/loaded identity; immutable provenance |
+| 6 и 7 | Сохранение параметров/анимации и legacy project; separable mapping, Bicubic rows и fallback без изменения arithmetic |
+| 8 | Attribution реального plane path до оптимизации; call-local scratch; exceptional-float parity; границы MFR evidence |
+| 9 | Native gesture → наблюдаемое изменение → Undo; viewer labels, preview cache и display latency как разные наблюдения |
+| 11 | Render completion по полному набору decoded outputs, а не exit0; queue-chain/readback и границы async completion |
+| 12 и 13 | Проверка фактически загруженного артефакта; downloaded package и reversible update; Windows переносится только после проверки своих контрактов |
+| 15 | Matched-toolchain controls; независимый calibrated decode; отдельные native/export/cache-fill/playback метрики; bounded crash investigation |
+| 16 | Scoped case study ElasticGridFX и согласованный freeze: документация не создаёт новый host PASS; tool adaptation остаётся отдельной задачей |
 
-### 3. Evidence discipline
+В блок 15 включить **заполненный реальными project-reported данными пример** наряду с illustrative forms: native-only ≈12.062×, ordinary AE export ≈1.3507× и screenshot-bracketed Preview intervals. У каждого значения назвать workload, representation, scope и limitations; не публиковать общий вывод «12× быстрее в AE».
 
-Bible различает:
+После блоков 5, 8 и 15 написать отдельный ElasticGridFX case study в разделе 22 и связать его с core chapters. Независимая повторная host-QA не обязательна для такого PROJECT-REPORTED переноса. Adaptation `render_observation.py`, `live_identity.py`, `perf_fixture_runner.py` требует проверки зависимостей, лицензии, side effects и host assumptions; код инструментов сейчас не копируется.
 
-- DOCUMENTED;
-- SDK-CONTRACT-REVIEWED;
-- PROJECT-REPORTED / RUNTIME-OBSERVED;
-- RECONSTRUCTED;
-- recommendation/design guidance.
 
-Отсутствие host-run не должно превращаться в искусственный TODO, если текст не заявляет host-observed результат.
+---
 
-### 4. Practical usefulness
+<!-- SOURCE: EDITORIAL-AUDIT-2026-10-02.md -->
 
-Каждый практический раздел должен объяснять:
+# Аудит AE Developer Bible
 
-- когда использовать технологию;
-- когда её не использовать;
-- architecture/lifecycle;
-- основные entry points/suites/contracts;
-- ownership/lifetime/threading;
-- platform/version caveats;
-- production workflow;
-- debugging/testing guidance;
-- частые ошибки;
-- related recipes/templates.
+Дата: 2 октября 2026 года. Репозиторий: https://github.com/ios3kov/AAE-Developer-Bible. Проверенный HEAD: `da625d129a2e508e9b6f24851e3300c1a3846ffa`.
 
-### 5. Editorial consistency
+Библия имеет сильную техническую основу и широкий охват. До готовой редакции её отделяют согласование доказательств и примеров, более конкретные учебные сценарии и полноценная навигация. Главная задача — превратить уже написанную базу знаний в связный практический справочник. Требование собрать и запустить каждый демонстрационный плагин для этого не нужно.
 
-README, STATUS, coverage, source-review records, recipes и examples не должны противоречить друг другу.
+## Объём и границы проверки
 
-### 6. Research appendices
+Выполнены полная инвентаризация дерева, структурный проход по всем разделам, проверка редакционных правил, статусов, источников, навигации, генератора, четырёх workflows и переносимых тестов. Углублённо проверены ключевые главы Effect/SmartFX/MFR, scripting/CEP, ownership, cookbook, foundation и связанные примеры. Это аудит репозитория и редакционной готовности; он не означает построчную независимую сертификацию всех API-утверждений во всех 204 документах.
 
-Разделы 21–22 дают дополнительную практическую ценность и могут развиваться после выпуска core Bible. Полный каталог всех bundled effects не блокирует core edition.
+В дереве 204 Markdown-документа без сгенерированного MASTER, около 167 тысяч слов по подсчёту whitespace-токенов. В тематических разделах 00–22 находится 191 документ. Manifest содержит 270 записей. Объём сам по себе не является оценкой качества.
 
-### 7. Editorial release
+SDK 25.6 build 61 в эту сессию не предоставлен и не проверялся заново. Результаты 35/35 contracts и 39/39 call-sites — сохранённые результаты прежнего аудита с указанными ограничениями. AE, native platform builds, Windows, signing и notarization в текущем аудите не запускались. Для оценки документации это допустимая граница, которую следует сохранить явно.
 
-Перед фиксацией редакции:
+## Что уже сделано хорошо
 
-- проверить navigation и links;
-- проверить provenance/licensing notes;
-- пересобрать generated MASTER/manifest;
-- выполнить strict documentation build;
-- зафиксировать research date;
-- обновить changelog/version.
+- Правильное разделение Effect, AEGP, AEIO, Artisan, ScriptUI, CEP, native panels и BlitHook.
+- Внятная иерархия источников и baseline SDK 25.6. Исторические suite generations отделены от текущих во многих ключевых главах.
+- Подробные модели ownership, lifetime, структурной invalidation, cleanup и threading. Undo не выдаётся за автоматический rollback.
+- SmartFX разделяет ROI, результат, maximum result, checkout IDs, параметры и буферы. MFR не сводится к включению флага.
+- Source review сохраняет обнаруженные расхождения headers/samples вместо молчаливого копирования.
+- Исследовательские кейсы отделяют private loader, project-reported результаты и общедоступные SDK-контракты.
+- Тесты инструментов включают отрицательные сценарии и запреты на ложный успех. Генерация документации воспроизводится на проверенном HEAD.
 
-## Этапы
+## Подтверждённые проблемы
 
-| Этап | Содержание | Статус |
+Приоритет P1 означает исправить до фиксации редакции; P2 — значимое улучшение практической полноты; P3 — сопровождение. Это редакционные приоритеты, а не шкала опасности коммерческого продукта.
+
+### 1. Старый completion model остался в действующих главах
+
+**P1, высокая уверенность.** `EDITORIAL-GUIDE.md` и текущий план отменяют обязательную сборку/host-QA примеров, но:
+
+- `02-EFFECT-PLUGINS/01-ANATOMY.md:119` требует сборку Minimal Gain и gates этапа 5;
+- `02-EFFECT-PLUGINS/03-SMARTFX.md:110` называет host-готовность SmartFX Copy незакрытым этапом 5;
+- `02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md:204` ссылается на прежние обязательства плана;
+- `08-MACOS/01-XCODE-SETUP.md:137` оставляет full host-cycle acceptance открытым без ясного разграничения;
+- `22-PROJECT-CASE-STUDIES/README.md:7,111` сохраняет старые этапы/Gates и host-gates Bible.
+
+Читатель получает два разных определения готовности книги. Исправление: в действующих инструкциях заменить старые обязанности книги на рекомендации проверки продукта; исторические записи сохранить с датой и отметкой superseded. Не удалять честные NOT_RUN из исторического evidence.
+
+### 2. CEP-протокол расходится между главой и шаблоном
+
+**P1, высокая уверенность, воспроизведено без AE.** В `15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md:54` поле версии называется `version`; в `16-WORKING-TEMPLATES/cep-panel-bridge/host/index.jsx:17` ожидается `protocol`. Команды и payload также различаются: глава показывает `renameSelectedLayer/name`, шаблон — `renameSelected/prefix`.
+
+Разные независимые иллюстрации допустимы, но README шаблона прямо заявляет совпадение schema с communication chapter, а `VERIFICATION.md` утверждает, что именно это расхождение уже исправлено. Передача запроса с `version` в шаблон воспроизводимо возвращает `UNSUPPORTED_VERSION`.
+
+Исправление: один канонический учебный протокол либо явное объяснение разных независимых примеров. Все утверждения о выполненном согласовании должны соответствовать фактическому тексту.
+
+### 3. CEP-пример не соблюдает описанную обработку ошибок
+
+**P1, высокая уверенность, воспроизведено без AE.**
+
+- В главе `15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md:96` `JSON.parse(raw)` стоит перед `try`. Неверный JSON выбрасывает исключение вместо error envelope. Версия запроса в этом фрагменте не проверяется.
+- Шаблон host dispatcher возвращает `JSON_UNAVAILABLE` с `requestId:null` (`host/index.jsx:7`). UI отбрасывает его как stale response (`index.js:36`), и пользователь не видит bootstrap-ошибку.
+- Отбрасывание устаревшего ответа не отменяет уже выполненную mutation. Повторные нажатия rename могут несколько раз добавить prefix; эта граница недостаточно объяснена рядом с примером.
+
+Исправление: определить bootstrap/transport/protocol/domain errors, проверять parse и schema, показывать ошибку текущего callback даже без валидного host request ID по явно заданной политике, документировать порядок mutating commands и повторное выполнение. Добавить небольшие реальные contract tests именно этих отказов.
+
+### 4. Историческая компиляция приписана текущим исходникам
+
+**P1, высокая уверенность.** `17-NATIVE-SUITE-COOKBOOK/VERIFICATION.md:5,36` утверждает, что все шесть recipes и current source syntax/type-checked. `17-NATIVE-SUITE-COOKBOOK/code/README.md` уже корректно ограничивает compiler evidence прежним снимком. После него менялись EffectSuite и render-queue source.
+
+Исправление: указать дату, исходный SHA/хэши проверенных файлов и историческую область compiler evidence; текущие source examples обозначить своим действительным уровнем доказательности. Новая компиляция нужна только для нового заявления о компиляции, а не как условие готовности книги.
+
+### 5. Строгая сборка не обеспечивает полноту навигации
+
+**P1, высокая уверенность.** Из 191 тематического Markdown-документа 41 не указан прямо в `mkdocs.yml`. Среди них `08-AUXILIARY-CHANNELS.md`, `09-CUSTOM-UI-DRAWBOT.md`, SDK source-review главы и все 11 вложенных reference guides. Часть доступна через внутренние ссылки и поиск; отсутствие в меню не означает полную недоступность.
+
+`validation.nav.omitted_files: info` позволяет строгой сборке пройти. Не каждый omitted historical/generated file следует добавлять в меню: требуется явная классификация core/reference/research/archive. `NAVIGATION.md`, MkDocs nav и вводные README нужно согласовать. В decision tree направления показаны преимущественно как code-пути, а не переходы.
+
+### 6. Локальный portable test падает на macOS
+
+**P2, высокая уверенность.** Из 78 Python-тестов `scripts/test_*.py` один падает: `test_sdk_header_manifest_is_deterministic_and_sensitive`. `sdk_header_manifest()` разрешает реальные пути файлов, но в `relative_to(examples)` передаёт неканонический корень (`scripts/check_native.py:69,75`). На macOS `/var/...` и `/private/var/...` относятся к одному месту, но не равны как строки путей.
+
+С `TMPDIR=/private/tmp` тот же тест проходит. CLI предварительно делает `examples.resolve()`; выявленный отказ относится к helper/test-пути и переносимости набора проверок, а не доказывает отказ обычного CLI. Исправление: канонизация корня в самом helper и проверка alias-path случая.
+
+### 7. CI проверяет пересборку, но не запрещает stale generated files
+
+**P2, высокая уверенность.** Validate сначала перезаписывает MASTER/MANIFEST, затем собирает docs. Он не вызывает `build_docs.py --check` до изменения файлов и не проверяет resulting diff. Поэтому сборка подтверждает генерируемость, но сама по себе не совпадение committed generated files с исходниками.
+
+На текущем HEAD совпадение подтверждено отдельно. Regenerate docs пишет в main, повторяет попытки от latest main и имеет concurrency — это оправданный механизм, а не автоматически дефект. В последних 10 публичных runs Validate успешно завершён для source-parent `3fd9a3e`; отдельного Validate для generated commit `da625d1` в этой выборке нет. Между ними изменены только MASTER/MANIFEST. Не переносить статус CI на другой SHA без указания этой границы.
+
+Исправление: два явно различимых результата — source validation и generated consistency. Публикация generated edition должна быть связана с конкретным проверенным source SHA. Не превращать допустимый промежуток до bot-regeneration в ложное падение всех source PR.
+
+### 8. Практические главы неодинаково конкретны
+
+**P2, редакционная оценка.** Native ownership/cookbook сильнее, чем scripting, panel bootstrap и некоторые platform recipes. Например, CEP chapter показывает layout, но не минимальный согласованный `manifest.xml`, bootstrap, JSON/polyfill dependency и точный путь диагностики первого запуска. Object-model глава объясняет хорошие границы, но даёт мало законченных операций с keyframes/import/render queue.
+
+Первый эффект описан как правильная последовательность фаз, однако читателю приходится самостоятельно собирать таблицу конкретных изменений source/PiPL/metadata и связывать её с Minimal Gain. macOS debugging значительно короче Windows debugging и опирается на version-sensitive рекомендации.
+
+Критерий исправления — не увеличение числа слов, а воспроизводимый учебный сценарий: вход → подготовка → вызовы → владение → отказ → ожидаемый результат → связанные файлы.
+
+### 9. Ряд сложных тем только упомянут
+
+**P2, предложения по покрытию, не утверждения о дефектах API.** Нужен отдельный цельный материал об arbitrary data и эволюции сохранённых данных эффекта; о пространстве/времени Effect inputs, temporal checkout, ROI для фильтра с соседями; о scripting keyframes/ease/expressions, File/Folder и Unicode; о bounded async frame requests, завершении и cancellation в Custom UI.
+
+GPU, audio и Drawbot честно сохраняют ограничения, но многие операции описаны на уровне схемы. Их можно дополнить exact source maps, небольшими source examples или маркированным псевдокодом без выдуманных runtime guarantees. Там, где contract не установлен, конкретность не должна достигаться угадыванием.
+
+### 10. Provenance не одинаково удобно проверять
+
+**P2, высокая уверенность в структуре, полнота внешних фактов проверена частично.** SDK records содержат файлы, hashes и line ranges. Многие scripting/platform главы ссылаются на “current guide” без локальной связи с датированным источником. Центральный SOURCES существует, но читателю сложно сопоставить отдельное утверждение с конкретной страницей и границей версии.
+
+Основной CEP/UXP roadmap перепроверен по официальному Adobe announcement: план AE beta к ноябрю 2026, AE CEP milestone декабря 2028 и общий переход конца 2029 согласуются с источником. Это planning facts, а не подтверждённый AE UXP API. Adobe CEP 12 cookbook подтверждает AEFT и отдельные host/runtime versions. Полная перепроверка Apple/Microsoft/debugger/ARM64 claims в эту сессию не выполнена; доступ к содержательному тексту Apple notarization page через использованный web-reader оказался ограничен.
+
+Источники: [Adobe UXP announcement](https://blog.developer.adobe.com/en/publish/2026/09/investing-in-the-future-of-creative-cloud-extensibility-uxp-comes-to-our-flagship-applications), [официальный CEP 12 cookbook](https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_12.x/Documentation/CEP%2012%20HTML%20Extension%20Cookbook.md), [Microsoft SignTool](https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool).
+
+### 11. Условия переиспользования собственных примеров не определены явно
+
+**P2, структурный факт.** В checkout нет LICENSE. NOTICE описывает независимость проекта и права Adobe, но не задаёт условия использования собственного текста и authored snippets. Для справочника с reusable templates это практически значимая неопределённость.
+
+Предложение: владелец выбирает условия для текста и собственного кода; отдельно сохраняются vendor licenses/provenance. Аудит не выбирает лицензию за владельца и не даёт юридического заключения.
+
+### 12. Hardened CI и языковая редактура
+
+**P3.** Статический scanner отметил 10 action references без full SHA и четыре checkout со стандартным сохранением credentials. Это задачи усиления supply chain, не доказательство эксплуатации. Для read-only jobs можно явно ограничить permissions и отключить сохранение Git credentials; для regeneration authenticated Git необходим.
+
+Scanner-кандидат «auth route без rate limit» в `acx_channel_gate.py:282` ложный: это offline argparse CLI, а не HTTP endpoint. `contents:write` у regeneration оправдан его задачей.
+
+Основной язык принят русским, однако многие новые разделы написаны английской прозой. GLOSSARY краткий, отсутствуют многие термины ownership/receipt/ROI/timebase. Нужна единая редактура, которая оставляет API names точными и устраняет повторяющиеся общие предупреждения там, где достаточно ссылки на каноническую главу.
+
+## Карта полноты
+
+| Направление | Оценка по прочитанным материалам | Работа до редакции |
 |---|---|---|
-| **A. Scope & taxonomy** | структура, decision tree, типы расширений, платформы | **готово** |
-| **B. Core technical coverage** | Effect/AEGP/AEIO/Artisan/scripting/panels/platform/testing/distribution | **основной массив написан** |
-| **C. SDK/source accuracy** | source reviews, real SDK 25.6 contract audit, errata/version boundaries | **baseline готов** |
-| **D. Consistency & practical sweep** | пройти главу за главой, убрать противоречия, дополнить слабые места, проверить recipes/templates | **текущий этап** |
-| **E. Research appendices** | atlas/case studies | **ongoing, non-blocking** |
-| **F. Editorial release** | links/nav/provenance/generated docs/changelog/freeze | **после D** |
+| 00–01 выбор и архитектура | Сильная основа | Маршруты новичок/Effect/automation; canonical state/version tables |
+| 02 Effect | Сильные базовые контракты | Старые gates; arbitrary data; temporal/spatial recipes; concrete GPU/UI/audio paths |
+| 03 AEGP | Хорошая основа | Несколько сквозных commands и lifecycle/error source maps |
+| 04–05 AEIO и Artisan | Подробные обзоры | Согласовать уровни overview/deep/reference; bounded source walkthrough |
+| 06 scripting | Хорошие правила, мало операций | Keyframes, import/render queue, text/masks, files, expression rigs |
+| 07 panels | Хорошая архитектура | Полный CEP bootstrap; согласованный протокол; transport failures |
+| 08–09 platforms | Хорошие workflows | Конкретные build/resource/debug recipes; source refresh; одинаковая глубина |
+| 10–13 testing, release, recipes, templates | Сильная методология | Один заполненный сквозной пример вместо только пустых форм; reader-product wording |
+| 14–15 integrations/communication | Детально, есть дублирование | Canonical ownership/flow links и устранение CEP contradictions |
+| 16–20 source/reference/SDK | Полезная основа | Навигация; exact evidence identity; chapter/example contract checks |
+| 21–22 исследования | Хорошая дисциплина границ | Убрать obsolete completion dependencies; развивать независимо |
 
-## Текущий приоритет
+## Выполненные проверки
 
-**Продолжать писать и редактировать Bible.**
+| Проверка | Результат | Граница вывода |
+|---|---|---|
+| `build_docs.py --check` | PASS | Committed MASTER/MANIFEST совпадают с генератором |
+| Независимые SHA-256, 270 manifest rows | PASS, 0 mismatches | Совпадение файлов с manifest |
+| Генерация и `mkdocs build --strict` | PASS | Навигационные omissions разрешены как INFO |
+| Python `scripts/test_*.py` | FAIL, 78 tests, 1 error | 77 без ошибки; macOS alias-path defect |
+| Повтор одного падавшего теста с canonical TMPDIR | PASS | Подтверждает конкретную причину, не заменяет исходный FAIL |
+| SDK inventory/validation fixtures | PASS, 17 tests | Synthetic fixtures, не новый real SDK audit |
+| JSX depth portable suite | PASS, 13 tests | Без AE |
+| JSX edge/export portable suite | PASS, 22 tests | Без Adobe renderer |
+| Withdrawn Mega entry point | PASS | Запрещённые побочные действия не выполняются |
+| Protocol C++ headers | PASS | Portable compile/run |
+| Foundation C++ stub tests | PASS | Stub behavior, не real SDK/host |
+| macOS runner shell syntax | PASS | Только shell syntax |
+| PowerShell parser | NOT_RUN | `pwsh` отсутствует |
+| CEP three failure reproductions | CONFIRMED | Node VM с заглушками, AE не используется |
+| Static code audit | REVIEW_REQUIRED | Confirmed CI hardening + один false positive |
+| GitHub Validate | PASS на `3fd9a3e` | Source-parent; generated HEAD отдельно проверен локально |
+| Новая SDK/native/AE/signing matrix | NOT_RUN | Не требуется для редакционного аудита |
 
-Следующая работа:
+Последний просмотренный Validate: https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/36885767413. Regeneration: https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/36885767510.
 
-1. пройти основные разделы по единому шаблону полноты;
-2. найти слабые/короткие главы;
-3. найти старые или конфликтующие формулировки;
-4. связать source-review findings с основными главами;
-5. привести examples/recipes к единой evidence vocabulary;
-6. завершить финальный editorial audit.
+## Решение
 
-[COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md) является текущим редакционным чеклистом.
+Фиксировать завершённую редакцию пока рано: есть подтверждённые противоречия между правилами, главами, примерами и evidence. База достаточно развита, чтобы завершать её последовательными редакционными блоками без переписывания с нуля.
+
+Сначала закрыть findings 1–5, затем наполнить практические маршруты, выровнять provenance и завершить freeze. Дополнительные SDK/runtime эксперименты нужны только для спорных утверждений, которые нельзя честно изложить на существующем уровне доказательности.
+
+Исходники и tracking documents репозитория не изменены. Локальные generated docs/site созданы в игнорируемых каталогах; рабочее дерево Git после проверок чистое. Подробный следующий порядок работ дан в [плане завершения](COMPLETION-PLAN.md).
 
 
 ---
@@ -36343,6 +36778,13 @@ See [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md).
 - [Reference implementations and guides](20-REFERENCE-IMPLEMENTATIONS/README.md)
 
 
+## Audit and completion roadmap — 2026-10-02
+
+- [Редакционный аудит](EDITORIAL-AUDIT-2026-10-02.md)
+- [План завершения](COMPLETION-PLAN.md)
+- [ElasticGridFX transfer plan](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md)
+
+
 ---
 
 <!-- SOURCE: NOTICE.md -->
@@ -36519,17 +36961,30 @@ Used only where the rendered HTML guide appears inconsistent; actual Adobe SDK h
 The v0.4 tooling deliberately does **not** bundle Adobe SDK headers. Exact inventories are generated from the SDK headers present on the developer's own machine; those headers remain the compile-time source of truth.
 
 
+## Project evidence reviewed — 2026-10-02
+
+ElasticGridFX / FSTR Stretch 0.9.3-perf.1: [retrospective](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/retrospective-0.9.3-perf.1.md), [project know-how](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/AE_ENGINEERING_KNOWHOW.md). Immutable documentation snapshot: `9d0162de64d01ceb41f6a1374a73544729ed0ec2`; shipping source differs and is recorded separately.
+
+Classification: **PROJECT-REPORTED**; user acceptance is **USER-REPORTED**. These are scoped product observations, not Adobe API contracts or a new Bible-owned host test. [Transfer plan and primary records](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md).
+
+
 ---
 
 <!-- SOURCE: STATUS.md -->
 
 # Status
 
-Updated: **2026-10-01**
+Updated: **2026-10-02**
 
 ## Canonical editorial policy
 
 All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). The mandatory workflow is: finish one logical block → commit/validate → report status to the user → stop before the next block.
+
+## План завершения после аудита — 2026-10-02
+
+Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). Следующий блок: **единая редакционная готовность и evidence**. Сам аудит и фиксация плана не исправляют перечисленные в нём дефекты глав/примеров.
+
+[ElasticGridFX transfer plan](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) добавляет scoped performance/release lessons в существующие блоки. Source snapshot закреплён; перенос в core главы и адаптация tools пока не выполнены. Новые SDK/native/AE результаты не заявляются.
 
 ## Current mission
 
@@ -37285,3 +37740,14 @@ Historical sample generations remain workflow evidence only. Legacy migration no
 One does not prove the other.
 
 **Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new PICA provider/consumer or Effect↔AEGP host run is claimed.
+
+
+## Audit-based roadmap and ElasticGridFX source review — 2026-10-02
+
+Planning input Bible HEAD: `da625d129a2e508e9b6f24851e3300c1a3846ffa`. ElasticGridFX documentation snapshot: `9d0162de64d01ceb41f6a1374a73544729ed0ec2`.
+
+Read the current-cycle retrospective and AE_ENGINEERING_KNOWHOW; inspected selected primary JSON records for identity, performance/quality scope and retained limitations. Added the 16-block completion roadmap and immutable, chapter-mapped transfer tasks. Published the prior editorial audit as a dated input; its findings remain open.
+
+**Evidence level:** documentation/source review and planning. No new SDK audit, native plugin build, AE render/Preview, install, signing, MFR fix or performance acceptance is claimed. Tool candidates were inspected as future adaptations, not copied or executed. Parent-source historical host records remain PROJECT-REPORTED; human acceptance stays USER-REPORTED.
+
+Validation for this documentation change: generated docs rebuilt; `build_docs.py --check`, `mkdocs build --strict`, `git diff --check` and existence checks for all 17 distinct immutable source paths **PASS** locally. GitHub Validate is evaluated separately on the pushed source SHA; no historical green run is reused as current evidence. These documentation checks do not close the previously recorded macOS tooling-test defect.

@@ -556,3 +556,14 @@ Historical sample generations remain workflow evidence only. Legacy migration no
 One does not prove the other.
 
 **Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. No new PICA provider/consumer or Effect↔AEGP host run is claimed.
+
+
+## Audit-based roadmap and ElasticGridFX source review — 2026-10-02
+
+Planning input Bible HEAD: `da625d129a2e508e9b6f24851e3300c1a3846ffa`. ElasticGridFX documentation snapshot: `9d0162de64d01ceb41f6a1374a73544729ed0ec2`.
+
+Read the current-cycle retrospective and AE_ENGINEERING_KNOWHOW; inspected selected primary JSON records for identity, performance/quality scope and retained limitations. Added the 16-block completion roadmap and immutable, chapter-mapped transfer tasks. Published the prior editorial audit as a dated input; its findings remain open.
+
+**Evidence level:** documentation/source review and planning. No new SDK audit, native plugin build, AE render/Preview, install, signing, MFR fix or performance acceptance is claimed. Tool candidates were inspected as future adaptations, not copied or executed. Parent-source historical host records remain PROJECT-REPORTED; human acceptance stays USER-REPORTED.
+
+Validation for this documentation change: generated docs rebuilt; `build_docs.py --check`, `mkdocs build --strict`, `git diff --check` and existence checks for all 17 distinct immutable source paths **PASS** locally. GitHub Validate is evaluated separately on the pushed source SHA; no historical green run is reused as current evidence. These documentation checks do not close the previously recorded macOS tooling-test defect.

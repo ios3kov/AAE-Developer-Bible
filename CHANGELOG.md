@@ -1,5 +1,12 @@
 # Changelog
 
+## Plan and source review — 2026-10-02
+
+- Published the editorial audit and concrete 16-block completion plan; findings remain open until their repair blocks are completed.
+- Added an immutable ElasticGridFX 0.9.3-perf.1 transfer plan: exact sampling, exceptional floats, matched-toolchain parity, output calibration, separate performance metrics, render completion, bounded MFR incidents and artifact identity.
+- Mapped these lessons to core chapters and acceptance criteria; preserved project-reported/user-reported limits. No product code, tools, SDK contracts or AE runtime results were changed.
+- Linked the audit and transfer plan through documentation navigation and reconciled the planning/status/source records.
+
 ## Editorial progress — 2026-10-01
 
 - **Editorial model correction:** AE Developer Bible is a knowledge base, not a plug-in QA program. The former mandatory build/host completion-gate model is superseded; compiler/host runs remain evidence for specific claims, not requirements for Bible completion.

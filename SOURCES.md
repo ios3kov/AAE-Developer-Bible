@@ -155,3 +155,10 @@ Used only where the rendered HTML guide appears inconsistent; actual Adobe SDK h
   https://ae-plugins.docsforadobe.dev/intro/sample-projects/
 
 The v0.4 tooling deliberately does **not** bundle Adobe SDK headers. Exact inventories are generated from the SDK headers present on the developer's own machine; those headers remain the compile-time source of truth.
+
+
+## Project evidence reviewed — 2026-10-02
+
+ElasticGridFX / FSTR Stretch 0.9.3-perf.1: [retrospective](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/retrospective-0.9.3-perf.1.md), [project know-how](https://github.com/ios3kov/ElasticGridFX/blob/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs/AE_ENGINEERING_KNOWHOW.md). Immutable documentation snapshot: `9d0162de64d01ceb41f6a1374a73544729ed0ec2`; shipping source differs and is recorded separately.
+
+Classification: **PROJECT-REPORTED**; user acceptance is **USER-REPORTED**. These are scoped product observations, not Adobe API contracts or a new Bible-owned host test. [Transfer plan and primary records](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md).

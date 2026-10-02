@@ -14,6 +14,7 @@ nav:
   - Sources: SOURCES.md
   - Verification: VERIFICATION.md
   - Coverage: FINAL-COVERAGE-AUDIT.md
+  - Editorial audit 2026-10-02: EDITORIAL-AUDIT-2026-10-02.md
   - Completion plan: COMPLETION-PLAN.md
   - Completion checklist: COMPLETION-CHECKLIST.md
   - Reference implementations: 20-REFERENCE-IMPLEMENTATIONS/README.md
@@ -188,3 +189,5 @@ nav:
   - 22-PROJECT-CASE-STUDIES:
       - "Практические кейсы — FSTR Line и AE Hot Loader": 22-PROJECT-CASE-STUDIES/README.md
       - "Reuse audit — 2026-10-01": 22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md
+
+      - "ElasticGridFX transfer plan — 2026-10-02": 22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md

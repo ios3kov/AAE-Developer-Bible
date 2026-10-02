@@ -178,3 +178,10 @@
 - [Verification results and commands](VERIFICATION.md)
 - [Coverage matrix](FINAL-COVERAGE-AUDIT.md)
 - [Reference implementations and guides](20-REFERENCE-IMPLEMENTATIONS/README.md)
+
+
+## Audit and completion roadmap — 2026-10-02
+
+- [Редакционный аудит](EDITORIAL-AUDIT-2026-10-02.md)
+- [План завершения](COMPLETION-PLAN.md)
+- [ElasticGridFX transfer plan](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md)

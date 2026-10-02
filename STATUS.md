@@ -1,10 +1,16 @@
 # Status
 
-Updated: **2026-10-01**
+Updated: **2026-10-02**
 
 ## Canonical editorial policy
 
 All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). The mandatory workflow is: finish one logical block → commit/validate → report status to the user → stop before the next block.
+
+## План завершения после аудита — 2026-10-02
+
+Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). Следующий блок: **единая редакционная готовность и evidence**. Сам аудит и фиксация плана не исправляют перечисленные в нём дефекты глав/примеров.
+
+[ElasticGridFX transfer plan](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) добавляет scoped performance/release lessons в существующие блоки. Source snapshot закреплён; перенос в core главы и адаптация tools пока не выполнены. Новые SDK/native/AE результаты не заявляются.
 
 ## Current mission
 
