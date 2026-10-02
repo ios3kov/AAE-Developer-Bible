@@ -6,6 +6,12 @@ It records what was actually reviewed, compiled, observed or not run so the text
 
 The authoritative editorial readiness criteria are in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md).
 
+## Как читать исторические записи — уточнение 2026-10-02
+
+Разделы ниже сохраняют даты, исходные source identities, выполненные проверки и NOT RUN своей итерации. Названия Gates и упоминания следующего этапа описывают прежний процесс; обязательная build/host модель отменена [EDITORIAL-GUIDE](EDITORIAL-GUIDE.md). Актуальные задачи находятся в [плане](COMPLETION-PLAN.md) и [поглавном трекере](CHAPTER-COMPLETION-TRACKER.md), а не выводятся из старых фраз «gates remain open».
+
+Повторная portable-проверка FSTR уже выполнена в записи Gate 3A ниже. Исторический OPEN render-queue enum finding позже исправлен на source level; это не runtime PASS. SDK audit и CI результаты относятся к указанным в них source snapshots/runs и не автоматически подтверждают текущий HEAD.
+
 ---
 
 ## Gate 3 post-close consistency correction — 3D Channel Extract (2026-10-01)
@@ -169,7 +175,9 @@ That iteration expanded Effect anatomy and SmartFX and added an auxiliary-channe
 
 The 13 recorded translation-unit checks include two forwarding entry files and a foundation-header probe. These historical results are not repeated by the editorial reviews above.
 
-`scripts/materialize_sdk_examples.py` provides exact local sample shells for all six gaps. `scripts/host_cycle.py` installs a built bundle and optionally invokes `aerender`, but intentionally reports UI load/unload and MFR stress as pending.
+**Уточнение идентичности — 2026-10-02:** в сохранённой записи этого compiler baseline отсутствуют exact tested source SHA и per-translation-unit hashes. Результат сохранён как исторически сообщённый; документационный commit не принимается за identity реально проверенного source tree. Этот baseline не подтверждает компиляцию нынешних examples/recipes, включая исправления EffectSuite и render-queue от 2026-10-01. Для нового утверждения о текущем source нужен отдельный идентифицированный compiler report.
+
+`scripts/materialize_sdk_examples.py` предоставляет sample shells для адаптации reference-кода. `scripts/host_cycle.py` может устанавливать построенный bundle и запускать `aerender`; UI load/unload и MFR stress он сам не подтверждает. Это вспомогательные инструменты проверки продуктов, не незакрытые этапы Библии.
 
 ## Reproduce portable checks
 
@@ -567,3 +575,19 @@ Read the current-cycle retrospective and AE_ENGINEERING_KNOWHOW; inspected selec
 **Evidence level:** documentation/source review and planning. No new SDK audit, native plugin build, AE render/Preview, install, signing, MFR fix or performance acceptance is claimed. Tool candidates were inspected as future adaptations, not copied or executed. Parent-source historical host records remain PROJECT-REPORTED; human acceptance stays USER-REPORTED.
 
 Validation for this documentation change: generated docs rebuilt; `build_docs.py --check`, `mkdocs build --strict`, `git diff --check` and existence checks for all 17 distinct immutable source paths **PASS** locally. GitHub Validate is evaluated separately on the pushed source SHA; no historical green run is reused as current evidence. These documentation checks do not close the previously recorded macOS tooling-test defect.
+
+## Block 1 — editorial readiness and evidence (2026-10-02)
+
+Входной Bible HEAD: `f9011267526553c39819b86f986627dfdc506ece`. Изменены документация, navigation config и generated artifacts; executable source, SDK bytes и host environment не изменялись.
+
+Выполнена сверка editorial policy, текущего плана/checklist/status, legacy references в Effect/SmartFX/MFR/macOS, Cookbook и связанных source guides. Active “этап 5”/host-test-pending labels заменены scoped product-validation guidance и RUNTIME-NOT-CLAIMED. Dated SDK/reuse records получили пояснения исторического процесса; их source identities, исходные findings и NOT RUN сохранены.
+
+Старый compiler baseline от 2026-09-30 не содержит exact tested source SHA или per-file hashes. Его сообщённый PASS сохранён; current-source compilation claims сняты, включая Cookbook, SmartFX и Drawbot guides. Source-review commit не назначается задним числом identity компиляции. FSTR rerun уже подтверждён исторической записью Gate 3A; в этой итерации он не повторялся.
+
+Добавлен [chapter tracker](CHAPTER-COMPLETION-TRACKER.md): 127 core pages, пять отдельных осей и конкретные remaining results по блокам. Проверка охвата сопоставляет список ссылок с фактическими core Markdown paths; отсутствие/дубли core rows недопустимы. Трекер задаёт рабочую очередь, а не выдаёт новую техническую сертификацию всех страниц.
+
+По вопросу пользователя о существующих аналогах выполнен публичный поиск и прочитаны entry pages C++/scripting guides, Adobe CEP Resources и README `pushREC/after-effects-sdk-kb`. Близкий публичный KB отмечен кандидатом для сравнения в блоке 5, без утверждения о его техническом качестве и без копирования материала. Полный comparative audit в этой итерации не выполнен.
+
+**Local validation: PASS** — generated docs/manifest rebuilt; `build_docs.py --check`, `mkdocs build --strict`, `git diff --check`; exact coverage/uniqueness check для 127 core rows; новые ledger anchors проверены в generated HTML. Все ранее записанные source hashes/commit IDs в изменённых ledger/source records сохранены; dated SDK/reuse records получили только additive context. GitHub Validate и Regenerate docs проверяются отдельно по фактически опубликованному source SHA; старые зелёные runs не используются вместо них.
+
+**Evidence boundary:** documentation/process consistency only. Новая exact-SDK compilation, linked plug-in, AE execution, MFR/GPU acceptance, signing/install или независимое повторение проектных runtime результатов — NOT RUN. Подтверждённые CEP defects, navigation omissions и macOS alias-path tooling regression остаются в блоках 2–4.

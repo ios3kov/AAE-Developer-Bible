@@ -1,6 +1,6 @@
 # SmartFX pass-through reference
 
-Status: **source implementation / SDK 25.6 macOS syntax-checked / runtime result not claimed**.
+Status: **SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED**. SDK contract basis: 25.6 build 61; historical compiler evidence is scoped below.
 
 SmartFxMfr.cpp is intentionally a small pass-through reference with SmartFX support. It does **not** currently declare MFR support.
 
@@ -93,12 +93,12 @@ Required before setting PF_OutFlag2_SUPPORTS_THREADED_RENDERING:
 - memory trend;
 - lock review.
 
-## Verification command
+## Проверка собственного продукта
 
-Use scripts/check_native.py against the exact SDK for syntax/type checks, then compile/link in the SDK project and run host fixtures.
+Если этот source example используется в продукте, применяйте scripts/check_native.py к его точному source snapshot и SDK, затем проверяйте compile/link и необходимые host fixtures. Это путь получения доказательств для продукта, а не обязательный этап готовности документации.
 
 Record the host result in VERIFICATION/evidence; do not replace NOT RUN with PASS after syntax checking.
 
 ## Verification boundary
 
-Current evidence is syntax/type level for the supplied SDK baseline. Host ROI/pixel/MFR acceptance remains open.
+The [2026-09-30 compiler record](../../../VERIFICATION.md#recorded-baseline-2026-09-30) lacks an exact tested source identity. It is retained as historical evidence and does not establish current-source compilation. This reference explains source/contract behavior without claiming AE ROI, pixel or MFR execution. Product-validation scenarios above apply to a separately identified product build.

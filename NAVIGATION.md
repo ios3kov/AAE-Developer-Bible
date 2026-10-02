@@ -184,4 +184,5 @@
 
 - [Редакционный аудит](EDITORIAL-AUDIT-2026-10-02.md)
 - [План завершения](COMPLETION-PLAN.md)
+- [Поглавный трекер — 127 core pages](CHAPTER-COMPLETION-TRACKER.md)
 - [ElasticGridFX transfer plan](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md)

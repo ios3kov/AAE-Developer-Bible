@@ -1,12 +1,12 @@
 # Custom UI / Drawbot reference
 
-Status: **acquisition skeleton / SDK 25.6 macOS syntax-checked / runtime result not claimed**.
+Status: **SOURCE EXAMPLE — acquisition skeleton / RUNTIME-NOT-CLAIMED**. SDK contract basis: 25.6 build 61.
 
 EventSkeleton.cpp intentionally stops after obtaining the drawing reference. It does not draw a path, text, icon or control.
 
 ## Purpose
 
-The skeleton proves the outer event/acquisition shape without pretending a partial Drawbot implementation is finished.
+The skeleton illustrates the outer event/acquisition shape; drawing and interaction remain outside this source example.
 
 ~~~text
 PF_Cmd_EVENT
@@ -84,7 +84,7 @@ Before drawing define:
 
 Do not infer coordinates from one display setup.
 
-## Acceptance path
+## Product-validation path
 
 Implement incrementally:
 
@@ -100,4 +100,4 @@ Implement incrementally:
 
 ## Verification boundary
 
-Syntax checking only proves declarations/types. This remains a skeleton until it visibly draws and its resource/event lifecycle passes in the target AE host.
+This source example stops at acquisition; it does not draw or claim host interaction. The [historical compiler record](../../../VERIFICATION.md#recorded-baseline-2026-09-30) lacks exact tested source identity and cannot establish compilation of the current skeleton. To claim drawing/resource/event behavior for a product, implement those paths and record their execution on the identified target AE build. The bounded acquisition example is valid editorial material without that product result.

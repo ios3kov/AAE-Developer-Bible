@@ -1,6 +1,6 @@
 # GPU effect reference path
 
-Status: **SDK sample workspace: Effect/SDK_Invert_ProcAmp / host GPU-test pending**.
+Status: **SDK sample workspace: Effect/SDK_Invert_ProcAmp / RUNTIME-NOT-CLAIMED**.
 
 Materialize the exact licensed SDK sample:
 
@@ -121,4 +121,4 @@ A Universal macOS plug-in with a one-architecture nested GPU/helper dependency i
 
 ## Verification boundary
 
-The reference remains host GPU-test pending. Materializing the SDK sample and compiling it does not prove the modified product kernel, fallback or performance.
+This reference explains an SDK sample workspace without claiming GPU execution. Materializing the SDK sample and compiling it does not prove a modified product kernel, fallback or performance. Those claims need results for the identified product artifact/backend/device; their absence is an evidence boundary for this guide.

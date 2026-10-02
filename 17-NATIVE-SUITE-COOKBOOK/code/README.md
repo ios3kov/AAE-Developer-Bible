@@ -34,6 +34,6 @@ This closes the **source-level argument-selection defect**. It does **not** prov
 
 ## Verification label
 
-**Evidence boundary:** historical SDK 25.6 syntax/type evidence exists for an earlier source snapshot. Current recipes are SOURCE EXAMPLES / SDK-CONTRACT-REVIEWED where noted; Bible does not claim runtime results unless a separate runtime record exists. The render-queue enum defect is corrected at source level.
+**Evidence boundary:** the historical SDK 25.6 syntax/type record from 2026-09-30 lacks exact tested source identity. It cannot establish current-source compilation; later EffectSuite and render-queue source corrections were not covered by that recorded run. Current recipes are SOURCE EXAMPLES / SDK-CONTRACT-REVIEWED where noted, with RUNTIME-NOT-CLAIMED. The render-queue enum defect is corrected at source level.
 
 Команда и результаты: [VERIFICATION.md](../../VERIFICATION.md). Сохраните relative includes к `19-NATIVE-CODE-FOUNDATION` или перенесите helpers вместе с recipes. Host callbacks, вызывающие recipes, должны иметь exception boundary.

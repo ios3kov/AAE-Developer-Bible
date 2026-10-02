@@ -2,7 +2,7 @@
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Suites in that SDK:** `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`.
-**Verification level:** SDK source-reviewed; cookbook code was previously syntax/type-checked on macOS, but this editorial revision is not a new native build or AE host test.
+**Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. Исторический compiler result от 2026-09-30 не содержит exact tested source identity и не подтверждает компиляцию текущих recipes; границы — в [матрице evidence](VERIFICATION.md).
 
 В AEGP значение, параметр эффекта, transform property, marker, mask outline и многие другие свойства представлены через **stream**. `AEGP_StreamRefH` — ссылка на host object; `AEGP_StreamValue2` — отдельное полученное значение со своим lifetime.
 

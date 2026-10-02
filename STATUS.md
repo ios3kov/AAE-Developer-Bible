@@ -8,7 +8,17 @@ All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL
 
 ## План завершения после аудита — 2026-10-02
 
-Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). Следующий блок: **единая редакционная готовность и evidence**. Сам аудит и фиксация плана не исправляют перечисленные в нём дефекты глав/примеров.
+Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). **Блок 1 — единая редакционная готовность и evidence: выполнен.** Следующий содержательный блок: **CEP protocol и failure paths**. Его подтверждённые дефекты пока не исправлены.
+
+Результат блока 1:
+
+- В active chapters/source guides убраны устаревшие этапы обязательной build/host приёмки Bible; product-validation scenarios сохранены с правильной областью.
+- Исторический compiler PASS от 2026-09-30 больше не присваивается нынешним recipes/reference sources: exact tested source identity в старой записи отсутствует.
+- SDK-review records и evidence ledger объясняют исторические Gates; результаты, хэши и NOT RUN своей итерации сохранены.
+- Case-study overview исправлен: independent FSTR portable rerun уже выполнен для pinned snapshot.
+- [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) охватывает 127 core pages, пять осей готовности и конкретные результаты следующих блоков.
+
+Локальные документационные проверки **PASS**; результаты GitHub CI читаются отдельно по опубликованному source SHA. Проверки и ограничения фиксируются в [ledger](VERIFICATION.md#block-1-editorial-readiness-and-evidence-2026-10-02). Новая native-компиляция и AE execution не заявляются.
 
 [ElasticGridFX transfer plan](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) добавляет scoped performance/release lessons в существующие блоки. Source snapshot закреплён; перенос в core главы и адаптация tools пока не выполнены. Новые SDK/native/AE результаты не заявляются.
 
@@ -72,7 +82,7 @@ Historical filenames containing “Gate 4” are retained for stable links/histo
 - Scripting/ScriptUI/CEP communication architecture.
 - macOS/Windows build, debugging, signing and packaging guidance.
 - Test/evidence/release methodology.
-- CEP protocol reconciliation.
+- Historical CEP field-name reconciliation; remaining envelope/error-path defects are scheduled in block 2.
 - Render-queue enum correction.
 - 3D Channel Extract historical classification correction.
 - FSTR Line / AE Hot Loader reuse audit.
@@ -181,12 +191,11 @@ Completed as one native-service/bridge/migration block:
 
 ## Current editorial TODO
 
-1. Sweep every main chapter for completeness against the editorial checklist.
-2. Find underdeveloped/too-short sections and expand them.
-3. Reconcile recipes/source examples with the latest explanatory chapters.
-4. Review dated public facts before edition freeze.
-5. Complete cross-link/provenance audit.
-6. Freeze and publish the next coherent documentation edition.
+1. Complete block 2: CEP chapter/template contract and controlled failures.
+2. Complete block 3: navigation omissions and three reader routes.
+3. Complete block 4: alias-path tooling regression and generated identity checks.
+4. Follow blocks 5–15 and update each affected row in the chapter tracker.
+5. Complete block 16: source/link/provenance sweep and edition freeze.
 
 ## Research tracks
 
@@ -198,6 +207,7 @@ They are **appendices, not blockers**. Full reverse engineering of every bundled
 
 - [Evidence ledger](VERIFICATION.md)
 - [Coverage matrix](FINAL-COVERAGE-AUDIT.md)
+- [Chapter completion tracker](CHAPTER-COMPLETION-TRACKER.md)
 - [Editorial completion plan](COMPLETION-PLAN.md)
 - [Editorial checklist](COMPLETION-CHECKLIST.md)
 

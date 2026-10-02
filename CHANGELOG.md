@@ -1,5 +1,13 @@
 # Changelog
 
+## Completion block 1 — 2026-10-02
+
+- Reconciled active chapter/reference evidence labels with the editorial policy; reader-product validation scenarios remain scoped to their product claims.
+- Removed current-source compiler claims based on the 2026-09-30 record, whose exact tested source identity is missing; retained its historical reported results.
+- Added dated context to older SDK reviews and reuse audit, preserving source hashes/findings/NOT RUN. Corrected the stale FSTR rerun TODO.
+- Added a chapter tracker covering all 127 core pages across explanation, scenario, provenance, source-example consistency and links; mapped concrete remaining results to the 16-block roadmap.
+- Updated status, coverage, checklist and dependencies. CEP failures, navigation gaps and the macOS alias-path tooling defect remain assigned to their later blocks.
+
 ## Plan and source review — 2026-10-02
 
 - Published the editorial audit and concrete 16-block completion plan; findings remain open until their repair blocks are completed.

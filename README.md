@@ -35,7 +35,7 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 4. датированные исследовательские наблюдения;
 5. реконструкция и архитектурные рекомендации — только с явной маркировкой.
 
-Для текущей редакции реальный Adobe After Effects SDK **25.6 build 61** сверён по обязательному контрактному baseline: **35/35 required contracts** и **39/39 cookbook call-sites** разрешаются в нужных suite generations. Это проверка точности документации и source examples, а не требование собрать Bible как приложение.
+Контрактная опора редакции — реальный Adobe After Effects SDK **25.6 build 61**. [Сохранённый exact-header audit](18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md) и later consistency correction в [ledger](VERIFICATION.md#current-suite-manifest-correction) фиксируют **35/35 required contracts** и **39/39 cookbook call-sites** для рассмотренных снимков. Эти результаты не являются новой проверкой каждого текущего файла или требованием собрать Bible как приложение.
 
 ## Как читать уровни доказательности
 
@@ -46,6 +46,8 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 - **RECONSTRUCTED** — вывод восстановлен по evidence и не выдаётся за публичный контракт.
 
 Отсутствие runtime evidence у source example означает только **«Bible не заявляет этот runtime result»**, а не «Bible обязана теперь собрать и протестировать этот пример».
+
+Работа над следующей редакцией ведётся по [плану](COMPLETION-PLAN.md). [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) содержит конкретные оставшиеся результаты для всех 127 core pages и не смешивает их с историческими compiler/runtime записями.
 
 ## Главный принцип
 

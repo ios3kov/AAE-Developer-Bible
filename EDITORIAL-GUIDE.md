@@ -1,6 +1,6 @@
 # AE Developer Bible — Editorial Guide
 
-Updated: **2026-10-01**
+Updated: **2026-10-02**
 
 This is the **canonical writing and editing policy** for AE Developer Bible.
 
@@ -186,6 +186,16 @@ A conclusion derived from evidence/reverse engineering. Never present it as a do
 ## RUNTIME-NOT-CLAIMED
 
 Bible explains a source/API pattern but does not assert host execution. This is a valid final editorial state, not an automatic TODO.
+
+## Evidence identity and historical records
+
+Compiler and runtime results belong to the source/artifact that was actually checked. A usable record identifies the date, source commit or file hashes, SDK/compiler or AE build, platform, commands/scenario and result. For a binary result, record the tested artifact identity separately from the documentation commit.
+
+An older PASS does not transfer to modified code. If a historical report lacks source identity, preserve its reported result and mark the identity gap; do not infer the tested source from the commit that published the report. Current code remains SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED unless matching evidence exists.
+
+Dated source reviews retain their original hashes, ranges, findings and NOT RUN results. Add a dated correction when a later review changes a conclusion or planning rule. Historical references to stages or Gates describe the old process; current work is tracked in [the completion plan](COMPLETION-PLAN.md) and [the chapter tracker](CHAPTER-COMPLETION-TRACKER.md).
+
+In active chapter/example guidance, use RUNTIME-NOT-CLAIMED instead of an unexplained “host test pending/required” label. Product-validation scenarios must say which reader-product claim they test. They do not become mandatory Bible tasks.
 
 ---
 

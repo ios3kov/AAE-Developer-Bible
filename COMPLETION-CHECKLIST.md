@@ -38,6 +38,8 @@ Bible готова как редакция, когда читатель може
 - [x] Source examples не называются готовыми binaries.
 - [x] Отсутствие собственного host-run не считается незакрытым completion task Bible.
 - [ ] Финальным проходом проверить старые главы на устаревшие verification labels.
+- [x] Блок 1: убрать active host-test-pending labels и legacy completion stages; dated records снабдить пояснениями исторического процесса.
+- [x] Блок 1: объяснить missing source identity compiler baseline от 2026-09-30 и снять current-source compilation claims.
 
 ## D. Chapter completeness
 
@@ -57,6 +59,8 @@ Bible готова как редакция, когда читатель може
 - [ ] sources/version boundary.
 
 Этот пункт закрывается **редакционным проходом по главам**, а не сборкой примеров.
+
+[Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) содержит все 127 core pages: пять независимых осей, конкретный следующий результат и ведущий блок плана. Начальные E/R не отменяют прежние source reviews и не означают, что каждая строка содержит подтверждённый дефект. Полное закрытие осей выполняется в соответствующих блоках и перед freeze.
 
 ## Editorial sweep progress — 2026-10-01
 
@@ -257,15 +261,17 @@ Checked and reconciled as one logical block:
 
 ## Current next step
 
-**Блок 1 [плана завершения](COMPLETION-PLAN.md): единая редакционная готовность и evidence.**
+**Блок 2 [плана завершения](COMPLETION-PLAN.md): CEP protocol и failure paths.** Блок 1 выполнен; проверки и scope результата записаны в ledger.
 
 ## Audit-based completion plan — 2026-10-02
 
 - [x] [Аудит](EDITORIAL-AUDIT-2026-10-02.md) и 16-block roadmap сохранены.
 - [x] [ElasticGridFX transfer tasks](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) привязаны к immutable source и целевым главам.
-- [ ] Устранить подтверждённые противоречия policy/evidence и CEP examples из аудита.
+- [x] Блок 1: устранить подтверждённые противоречия policy/evidence; сохранить исторические границы результатов.
+- [x] Блок 1: создать поглавный трекер и указать зависимости плана.
+- [ ] Блок 2: исправить подтверждённые CEP schema/error-path defects.
 - [ ] Исправить core/reference navigation и targeted tooling/CI findings.
-- [ ] Выполнить практические и source-review блоки 5–15; chapter-level progress фиксируется отдельно.
+- [ ] Выполнить практические и source-review блоки 5–15; progress фиксируется в поглавном трекере.
 - [ ] Перенести scoped ElasticGridFX lessons в соответствующих блоках; tool adaptation только после review.
 - [ ] Завершить block 16: editorial review, exact generated identity и freeze.
 

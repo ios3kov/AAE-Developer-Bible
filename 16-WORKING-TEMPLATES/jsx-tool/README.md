@@ -1,6 +1,6 @@
 # Standalone JSX tool
 
-Status: **complete source example / After Effects host test pending**.
+Status: **SOURCE EXAMPLE — complete command source / RUNTIME-NOT-CLAIMED**.
 
 rename-selected-layers.jsx is intentionally small enough to audit as one complete Script-menu command.
 

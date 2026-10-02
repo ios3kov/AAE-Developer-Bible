@@ -2,7 +2,7 @@
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Suites in that SDK:** `AEGP_KeyframeSuite5` + `AEGP_StreamSuite6`; для hierarchy/separated dimensions дополнительно `AEGP_DynamicStreamSuite4`.
-**Verification level:** SDK source-reviewed. Существующий recipe ранее проходил syntax/type baseline, но эта редакционная итерация не является новым native build или host test.
+**Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. Исторический compiler result от 2026-09-30 не содержит exact tested source identity и не подтверждает компиляцию текущего recipe; границы — в [матрице evidence](VERIFICATION.md).
 
 Keyframe API работает поверх конкретного `AEGP_StreamRefH`. Поэтому правильная операция начинается не с индекса ключа, а с доказанного stream context, его типа, dimensionality и временного пространства.
 

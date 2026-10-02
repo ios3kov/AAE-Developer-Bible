@@ -1,14 +1,16 @@
 # Coverage matrix
 
-Edition: **working line**, updated 2026-10-01.
+Edition: **working line**, updated 2026-10-02.
 
 This matrix describes **documentation coverage, reference material and evidence boundaries**. It is not a product QA scoreboard.
+
+[Поглавный трекер завершения](CHAPTER-COMPLETION-TRACKER.md) дополняет эту обзорную матрицу конкретными задачами для всех 127 core pages. Он не объявляет полную готовность направлений по одной обзорной оценке «strong/source reviewed».
 
 | Area | Documentation coverage | Reference material | Evidence / limit |
 |---|---|---|---|
 | Extension selection / architecture | strong | decision tree, communication maps | editorial/source reviewed |
 | Classic Effect | lifecycle, parameters, pixels, color | Minimal Gain source example | SDK-contract reviewed; no shipping-binary claim |
-| SmartFX / MFR | ROI, checkout, state, thread safety | pass-through/source examples | contract guidance + historical source evidence |
+| SmartFX / MFR | ROI, checkout, state, thread safety | pass-through/source examples | contract guidance; historical compiler record lacks exact tested source identity |
 | GPU | backend lifecycle, device/world ownership, testing guidance | SDK sample path | source reviewed; no universal runtime claim |
 | Custom UI / Drawbot | event model, drawing references, async boundary | acquisition skeleton | source reviewed; skeleton intentionally partial |
 | Audio effects | selectors, sound world, checkout/checkin | guidance | supplied SDK has no bundled AUDIO_RENDER implementation |
@@ -52,5 +54,7 @@ A section can be editorially complete without a Bible-owned host run when:
 - known limitations are explicit.
 
 Compilation or host execution matters only when the text makes a claim that depends on that execution.
+
+Block 1 reconciled legacy completion labels and scoped the 2026-09-30 compiler record. Core expansion and consistency work remains in the tracker. Existing SDK audit results belong to their recorded snapshots; no new whole-repository native/host result was produced.
 
 See [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md).

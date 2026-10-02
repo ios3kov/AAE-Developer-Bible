@@ -44,7 +44,7 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 4. датированные исследовательские наблюдения;
 5. реконструкция и архитектурные рекомендации — только с явной маркировкой.
 
-Для текущей редакции реальный Adobe After Effects SDK **25.6 build 61** сверён по обязательному контрактному baseline: **35/35 required contracts** и **39/39 cookbook call-sites** разрешаются в нужных suite generations. Это проверка точности документации и source examples, а не требование собрать Bible как приложение.
+Контрактная опора редакции — реальный Adobe After Effects SDK **25.6 build 61**. [Сохранённый exact-header audit](18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md) и later consistency correction в [ledger](VERIFICATION.md#current-suite-manifest-correction) фиксируют **35/35 required contracts** и **39/39 cookbook call-sites** для рассмотренных снимков. Эти результаты не являются новой проверкой каждого текущего файла или требованием собрать Bible как приложение.
 
 ## Как читать уровни доказательности
 
@@ -55,6 +55,8 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 - **RECONSTRUCTED** — вывод восстановлен по evidence и не выдаётся за публичный контракт.
 
 Отсутствие runtime evidence у source example означает только **«Bible не заявляет этот runtime result»**, а не «Bible обязана теперь собрать и протестировать этот пример».
+
+Работа над следующей редакцией ведётся по [плану](COMPLETION-PLAN.md). [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) содержит конкретные оставшиеся результаты для всех 127 core pages и не смешивает их с историческими compiler/runtime записями.
 
 ## Главный принцип
 
@@ -2924,9 +2926,9 @@ Skeleton устанавливает `PF_OutFlag_DEEP_COLOR_AWARE` с комме�
 
 Также его catch перехватывает `PF_Err`, а не все возможные C++-исключения. Для собственного кода, добавляющего стандартные контейнеры или сторонние библиотеки, требуется отдельная защита ABI-границы: исключение не должно пересекать вызов хоста. Это наша инженерная рекомендация, а не заявление, что Skeleton уже решает все варианты ошибок.
 
-## 8. Как пользоваться главой в плане Библии
+## 8. От контракта к собственному продукту
 
-Для чтения SDK эта глава даёт проверенную карту команд и структур. Для этапа 5 плана всё ещё нужны сборка Minimal Gain, корректные ресурсы/экспорты, загрузка и пиксельные проверки. Текст главы не закрывает эти gates. Переход к областям и float: [SmartFX](02-EFFECT-PLUGINS/03-SMARTFX.md); к данным глубины, ID и нормалей: [дополнительные каналы](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md).
+Для чтения SDK эта глава даёт проверенную карту команд и структур: **SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED**. Если разработчик превращает Minimal Gain в свой плагин, сборка, согласование ресурсов/экспортов, загрузка и пиксельные проверки дают доказательства именно для его артефакта и целевой среды. Они не являются условием редакционной готовности главы. Переход к областям и float: [SmartFX](02-EFFECT-PLUGINS/03-SMARTFX.md); к данным глубины, ID и нормалей: [дополнительные каналы](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md).
 
 
 ---
@@ -3232,7 +3234,7 @@ PF_Cmd_SMART_RENDER → PF_SmartRenderExtra
 
 Для GPU header дополнительно требует `PF_RenderOutputFlag_GPU_RENDER_POSSIBLE` на pre-render этапе. Само наличие поля `what_gpu` или настройка GPU у проекта не доказывает исполнения GPU-ветки конкретного эффекта. [S1:2504–2507], [S2:1007]
 
-План Библии сохраняет отдельные проверки: CPU-корректность, float, частичные области, ошибки/отмена, cache и конкуренция. **В этой главе проверены источники интерфейса; готовность SmartFX Copy внутри AE остаётся незакрытым этапом 5.**
+Для собственного SmartFX-продукта проверяют отдельно CPU-корректность, float, частичные области, ошибки/отмену, cache и конкуренцию. **Уровень этой главы — SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.** Описанные сценарии не подтверждают выполнение SmartFX Copy в AE и не создают обязательный host-QA этап для Библии. Результат проверки продукта должен указывать его source/artifact identity, AE build и покрытые сценарии.
 
 
 ---
@@ -3442,7 +3444,7 @@ Header описывает multi-checkout pattern: сначала запроси�
 
 В этой итерации проверены **исходные декларации и комментарии** supplied SDK, а также смысл показанных в них схем. Не выполнены: MFR stress, измерение ускорения, проверка конкретного GPU, native-компиляция новой реализации или её загрузка в AE. Такие результаты не выводятся из успешной сборки документации.
 
-Глава продолжает [память и владение ресурсами](02-EFFECT-PLUGINS/../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) и [SmartFX](02-EFFECT-PLUGINS/03-SMARTFX.md). Полные обязательства плана, включая аудит прежних проектов и проверку эталонных примеров, остаются в [чеклисте](02-EFFECT-PLUGINS/../COMPLETION-CHECKLIST.md). Разработка отдельного auxiliary-считывателя остаётся приостановленной.
+Глава продолжает [память и владение ресурсами](02-EFFECT-PLUGINS/../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) и [SmartFX](02-EFFECT-PLUGINS/03-SMARTFX.md). Её evidence — **SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED**. Матрица выше помогает проверить MFR-корректность собственного продукта; она не является обязательной host-QA программой Библии. Редакционные дополнения к главе отмечены в [поглавном трекере](02-EFFECT-PLUGINS/../CHAPTER-COMPLETION-TRACKER.md). Исследование отдельного auxiliary-считывателя остаётся самостоятельной работой.
 
 
 ---
@@ -7613,7 +7615,7 @@ Record for every native build:
 
 ## Verification boundary
 
-The Bible has an earlier macOS arm64 syntax/type baseline against the supplied AE SDK 25.6. That is not the same as building, linking, signing and loading every reference plug-in. Full host-cycle acceptance remains open.
+В [исторической записи от 2026-09-30](08-MACOS/../VERIFICATION.md#recorded-baseline-2026-09-30) сообщается об успешных macOS arm64 syntax/type checks с SDK 25.6. Точный source SHA/хэши проверенных translation units в этой записи отсутствуют; она не подтверждает компиляцию нынешних файлов. Для своего продукта разработчик отдельно проверяет сборку, линковку, ресурсы, подпись и загрузку конкретного артефакта. Глава описывает этот маршрут без заявления о новом build/host результате Библии.
 
 
 ---
@@ -21847,7 +21849,7 @@ Syntax/type checking is not load/render evidence. Only claim a build/install/hos
 
 # Standalone JSX tool
 
-Status: **complete source example / After Effects host test pending**.
+Status: **SOURCE EXAMPLE — complete command source / RUNTIME-NOT-CLAIMED**.
 
 rename-selected-layers.jsx is intentionally small enough to audit as one complete Script-menu command.
 
@@ -23406,7 +23408,7 @@ The required-contract manifest pins `AEGP_EffectSuite5` for SDK 25.6.
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Suites in that SDK:** `AEGP_StreamSuite6`, `AEGP_DynamicStreamSuite4`.
-**Verification level:** SDK source-reviewed; cookbook code was previously syntax/type-checked on macOS, but this editorial revision is not a new native build or AE host test.
+**Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. Исторический compiler result от 2026-09-30 не содержит exact tested source identity и не подтверждает компиляцию текущих recipes; границы — в [матрице evidence](17-NATIVE-SUITE-COOKBOOK/VERIFICATION.md).
 
 В AEGP значение, параметр эффекта, transform property, marker, mask outline и многие другие свойства представлены через **stream**. `AEGP_StreamRefH` — ссылка на host object; `AEGP_StreamValue2` — отдельное полученное значение со своим lifetime.
 
@@ -23676,7 +23678,7 @@ Do not collapse all failures into “property not found”.
 
 **Baseline source review:** Adobe After Effects SDK **25.6 build 61**.
 **Suites in that SDK:** `AEGP_KeyframeSuite5` + `AEGP_StreamSuite6`; для hierarchy/separated dimensions дополнительно `AEGP_DynamicStreamSuite4`.
-**Verification level:** SDK source-reviewed. Существующий recipe ранее проходил syntax/type baseline, но эта редакционная итерация не является новым native build или host test.
+**Verification level:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED. Исторический compiler result от 2026-09-30 не содержит exact tested source identity и не подтверждает компиляцию текущего recipe; границы — в [матрице evidence](17-NATIVE-SUITE-COOKBOOK/VERIFICATION.md).
 
 Keyframe API работает поверх конкретного `AEGP_StreamRefH`. Поэтому правильная операция начинается не с индекса ключа, а с доказанного stream context, его типа, dimensionality и временного пространства.
 
@@ -26992,42 +26994,38 @@ Some existing C++ recipes deliberately use older compatible Suite3/Suite4 subset
 
 <!-- SOURCE: 17-NATIVE-SUITE-COOKBOOK/VERIFICATION.md -->
 
-# Verification matrix
+# Cookbook — границы доказательств
 
-## v1.1 compiled baseline
+Обновлено: **2026-10-02**. Правила: [EDITORIAL-GUIDE](17-NATIVE-SUITE-COOKBOOK/../EDITORIAL-GUIDE.md); первичные записи: [общий evidence ledger](17-NATIVE-SUITE-COOKBOOK/../VERIFICATION.md).
 
-All six `code/*.cpp` recipes pass strict syntax/type checks with **SDK 25.6 on macOS arm64**. Sources use CompSuite12, StreamSuite6, KeyframeSuite5 and RQItemSuite3 where applicable. Narrative sections may describe newer generations; acquire only suites supplied by the SDK/host you target. See [reproducible checks](17-NATIVE-SUITE-COOKBOOK/../VERIFICATION.md).
+## Исторический compiler result — 2026-09-30
 
-The table below records historical public-documentation review, not compiler or host evidence. No host execution is claimed.
+В [записи v1.1](17-NATIVE-SUITE-COOKBOOK/../VERIFICATION.md#recorded-baseline-2026-09-30) сообщается об успешных 13 translation-unit syntax/type checks с SDK **25.6 build 61**, macOS arm64, Apple Clang, C++17. Cookbook тогда описывал шесть `code/*.cpp` recipes как проверенные в составе этого baseline.
 
-| Area | Public SDK signature checked | Adobe sample pattern | Host executed here |
-|---|---:|---:|---:|
-| Project / Item | yes | Projector | no |
-| Composition / Layer | yes | Projector | no |
-| Effect / Stream | yes | Streamie-style | no |
-| Keyframes | yes | Easy Cheese-style | no |
-| Masks / Text / Markers | yes | SDK guide | no |
-| Frame checkout | yes | Grabba/render samples | no |
-| Render Queue | yes | QueueBert | no |
-| Guide / ItemView 26.5 | release-notes + guide | n/a/new | no |
+В сохранённой записи нет точного source SHA или хэшей проверенных translation units. Поэтому её PASS сохраняется как исторически сообщённый результат с пробелом идентичности; нельзя заключить, что именно нынешние файлы проходили компиляцию. Коммит, публикующий отчёт, сам по себе не доказывает identity проверенного source tree.
 
-## Meaning
+После этого результата менялись исходники: `EffectStreamRecipes.cpp` перешёл на `EffectSuite5`, а `RenderQueueRecipes.cpp` получил named enum `AEGP_RenderItemStatus_QUEUED` и readback. Эти исправления имеют source-level evidence, а новый exact-SDK compiler result для них здесь не заявлен.
 
-`yes` in the first column means the public declaration/contract used by the recipe was checked. It does **not** mean the snippet was compiled against Adobe's proprietary 26.5 headers inside this sandbox.
+## Текущий контракт и source examples
 
-The final engineering verification step is:
+Baseline Cookbook — supplied SDK **25.6 build 61**. [Exact-header audit от 2026-10-01](17-NATIVE-SUITE-COOKBOOK/../18-SDK-HEADER-TOOLS/17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md) фиксирует 35/35 required contracts и 39/39 cookbook call-sites для указанного в нём источника. Более поздние corrections перечислены отдельно в [ledger](17-NATIVE-SUITE-COOKBOOK/../VERIFICATION.md#current-suite-manifest-correction); это не новая проверка всей текущей редакции.
 
-```text
-official 26.5 SDK headers
-→ build macOS
-→ build Windows x64
-→ build Windows ARM64 where targeted
-→ launch target AE
-→ exercise recipe
-→ record result in compatibility matrix
-```
+| Материал | Что поддерживает запись | Чего запись не подтверждает |
+|---|---|---|
+| Главы со ссылками на exact SDK reviews | Декларации, suite generations и разобранные ownership contracts в указанной поставке | Link, host execution и совместимость любого будущего SDK |
+| Текущие `code/*.cpp` | SOURCE EXAMPLE; source corrections и SDK-CONTRACT-REVIEWED участки, где указаны источники | Успешную компиляцию нынешнего source tree или выполнение в AE |
+| Adobe sample patterns | Устройство операции в конкретном образце и версии | Production-корректность любой адаптации |
+| Notes о later SDK generations, включая 26.5 | Отдельный датированный public-source контекст | Наличие этих suites в supplied SDK 25.6 или проверку proprietary later headers |
 
-Current source is **SDK 25.6 syntax/type-checked**; linking, host execution and other SDK/platform versions remain pending.
+Суффикс структуры suite, версия AcquireSuite, версия SDK и AE build — разные значения. Следуйте [таблице функций](17-NATIVE-SUITE-COOKBOOK/16-SUITE-FUNCTION-MAP.md) и конкретной source-review записи; не переносите later-generation API в baseline 25.6 без явного adapter/version boundary.
+
+## Как получить evidence для собственного продукта
+
+Если recipe используется в продукте, зафиксируйте его source commit/хэши, exact SDK и compiler, сохраните команды и per-file результаты syntax/type check. Для заявления о работе в AE дополнительно нужны идентичность linked artifact, AE build, OS/architecture, сценарий, ожидаемый и наблюдаемый результат. Матрица платформ определяется обещаниями самого продукта.
+
+Результаты компиляции, линковки и host execution записываются отдельно. Не заменяйте NOT RUN на PASS по наличию source review или зелёной документационной CI.
+
+Редакционное состояние Cookbook — **SOURCE EXAMPLE / SDK-CONTRACT-REVIEWED где указано / RUNTIME-NOT-CLAIMED**. Проверки продуктов полезны для их конкретных claims; готовность документации определяется [редакционным чеклистом](17-NATIVE-SUITE-COOKBOOK/../COMPLETION-CHECKLIST.md).
 
 
 ---
@@ -27070,7 +27068,7 @@ This closes the **source-level argument-selection defect**. It does **not** prov
 
 ## Verification label
 
-**Evidence boundary:** historical SDK 25.6 syntax/type evidence exists for an earlier source snapshot. Current recipes are SOURCE EXAMPLES / SDK-CONTRACT-REVIEWED where noted; Bible does not claim runtime results unless a separate runtime record exists. The render-queue enum defect is corrected at source level.
+**Evidence boundary:** the historical SDK 25.6 syntax/type record from 2026-09-30 lacks exact tested source identity. It cannot establish current-source compilation; later EffectSuite and render-queue source corrections were not covered by that recorded run. Current recipes are SOURCE EXAMPLES / SDK-CONTRACT-REVIEWED where noted, with RUNTIME-NOT-CLAIMED. The render-queue enum defect is corrected at source level.
 
 Команда и результаты: [VERIFICATION.md](17-NATIVE-SUITE-COOKBOOK/code/../../VERIFICATION.md). Сохраните relative includes к `19-NATIVE-CODE-FOUNDATION` или перенесите helpers вместе с recipes. Host callbacks, вызывающие recipes, должны иметь exception boundary.
 
@@ -27728,6 +27726,8 @@ Never make code compile by weakening a native contract you have not understood.
 
 **Результат: исходники SDK прочитаны, три главы доработаны с привязкой к файлам и строкам. Это не новая сборка native-плагина и не прогон After Effects.**
 
+**Исторический контекст — уточнение 2026-10-02:** следующий блок и этап 3A ниже относятся к плану на дату этой записи. Portable reuse rerun позже выполнен: [ledger](18-SDK-HEADER-TOOLS/../VERIFICATION.md#gate-3a-reuse-audit-verification-2026-10-01). Текущие редакционные обязанности задаёт [план](18-SDK-HEADER-TOOLS/../COMPLETION-PLAN.md); прежние требования build/host Gates не действуют. Исходные хэши, диапазоны строк и результаты этого review сохранены.
+
 ## Место в согласованном плане
 
 Эта запись — источниковая опора текущей редакции Bible. Она фиксирует exact SDK baseline и source-review findings. Старый completion-gate model superseded: compiler/host evidence остаётся отдельным evidence class и не определяет готовность документации.
@@ -27827,6 +27827,8 @@ The required-contract manifest passes all 35 required contract tables/functions,
 
 Дата: **2026-09-30**. Редакционный блок продолжает [первую сверку поставки](18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md) и source-contract review текущего SDK baseline.
 
+**Исторический контекст — уточнение 2026-10-02:** этапы приёмки native-примеров и «этап 5» ниже описывают прежний план. По [EDITORIAL-GUIDE](18-SDK-HEADER-TOOLS/../EDITORIAL-GUIDE.md) build/host проверки требуются для соответствующих claims продукта, а не для редакционной готовности Библии. NOT RUN и source identities этой итерации сохранены.
+
 **Объём: две главы Библии, а не новый тестовый плагин.** Основа — исходные headers и образцы из приложенного `ae25.6_61.64bit.AfterEffectsSDK`. Здесь фиксируются источники и границы утверждений для [параметров/UI](18-SDK-HEADER-TOOLS/../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md) и [цвета/пикселей](18-SDK-HEADER-TOOLS/../02-EFFECT-PLUGINS/06-COLOR-PIXELS.md). Этапы приёмки native-примеров остаются открытыми.
 
 ## Идентичность источника
@@ -27898,6 +27900,8 @@ The required-contract manifest passes all 35 required contract tables/functions,
 # SDK 25.6: память, lifetime и MFR — третья сверка глав
 
 Дата: **2026-10-01**. Результат: содержательно переработаны главы [памяти и ошибок](18-SDK-HEADER-TOOLS/../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) и [MFR](18-SDK-HEADER-TOOLS/../02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md).
+
+**Исторический контекст — уточнение 2026-10-02:** ссылки на полные этапы плана и этап 3A ниже относятся к моменту этой сверки. Позднейший reuse audit/portable rerun записан в [ledger](18-SDK-HEADER-TOOLS/../VERIFICATION.md#gate-3a-reuse-audit-verification-2026-10-01). Текущий [редакционный план](18-SDK-HEADER-TOOLS/../COMPLETION-PLAN.md) не требует host-QA каждого source example. Исходные хэши, findings и NOT RUN этой итерации сохранены.
 
 **Уровень: SDK source review и редакционная работа.** Это не новый native-плагин, не считыватель каналов, не проверка утечек в AE и не измерение ускорения. Согласованный объём Библии не изменён; полные этапы плана не закрываются фактом написания этих глав.
 
@@ -28000,6 +28004,8 @@ The required-contract manifest passes all 35 required contract tables/functions,
 # SDK 25.6: регистрация, PiPL и жизненный цикл AEGP
 
 Дата: **2026-10-01**. Редакционная итерация по присланной поставке `ae25.6_61.64bit.AfterEffectsSDK`.
+
+**Исторический контекст — уточнение 2026-10-02:** этапы и условия приёмки ниже описывают план этой итерации. Позднейшие safe-tool и reuse-audit результаты сохранены в [ledger](18-SDK-HEADER-TOOLS/../VERIFICATION.md). Прежняя обязательная build/host модель заменена [EDITORIAL-GUIDE](18-SDK-HEADER-TOOLS/../EDITORIAL-GUIDE.md); этот review сохраняет свои source identities и NOT RUN.
 
 **Результат этой работы — главы Библии и проверяемая привязка к исходникам. Компиляция новых фрагментов, сборка ресурсов, загрузка AEGP и host-тесты не выполнялись.** Разработка auxiliary-считывателя остаётся приостановленной.
 
@@ -31346,13 +31352,13 @@ Sweetie/Checkout establish the SDK provider/consumer pattern, not a runtime resu
 
 # Custom UI / Drawbot reference
 
-Status: **acquisition skeleton / SDK 25.6 macOS syntax-checked / runtime result not claimed**.
+Status: **SOURCE EXAMPLE — acquisition skeleton / RUNTIME-NOT-CLAIMED**. SDK contract basis: 25.6 build 61.
 
 EventSkeleton.cpp intentionally stops after obtaining the drawing reference. It does not draw a path, text, icon or control.
 
 ## Purpose
 
-The skeleton proves the outer event/acquisition shape without pretending a partial Drawbot implementation is finished.
+The skeleton illustrates the outer event/acquisition shape; drawing and interaction remain outside this source example.
 
 ~~~text
 PF_Cmd_EVENT
@@ -31430,7 +31436,7 @@ Before drawing define:
 
 Do not infer coordinates from one display setup.
 
-## Acceptance path
+## Product-validation path
 
 Implement incrementally:
 
@@ -31446,7 +31452,7 @@ Implement incrementally:
 
 ## Verification boundary
 
-Syntax checking only proves declarations/types. This remains a skeleton until it visibly draws and its resource/event lifecycle passes in the target AE host.
+This source example stops at acquisition; it does not draw or claim host interaction. The [historical compiler record](20-REFERENCE-IMPLEMENTATIONS/Effect/CustomUI-Drawbot/../../../VERIFICATION.md#recorded-baseline-2026-09-30) lacks exact tested source identity and cannot establish compilation of the current skeleton. To claim drawing/resource/event behavior for a product, implement those paths and record their execution on the identified target AE build. The bounded acquisition example is valid editorial material without that product result.
 
 
 ---
@@ -31455,7 +31461,7 @@ Syntax checking only proves declarations/types. This remains a skeleton until it
 
 # SmartFX pass-through reference
 
-Status: **source implementation / SDK 25.6 macOS syntax-checked / runtime result not claimed**.
+Status: **SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED**. SDK contract basis: 25.6 build 61; historical compiler evidence is scoped below.
 
 SmartFxMfr.cpp is intentionally a small pass-through reference with SmartFX support. It does **not** currently declare MFR support.
 
@@ -31548,15 +31554,15 @@ Required before setting PF_OutFlag2_SUPPORTS_THREADED_RENDERING:
 - memory trend;
 - lock review.
 
-## Verification command
+## Проверка собственного продукта
 
-Use scripts/check_native.py against the exact SDK for syntax/type checks, then compile/link in the SDK project and run host fixtures.
+Если этот source example используется в продукте, применяйте scripts/check_native.py к его точному source snapshot и SDK, затем проверяйте compile/link и необходимые host fixtures. Это путь получения доказательств для продукта, а не обязательный этап готовности документации.
 
 Record the host result in VERIFICATION/evidence; do not replace NOT RUN with PASS after syntax checking.
 
 ## Verification boundary
 
-Current evidence is syntax/type level for the supplied SDK baseline. Host ROI/pixel/MFR acceptance remains open.
+The [2026-09-30 compiler record](20-REFERENCE-IMPLEMENTATIONS/Effect/SmartFX-MFR/../../../VERIFICATION.md#recorded-baseline-2026-09-30) lacks an exact tested source identity. It is retained as historical evidence and does not establish current-source compilation. This reference explains source/contract behavior without claiming AE ROI, pixel or MFR execution. Product-validation scenarios above apply to a separately identified product build.
 
 
 ---
@@ -31565,7 +31571,7 @@ Current evidence is syntax/type level for the supplied SDK baseline. Host ROI/pi
 
 # GPU effect reference path
 
-Status: **SDK sample workspace: Effect/SDK_Invert_ProcAmp / host GPU-test pending**.
+Status: **SDK sample workspace: Effect/SDK_Invert_ProcAmp / RUNTIME-NOT-CLAIMED**.
 
 Materialize the exact licensed SDK sample:
 
@@ -31686,7 +31692,7 @@ A Universal macOS plug-in with a one-architecture nested GPU/helper dependency i
 
 ## Verification boundary
 
-The reference remains host GPU-test pending. Materializing the SDK sample and compiling it does not prove the modified product kernel, fallback or performance.
+This reference explains an SDK sample workspace without claiming GPU execution. Materializing the SDK sample and compiling it does not prove a modified product kernel, fallback or performance. Those claims need results for the identified product artifact/backend/device; their absence is an evidence boundary for this guide.
 
 
 ---
@@ -31760,7 +31766,7 @@ Historical compiler/runtime evidence, where present, remains documented in [VERI
 
 # ScriptUI panel reference source
 
-Status: **source supplied / After Effects host test pending**.
+Status: **SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED**.
 
 Copy AEDeveloperBiblePanel.jsx into the After Effects ScriptUI Panels folder for the target installation, restart AE when required, then open the panel from the Window menu.
 
@@ -34606,7 +34612,7 @@ The master list includes bundled entries that Adobe itself lists (for example Mo
 
 Незавершённый продукт может содержать полезные отдельные решения и отрицательные результаты. Здесь сохраняются именно они, а не обещание готовности всего продукта.
 
-Этот раздел сохраняет отдельный reuse-audit milestone, выполненный в ходе редакционной работы Bible. Текущая code-level запись: [Reuse audit — 2026-10-01](22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md). Перед созданием новых примеров в этапах 5–6 проверяем, какие наработки уже есть в двух проектах. Safe tooling Gate 2 и documentation Gate 3 уже закрыты; текущий незакрытый пункт 3A — независимый portable rerun выбранного FSTR snapshot.
+Этот раздел сохраняет reuse-audit, выполненный в ходе редакционной работы Bible: [Reuse audit — 2026-10-01](22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md). Независимый portable rerun FSTR snapshot `c69e3663de59dc44cbdef18042891f6dd1ce5ee6` уже выполнен: [запись проверки](22-PROJECT-CASE-STUDIES/../VERIFICATION.md#gate-3a-reuse-audit-verification-2026-10-01) указывает audit commit и успешный CI run. Это результат для выбранного снимка, а не проверка текущих версий проектов или AE runtime. Названия прежних Gates сохранены только в исторических записях; дальнейший перенос ведётся по [редакционному плану](22-PROJECT-CASE-STUDIES/../COMPLETION-PLAN.md).
 
 ## Зафиксированные источники
 
@@ -34709,7 +34715,7 @@ The master list includes bundled entries that Adobe itself lists (for example Mo
 
 До использования кода в эталонном примере фиксируем конкретный файл и коммит, проверяем относящиеся к нему тесты и происхождение материалов, записываем решение: переиспользовать / адаптировать / не переносить. Причина отказа тоже остаётся полезным результатом. Завершение обоих продуктов не является условием переноса отдельного проверенного решения.
 
-Результаты исходного проекта не закрывают host-gates Bible автоматически. После адаптации кода нужны собственные проверки на заявленной матрице. Неразрешённый SYNC-001 и исследовательский private loader остаются видимыми ограничениями, а не скрытыми зависимостями практической части.
+Результаты исходного проекта поддерживают только заявленную в его записи область. После адаптации кода результат исходного проекта нельзя приписать новой реализации: для compiler/runtime утверждения нужны проверки её точного source/artifact identity и целевой среды. Перенос объяснения или SOURCE EXAMPLE может оставаться RUNTIME-NOT-CLAIMED. Неразрешённый SYNC-001 и исследовательский private loader сохраняют свои ограничения в закреплённых снимках.
 
 
 ## ElasticGridFX — запланированный кейс
@@ -34726,6 +34732,8 @@ The master list includes bundled entries that Adobe itself lists (for example Mo
 This is the code-level follow-up to the initial case-study extraction in [README.md](22-PROJECT-CASE-STUDIES/README.md).
 
 The purpose is narrow: identify reusable engineering patterns before project patterns are reused in Bible reference material. It does **not** promote either source product to a Bible host-verified reference.
+
+**Historical process note — 2026-10-02:** references to Gate 2 below name the transaction-safety work recorded in [the ledger](22-PROJECT-CASE-STUDIES/../VERIFICATION.md#safe-tooling-gate-2-verification-2026-10-01). Its staging/backup/rollback safeguards remain relevant; the old mandatory Bible build/host completion model is superseded by [EDITORIAL-GUIDE](22-PROJECT-CASE-STUDIES/../EDITORIAL-GUIDE.md). Source identities, transfer decisions and failed-run evidence in this audit are retained.
 
 ## Audit baseline
 
@@ -35199,6 +35207,14 @@ No source-project host result is promoted into Bible host verification. FSTR SYN
 
 # Changelog
 
+## Completion block 1 — 2026-10-02
+
+- Reconciled active chapter/reference evidence labels with the editorial policy; reader-product validation scenarios remain scoped to their product claims.
+- Removed current-source compiler claims based on the 2026-09-30 record, whose exact tested source identity is missing; retained its historical reported results.
+- Added dated context to older SDK reviews and reuse audit, preserving source hashes/findings/NOT RUN. Corrected the stale FSTR rerun TODO.
+- Added a chapter tracker covering all 127 core pages across explanation, scenario, provenance, source-example consistency and links; mapped concrete remaining results to the 16-block roadmap.
+- Updated status, coverage, checklist and dependencies. CEP failures, navigation gaps and the macOS alias-path tooling defect remain assigned to their later blocks.
+
 ## Plan and source review — 2026-10-02
 
 - Published the editorial audit and concrete 16-block completion plan; findings remain open until their repair blocks are completed.
@@ -35288,6 +35304,271 @@ No source-project host result is promoted into Bible host verification. FSTR SYN
 
 ---
 
+<!-- SOURCE: CHAPTER-COMPLETION-TRACKER.md -->
+
+# Поглавный трекер завершения
+
+Обновлено: **2026-10-02**. План: [16 логических блоков](COMPLETION-PLAN.md). Правила: [EDITORIAL-GUIDE](EDITORIAL-GUIDE.md); существующий source/evidence baseline — [coverage matrix](FINAL-COVERAGE-AUDIT.md).
+
+## Что здесь учитывается
+
+Это рабочая очередь для **127 core pages**: Markdown непосредственно в разделах 00–15, 17 и 19, включая их обзорные README. Dated source reviews, verification ledgers, вложенные source/reference guides и исследовательские приложения учитываются отдельно ниже. Каждый core page включён ровно один раз.
+
+Строки задают конкретный оставшийся результат по аудиту и плану. Это не новая полная техническая сертификация каждой главы и не отмена прежних source reviews. `R` может обозначать запланированную сверку, а не уже обнаруженную ошибку. Сам факт наличия текста, большого объёма или зелёной CI не закрывает строку.
+
+Пять независимых осей: **Т** — полнота объяснения; **С** — практический сценарий; **И** — provenance/version boundary; **П** — согласованность source example/recipe; **Л** — ссылки и маршрут чтения.
+
+| Код | Статус | Когда ставить |
+|---|---|---|
+| C | complete | Применимые критерии оси проверены; есть dated block/evidence record |
+| E | needs expansion | В указанном блоке нужно добавить конкретное объяснение или сценарий |
+| R | needs reconciliation | Нужно сверить с связанными главами, source examples, источниками или routes |
+| L | intentionally limited | Ограничение явно названо; standalone code/runtime walkthrough не обещан для этой оси |
+
+Все строки сейчас остаются в очереди: ни одна core глава не объявляется полностью закрытой созданием этого трекера. `L` в обзоре означает, что это route/index, а не самостоятельная реализация. Для UXP, BlitHook и catalogue/errata предел отдельно указан в строке; остальные применимые оси ещё требуют сверки. Для provenance запланирован итоговый проход блока 5, для links — блока 3. Столбец «Результат / блок» указывает ведущую содержательную работу, а не все зависимости.
+
+## Выполнено в блоке 1
+
+Согласованы текущие evidence labels в Effect anatomy/SmartFX/MFR, macOS setup, Cookbook и связанных reference guides; снято приписывание исторического compiler PASS нынешнему коду. Dated SDK reviews и reuse audit получили пояснения исторического процесса. Эти исправления закрывают findings блока 1, но не практические дополнения строк ниже.
+
+В следующих блоках обновлять оси каждой затронутой строки отдельно. Для полного закрытия строки все применимые оси должны стать C или обоснованным L, а результат — ссылаться на dated verification entry. Блок 16 проверяет весь набор перед freeze.
+
+## 00-START-HERE
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [Decision tree — что именно вы разрабатываете?](00-START-HERE/00-DECISION-TREE.md) | E | E | R | R | R | Связать решения с тремя маршрутами и конкретным первым действием. **№3** |
+| [Extension types](00-START-HERE/01-EXTENSION-TYPES.md) | R | E | R | R | R | Согласовать выбор family с маршрутами Effect, automation и native integration. **№3** |
+| [Environment matrix](00-START-HERE/02-ENVIRONMENT-MATRIX.md) | R | R | R | R | R | Разнести SDK, AE build, suite generation и OS/architecture; датировать ограничения. **№5** |
+
+## 01-ARCHITECTURE
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [Native plug-in lifecycle](01-ARCHITECTURE/01-LIFECYCLE.md) | R | E | R | R | R | Связать lifecycle с versioned persistence и failure/recovery состояниями Effect. **№6** |
+| [Память, время жизни ресурсов и ошибки](01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) | R | E | R | R | R | Сверить memory/thread policy с receipt lifecycle Compute Cache и bounded MFR incident. **№8** |
+| [PiPL, регистрация и загрузка плагина](01-ARCHITECTURE/03-PIPL-AND-LOADING.md) | R | E | R | R | R | Связать PiPL/resource chain с конкретными macOS/Windows sample walkthroughs. **№13** |
+| [Version compatibility](01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md) | R | E | R | R | R | Добавить читаемую таблицу SDK/AE/suite/architecture и сценарий отказа при несовместимости. **№5** |
+| [Performance architecture](01-ARCHITECTURE/05-PERFORMANCE-ARCHITECTURE.md) | E | E | R | R | R | Разделить native core, host render, RAM Preview и измеренную конкурентность. **№8** |
+| [Build system strategy](01-ARCHITECTURE/06-BUILD-SYSTEM.md) | R | E | R | R | R | Связать общие правила с конкретными resource/export/build маршрутами обеих платформ. **№13** |
+| [Communication architecture](01-ARCHITECTURE/07-COMMUNICATION-ARCHITECTURE.md) | R | E | R | R | R | Согласовать CEP envelopes и отделить correlation от mutation ordering/idempotency. **№2** |
+
+## 02-EFFECT-PLUGINS
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [Устройство Effect-плагина: от регистрации до кадра](02-EFFECT-PLUGINS/01-ANATOMY.md) | R | E | R | R | R | Связать lifecycle с migration/resetup/flatten и sample state example. **№6** |
+| [Параметры и интерфейс Effect-плагина](02-EFFECT-PLUGINS/02-PARAMETERS-UI.md) | E | E | R | R | R | Добавить arbitrary data, schema evolution, compare/interpolate/flatten и disk-ID migration. **№6** |
+| [SmartFX: зависимости, области и время жизни буферов](02-EFFECT-PLUGINS/03-SMARTFX.md) | E | E | R | R | R | Добавить blur/transform/temporal walkthrough с checkout IDs, ROI и time conversion. **№7** |
+| [MFR: параллельный рендер, состояние и Compute Cache](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md) | E | E | R | R | R | Добавить receipt/error cleanup схему и ограниченный incident record из ElasticGridFX. **№8** |
+| [GPU effects](02-EFFECT-PLUGINS/05-GPU.md) | E | E | R | R | R | Разобрать device state, one backend, fallback и подтверждение реально исполненной ветки. **№8** |
+| [Пиксели, цвет и прозрачность в Effect-плагине](02-EFFECT-PLUGINS/06-COLOR-PIXELS.md) | E | E | R | R | R | Добавить calibrated output, exact sampling, NaN/Inf и integer/float/alpha правила. **№7** |
+| [Audio effects](02-EFFECT-PLUGINS/07-AUDIO.md) | E | E | R | R | R | Дать bounded sound-world walkthrough; сохранять отсутствие sample-backed AUDIO_RENDER guarantees. **№9** |
+| [Дополнительные каналы: глубина, ID, нормали и сырые данные](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md) | R | E | R | R | R | Связать channel checkout/checkin, dimensions и coordinate conversion с SmartFX walkthrough. **№7** |
+| [Custom UI and Drawbot](02-EFFECT-PLUGINS/09-CUSTOM-UI-DRAWBOT.md) | E | E | R | R | R | Добавить один draw/hit/drag путь с cleanup и scoped async-manager границей. **№9** |
+| [Effect plug-ins](02-EFFECT-PLUGINS/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+
+## 03-AEGP
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [AEGP: инициализация, hooks и suites](03-AEGP/01-HOOKS-SUITES.md) | R | E | R | R | R | Проследить menu command от resolve target до cleanup, ошибки и report. **№11** |
+| [AEGP: операции с проектом и рендером](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md) | E | E | R | R | R | Добавить import/create/animate/queue/render operation chains с rollback и identity. **№11** |
+| [AEGP](03-AEGP/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+
+## 04-AEIO
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [AEIO — media import/export plug-ins](04-AEIO/README.md) | E | E | R | R | R | Связать importer/exporter сценарий с exact SDK callback/file paths и cleanup. **№14** |
+
+## 05-ARTISAN
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [Artisan — custom composition 3D renderer](05-ARTISAN/README.md) | E | E | R | R | R | Связать normalized scene и render lifecycle с exact Artie path и current suites. **№14** |
+
+## 06-SCRIPTING
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [After Effects scripting object model](06-SCRIPTING/01-OBJECT-MODEL.md) | E | E | R | R | R | Добавить bulk rename/import/replace операции со stable targeting и partial failure. **№10** |
+| [ScriptUI](06-SCRIPTING/02-SCRIPTUI.md) | E | E | R | R | R | Связать dockable panel с reusable command, progress/cancel и stale target. **№10** |
+| [Expressions vs scripts](06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md) | E | E | R | R | R | Добавить законченный expression rig с matchName и escaping/version границами. **№10** |
+| [ExtendScript scripting](06-SCRIPTING/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+
+## 07-PANELS
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [CEP development](07-PANELS/01-CEP.md) | E | E | R | R | R | Добавить manifest/bootstrap walkthrough и единые controlled error paths. **№2** |
+| [UXP transition for After Effects](07-PANELS/02-UXP-TRANSITION.md) | R | L | R | L | R | Перепроверить официальные даты; ограничить главу migration context без выдуманного API. **№5** |
+| [Panels: CEP now, UXP transition](07-PANELS/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+
+## 08-MACOS
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [macOS — Xcode setup](08-MACOS/01-XCODE-SETUP.md) | E | E | R | R | R | Дать exact sample/target/settings путь до build artifact, объяснить SDK path/resource шаги. **№12** |
+| [macOS — Apple Silicon / Universal binary](08-MACOS/02-UNIVERSAL-BINARY.md) | R | E | R | R | R | Добавить проверку slices/ресурсов/export на одном конкретном product artifact. **№12** |
+| [macOS — debugging After Effects plug-ins](08-MACOS/03-DEBUGGING.md) | E | E | R | R | R | Добавить attach/breakpoint/LLDB/symbols walkthrough и диагностические развилки. **№12** |
+| [macOS — GPU development](08-MACOS/04-GPU.md) | R | E | R | R | R | Связать backend/device policy с macOS sample и подтверждением выбранного GPU пути. **№12** |
+| [macOS — signing and notarization](08-MACOS/05-SIGNING-NOTARIZATION.md) | E | E | R | R | R | Дать конкретный signing/notary/stapling маршрут с identity и проверяемым результатом. **№12** |
+| [macOS — installation and packaging](08-MACOS/06-INSTALLATION-PACKAGING.md) | E | E | R | R | R | Добавить staging/install/upgrade/rollback пример с владением установленными файлами. **№12** |
+| [macOS — CI pipeline](08-MACOS/07-CI.md) | R | E | R | R | R | Связать CI outputs, symbol archive и signed artifact с точным source/build identity. **№12** |
+| [macOS — native SDK validation](08-MACOS/08-NATIVE-SDK-VALIDATION.md) | R | E | R | R | R | Согласовать alias-path fix и source report; optional compile не смешивать с docs readiness. **№4** |
+| [macOS — production build pipeline](08-MACOS/09-PRODUCTION-BUILD-PIPELINE.md) | E | E | R | R | R | Свести sample→resources→bundle→symbols→package в воспроизводимый учебный маршрут. **№12** |
+| [macOS developer bible](08-MACOS/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+
+## 09-WINDOWS
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [Windows — Visual Studio setup](09-WINDOWS/01-VISUAL-STUDIO-SETUP.md) | E | E | R | R | R | Дать exact sample/VS target/include/lib settings и resource chain до .aex. **№13** |
+| [Windows — x64 and ARM64](09-WINDOWS/02-X64-ARM64.md) | R | E | R | R | R | Разнести target architecture, toolchain и подтверждённую host support matrix. **№13** |
+| [Windows — debugging After Effects plug-ins](09-WINDOWS/03-DEBUGGING.md) | E | E | R | R | R | Добавить attach/breakpoint/exception/symbols walkthrough и диагностику load failure. **№13** |
+| [Windows — GPU development](09-WINDOWS/04-GPU.md) | R | E | R | R | R | Связать backend/device/fallback с конкретным Windows sample/configuration. **№13** |
+| [Windows — code signing](09-WINDOWS/05-CODE-SIGNING.md) | E | E | R | R | R | Дать SignTool/signature/timestamp verification пример для конкретного artifact. **№13** |
+| [Windows — installation and packaging](09-WINDOWS/06-INSTALLATION-PACKAGING.md) | E | E | R | R | R | Добавить owned-file install/upgrade/rollback маршрут с expected results. **№13** |
+| [Windows — CI pipeline](09-WINDOWS/07-CI.md) | R | E | R | R | R | Связать Windows build/symbol/package outputs с source identity и target matrix. **№13** |
+| [Windows — native SDK validation](09-WINDOWS/08-NATIVE-SDK-VALIDATION.md) | R | E | R | R | R | Согласовать MSVC report и portable lane; не приписывать stub PASS реальному SDK. **№4** |
+| [Windows — production build pipeline](09-WINDOWS/09-PRODUCTION-BUILD-PIPELINE.md) | E | E | R | R | R | Проследить source→PiPL/.r→.rc/.res→.aex→symbols→installer на одном примере. **№13** |
+| [Windows developer bible](09-WINDOWS/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+
+## 10-TESTING
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [Test matrix](10-TESTING/01-TEST-MATRIX.md) | E | E | R | R | R | Добавить заполненную учебную матрицу с expected/observed и exact identity. **№15** |
+| [Render correctness](10-TESTING/02-RENDER-CORRECTNESS.md) | E | E | R | R | R | Добавить identity calibration, exceptional floats и matched-toolchain parity recipe. **№15** |
+| [MFR stress tests](10-TESTING/03-MFR-STRESS.md) | E | E | R | R | R | Добавить bounded hang/cancel incident template с доказательствами concurrency. **№15** |
+| [Performance testing](10-TESTING/04-PERFORMANCE.md) | E | E | R | R | R | Показать раздельные core/render/Preview метрики, повторения и frame coverage. **№15** |
+| [Crash diagnostics](10-TESTING/05-CRASH-DIAGNOSTICS.md) | E | E | R | R | R | Добавить заполненный crash/hang record с artifact/symbol identity и границами вывода. **№15** |
+| [Evidence and acceptance](10-TESTING/06-EVIDENCE-AND-ACCEPTANCE.md) | R | E | R | R | R | Согласовать PASS/FAIL/BLOCKED/NOT RUN с заполненным sample record. **№15** |
+| [Host verification in After Effects](10-TESTING/06-HOST-VERIFICATION.md) | R | E | R | R | R | Связать evidence ladder с калибровкой output и actual route/frame coverage. **№15** |
+| [Test evidence and acceptance records](10-TESTING/07-TEST-EVIDENCE.md) | E | E | R | R | R | Добавить machine-readable filled record и отдельную raw evidence reference. **№15** |
+| [Clean-machine release acceptance](10-TESTING/08-CLEAN-MACHINE-ACCEPTANCE.md) | R | E | R | R | R | Показать scoped install/upgrade/rollback record без фиктивных выполненных проверок. **№15** |
+| [Testing strategy](10-TESTING/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+
+## 11-DISTRIBUTION
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [Versioning and compatibility](11-DISTRIBUTION/01-VERSIONING-COMPATIBILITY.md) | R | E | R | R | R | Согласовать version table, disk IDs и source/artifact compatibility promises. **№5** |
+| [Security and licensing architecture](11-DISTRIBUTION/02-SECURITY-LICENSING.md) | R | E | R | R | R | Зафиксировать license/provenance правила примеров и происхождение third-party SDK assets. **№5** |
+| [Release checklist](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md) | R | E | R | R | R | Добавить filled documentation/product evidence пример и artifact-bound release gate. **№15** |
+| [Install locations cheat sheet](11-DISTRIBUTION/04-INSTALL-LOCATIONS.md) | R | E | R | R | R | Сверить официальные platform paths и связать их с owned-file installers. **№13** |
+| [Release artifacts, installers and update strategy](11-DISTRIBUTION/05-RELEASE-ARTIFACTS-UPDATES.md) | E | E | R | R | R | Связать binary/PiPL/UI identity, symbols и upgrade/rollback evidence. **№15** |
+
+## 12-RECIPES
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [Recipe — first native effect](12-RECIPES/01-FIRST-EFFECT.md) | E | E | R | R | R | Связать конкретный sample, build steps, expected gain и evidence boundaries. **№12** |
+| [Recipe — migrate an existing effect to MFR](12-RECIPES/02-MFR-MIGRATION.md) | E | E | R | R | R | Добавить state inventory→immutable snapshot→cache receipt→concurrency workflow. **№8** |
+| [Recipe — plug-in does not load](12-RECIPES/03-DEBUG-PLUGIN-NOT-LOADING.md) | R | E | R | R | R | Связать failure tree с resources/exports/architecture/logs обеих платформ. **№13** |
+| [Recipe — CPU/GPU equivalence](12-RECIPES/04-CPU-GPU-EQUIVALENCE.md) | E | E | R | R | R | Добавить matched identity/toolchain, exact/tolerance/NaN и fallback comparisons. **№15** |
+| [Recipe — panel + native core](12-RECIPES/05-HYBRID-PANEL-NATIVE.md) | R | E | R | R | R | Согласовать CEP schema/commands, request ordering и error envelopes. **№2** |
+| [Recipe — profiling a slow effect](12-RECIPES/06-PROFILING.md) | E | E | R | R | R | Добавить воспроизводимый profiling record с warmup/repeats/core-host-Preview scopes. **№15** |
+| [Practical recipes](12-RECIPES/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+
+## 13-TEMPLATES
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [Bug report template](13-TEMPLATES/BUG-REPORT.md) | E | E | R | R | R | Добавить заполненный example с exact artifact, raw evidence и bounded conclusion. **№15** |
+| [Compatibility matrix template](13-TEMPLATES/COMPATIBILITY-MATRIX.md) | E | E | R | R | R | Показать filled rows с SDK/AE/OS/architecture и честными NOT RUN. **№15** |
+| [Performance report template](13-TEMPLATES/PERFORMANCE-REPORT.md) | E | E | R | R | R | Добавить filled report с раздельными performance layers и frame coverage. **№15** |
+| [Plug-in specification template](13-TEMPLATES/PLUGIN-SPEC.md) | E | E | R | R | R | Связать filled spec с persistence, errors, expected output и verification matrix. **№15** |
+| [Working templates](13-TEMPLATES/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+| [Release notes template](13-TEMPLATES/RELEASE-NOTES.md) | E | E | R | R | R | Показать filled release record с artifact identity и реальными evidence limits. **№15** |
+
+## 14-NATIVE-INTEGRATIONS
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [Native SDK taxonomy](14-NATIVE-INTEGRATIONS/01-TAXONOMY.md) | R | E | R | R | R | Связать native family selection с route и exact reference entry. **№3** |
+| [Host call flows](14-NATIVE-INTEGRATIONS/02-HOST-CALL-FLOWS.md) | R | E | R | R | R | Сопоставить call flows с одним сквозным AEGP command и resource cleanup. **№11** |
+| [PICA suites — versioned native service bus](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md) | R | E | R | R | R | Согласовать ABI/version/ownership ошибки с bridge/cookbook examples. **№11** |
+| [Effect plug-ins — native capability map](14-NATIVE-INTEGRATIONS/04-EFFECTS.md) | R | E | R | R | R | Связать native Effect model со state/arbitrary migration walkthrough. **№6** |
+| [AEGP tools — native automation and deep AE integration](14-NATIVE-INTEGRATIONS/05-AEGP-TOOLS.md) | R | E | R | R | R | Связать command/update/idle/death flow со stable targets и partial init. **№11** |
+| [Keyframers](14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md) | R | E | R | R | R | Добавить route к animate recipe, separated dimensions и batch failure cleanup. **№11** |
+| [Native dockable panels](14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md) | R | E | R | R | R | Сверить panel commands/model handoff с stale generations и shutdown recipe. **№11** |
+| [AEIO — registration and callback lifecycle](14-NATIVE-INTEGRATIONS/08-AEIO.md) | R | E | R | R | R | Согласовать callback walkthrough с основным AEIO разделом и exact source paths. **№14** |
+| [Artisan — registration, contexts and render contract](14-NATIVE-INTEGRATIONS/09-ARTISAN.md) | R | E | R | R | R | Согласовать Artie/current-suite walkthrough с основным renderer разделом. **№14** |
+| [BlitHook — display-pipeline frame hook](14-NATIVE-INTEGRATIONS/10-BLITHOOK.md) | R | L | R | L | R | Согласовать borrowed buffer/IPC boundary; async lifetime оставить ограниченным известным контрактом. **№11** |
+| [Legacy / historical native integration boundaries](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) | R | E | R | R | R | Сверить old/current suite table и разделить source migration от project compatibility. **№5** |
+| [AEGP suites catalog — After Effects 26.5 snapshot](14-NATIVE-INTEGRATIONS/12-AEGP-SUITES-CATALOG.md) | R | L | R | L | R | Согласовать catalogue с exact baseline; не превращать inventory в runtime coverage claim. **№5** |
+| [Public SDK docs errata / verification notes](14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md) | R | L | R | L | R | Связать errata с dated sources; сохранить superseded finding и later correction. **№5** |
+| [Native integrations — карта всего нативного SDK After Effects](14-NATIVE-INTEGRATIONS/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+
+## 15-COMMUNICATION
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [After Effects → Effect plug-in](15-COMMUNICATION/01-AE-TO-EFFECT.md) | R | E | R | R | R | Согласовать selector/state/persistence границы с Effect migration примером. **№6** |
+| [After Effects → AEGP](15-COMMUNICATION/02-AE-TO-AEGP.md) | R | E | R | R | R | Согласовать initializer/hooks/main-thread lifecycle с command walkthrough. **№11** |
+| [AEGP → Effect: generic call](15-COMMUNICATION/03-AEGP-TO-EFFECT.md) | R | E | R | R | R | Добавить generic-call chain с fresh EffectRef, layer time и separate error classes. **№11** |
+| [Plug-in → Plug-in через published PICA suite](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md) | R | E | R | R | R | Согласовать version/ownership/service failure с provider/consumer source example. **№11** |
+| [ExtendScript → After Effects](15-COMMUNICATION/05-SCRIPT-TO-AE.md) | R | E | R | R | R | Связать reusable commands, undo и partial failure с automation recipes. **№10** |
+| [CEP panel <-> ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md) | E | E | R | R | R | Исправить envelopes, parse/type/error paths, bootstrap JSON failure и mutation ordering. **№2** |
+| [Native <-> script/panel: как собирать гибридный продукт](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md) | R | E | R | R | R | Разнести transport correlation, freshness, cancellation и host command ordering. **№2** |
+| [Threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md) | R | E | R | R | R | Согласовать workers/MFR/UI handoff с cache и bounded incident схемами. **№8** |
+| [Data ownership and lifetime](15-COMMUNICATION/09-DATA-OWNERSHIP.md) | R | E | R | R | R | Согласовать payload/receipt lifetimes, stale generations и failure cleanup. **№8** |
+| [Как компоненты общаются друг с другом и с After Effects](15-COMMUNICATION/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+
+## 17-NATIVE-SUITE-COOKBOOK
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [Как пользоваться cookbook](17-NATIVE-SUITE-COOKBOOK/00-HOW-TO-USE.md) | R | E | R | R | R | Дать route от задачи к exact suite/source, operation chain и evidence. **№11** |
+| [Project + Item recipes](17-NATIVE-SUITE-COOKBOOK/01-PROJECT-ITEMS.md) | R | E | R | R | R | Добавить import/resolve/adopt chain с dangerous New/Open и invalidation policy. **№11** |
+| [Composition recipes](17-NATIVE-SUITE-COOKBOOK/02-COMPOSITIONS.md) | R | E | R | R | R | Связать create/configure comp с current suite, undo и partial cleanup. **№11** |
+| [Layer recipes](17-NATIVE-SUITE-COOKBOOK/03-LAYERS.md) | R | E | R | R | R | Связать stable LayerID/fresh resolution с create/edit/remove сценариями. **№11** |
+| [Effect recipes](17-NATIVE-SUITE-COOKBOOK/04-EFFECTS.md) | R | E | R | R | R | Связать find/apply/dispose EffectRef с stream mutation и generic-call errors. **№11** |
+| [Streams / properties / expressions](17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md) | R | E | R | R | R | Проследить acquire/sample/set/dispose с expression/separated-dimension границами. **№11** |
+| [Keyframes: чтение, изменение, batch insert, interpolation](17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md) | R | E | R | R | R | Дать animate chain и batch error path с timebase/interpolation ownership. **№11** |
+| [Masks: reference lifetime, outline stream и geometry](17-NATIVE-SUITE-COOKBOOK/07-MASKS.md) | R | E | R | R | R | Связать MaskRef/outline/value cleanup со scoped create/edit operation. **№11** |
+| [Text documents and markers](17-NATIVE-SUITE-COOKBOOK/08-TEXT-MARKERS.md) | R | E | R | R | R | Связать UTF-16/document/marker ownership со scoped write/keyframe recipe. **№11** |
+| [Footage / import: ownership, interpretation, sequences and proxies](17-NATIVE-SUITE-COOKBOOK/09-FOOTAGE-IMPORT.md) | E | E | R | R | R | Дать import/adopt/replace chain с caller-owned failure rollback. **№11** |
+| [Render frame → pixels](17-NATIVE-SUITE-COOKBOOK/10-RENDER-FRAMES.md) | E | E | R | R | R | Дать configure→checkout→world→checkin chain с calibration/output scope. **№11** |
+| [Render Queue recipes](17-NATIVE-SUITE-COOKBOOK/11-RENDER-QUEUE.md) | E | E | R | R | R | Дать add/configure/queue/readback chain с named enum, state и artifact identity. **№11** |
+| [Memory / Undo / Persistent Data](17-NATIVE-SUITE-COOKBOOK/12-MEMORY-UNDO-PERSISTENCE.md) | R | E | R | R | R | Связать undo vs rollback и ownership adoption с failed command cleanup. **№11** |
+| [Guides / Item Views / Selection](17-NATIVE-SUITE-COOKBOOK/13-GUIDES-VIEWS-SELECTION.md) | R | E | R | R | R | Согласовать current/later API gates со stable selection и UI-only workflow. **№11** |
+| [Lifetime + threading rules](17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md) | R | E | R | R | R | Проследить handle validity, suite-before-owner teardown и async shutdown в рецепте. **№11** |
+| [Native recipe index](17-NATIVE-SUITE-COOKBOOK/15-RECIPE-INDEX.md) | R | L | R | L | R | Согласовать operation index с новыми chains, exact code и evidence links. **№11** |
+| [AEGP Suite function map — native capability index](17-NATIVE-SUITE-COOKBOOK/16-SUITE-FUNCTION-MAP.md) | R | L | R | L | R | Сверить function/suite version map с exact SDK records, сохранять compatibility choices. **№5** |
+| [Native Suite Cookbook](17-NATIVE-SUITE-COOKBOOK/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+
+## 19-NATIVE-CODE-FOUNDATION
+
+| Глава | Т | С | И | П | Л | Оставшийся результат / блок |
+|---|---|---|---|---|---|---|
+| [Suite acquisition](19-NATIVE-CODE-FOUNDATION/01-SUITE-ACQUISITION.md) | R | E | R | R | R | Согласовать acquire/release/failure с command lifetime и optional dependency. **№11** |
+| [AEGP ownership / RAII](19-NATIVE-CODE-FOUNDATION/02-RAII-OWNERSHIP.md) | R | E | R | R | R | Проследить owner cleanup/adoption при частично выполненной operation chain. **№11** |
+| [Undo groups and transaction boundaries](19-NATIVE-CODE-FOUNDATION/03-UNDO-TRANSACTIONS.md) | R | E | R | R | R | Связать Undo grouping с explicit rollback и partial mutation example. **№11** |
+| [Host callback ABI boundary](19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md) | R | E | R | R | R | Проследить exceptions/host errors/cleanup через один command callback. **№11** |
+| [Native C++ foundation — reusable safety layer](19-NATIVE-CODE-FOUNDATION/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
+
+## Поддерживающие материалы и приложения
+
+| Материал | Оставшийся результат | Блоки |
+|---|---|---|
+| [Working templates](16-WORKING-TEMPLATES/README.md) | CEP fixes; source/contract alignment с соответствующей core главой; filled use cases | 2, 6–15 |
+| [SDK tools и records](18-SDK-HEADER-TOOLS/README.md) | Alias-path regression, transparent generated identity, dated-source/version/provenance sweep | 4, 5 |
+| [Cookbook evidence](17-NATIVE-SUITE-COOKBOOK/VERIFICATION.md), [code guide](17-NATIVE-SUITE-COOKBOOK/code/README.md) | Исторические compiler claims согласованы в блоке 1; recipes ещё сверить со сквозными операциями | 1 выполнен; 11 |
+| [Reference guides](20-REFERENCE-IMPLEMENTATIONS/README.md) | Сделать все intended guides достижимыми; reconcile source и practical steps в соответствующих блоках | 3, 6–15 |
+| [Platform source review](11-DISTRIBUTION/05-PLATFORM-SOURCE-REVIEW-2026-10-01.md) | Перепроверить датированные официальные факты перед freeze | 5, 16 |
+| [Case studies](22-PROJECT-CASE-STUDIES/README.md) | Scoped FSTR/Hot Loader перенос без расширения старых runtime результатов | 2, 11, 15 |
+| [ElasticGridFX transfer](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) | Реализовать уже mapped sampling/performance/identity уроки; инструменты отдельно reviewed перед адаптацией | 5–8, 12–15 |
+| [Built-in effects atlas](21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/README.md) | Исследовательское приложение; полный каталог не блокирует core edition | По ценности, вне обязательного freeze |
+| [Coverage matrix](FINAL-COVERAGE-AUDIT.md), [checklist](COMPLETION-CHECKLIST.md), [ledger](VERIFICATION.md) | После каждого блока согласовывать фактические результаты и открытые задачи | 1–16 |
+
+Generated MASTER/MANIFEST и historical aliases не являются отдельными core chapters. Их source/generated consistency проверяется в блоках 4 и 16; dated audit остаётся исходным входом, исправления фиксируются в текущем плане и ledger.
+
+
+---
+
 <!-- SOURCE: COMPLETION-CHECKLIST.md -->
 
 # AE Developer Bible — editorial completion checklist
@@ -35330,6 +35611,8 @@ Bible готова как редакция, когда читатель може
 - [x] Source examples не называются готовыми binaries.
 - [x] Отсутствие собственного host-run не считается незакрытым completion task Bible.
 - [ ] Финальным проходом проверить старые главы на устаревшие verification labels.
+- [x] Блок 1: убрать active host-test-pending labels и legacy completion stages; dated records снабдить пояснениями исторического процесса.
+- [x] Блок 1: объяснить missing source identity compiler baseline от 2026-09-30 и снять current-source compilation claims.
 
 ## D. Chapter completeness
 
@@ -35349,6 +35632,8 @@ Bible готова как редакция, когда читатель може
 - [ ] sources/version boundary.
 
 Этот пункт закрывается **редакционным проходом по главам**, а не сборкой примеров.
+
+[Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) содержит все 127 core pages: пять независимых осей, конкретный следующий результат и ведущий блок плана. Начальные E/R не отменяют прежние source reviews и не означают, что каждая строка содержит подтверждённый дефект. Полное закрытие осей выполняется в соответствующих блоках и перед freeze.
 
 ## Editorial sweep progress — 2026-10-01
 
@@ -35549,15 +35834,17 @@ Checked and reconciled as one logical block:
 
 ## Current next step
 
-**Блок 1 [плана завершения](COMPLETION-PLAN.md): единая редакционная готовность и evidence.**
+**Блок 2 [плана завершения](COMPLETION-PLAN.md): CEP protocol и failure paths.** Блок 1 выполнен; проверки и scope результата записаны в ledger.
 
 ## Audit-based completion plan — 2026-10-02
 
 - [x] [Аудит](EDITORIAL-AUDIT-2026-10-02.md) и 16-block roadmap сохранены.
 - [x] [ElasticGridFX transfer tasks](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) привязаны к immutable source и целевым главам.
-- [ ] Устранить подтверждённые противоречия policy/evidence и CEP examples из аудита.
+- [x] Блок 1: устранить подтверждённые противоречия policy/evidence; сохранить исторические границы результатов.
+- [x] Блок 1: создать поглавный трекер и указать зависимости плана.
+- [ ] Блок 2: исправить подтверждённые CEP schema/error-path defects.
 - [ ] Исправить core/reference navigation и targeted tooling/CI findings.
-- [ ] Выполнить практические и source-review блоки 5–15; chapter-level progress фиксируется отдельно.
+- [ ] Выполнить практические и source-review блоки 5–15; progress фиксируется в поглавном трекере.
 - [ ] Перенести scoped ElasticGridFX lessons в соответствующих блоках; tool adaptation только после review.
 - [ ] Завершить block 16: editorial review, exact generated identity и freeze.
 
@@ -35589,6 +35876,12 @@ Checked and reconciled as one logical block:
 7. Найти источник любого критичного version-sensitive утверждения.
 
 Для каждого core chapter в coverage tracker отмечать отдельно: полнота объяснения, практический сценарий, provenance, согласованность примеров, links. Статусы: complete / needs expansion / needs reconciliation / intentionally limited. Последний статус требует ясного объяснения, а не служит способом скрыть недописанный материал.
+
+## Прогресс — 2026-10-02
+
+**Блок 1: выполнен; результаты проверок — в [ledger](VERIFICATION.md#block-1-editorial-readiness-and-evidence-2026-10-02).** Устранены active legacy gates, scoped исторический compiler result, согласован FSTR rerun status. [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) охватывает 127 core pages. Следующий содержательный блок — **2: CEP protocol и failure paths**; его исправления не входят в блок 1.
+
+Зависимости: блок 1 задаёт общий evidence язык; блоки 2–4 устраняют protocol/navigation/tooling findings; блок 5 задаёт provenance/version таблицу для практических дополнений 6–15. Маршруты блока 3 обновляются по мере появления этих дополнений. Блок 16 принимается после всех обязательных результатов 1–15 и их поглавной сверки. ElasticGridFX lessons выполняются в mapped блоках, а не отдельной необязательной копией материалов.
 
 ## Порядок работ
 
@@ -35658,6 +35951,8 @@ Checked and reconciled as one logical block:
 **Файлы:** SOURCES, environment/version chapters, SDK records, platform source review, CEP/UXP transition, NOTICE.
 
 Ввести компактную таблицу: claim group → exact source → review date → SDK/AE/OS boundary → evidence class. Добавить прямые source links рядом с версионными утверждениями. SDK baseline, host support, panel runtime и platform policy должны иметь разные колонки.
+
+Сопоставить охват и practical depth с существующими C++/scripting guides и [After Effects SDK Knowledge Base](https://github.com/pushREC/after-effects-sdk-kb). Последний найден при поиске 2026-10-02; пока прочитан только README, качество API-утверждений не проверено. Аналог не принимается за canonical source автоматически. Позиционирование Bible должно опираться на проверяемую пользу, а не утверждение об отсутствии аналогов.
 
 Перепроверить debugger restrictions, macOS signing/notarization и Windows ARM64 по соответствующим источникам. Roadmap UXP сейчас согласуется с официальным announcement; перед freeze обновить его дату проверки и снова подтвердить actual AE availability. Если новый AE-specific contract недоступен, оставить planning status.
 
@@ -36008,7 +36303,7 @@ Scanner-кандидат «auth route без rate limit» в `acx_channel_gate.p
 
 # AE Developer Bible — Editorial Guide
 
-Updated: **2026-10-01**
+Updated: **2026-10-02**
 
 This is the **canonical writing and editing policy** for AE Developer Bible.
 
@@ -36194,6 +36489,16 @@ A conclusion derived from evidence/reverse engineering. Never present it as a do
 ## RUNTIME-NOT-CLAIMED
 
 Bible explains a source/API pattern but does not assert host execution. This is a valid final editorial state, not an automatic TODO.
+
+## Evidence identity and historical records
+
+Compiler and runtime results belong to the source/artifact that was actually checked. A usable record identifies the date, source commit or file hashes, SDK/compiler or AE build, platform, commands/scenario and result. For a binary result, record the tested artifact identity separately from the documentation commit.
+
+An older PASS does not transfer to modified code. If a historical report lacks source identity, preserve its reported result and mark the identity gap; do not infer the tested source from the commit that published the report. Current code remains SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED unless matching evidence exists.
+
+Dated source reviews retain their original hashes, ranges, findings and NOT RUN results. Add a dated correction when a later review changes a conclusion or planning rule. Historical references to stages or Gates describe the old process; current work is tracked in [the completion plan](COMPLETION-PLAN.md) and [the chapter tracker](CHAPTER-COMPLETION-TRACKER.md).
+
+In active chapter/example guidance, use RUNTIME-NOT-CLAIMED instead of an unexplained “host test pending/required” label. Product-validation scenarios must say which reader-product claim they test. They do not become mandatory Bible tasks.
 
 ---
 
@@ -36452,15 +36757,17 @@ This workflow is mandatory for continued development of AE Developer Bible.
 
 # Coverage matrix
 
-Edition: **working line**, updated 2026-10-01.
+Edition: **working line**, updated 2026-10-02.
 
 This matrix describes **documentation coverage, reference material and evidence boundaries**. It is not a product QA scoreboard.
+
+[Поглавный трекер завершения](CHAPTER-COMPLETION-TRACKER.md) дополняет эту обзорную матрицу конкретными задачами для всех 127 core pages. Он не объявляет полную готовность направлений по одной обзорной оценке «strong/source reviewed».
 
 | Area | Documentation coverage | Reference material | Evidence / limit |
 |---|---|---|---|
 | Extension selection / architecture | strong | decision tree, communication maps | editorial/source reviewed |
 | Classic Effect | lifecycle, parameters, pixels, color | Minimal Gain source example | SDK-contract reviewed; no shipping-binary claim |
-| SmartFX / MFR | ROI, checkout, state, thread safety | pass-through/source examples | contract guidance + historical source evidence |
+| SmartFX / MFR | ROI, checkout, state, thread safety | pass-through/source examples | contract guidance; historical compiler record lacks exact tested source identity |
 | GPU | backend lifecycle, device/world ownership, testing guidance | SDK sample path | source reviewed; no universal runtime claim |
 | Custom UI / Drawbot | event model, drawing references, async boundary | acquisition skeleton | source reviewed; skeleton intentionally partial |
 | Audio effects | selectors, sound world, checkout/checkin | guidance | supplied SDK has no bundled AUDIO_RENDER implementation |
@@ -36504,6 +36811,8 @@ A section can be editorially complete without a Bible-owned host run when:
 - known limitations are explicit.
 
 Compilation or host execution matters only when the text makes a claim that depends on that execution.
+
+Block 1 reconciled legacy completion labels and scoped the 2026-09-30 compiler record. Core expansion and consistency work remains in the tracker. Existing SDK audit results belong to their recorded snapshots; no new whole-repository native/host result was produced.
 
 See [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md).
 
@@ -36782,6 +37091,7 @@ See [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md).
 
 - [Редакционный аудит](EDITORIAL-AUDIT-2026-10-02.md)
 - [План завершения](COMPLETION-PLAN.md)
+- [Поглавный трекер — 127 core pages](CHAPTER-COMPLETION-TRACKER.md)
 - [ElasticGridFX transfer plan](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md)
 
 
@@ -36805,6 +37115,10 @@ The Bible intentionally summarizes rather than republishes SDK documentation. AP
 # Sources registry
 
 Research snapshot: 2026-10-01.
+
+## Кандидат для сравнительного review — 2026-10-02
+
+[After Effects SDK Knowledge Base — pushREC](https://github.com/pushREC/after-effects-sdk-kb/blob/main/README.md). При поиске аналогов прочитан README: он перечисляет C++ SDK, SmartFX/GPU/MFR, AEGP/AEIO/Artisan и scripting; CEP development явно исключён из его scope. Это свидетельство наличия близкого публичного ресурса, а не подтверждение технической полноты или корректности его содержимого. Source/code не копировались. Сравнение глав, version-sensitive claims и provenance назначено в блок 5; до него этот кандидат не используется как API authority.
 
 ## Tier A — Adobe / platform vendor
 
@@ -36982,7 +37296,17 @@ All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL
 
 ## План завершения после аудита — 2026-10-02
 
-Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). Следующий блок: **единая редакционная готовность и evidence**. Сам аудит и фиксация плана не исправляют перечисленные в нём дефекты глав/примеров.
+Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). **Блок 1 — единая редакционная готовность и evidence: выполнен.** Следующий содержательный блок: **CEP protocol и failure paths**. Его подтверждённые дефекты пока не исправлены.
+
+Результат блока 1:
+
+- В active chapters/source guides убраны устаревшие этапы обязательной build/host приёмки Bible; product-validation scenarios сохранены с правильной областью.
+- Исторический compiler PASS от 2026-09-30 больше не присваивается нынешним recipes/reference sources: exact tested source identity в старой записи отсутствует.
+- SDK-review records и evidence ledger объясняют исторические Gates; результаты, хэши и NOT RUN своей итерации сохранены.
+- Case-study overview исправлен: independent FSTR portable rerun уже выполнен для pinned snapshot.
+- [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) охватывает 127 core pages, пять осей готовности и конкретные результаты следующих блоков.
+
+Локальные документационные проверки **PASS**; результаты GitHub CI читаются отдельно по опубликованному source SHA. Проверки и ограничения фиксируются в [ledger](VERIFICATION.md#block-1-editorial-readiness-and-evidence-2026-10-02). Новая native-компиляция и AE execution не заявляются.
 
 [ElasticGridFX transfer plan](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) добавляет scoped performance/release lessons в существующие блоки. Source snapshot закреплён; перенос в core главы и адаптация tools пока не выполнены. Новые SDK/native/AE результаты не заявляются.
 
@@ -37046,7 +37370,7 @@ Historical filenames containing “Gate 4” are retained for stable links/histo
 - Scripting/ScriptUI/CEP communication architecture.
 - macOS/Windows build, debugging, signing and packaging guidance.
 - Test/evidence/release methodology.
-- CEP protocol reconciliation.
+- Historical CEP field-name reconciliation; remaining envelope/error-path defects are scheduled in block 2.
 - Render-queue enum correction.
 - 3D Channel Extract historical classification correction.
 - FSTR Line / AE Hot Loader reuse audit.
@@ -37155,12 +37479,11 @@ Completed as one native-service/bridge/migration block:
 
 ## Current editorial TODO
 
-1. Sweep every main chapter for completeness against the editorial checklist.
-2. Find underdeveloped/too-short sections and expand them.
-3. Reconcile recipes/source examples with the latest explanatory chapters.
-4. Review dated public facts before edition freeze.
-5. Complete cross-link/provenance audit.
-6. Freeze and publish the next coherent documentation edition.
+1. Complete block 2: CEP chapter/template contract and controlled failures.
+2. Complete block 3: navigation omissions and three reader routes.
+3. Complete block 4: alias-path tooling regression and generated identity checks.
+4. Follow blocks 5–15 and update each affected row in the chapter tracker.
+5. Complete block 16: source/link/provenance sweep and edition freeze.
 
 ## Research tracks
 
@@ -37172,6 +37495,7 @@ They are **appendices, not blockers**. Full reverse engineering of every bundled
 
 - [Evidence ledger](VERIFICATION.md)
 - [Coverage matrix](FINAL-COVERAGE-AUDIT.md)
+- [Chapter completion tracker](CHAPTER-COMPLETION-TRACKER.md)
 - [Editorial completion plan](COMPLETION-PLAN.md)
 - [Editorial checklist](COMPLETION-CHECKLIST.md)
 
@@ -37189,6 +37513,12 @@ This file is an **evidence ledger**, not the completion checklist for AE Develop
 It records what was actually reviewed, compiled, observed or not run so the text never overstates evidence. A missing host/compiler result means only that Bible must not claim that result. It does **not** create an obligation to build or run every example before the documentation can be complete.
 
 The authoritative editorial readiness criteria are in [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md).
+
+## Как читать исторические записи — уточнение 2026-10-02
+
+Разделы ниже сохраняют даты, исходные source identities, выполненные проверки и NOT RUN своей итерации. Названия Gates и упоминания следующего этапа описывают прежний процесс; обязательная build/host модель отменена [EDITORIAL-GUIDE](EDITORIAL-GUIDE.md). Актуальные задачи находятся в [плане](COMPLETION-PLAN.md) и [поглавном трекере](CHAPTER-COMPLETION-TRACKER.md), а не выводятся из старых фраз «gates remain open».
+
+Повторная portable-проверка FSTR уже выполнена в записи Gate 3A ниже. Исторический OPEN render-queue enum finding позже исправлен на source level; это не runtime PASS. SDK audit и CI результаты относятся к указанным в них source snapshots/runs и не автоматически подтверждают текущий HEAD.
 
 ---
 
@@ -37353,7 +37683,9 @@ That iteration expanded Effect anatomy and SmartFX and added an auxiliary-channe
 
 The 13 recorded translation-unit checks include two forwarding entry files and a foundation-header probe. These historical results are not repeated by the editorial reviews above.
 
-`scripts/materialize_sdk_examples.py` provides exact local sample shells for all six gaps. `scripts/host_cycle.py` installs a built bundle and optionally invokes `aerender`, but intentionally reports UI load/unload and MFR stress as pending.
+**Уточнение идентичности — 2026-10-02:** в сохранённой записи этого compiler baseline отсутствуют exact tested source SHA и per-translation-unit hashes. Результат сохранён как исторически сообщённый; документационный commit не принимается за identity реально проверенного source tree. Этот baseline не подтверждает компиляцию нынешних examples/recipes, включая исправления EffectSuite и render-queue от 2026-10-01. Для нового утверждения о текущем source нужен отдельный идентифицированный compiler report.
+
+`scripts/materialize_sdk_examples.py` предоставляет sample shells для адаптации reference-кода. `scripts/host_cycle.py` может устанавливать построенный bundle и запускать `aerender`; UI load/unload и MFR stress он сам не подтверждает. Это вспомогательные инструменты проверки продуктов, не незакрытые этапы Библии.
 
 ## Reproduce portable checks
 
@@ -37751,3 +38083,19 @@ Read the current-cycle retrospective and AE_ENGINEERING_KNOWHOW; inspected selec
 **Evidence level:** documentation/source review and planning. No new SDK audit, native plugin build, AE render/Preview, install, signing, MFR fix or performance acceptance is claimed. Tool candidates were inspected as future adaptations, not copied or executed. Parent-source historical host records remain PROJECT-REPORTED; human acceptance stays USER-REPORTED.
 
 Validation for this documentation change: generated docs rebuilt; `build_docs.py --check`, `mkdocs build --strict`, `git diff --check` and existence checks for all 17 distinct immutable source paths **PASS** locally. GitHub Validate is evaluated separately on the pushed source SHA; no historical green run is reused as current evidence. These documentation checks do not close the previously recorded macOS tooling-test defect.
+
+## Block 1 — editorial readiness and evidence (2026-10-02)
+
+Входной Bible HEAD: `f9011267526553c39819b86f986627dfdc506ece`. Изменены документация, navigation config и generated artifacts; executable source, SDK bytes и host environment не изменялись.
+
+Выполнена сверка editorial policy, текущего плана/checklist/status, legacy references в Effect/SmartFX/MFR/macOS, Cookbook и связанных source guides. Active “этап 5”/host-test-pending labels заменены scoped product-validation guidance и RUNTIME-NOT-CLAIMED. Dated SDK/reuse records получили пояснения исторического процесса; их source identities, исходные findings и NOT RUN сохранены.
+
+Старый compiler baseline от 2026-09-30 не содержит exact tested source SHA или per-file hashes. Его сообщённый PASS сохранён; current-source compilation claims сняты, включая Cookbook, SmartFX и Drawbot guides. Source-review commit не назначается задним числом identity компиляции. FSTR rerun уже подтверждён исторической записью Gate 3A; в этой итерации он не повторялся.
+
+Добавлен [chapter tracker](CHAPTER-COMPLETION-TRACKER.md): 127 core pages, пять отдельных осей и конкретные remaining results по блокам. Проверка охвата сопоставляет список ссылок с фактическими core Markdown paths; отсутствие/дубли core rows недопустимы. Трекер задаёт рабочую очередь, а не выдаёт новую техническую сертификацию всех страниц.
+
+По вопросу пользователя о существующих аналогах выполнен публичный поиск и прочитаны entry pages C++/scripting guides, Adobe CEP Resources и README `pushREC/after-effects-sdk-kb`. Близкий публичный KB отмечен кандидатом для сравнения в блоке 5, без утверждения о его техническом качестве и без копирования материала. Полный comparative audit в этой итерации не выполнен.
+
+**Local validation: PASS** — generated docs/manifest rebuilt; `build_docs.py --check`, `mkdocs build --strict`, `git diff --check`; exact coverage/uniqueness check для 127 core rows; новые ledger anchors проверены в generated HTML. Все ранее записанные source hashes/commit IDs в изменённых ledger/source records сохранены; dated SDK/reuse records получили только additive context. GitHub Validate и Regenerate docs проверяются отдельно по фактически опубликованному source SHA; старые зелёные runs не используются вместо них.
+
+**Evidence boundary:** documentation/process consistency only. Новая exact-SDK compilation, linked plug-in, AE execution, MFR/GPU acceptance, signing/install или независимое повторение проектных runtime результатов — NOT RUN. Подтверждённые CEP defects, navigation omissions и macOS alias-path tooling regression остаются в блоках 2–4.

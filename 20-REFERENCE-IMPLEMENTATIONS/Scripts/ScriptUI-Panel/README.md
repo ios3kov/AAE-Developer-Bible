@@ -1,6 +1,6 @@
 # ScriptUI panel reference source
 
-Status: **source supplied / After Effects host test pending**.
+Status: **SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED**.
 
 Copy AEDeveloperBiblePanel.jsx into the After Effects ScriptUI Panels folder for the target installation, restart AE when required, then open the panel from the Window menu.
 

@@ -134,4 +134,4 @@ Record for every native build:
 
 ## Verification boundary
 
-The Bible has an earlier macOS arm64 syntax/type baseline against the supplied AE SDK 25.6. That is not the same as building, linking, signing and loading every reference plug-in. Full host-cycle acceptance remains open.
+В [исторической записи от 2026-09-30](../VERIFICATION.md#recorded-baseline-2026-09-30) сообщается об успешных macOS arm64 syntax/type checks с SDK 25.6. Точный source SHA/хэши проверенных translation units в этой записи отсутствуют; она не подтверждает компиляцию нынешних файлов. Для своего продукта разработчик отдельно проверяет сборку, линковку, ресурсы, подпись и загрузку конкретного артефакта. Глава описывает этот маршрут без заявления о новом build/host результате Библии.

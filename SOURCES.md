@@ -2,6 +2,10 @@
 
 Research snapshot: 2026-10-01.
 
+## Кандидат для сравнительного review — 2026-10-02
+
+[After Effects SDK Knowledge Base — pushREC](https://github.com/pushREC/after-effects-sdk-kb/blob/main/README.md). При поиске аналогов прочитан README: он перечисляет C++ SDK, SmartFX/GPU/MFR, AEGP/AEIO/Artisan и scripting; CEP development явно исключён из его scope. Это свидетельство наличия близкого публичного ресурса, а не подтверждение технической полноты или корректности его содержимого. Source/code не копировались. Сравнение глав, version-sensitive claims и provenance назначено в блок 5; до него этот кандидат не используется как API authority.
+
 ## Tier A — Adobe / platform vendor
 
 - Adobe After Effects Developer Portal  

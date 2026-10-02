@@ -20,6 +20,12 @@
 
 Для каждого core chapter в coverage tracker отмечать отдельно: полнота объяснения, практический сценарий, provenance, согласованность примеров, links. Статусы: complete / needs expansion / needs reconciliation / intentionally limited. Последний статус требует ясного объяснения, а не служит способом скрыть недописанный материал.
 
+## Прогресс — 2026-10-02
+
+**Блок 1: выполнен; результаты проверок — в [ledger](VERIFICATION.md#block-1-editorial-readiness-and-evidence-2026-10-02).** Устранены active legacy gates, scoped исторический compiler result, согласован FSTR rerun status. [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) охватывает 127 core pages. Следующий содержательный блок — **2: CEP protocol и failure paths**; его исправления не входят в блок 1.
+
+Зависимости: блок 1 задаёт общий evidence язык; блоки 2–4 устраняют protocol/navigation/tooling findings; блок 5 задаёт provenance/version таблицу для практических дополнений 6–15. Маршруты блока 3 обновляются по мере появления этих дополнений. Блок 16 принимается после всех обязательных результатов 1–15 и их поглавной сверки. ElasticGridFX lessons выполняются в mapped блоках, а не отдельной необязательной копией материалов.
+
 ## Порядок работ
 
 План содержит 16 логических блоков. Это рекомендуемый порядок, не обещание, что каждый блок займёт одну сессию. Слишком большой блок можно разделить по самостоятельным результатам. Каждую завершённую тему проверять и отчитывать отдельно в соответствии с EDITORIAL-GUIDE.
@@ -88,6 +94,8 @@
 **Файлы:** SOURCES, environment/version chapters, SDK records, platform source review, CEP/UXP transition, NOTICE.
 
 Ввести компактную таблицу: claim group → exact source → review date → SDK/AE/OS boundary → evidence class. Добавить прямые source links рядом с версионными утверждениями. SDK baseline, host support, panel runtime и platform policy должны иметь разные колонки.
+
+Сопоставить охват и practical depth с существующими C++/scripting guides и [After Effects SDK Knowledge Base](https://github.com/pushREC/after-effects-sdk-kb). Последний найден при поиске 2026-10-02; пока прочитан только README, качество API-утверждений не проверено. Аналог не принимается за canonical source автоматически. Позиционирование Bible должно опираться на проверяемую пользу, а не утверждение об отсутствии аналогов.
 
 Перепроверить debugger restrictions, macOS signing/notarization и Windows ARM64 по соответствующим источникам. Roadmap UXP сейчас согласуется с официальным announcement; перед freeze обновить его дату проверки и снова подтвердить actual AE availability. Если новый AE-specific contract недоступен, оставить planning status.
 

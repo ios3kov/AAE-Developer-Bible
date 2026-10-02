@@ -4,6 +4,8 @@ This is the code-level follow-up to the initial case-study extraction in [README
 
 The purpose is narrow: identify reusable engineering patterns before project patterns are reused in Bible reference material. It does **not** promote either source product to a Bible host-verified reference.
 
+**Historical process note — 2026-10-02:** references to Gate 2 below name the transaction-safety work recorded in [the ledger](../VERIFICATION.md#safe-tooling-gate-2-verification-2026-10-01). Its staging/backup/rollback safeguards remain relevant; the old mandatory Bible build/host completion model is superseded by [EDITORIAL-GUIDE](../EDITORIAL-GUIDE.md). Source identities, transfer decisions and failed-run evidence in this audit are retained.
+
 ## Audit baseline
 
 | Project | Reviewed tree | Role of this tree |
