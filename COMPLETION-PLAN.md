@@ -87,6 +87,8 @@
 
 ## 4. Проверки и генерация документации
 
+**В работе 2026-10-04:** локальная реализация и отрицательные регрессии проходят; original macOS alias-path test исправлен без TMPDIR workaround. Source staging и frozen check разделены; content digest и Git SHA различаются. GitHub jobs и bot-regeneration ещё не запущены для новой редакции; блок не закрыт. [Ledger](VERIFICATION.md#block-4-local-implementation-2026-10-04).
+
 **Файлы:** `scripts/check_native.py`, его tests, `scripts/build_docs.py`, workflows, requirements-docs.
 
 Канонизировать SDK root внутри manifest helper и покрыть macOS alias-path regression. Уточнить source-validation и generated-consistency lanes. Проверка source PR может собирать generated docs во временном staging; проверка frozen/generated revision должна запрещать stale MASTER/MANIFEST. Привязать результаты bot-regeneration к source SHA, который они представляют.

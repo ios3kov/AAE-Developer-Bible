@@ -8,7 +8,7 @@ All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL
 
 ## План завершения после аудита — 2026-10-02
 
-**Блоки 2 и 3 выполнены 2026-10-04 в редакционной области.** Навигация, три маршрута и полный охват 153 core/reference страниц сверены; 498 ссылок/якорей PASS. Ограничения поиска сохранены в [navigation audit](NAVIGATION-AUDIT.md). Следующий блок — 4: проверки и генерация документации; ещё не начат.
+**Блоки 2 и 3 выполнены 2026-10-04 в редакционной области.** Навигация, три маршрута и полный охват 153 core/reference страниц сверены; 498 ссылок/якорей PASS. Ограничения поиска сохранены в [navigation audit](NAVIGATION-AUDIT.md). Блок 4 выполняется: локальные проверки PASS; GitHub CI и новая bot-regeneration NOT RUN.
 
 Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). **Блок 1 — единая редакционная готовность и evidence: выполнен.** Блок 2 согласовал protocol/envelopes, `renameSelected({prefix})`, bootstrap и unknown-outcome policy. Добавлены portable regression tests в Validate; follow-up изолировал Unicode fixture и повторно проверил отдельный INTERNAL_ERROR: 14/14 portable scenarios PASS, host execution не заявляется. [Результаты и ограничения](VERIFICATION.md#block-2-cep-protocol-and-failure-paths-2026-10-04).
 
@@ -200,7 +200,7 @@ Completed as one native-service/bridge/migration block:
 ## Current editorial TODO
 
 1. Complete block 2: CEP chapter/template contract and controlled failures.
-2. Continue with block 4: documentation checks and generation; block 3 completed editorially.
+2. Block 4 local implementation/checks PASS; exact-revision GitHub CI and bot-regeneration remain NOT RUN.
 3. Complete block 4: alias-path tooling regression and generated identity checks.
 4. Follow blocks 5–15 and update each affected row in the chapter tracker.
 5. Complete block 16: source/link/provenance sweep and edition freeze.

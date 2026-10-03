@@ -58,6 +58,7 @@ def project_include_roots(root: Path = ROOT) -> list[Path]:
 
 
 def sdk_header_manifest(examples: Path) -> tuple[int, str]:
+    examples = examples.resolve()
     files: list[Path] = []
     for base in (examples / "Headers", examples / "Util"):
         if not base.exists():

@@ -69,6 +69,16 @@ class CheckNativeTests(unittest.TestCase):
             self.assertEqual(count3, 2)
             self.assertNotEqual(digest1, digest3)
 
+    def test_sdk_header_manifest_accepts_alias_root(self):
+        with tempfile.TemporaryDirectory() as td:
+            physical = Path(td).resolve() / "sdk"
+            (physical / "Headers").mkdir(parents=True)
+            (physical / "Headers" / "AE_Effect.h").write_text("fixture")
+            alias = Path(td) / "sdk-alias"
+            alias.symlink_to(physical, target_is_directory=True)
+            self.assertEqual(check_native.sdk_header_manifest(alias),
+                             check_native.sdk_header_manifest(physical))
+
     def _make_fake_tree(self, root: Path):
         sdk = root / "sdk" / "Examples"
         (sdk / "Headers" / "SP").mkdir(parents=True)

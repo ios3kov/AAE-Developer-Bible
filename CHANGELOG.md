@@ -1,5 +1,13 @@
 # Changelog
 
+## Documentation validation lanes — local work 2026-10-04
+
+- Fixed SDK manifest alias-root handling and added a portable symlink regression.
+- Added bounded CEP example, core navigation and evidence-boundary consistency guards.
+- Added relocatable source-content identity and isolated source staging; frozen checks reject stale outputs before regeneration.
+- Pinned documentation dependencies/actions; restricted permissions and disabled checkout credential persistence.
+- Added exact source/generated SHA reporting and a macOS regression CI job. Local checks PASS; new remote CI/bot runs NOT RUN, block 4 remains open.
+
 ## Navigation and reading routes — 2026-10-04
 
 - Completed block 3 editorially: reconciled menu/catalogue, three reading routes and decision-tree links; indexed reference guides and SDK evidence.

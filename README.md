@@ -160,3 +160,13 @@ Adobe 24 сентября 2026 объявила расширение UXP на Af
 ## Additional reference and notices
 
 [Glossary](GLOSSARY.md) · [Known pitfalls](KNOWN-PITFALLS.md) · [Notices](NOTICE.md) · [Generated combined edition](MASTER-AE-DEVELOPER-BIBLE.md) · [Navigation decisions](NAVIGATION-AUDIT.md).
+
+## Documentation validation lanes
+
+Block 4 implementation is locally verified; GitHub execution is not yet verified. Install the pinned documentation dependency set with `python -m pip install -r requirements-docs.txt`; constraints are in `requirements-docs.lock`. This fixes versions, not package hashes or an identical OS/Python environment.
+
+- **Source validation:** run `python -m unittest discover -s tests/consistency -v` and `python scripts/check_docs_consistency.py`. Generate into an external temporary directory with `python scripts/build_docs.py --output-root /absolute/temporary/staging`; then use `--check --output-root` on that same directory. Copy mkdocs.yml there and build using that staged config. The checkout's older MASTER/MANIFEST are allowed during source editing.
+- **Frozen/generated validation:** run `python scripts/build_docs.py --check` before regenerating anything. A stale MASTER or MANIFEST fails. Validate automatically chooses this lane for generated-only push commits; workflow_dispatch can explicitly select it.
+- **Identity:** the MASTER header records a relocatable source-content SHA-256, excluding MASTER/MANIFEST. It is not a Git revision. CI reports checkout SHA, triggering SHA and PR head SHA separately. Bot commits retain a `Source-Git-SHA` trailer and report the resulting generated commit SHA.
+
+Consistency tests check the actual request/success/error JSON examples in four CEP documents, the complete 127-row core inventory against nested menu/NAVIGATION, and three registered current evidence boundaries. They detect regressions and explicit unsupported CURRENT-COMPILE/RUNTIME/HOST claims; they do not certify every prose claim or execute AE. Existing source-driven CEP VM tests remain separate.
