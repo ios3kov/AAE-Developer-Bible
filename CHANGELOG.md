@@ -1,5 +1,11 @@
 # Changelog
 
+## Block 4 merged and verified — 2026-10-04
+
+- Merged PR #1 at c64b303; completed documentation validation and generation criteria.
+- Verified actual GitHub PR bot commit 1f0b792 from exact source 24fef6f; final-head source/frozen Linux/macOS CI PASS and repeated regeneration changed:false.
+- Reconciled current plan/status and retained earlier reports as historical evidence. Block 5 not started; no AE runtime claim.
+
 ## Documentation validation lanes — local work 2026-10-04
 
 - Fixed SDK manifest alias-root handling and added a portable symlink regression.

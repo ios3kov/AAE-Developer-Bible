@@ -8,7 +8,7 @@ All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL
 
 ## План завершения после аудита — 2026-10-02
 
-**Блоки 2 и 3 выполнены 2026-10-04 в редакционной области.** Навигация, три маршрута и полный охват 153 core/reference страниц сверены; 498 ссылок/якорей PASS. Ограничения поиска сохранены в [navigation audit](NAVIGATION-AUDIT.md). Блок 4 выполняется: локальные проверки и GitHub source Validate на b6f99db PASS, включая Linux и macOS. Frozen/source Validate на a414311 PASS. Добавлена read-only PR regeneration packet job; её новый exact-SHA run проверяется отдельно.
+**Блоки 2–4 выполнены 2026-10-04 в редакционной области.** Навигация: 153 core/reference страницы, 498 ссылок/якорей PASS. Блок 4: exact-head PR bot regeneration и Validate Linux/macOS PASS; PR #1 слит в main на `c64b303`. Детальные SHA и post-merge проверки — в [VERIFICATION](VERIFICATION.md). Блок 5 ещё не начат.
 
 Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). **Блок 1 — единая редакционная готовность и evidence: выполнен.** Блок 2 согласовал protocol/envelopes, `renameSelected({prefix})`, bootstrap и unknown-outcome policy. Добавлены portable regression tests в Validate; follow-up изолировал Unicode fixture и повторно проверил отдельный INTERNAL_ERROR: 14/14 portable scenarios PASS, host execution не заявляется. [Результаты и ограничения](VERIFICATION.md#block-2-cep-protocol-and-failure-paths-2026-10-04).
 
@@ -199,11 +199,9 @@ Completed as one native-service/bridge/migration block:
 
 ## Current editorial TODO
 
-1. Complete block 2: CEP chapter/template contract and controlled failures.
-2. Block 4 source GitHub CI PASS on b6f99db; frozen/generated follow-up and main-only bot-regeneration are separate evidence.
-3. Complete block 4: alias-path tooling regression and generated identity checks.
-4. Follow blocks 5–15 and update each affected row in the chapter tracker.
-5. Complete block 16: source/link/provenance sweep and edition freeze.
+1. Start block 5: source/claim/version boundaries and remaining practical-depth comparison.
+2. Follow blocks 6–15 and update each affected row in the chapter tracker.
+3. Complete block 16: source/link/provenance sweep and edition freeze.
 
 ## Research tracks
 

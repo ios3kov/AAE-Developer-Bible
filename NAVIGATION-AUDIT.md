@@ -193,3 +193,8 @@ Block 3 remains closed. Block 4 is in local review: 127 unique core table rows n
 ### GitHub handoff update
 
 Source candidate b6f99db15d0d2b30c5d0e5baa0554eae0198e323 passed Validate on Linux/macOS and both ACX workflows. Draft PR 1 publishes accepted block 3 plus block 4; remote main remains 7bba4b0. Subsequent report/generated commits require separate exact-SHA CI evidence. Main-only bot-regeneration is still NOT RUN; block 4 is not declared closed.
+
+
+## Block 4 completion — 2026-10-04
+
+PR #1 merged at c64b3032be815803fe743ad10a995725aac2231f. The bounded consistency guards and source/frozen lanes are complete. Actual GitHub PR regeneration produced 1f0b792 from source 24fef6f; final-head Linux/macOS Validate PASS, repeat regeneration changed:false. Full SHA/run provenance and separate main workflow outcome are in VERIFICATION.md. No additional browser/search experiments or AE/CEP/native runtime checks were performed. Block 3 navigation evidence and accepted search limits remain unchanged; block 5 is next, not started.

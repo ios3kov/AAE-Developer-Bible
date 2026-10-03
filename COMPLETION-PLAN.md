@@ -87,7 +87,7 @@
 
 ## 4. Проверки и генерация документации
 
-**В работе 2026-10-04:** локальная реализация и отрицательные регрессии проходят; original macOS alias-path test исправлен без TMPDIR workaround. Source staging и frozen check разделены; content digest и Git SHA различаются. GitHub source Validate на b6f99db PASS (Linux/macOS); frozen follow-up оценивается отдельно. Main-only bot-regeneration ещё не запущена; блок не закрыт. [Ledger](VERIFICATION.md#block-4-local-implementation-2026-10-04).
+**Выполнен 2026-10-04 в редакционной/tooling области.** PR #1 слит в main на `c64b3032be815803fe743ad10a995725aac2231f`. Exact-head PR bot regeneration: source `24fef6f`, generated `1f0b792`; frozen/source Validate на конечном PR HEAD PASS (Linux/macOS), повторная регенерация `changed:false`. Post-merge main evidence записывается отдельно в [VERIFICATION](VERIFICATION.md). Блок 5 — следующий, ещё не начат.
 
 **Файлы:** `scripts/check_native.py`, его tests, `scripts/build_docs.py`, workflows, requirements-docs.
 
