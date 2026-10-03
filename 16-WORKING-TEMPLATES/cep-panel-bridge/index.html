@@ -1,13 +1,42 @@
 <!doctype html>
-<html>
+<html lang="ru">
 <head>
   <meta charset="utf-8">
-  <title>AE Bible Bridge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AE Bible — CEP bridge</title>
+  <style>
+    body {
+      font: 13px sans-serif;
+      margin: 16px;
+    }
+
+    button {
+      padding: 8px 12px;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+    }
+  </style>
 </head>
 <body>
-  <button id="rename">Rename selected layers</button>
-  <pre id="status"></pre>
-  <script src="lib/CSInterface.js"></script>
-  <script src="index.js"></script>
+  <h1>CEP → ExtendScript</h1>
+
+  <p>
+    Команда добавляет <code>Bible_</code> к именам всех слоёв,
+    выбранных в активной композиции на момент исполнения.
+    Повторный запуск добавляет префикс повторно.
+  </p>
+
+  <button id="rename" type="button" disabled>
+    Добавить Bible_ выбранным слоям
+  </button>
+
+  <pre id="status" role="status" aria-live="polite">Загрузка…</pre>
+
+  <!-- Supply Adobe CSInterface.js for the target CEP runtime. -->
+  <script src="./CSInterface.js"></script>
+  <script src="./index.js"></script>
 </body>
 </html>

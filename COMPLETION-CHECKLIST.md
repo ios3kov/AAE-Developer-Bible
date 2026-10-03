@@ -262,9 +262,9 @@ Checked and reconciled as one logical block:
 
 ## Current next step
 
-**Блок 2 [плана завершения](COMPLETION-PLAN.md): CEP protocol и failure paths.** Блок 1 выполнен; проверки и scope результата записаны в ledger.
+**Блок 3 [плана завершения](COMPLETION-PLAN.md): навигация и маршруты чтения.** Блоки 1/2 выполнены; scope и проверки — в ledger.
 
-После targeted review внешних источников работа временно остановлена по просьбе пользователя. Дополнения в scripting/CEP/UXP/header-first не закрывают блоки 2, 5 и 10 целиком. Их оставшиеся результаты остаются в поглавном трекере.
+После прежней паузы выполнен блок 2 (2026-10-04). Дополнения external review не закрывают блоки 5/10 целиком. После отчёта блока 2 остановка перед блоком 3.
 
 ## Audit-based completion plan — 2026-10-02
 
@@ -272,7 +272,7 @@ Checked and reconciled as one logical block:
 - [x] [ElasticGridFX transfer tasks](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md) привязаны к immutable source и целевым главам.
 - [x] Блок 1: устранить подтверждённые противоречия policy/evidence; сохранить исторические границы результатов.
 - [x] Блок 1: создать поглавный трекер и указать зависимости плана.
-- [ ] Блок 2: исправить подтверждённые CEP schema/error-path defects.
+- [x] Блок 2: исправить CEP schema/error-path defects; portable protocol checks, strict docs и ledger. Runtime не заявлен.
 - [ ] Исправить core/reference navigation и targeted tooling/CI findings.
 - [ ] Выполнить практические и source-review блоки 5–15; progress фиксируется в поглавном трекере.
 - [ ] Перенести scoped ElasticGridFX lessons в соответствующих блоках; tool adaptation только после review.

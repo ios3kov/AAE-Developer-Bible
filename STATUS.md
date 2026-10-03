@@ -1,6 +1,6 @@
 # Status
 
-Updated: **2026-10-02**
+Updated: **2026-10-04**
 
 ## Canonical editorial policy
 
@@ -8,9 +8,9 @@ All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL
 
 ## План завершения после аудита — 2026-10-02
 
-**Работа временно остановлена по просьбе пользователя после блока 1 и targeted external-source review.** Следующий основной блок не начат; возобновление — по следующему поручению пользователя.
+**Блок 2 — CEP protocol и failure paths: выполнен 2026-10-04.** Следующий блок — 3, навигация и маршруты чтения; не начат. После отчёта остановка по editorial workflow.
 
-Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). **Блок 1 — единая редакционная готовность и evidence: выполнен.** Следующий содержательный блок: **CEP protocol и failure paths**. Его подтверждённые дефекты пока не исправлены.
+Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). **Блок 1 — единая редакционная готовность и evidence: выполнен.** Блок 2 согласовал protocol/envelopes, `renameSelected({prefix})`, bootstrap и unknown-outcome policy. Добавлены portable regression tests в Validate; host execution не заявляется. [Результаты и ограничения](VERIFICATION.md#block-2-cep-protocol-and-failure-paths-2026-10-04).
 
 Результат блока 1:
 
@@ -28,7 +28,7 @@ All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL
 
 [Отчёт от 2026-10-02](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) закрепляет четыре source snapshots и выводы выбранных проверок. У secondary KB current-25.6 matrix выявлены расхождения; web guides также требуют per-member/version чтения. Полная построчная валидация внешних коллекций не заявляется.
 
-В core добавлены import preflight и provenance/invalidation уточнения, CEP manifest/library/bootstrap diagnostic chain, native source comparison и актуальная граница published UXP docs versus actual host proof. Синтаксис собственного import helper проверен; ошибочный upstream example воспроизведён syntax-only проверкой. Новые native/AE/CEP/UXP runtime результаты — NOT RUN. Блоки 2, 5 и 10 закрыты лишь в этих отдельных пунктах, остальные задачи остаются открыты.
+В core добавлены import preflight и provenance/invalidation уточнения, CEP manifest/library/bootstrap diagnostic chain, native source comparison и актуальная граница published UXP docs versus actual host proof. Синтаксис собственного import helper проверен; ошибочный upstream example воспроизведён syntax-only проверкой. Новые native/AE/CEP/UXP runtime результаты — NOT RUN. В этом external review блоки 2, 5 и 10 были закрыты лишь в отдельных пунктах. Блок 2 завершён отдельной итерацией 2026-10-04; задачи блоков 5/10 остаются открыты.
 
 ## Current mission
 

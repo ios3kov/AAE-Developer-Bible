@@ -1,5 +1,12 @@
 # Changelog
 
+## CEP protocol and failure paths — 2026-10-04
+
+- Reconciled chapters and template around `renameSelected` / string `payload.prefix`, protocol 1 and error outcomes.
+- Made bootstrap/JSON failures visible, parsing controlled and unexpected internal errors distinct.
+- Added one-outstanding-call policy, conservative timeout/late-reply handling, Unicode escaping and primary/Undo-cleanup error separation.
+- Added portable source-driven protocol regressions to Validate and documented manifest/JSON bootstrap dependencies. AE/CEP runtime remains NOT RUN.
+
 ## External-source review and scoped additions — 2026-10-02
 
 - Pinned and reviewed selected material from the public SDK Knowledge Base, C++ SDK Guide, Scripting Guide and official Adobe CEP Resources.

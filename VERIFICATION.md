@@ -603,3 +603,15 @@ Validation for this documentation change: generated docs rebuilt; `build_docs.py
 Локальные проверки документации: **PASS** — regeneration, `build_docs.py --check`, `mkdocs build --strict`, `git diff --check`; существование 10 использованных immutable source paths; 127 unique core tracker rows; наличие нового review и ledger anchor в generated HTML. Syntax-only helper/upstream checks описаны выше. GitHub runs оцениваются отдельно по опубликованному source SHA. Внешние collection-wide/compiler/runtime claims не заявлены; native build, AE script execution, CEP install и UXP host proof — NOT RUN.
 
 После завершения и публикации этого этапа работа остановлена по просьбе пользователя. Следующий основной блок — CEP protocol/failure paths; он не начат. Source/version/license и остальные scripting recipes остаются открытыми в блоках 5 и 10.
+
+## Block 2: CEP protocol and failure paths — 2026-10-04
+
+Input repository identity: `25256010a5c6946b4cca190764407ed294bfe3ff`, clean main before changes. User-supplied replacement proposal was reviewed and applied to client/host/HTML; unexpected internal errors use separate `INTERNAL_ERROR`. Canonical operation is `renameSelected({prefix})` on execution-time selection; arbitrary values are rejected and empty prefix is a validated no-op. Related architecture, CEP, communication, hybrid recipe and template README are reconciled.
+
+Portable evidence: `node scripts/test_cep_bridge.js` executes actual template sources in Node VM with fake DOM, timers and AE objects. Fourteen grouped scenarios cover valid/repeated/no-op behavior, controlled invalid JSON and schema/type/size errors, missing comp/selection/read failures, bootstrap/JSON visibility with null ID, correlation/envelope validation, one outstanding call, timeout/late callbacks, unload/bridge failures, execution-time targeting, Unicode/script escaping, primary/cleanup failures and serialization/internal fallbacks. This is logic evidence only; mocked AE objects and modern Node parsing do not prove ES3 syntax or real CEP/AE behavior.
+
+Local checks: portable scenarios PASS; documentation generation/check, strict MkDocs and diff whitespace checks PASS (executed for this block before publication). Validate and Regenerate are evaluated separately on the published commit; their success does not establish AE runtime compatibility. Current source identity is the commit containing this ledger plus generated MANIFEST.sha256; historical records are preserved.
+
+Sources: pinned Adobe CEP `ab5e4e3e53a42fad08e1225a22a991bb1ffe73f6` and scripting guide `7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`; bootstrap integration example requires separately supplied manifest/CSInterface/JSON dependency. No dependency is implicitly certified by this source example.
+
+AE/CEP installation, actual ExtendScript engine, polyfill compatibility, host setters/Undo and multi-version runtime: **NOT RUN / RUNTIME-NOT-CLAIMED**. No hot-loading research or native build is included. Next logical block is 3 (navigation); stop after the block report.

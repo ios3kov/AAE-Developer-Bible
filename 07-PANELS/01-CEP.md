@@ -55,7 +55,7 @@ Keep bridge.js and dispatcher.jsx small and explicit. Business logic should not 
 3. Host JSX загружен через manifest `ScriptPath` либо явный `evalScript`/`$.evalFile` bootstrap; путь относится к фактической установленной extension.
 4. Малый read-only вызов подтверждает достижимость dispatcher; только после этого проверяется command protocol.
 
-Источники: тот же Cookbook и [Adobe CEP README](https://github.com/Adobe-CEP/CEP-Resources/blob/ab5e4e3e53a42fad08e1225a22a991bb1ffe73f6/README.md), проверены **2026-10-02**. Здесь описан diagnostic workflow без заявления о установленной extension. JSON/polyfill bootstrap и контролируемые protocol failures остаются отдельной задачей [блока 2](../COMPLETION-PLAN.md).
+Источники: тот же Cookbook и [Adobe CEP README](https://github.com/Adobe-CEP/CEP-Resources/blob/ab5e4e3e53a42fad08e1225a22a991bb1ffe73f6/README.md), проверены **2026-10-02**. Здесь описан diagnostic workflow без заявления о установленной extension. JSON/polyfill bootstrap и controlled failure paths описаны в [bridge walkthrough](../15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md).
 
 ## Panel -> AE
 
@@ -177,7 +177,7 @@ Request example:
   "protocol": 1,
   "requestId": "42",
   "command": "renameSelected",
-  "payload": {"name": "Hero"}
+  "payload": {"prefix": "Bible_"}
 }
 ~~~
 
@@ -185,6 +185,7 @@ Success:
 
 ~~~json
 {
+  "protocol": 1,
   "ok": true,
   "requestId": "42",
   "result": {"changed": 3}
@@ -195,16 +196,18 @@ Failure:
 
 ~~~json
 {
+  "protocol": 1,
   "ok": false,
   "requestId": "42",
   "error": {
-    "code": "NO_COMP",
-    "message": "No active composition"
+    "code": "NO_ACTIVE_COMP",
+    "message": "No active composition",
+    "outcome": "notApplied"
   }
 }
 ~~~
 
-Localized human text must not be the only machine-readable error contract.
+`renameSelected` добавляет префикс всем слоям, выбранным при исполнении; повтор добавляет его повторно. Startup `ping`, validation, null-ID bootstrap errors, one outstanding call и outcome `notApplied` / `mayHaveApplied` описаны в [каноническом протоколе](../15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md). Timeout и отброшенный ответ не отменяют mutation. Лимиты и блокировка UI — политики template, не функции CEP. [Source skeleton](../16-WORKING-TEMPLATES/cep-panel-bridge/README.md) требует внешних manifest/library/JSON dependencies. Portable checks не доказывают host run.
 
 ## Transition status — 2026-10-01
 

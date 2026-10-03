@@ -22,11 +22,11 @@
 
 ## Прогресс — 2026-10-02
 
-**Блок 1: выполнен; результаты проверок — в [ledger](VERIFICATION.md#block-1-editorial-readiness-and-evidence-2026-10-02).** Устранены active legacy gates, scoped исторический compiler result, согласован FSTR rerun status. [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) охватывает 127 core pages. Следующий содержательный блок — **2: CEP protocol и failure paths**; его исправления не входят в блок 1.
+**Блок 1: выполнен; результаты проверок — в [ledger](VERIFICATION.md#block-1-editorial-readiness-and-evidence-2026-10-02).** Устранены active legacy gates, scoped исторический compiler result, согласован FSTR rerun status. [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) охватывает 127 core pages. Блок 2 завершён отдельной итерацией 2026-10-04; следующий блок — **3: навигация и маршруты чтения**.
 
 Зависимости: блок 1 задаёт общий evidence язык; блоки 2–4 устраняют protocol/navigation/tooling findings; блок 5 задаёт provenance/version таблицу для практических дополнений 6–15. Маршруты блока 3 обновляются по мере появления этих дополнений. Блок 16 принимается после всех обязательных результатов 1–15 и их поглавной сверки. ElasticGridFX lessons выполняются в mapped блоках, а не отдельной необязательной копией материалов.
 
-По дополнительному поручению пользователя выполнен [targeted external source review](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) и небольшой перенос в scripting/CEP/header-first/UXP chapters. Это частичная работа блока 5 и дополнения к блокам 2/10; они не объявляются полностью завершёнными. Следующий основной блок остаётся 2. После этого этапа работа остановлена по просьбе пользователя; следующий блок не начат.
+По дополнительному поручению пользователя выполнен [targeted external source review](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) и небольшой перенос в scripting/CEP/header-first/UXP chapters. Это частичная работа блока 5 и дополнения к блокам 2/10; они не объявляются полностью завершёнными. После review была пауза. По новому поручению блок 2 завершён 2026-10-04: template/chapters согласованы, portable failures проверены. [Ledger](VERIFICATION.md#block-2-cep-protocol-and-failure-paths-2026-10-04). Блок 3 ещё не начат.
 
 ## Порядок работ
 
@@ -62,6 +62,8 @@
 **Готово, когда:** в current guidance одна definition of done; исторический evidence не изменён по смыслу; нет необъяснённых действующих ссылок на отменённые обязательства; compiler/runtime claims привязаны к своим снимкам.
 
 ## 2. CEP protocol и failure paths
+
+**Выполнен 2026-10-04.** Канонический prefix contract, JSON/bootstrap errors, controlled parsing, outcome semantics, one-outstanding-call, timeout/late-reply policy и portable tests согласованы с главами. AE/CEP runtime — NOT RUN.
 
 **Файлы:** `07-PANELS/01-CEP.md`, `15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md`, `12-RECIPES/05-HYBRID-PANEL-NATIVE.md`, `16-WORKING-TEMPLATES/cep-panel-bridge/*`, relevant VERIFICATION.
 

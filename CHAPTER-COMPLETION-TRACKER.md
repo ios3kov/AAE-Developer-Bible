@@ -27,7 +27,7 @@
 
 ## Частичные дополнения после внешнего review
 
-[Targeted review](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) добавил import preflight/provenance в Object model, manifest/library/bootstrap diagnostic steps в CEP, published-docs boundary в UXP и worked native-source comparison в Header-first. Соответствующие главы сохраняют E/R для остальных practical/version/recipe результатов. После этого этапа работа остановлена по просьбе пользователя; следующие блоки не выполнялись.
+[Targeted review](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) добавил import preflight/provenance в Object model, manifest/library/bootstrap diagnostic steps в CEP, published-docs boundary в UXP и worked native-source comparison в Header-first. Соответствующие главы сохраняют E/R для остальных practical/version/recipe результатов. После паузы блок 2 завершён 2026-10-04; остальные блоки не объявляются завершёнными.
 
 ## 00-START-HERE
 
@@ -47,7 +47,7 @@
 | [Version compatibility](01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md) | R | E | R | R | R | Добавить читаемую таблицу SDK/AE/suite/architecture и сценарий отказа при несовместимости. **№5** |
 | [Performance architecture](01-ARCHITECTURE/05-PERFORMANCE-ARCHITECTURE.md) | E | E | R | R | R | Разделить native core, host render, RAM Preview и измеренную конкурентность. **№8** |
 | [Build system strategy](01-ARCHITECTURE/06-BUILD-SYSTEM.md) | R | E | R | R | R | Связать общие правила с конкретными resource/export/build маршрутами обеих платформ. **№13** |
-| [Communication architecture](01-ARCHITECTURE/07-COMMUNICATION-ARCHITECTURE.md) | R | E | R | R | R | Согласовать CEP envelopes и отделить correlation от mutation ordering/idempotency. **№2** |
+| [Communication architecture](01-ARCHITECTURE/07-COMMUNICATION-ARCHITECTURE.md) | C | C | C | C | C | Envelopes, correlation и mutation ordering/idempotency согласованы. **№2 выполнен**. |
 
 ## 02-EFFECT-PLUGINS
 
@@ -97,7 +97,7 @@
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [CEP development](07-PANELS/01-CEP.md) | E | E | R | R | R | Добавить manifest/bootstrap walkthrough и единые controlled error paths. **№2** |
+| [CEP development](07-PANELS/01-CEP.md) | C | C | C | C | C | Manifest/bootstrap walkthrough и controlled failure paths согласованы. **№2 выполнен**. |
 | [UXP transition for After Effects](07-PANELS/02-UXP-TRANSITION.md) | R | L | R | L | R | Перепроверить официальные даты; ограничить главу migration context без выдуманного API. **№5** |
 | [Panels: CEP now, UXP transition](07-PANELS/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
 
@@ -164,7 +164,7 @@
 | [Recipe — migrate an existing effect to MFR](12-RECIPES/02-MFR-MIGRATION.md) | E | E | R | R | R | Добавить state inventory→immutable snapshot→cache receipt→concurrency workflow. **№8** |
 | [Recipe — plug-in does not load](12-RECIPES/03-DEBUG-PLUGIN-NOT-LOADING.md) | R | E | R | R | R | Связать failure tree с resources/exports/architecture/logs обеих платформ. **№13** |
 | [Recipe — CPU/GPU equivalence](12-RECIPES/04-CPU-GPU-EQUIVALENCE.md) | E | E | R | R | R | Добавить matched identity/toolchain, exact/tolerance/NaN и fallback comparisons. **№15** |
-| [Recipe — panel + native core](12-RECIPES/05-HYBRID-PANEL-NATIVE.md) | R | E | R | R | R | Согласовать CEP schema/commands, request ordering и error envelopes. **№2** |
+| [Recipe — panel + native core](12-RECIPES/05-HYBRID-PANEL-NATIVE.md) | C | C | C | C | C | Prefix schema, ordering и error outcomes согласованы. **№2 выполнен**. |
 | [Recipe — profiling a slow effect](12-RECIPES/06-PROFILING.md) | E | E | R | R | R | Добавить воспроизводимый profiling record с warmup/repeats/core-host-Preview scopes. **№15** |
 | [Practical recipes](12-RECIPES/README.md) | R | L | R | L | R | Согласовать обзор/route с core chapters, sample entry и порядком «читать → повторить → проверить». **№3** |
 
@@ -207,7 +207,7 @@
 | [AEGP → Effect: generic call](15-COMMUNICATION/03-AEGP-TO-EFFECT.md) | R | E | R | R | R | Добавить generic-call chain с fresh EffectRef, layer time и separate error classes. **№11** |
 | [Plug-in → Plug-in через published PICA suite](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md) | R | E | R | R | R | Согласовать version/ownership/service failure с provider/consumer source example. **№11** |
 | [ExtendScript → After Effects](15-COMMUNICATION/05-SCRIPT-TO-AE.md) | R | E | R | R | R | Связать reusable commands, undo и partial failure с automation recipes. **№10** |
-| [CEP panel <-> ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md) | E | E | R | R | R | Исправить envelopes, parse/type/error paths, bootstrap JSON failure и mutation ordering. **№2** |
+| [CEP panel <-> ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md) | C | C | C | C | C | Envelopes, parse/type/errors, JSON bootstrap и mutation policy согласованы; portable tests PASS, runtime не заявлен. **№2 выполнен**. |
 | [Native <-> script/panel: как собирать гибридный продукт](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md) | R | E | R | R | R | Разнести transport correlation, freshness, cancellation и host command ordering. **№2** |
 | [Threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md) | R | E | R | R | R | Согласовать workers/MFR/UI handoff с cache и bounded incident схемами. **№8** |
 | [Data ownership and lifetime](15-COMMUNICATION/09-DATA-OWNERSHIP.md) | R | E | R | R | R | Согласовать payload/receipt lifetimes, stale generations и failure cleanup. **№8** |

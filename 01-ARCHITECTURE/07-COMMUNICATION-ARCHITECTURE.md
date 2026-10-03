@@ -417,3 +417,7 @@ Polling допустим как explicit fallback, но нужно учитыв�
 ## Evidence boundary
 
 Native generic-call/PICA contracts are SDK-contract-reviewed against the SDK 25.6 source material. Panel/script/IPC guidance is architecture and public-documentation guidance unless a specific runtime observation is explicitly cited.
+
+## CEP worked contract — 2026-10-04
+
+[Canonical bridge](../15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md) использует protocol/requestId/command/payload и protocol/requestId/ok/result-or-error. `renameSelected({prefix})` меняет execution-time selection. Correlation не даёт deduplication или rollback; stale read-only display и mutation ordering различаются. Один outstanding вызов — локальная политика template. Timeout, lost callback и reload не отменяют host mutation; `mayHaveApplied` требует проверки проекта перед повтором. Bootstrap/JSON errors с null ID явно отображаются. Portable logic checks — не AE runtime evidence.

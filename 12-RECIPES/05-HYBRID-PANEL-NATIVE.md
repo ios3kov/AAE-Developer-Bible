@@ -54,10 +54,9 @@ Request:
 {
   "protocol": 1,
   "requestId": "123",
-  "command": "analyzeFrame",
+  "command": "renameSelected",
   "payload": {
-    "layerId": 42,
-    "time": 1.25
+    "prefix": "Bible_"
   }
 }
 ~~~
@@ -66,10 +65,11 @@ Response:
 
 ~~~json
 {
+  "protocol": 1,
   "ok": true,
   "requestId": "123",
   "result": {
-    "status": "ready"
+    "changed": 2
   }
 }
 ~~~
@@ -78,16 +78,18 @@ Error:
 
 ~~~json
 {
+  "protocol": 1,
   "ok": false,
   "requestId": "123",
   "error": {
-    "code": "NO_LAYER",
-    "message": "Target layer is not available"
+    "code": "NO_ACTIVE_COMP",
+    "message": "No active composition",
+    "outcome": "notApplied"
   }
 }
 ~~~
 
-Human text is not the only machine-readable error contract.
+Учебная операция совпадает с [CEP template](../16-WORKING-TEMPLATES/cep-panel-bridge/README.md): prefix всем execution-time selected layers; повтор добавляет prefix ещё раз. Startup `ping` read-only. Native `analyzeFrame` — возможная отдельная domain command, которой этот skeleton не реализует. Schema, bootstrap, limits и failure table — в [bridge chapter](../15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md).
 
 ## 4. One panel bridge
 
@@ -134,7 +136,10 @@ If native/helper version is incompatible, fail clearly with component mismatch i
 
 ## 7. Avoid stale responses
 
-Use request/generation identity.
+Stale display rejection относится к read-only snapshots. Request ID связывает ответ, но не устанавливает mutation ordering/idempotency. Template допускает один outstanding call; timeout или `mayHaveApplied` блокирует новые изменения до проверки проекта. Lost callback не отменяет mutation, reload не доказывает её исход. Undo не является rollback; primary и cleanup errors сохраняются раздельно. Общие рекомендации ниже для развитого продукта не являются дополнительными реализованными командами skeleton.
+
+
+For read-only selection/preview snapshots, use request/generation identity.
 
 ~~~text
 request generation 7
