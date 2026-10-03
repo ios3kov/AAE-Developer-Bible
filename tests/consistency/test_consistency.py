@@ -96,3 +96,19 @@ class ConsistencyTests(unittest.TestCase):
         path = check.CEP_PAGES[0]
         texts[path] = texts[path].replace('"prefix": "Bible_"', '"suffix": "Bible_"')
         self.assertTrue(any(path in error for error in check.cep_errors(texts)))
+
+    def test_pr_regeneration_exact_head_read_only_and_fail_closed(self):
+        import yaml
+        workflow = yaml.safe_load((ROOT / '.github/workflows/block4-bot-regeneration.yml').read_text())
+        self.assertEqual(workflow['permissions'], {'contents':'read'})
+        events = workflow.get('on', workflow.get(True))
+        self.assertNotIn('pull_request_target', events)
+        job = workflow['jobs']['regenerate-pr-head']
+        checkout = job['steps'][0]
+        self.assertEqual(checkout['with']['ref'], '${{ github.event.pull_request.head.sha }}')
+        self.assertFalse(checkout['with']['persist-credentials'])
+        commands = '\n'.join(step.get('run','') for step in job['steps'])
+        self.assertNotIn('git push', commands)
+        self.assertNotIn('|| true', commands)
+        self.assertIn('Source-Git-SHA: $PR_SOURCE_SHA', commands)
+        self.assertIn('git bundle create', commands)

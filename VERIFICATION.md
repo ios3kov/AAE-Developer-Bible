@@ -663,3 +663,7 @@ ACX channel gate [37162585692](https://github.com/ios3kov/AAE-Developer-Bible/ac
 [Draft PR 1](https://github.com/ios3kov/AAE-Developer-Bible/pull/1) includes accepted block 3 (9e72ea2), which was not yet on remote main, plus block 4. PR-triggered merge-ref runs are separate evidence from the push run. This report and its following generated-only commit will have their own exact SHA/CI results; the b6f99db result is not assigned to later commits.
 
 Actual main-only bot-regeneration remains NOT RUN for block 4. Publication of this feature branch does not run that workflow or authorize merging. Block 4 remains open pending bot/provenance acceptance; no additional search experiments or AE runs.
+
+## Block 4 PR regeneration packet — implementation 2026-10-04
+
+PR job uses the exact event head SHA, contents:read, no persisted checkout credentials and no pull_request_target/write-token execution. It runs consistency tests, generator/check and strict build, then creates a bot-authored generated-only commit when needed. An uploaded bundle and provenance JSON record source Git SHA, generated Git SHA, source-content digest and run id. No-change runs explicitly report changed:false rather than failing an empty commit or inventing new evidence. PR publication is a separate verified fast-forward; reject stale source, unexpected parent or paths, and stale generated output. Main-only bot publishing remains unchanged. Remote evidence for this newly added job is not inferred from earlier Validate runs.
