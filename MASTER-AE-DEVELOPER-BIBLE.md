@@ -35087,6 +35087,12 @@ No source-project host result is promoted into Bible host verification. FSTR SYN
 
 # Changelog
 
+## CEP bridge follow-up — 2026-10-04
+
+- Retained distinct INTERNAL_ERROR and RESPONSE_SERIALIZATION_FAILED codes; made the shared invalid-outcome diagnostic neutral.
+- Isolated the Unicode fixture to one client/handshake and used a replacement callback to preserve literal dollar sequences.
+- Fresh portable run: 14/14 grouped scenarios PASS, including separate host INTERNAL_ERROR and client conservative blocking. AE/CEP runtime NOT RUN.
+
 ## CEP protocol and failure paths — 2026-10-04
 
 - Reconciled chapters and template around `renameSelected` / string `payload.prefix`, protocol 1 and error outcomes.
@@ -35411,7 +35417,7 @@ No source-project host result is promoted into Bible host verification. FSTR SYN
 | [AEGP → Effect: generic call](15-COMMUNICATION/03-AEGP-TO-EFFECT.md) | R | E | R | R | R | Добавить generic-call chain с fresh EffectRef, layer time и separate error classes. **№11** |
 | [Plug-in → Plug-in через published PICA suite](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md) | R | E | R | R | R | Согласовать version/ownership/service failure с provider/consumer source example. **№11** |
 | [ExtendScript → After Effects](15-COMMUNICATION/05-SCRIPT-TO-AE.md) | R | E | R | R | R | Связать reusable commands, undo и partial failure с automation recipes. **№10** |
-| [CEP panel <-> ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md) | C | C | C | C | C | Envelopes, parse/type/errors, JSON bootstrap и mutation policy согласованы; portable tests PASS, runtime не заявлен. **№2 выполнен**. |
+| [CEP panel <-> ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md) | C | C | C | C | C | Envelopes, parse/type/errors, JSON bootstrap и mutation policy согласованы; отдельный INTERNAL_ERROR и его client blocking проверены portable tests; Unicode fixture изолирован, runtime не заявлен. **№2 выполнен**. |
 | [Native <-> script/panel: как собирать гибридный продукт](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md) | R | E | R | R | R | Разнести transport correlation, freshness, cancellation и host command ordering. **№2** |
 | [Threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md) | R | E | R | R | R | Согласовать workers/MFR/UI handoff с cache и bounded incident схемами. **№8** |
 | [Data ownership and lifetime](15-COMMUNICATION/09-DATA-OWNERSHIP.md) | R | E | R | R | R | Согласовать payload/receipt lifetimes, stale generations и failure cleanup. **№8** |
@@ -37275,7 +37281,7 @@ All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL
 
 **Блок 2 — CEP protocol и failure paths: выполнен 2026-10-04.** Следующий блок — 3, навигация и маршруты чтения; не начат. После отчёта остановка по editorial workflow.
 
-Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). **Блок 1 — единая редакционная готовность и evidence: выполнен.** Блок 2 согласовал protocol/envelopes, `renameSelected({prefix})`, bootstrap и unknown-outcome policy. Добавлены portable regression tests в Validate; host execution не заявляется. [Результаты и ограничения](VERIFICATION.md#block-2-cep-protocol-and-failure-paths-2026-10-04).
+Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). **Блок 1 — единая редакционная готовность и evidence: выполнен.** Блок 2 согласовал protocol/envelopes, `renameSelected({prefix})`, bootstrap и unknown-outcome policy. Добавлены portable regression tests в Validate; follow-up изолировал Unicode fixture и повторно проверил отдельный INTERNAL_ERROR: 14/14 portable scenarios PASS, host execution не заявляется. [Результаты и ограничения](VERIFICATION.md#block-2-cep-protocol-and-failure-paths-2026-10-04).
 
 Результат блока 1:
 
@@ -38108,3 +38114,9 @@ Local checks: portable scenarios PASS; documentation generation/check, strict Mk
 Sources: pinned Adobe CEP `ab5e4e3e53a42fad08e1225a22a991bb1ffe73f6` and scripting guide `7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`; bootstrap integration example requires separately supplied manifest/CSInterface/JSON dependency. No dependency is implicitly certified by this source example.
 
 AE/CEP installation, actual ExtendScript engine, polyfill compatibility, host setters/Undo and multi-version runtime: **NOT RUN / RUNTIME-NOT-CLAIMED**. No hot-loading research or native build is included. Next logical block is 3 (navigation); stop after the block report.
+
+### Block 2 follow-up: isolated client fixture — 2026-10-04
+
+Base: `366e04114086c2793379e9a4fe94cd2708a772a0`. Separate `INTERNAL_ERROR` handling was already present in that commit; this follow-up does not reclassify serialization failures. Client diagnostic now says `invalid failure outcome` for both conservative fallback codes. Unicode regression creates one client/handshake through `options.clientSource`; replacement callback preserves literal dollar sequences and asserts fixture replacement succeeded.
+
+Fresh local execution of `node scripts/test_cep_bridge.js`: exit 0, 14/14 grouped scenarios PASS, stdout contains fourteen PASS lines and the summary, stderr empty. `internal failure has its own code` verifies host `INTERNAL_ERROR`; the uncertain-host-error scenario verifies client display/blocking. This is Node VM logic evidence, not AE/CEP execution. Local generation/check, strict MkDocs and diff checks PASS for this follow-up before commit. GitHub CI is checked independently against the follow-up commit. AE/CEP runtime remains NOT RUN.

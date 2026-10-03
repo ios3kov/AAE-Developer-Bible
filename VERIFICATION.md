@@ -615,3 +615,9 @@ Local checks: portable scenarios PASS; documentation generation/check, strict Mk
 Sources: pinned Adobe CEP `ab5e4e3e53a42fad08e1225a22a991bb1ffe73f6` and scripting guide `7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`; bootstrap integration example requires separately supplied manifest/CSInterface/JSON dependency. No dependency is implicitly certified by this source example.
 
 AE/CEP installation, actual ExtendScript engine, polyfill compatibility, host setters/Undo and multi-version runtime: **NOT RUN / RUNTIME-NOT-CLAIMED**. No hot-loading research or native build is included. Next logical block is 3 (navigation); stop after the block report.
+
+### Block 2 follow-up: isolated client fixture — 2026-10-04
+
+Base: `366e04114086c2793379e9a4fe94cd2708a772a0`. Separate `INTERNAL_ERROR` handling was already present in that commit; this follow-up does not reclassify serialization failures. Client diagnostic now says `invalid failure outcome` for both conservative fallback codes. Unicode regression creates one client/handshake through `options.clientSource`; replacement callback preserves literal dollar sequences and asserts fixture replacement succeeded.
+
+Fresh local execution of `node scripts/test_cep_bridge.js`: exit 0, 14/14 grouped scenarios PASS, stdout contains fourteen PASS lines and the summary, stderr empty. `internal failure has its own code` verifies host `INTERNAL_ERROR`; the uncertain-host-error scenario verifies client display/blocking. This is Node VM logic evidence, not AE/CEP execution. Local generation/check, strict MkDocs and diff checks PASS for this follow-up before commit. GitHub CI is checked independently against the follow-up commit. AE/CEP runtime remains NOT RUN.

@@ -174,7 +174,7 @@
         case "INTERNAL_ERROR":
         case "RESPONSE_SERIALIZATION_FAILED":
           if (res.error.outcome !== "mayHaveApplied") {
-            fail("MALFORMED_RESPONSE: invalid serialization outcome");
+            fail("MALFORMED_RESPONSE: invalid failure outcome");
           }
           break;
 

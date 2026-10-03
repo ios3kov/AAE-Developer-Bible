@@ -1,5 +1,11 @@
 # Changelog
 
+## CEP bridge follow-up — 2026-10-04
+
+- Retained distinct INTERNAL_ERROR and RESPONSE_SERIALIZATION_FAILED codes; made the shared invalid-outcome diagnostic neutral.
+- Isolated the Unicode fixture to one client/handshake and used a replacement callback to preserve literal dollar sequences.
+- Fresh portable run: 14/14 grouped scenarios PASS, including separate host INTERNAL_ERROR and client conservative blocking. AE/CEP runtime NOT RUN.
+
 ## CEP protocol and failure paths — 2026-10-04
 
 - Reconciled chapters and template around `renameSelected` / string `payload.prefix`, protocol 1 and error outcomes.

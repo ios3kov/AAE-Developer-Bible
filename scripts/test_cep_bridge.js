@@ -36,7 +36,7 @@ function panel(h = host(), options = {}) {
       if (options.throwBridge) throw Error('transport failed');
       pending.push({source, callback});
     };}});
-  vm.runInContext(clientSource, context);
+  vm.runInContext(options.clientSource || clientSource, context);
   function reply(raw) {const call = pending.shift(); call.callback(raw === undefined ? vm.runInContext(call.source, h.context) : raw); return call;}
   return {status, button, pending, listeners, timers, reply, context, h};
 }
@@ -126,10 +126,23 @@ test('confirmed no-mutation errors permit retry; uncertain host errors block', (
 });
 test('Unicode and script-sensitive characters roundtrip through actual client encoder', () => {
  const prefix='Ю"\\\n\u2028\u2029\'; $._injected = true; //';
- const source=clientSource.replace('prefix: "Bible_"','prefix: '+JSON.stringify(prefix));
- const p=panel(); // initialize harness, then evaluate edited fixture with same transport
- vm.runInContext(source,p.context);p.reply();p.reply();p.listeners.click();
- assert.equal(/[\u2028\u2029]/.test(p.pending[0].source),false);p.reply();
- assert.equal(p.h.comp.selectedLayers[0].name,prefix+'A');assert.equal(p.h.context.$._injected,undefined);
+ const source=clientSource.replace(
+  'prefix: "Bible_"',
+  () => 'prefix: '+JSON.stringify(prefix)
+ );
+ assert.notEqual(source,clientSource,'Client fixture replacement must succeed');
+
+ const p=panel(host(),{clientSource:source});
+ assert.equal(p.pending.length,1);
+ p.reply(); // Единственный handshake.
+ assert.equal(p.button.disabled,false);
+
+ p.listeners.click();
+ assert.equal(p.pending.length,1);
+ assert.equal(/[\u2028\u2029]/.test(p.pending[0].source),false);
+ p.reply();
+
+ assert.equal(p.h.comp.selectedLayers[0].name,prefix+'A');
+ assert.equal(p.h.context.$._injected,undefined);
 });
 console.log(`${count} CEP bridge portable scenarios passed; AE/CEP runtime NOT RUN`);

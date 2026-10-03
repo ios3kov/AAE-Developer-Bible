@@ -207,7 +207,7 @@
 | [AEGP → Effect: generic call](15-COMMUNICATION/03-AEGP-TO-EFFECT.md) | R | E | R | R | R | Добавить generic-call chain с fresh EffectRef, layer time и separate error classes. **№11** |
 | [Plug-in → Plug-in через published PICA suite](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md) | R | E | R | R | R | Согласовать version/ownership/service failure с provider/consumer source example. **№11** |
 | [ExtendScript → After Effects](15-COMMUNICATION/05-SCRIPT-TO-AE.md) | R | E | R | R | R | Связать reusable commands, undo и partial failure с automation recipes. **№10** |
-| [CEP panel <-> ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md) | C | C | C | C | C | Envelopes, parse/type/errors, JSON bootstrap и mutation policy согласованы; portable tests PASS, runtime не заявлен. **№2 выполнен**. |
+| [CEP panel <-> ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md) | C | C | C | C | C | Envelopes, parse/type/errors, JSON bootstrap и mutation policy согласованы; отдельный INTERNAL_ERROR и его client blocking проверены portable tests; Unicode fixture изолирован, runtime не заявлен. **№2 выполнен**. |
 | [Native <-> script/panel: как собирать гибридный продукт](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md) | R | E | R | R | R | Разнести transport correlation, freshness, cancellation и host command ordering. **№2** |
 | [Threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md) | R | E | R | R | R | Согласовать workers/MFR/UI handoff с cache и bounded incident схемами. **№8** |
 | [Data ownership and lifetime](15-COMMUNICATION/09-DATA-OWNERSHIP.md) | R | E | R | R | R | Согласовать payload/receipt lifetimes, stale generations и failure cleanup. **№8** |
