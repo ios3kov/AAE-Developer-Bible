@@ -653,3 +653,13 @@ Source PR validation builds regenerated output outside the checkout. Frozen/gene
 All actions pinned to exact official tag targets verified with git ls-remote on 2026-10-04: checkout v4 11d5960a326750d5838078e36cf38b85af677262, setup-python v5 a26af69be951a213d495a4c3e4e4022e16d87065, setup-node v4 49933ea5288caeca8642d1e84afbd3f7d6820020, upload-artifact v4 ea165f8d65b6e75b540449e92b4886f43607fa02. Validate has contents:read; only the regeneration job has contents:write. Checkout credential persistence disabled; authenticated regeneration Git calls use an ephemeral masked header rather than saved checkout credentials.
 
 GitHub CI, dependency installation under the new Linux/Python 3.11 constraints, and actual bot regeneration for this modified source: NOT RUN. Block 4 OPEN pending review and exact-revision remote verification. No main push/publication performed in this iteration.
+
+## Block 4 GitHub source validation — 2026-10-04
+
+Published candidate b6f99db15d0d2b30c5d0e5baa0554eae0198e323 on codex/block4-doc-validation. Push Validate run [37162585691](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37162585691): PASS for Linux portable-checks and macos-path-regression. Downloaded job logs bind checkout and checker output to this exact SHA with dirty:false. Original macOS test and explicit symlink-root regression both pass under CPython 3.11.9; all 9 native-driver tests PASS without TMPDIR override. Linux pinned dependency installation, 9 consistency regressions and isolated source-stage strict build PASS. Frozen pre-regeneration check was skipped as intended for this source commit; negative MASTER/MANIFEST mutations inside the consistency suite failed as expected.
+
+ACX channel gate [37162585692](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37162585692) and input qualification [37162585678](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37162585678): PASS on the same candidate. No Adobe host run. Runner warnings concern pinned actions' older Node runtime, which GitHub forced to Node 24; they did not fail these runs.
+
+[Draft PR 1](https://github.com/ios3kov/AAE-Developer-Bible/pull/1) includes accepted block 3 (9e72ea2), which was not yet on remote main, plus block 4. PR-triggered merge-ref runs are separate evidence from the push run. This report and its following generated-only commit will have their own exact SHA/CI results; the b6f99db result is not assigned to later commits.
+
+Actual main-only bot-regeneration remains NOT RUN for block 4. Publication of this feature branch does not run that workflow or authorize merging. Block 4 remains open pending bot/provenance acceptance; no additional search experiments or AE runs.

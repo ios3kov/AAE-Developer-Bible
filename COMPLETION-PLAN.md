@@ -87,7 +87,7 @@
 
 ## 4. Проверки и генерация документации
 
-**В работе 2026-10-04:** локальная реализация и отрицательные регрессии проходят; original macOS alias-path test исправлен без TMPDIR workaround. Source staging и frozen check разделены; content digest и Git SHA различаются. GitHub jobs и bot-regeneration ещё не запущены для новой редакции; блок не закрыт. [Ledger](VERIFICATION.md#block-4-local-implementation-2026-10-04).
+**В работе 2026-10-04:** локальная реализация и отрицательные регрессии проходят; original macOS alias-path test исправлен без TMPDIR workaround. Source staging и frozen check разделены; content digest и Git SHA различаются. GitHub source Validate на b6f99db PASS (Linux/macOS); frozen follow-up оценивается отдельно. Main-only bot-regeneration ещё не запущена; блок не закрыт. [Ledger](VERIFICATION.md#block-4-local-implementation-2026-10-04).
 
 **Файлы:** `scripts/check_native.py`, его tests, `scripts/build_docs.py`, workflows, requirements-docs.
 

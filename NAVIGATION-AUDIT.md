@@ -189,3 +189,7 @@ Generation/check, strict build and diff checks PASS. Search language config en/r
 ## Block 4 consistency guard handoff — 2026-10-04
 
 Block 3 remains closed. Block 4 is in local review: 127 unique core table rows now guarded against source inventory drift, nested-menu removal and NAVIGATION omissions. CEP examples and scoped evidence-boundary guards are separate checks. Source-content SHA-256 in generated MASTER excludes outputs and uses relative paths; Git source SHA is recorded separately by CI/bot provenance, not mislabeled as the content digest. Local tests PASS; exact-revision GitHub runs NOT RUN. The base for these dirty changes is 9e72ea2828650bda097e5496f2ce7ffc7660e6c8. Full block 3 HTML evidence is not reclassified as a new runtime/CI result.
+
+### GitHub handoff update
+
+Source candidate b6f99db15d0d2b30c5d0e5baa0554eae0198e323 passed Validate on Linux/macOS and both ACX workflows. Draft PR 1 publishes accepted block 3 plus block 4; remote main remains 7bba4b0. Subsequent report/generated commits require separate exact-SHA CI evidence. Main-only bot-regeneration is still NOT RUN; block 4 is not declared closed.

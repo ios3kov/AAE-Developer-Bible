@@ -163,7 +163,7 @@ Adobe 24 сентября 2026 объявила расширение UXP на Af
 
 ## Documentation validation lanes
 
-Block 4 implementation is locally verified; GitHub execution is not yet verified. Install the pinned documentation dependency set with `python -m pip install -r requirements-docs.txt`; constraints are in `requirements-docs.lock`. This fixes versions, not package hashes or an identical OS/Python environment.
+Block 4 source validation passed locally and on GitHub for b6f99db (Linux/macOS). Later frozen/generated commits and main-only bot execution need their own evidence. Install the pinned documentation dependency set with `python -m pip install -r requirements-docs.txt`; constraints are in `requirements-docs.lock`. This fixes versions, not package hashes or an identical OS/Python environment.
 
 - **Source validation:** run `python -m unittest discover -s tests/consistency -v` and `python scripts/check_docs_consistency.py`. Generate into an external temporary directory with `python scripts/build_docs.py --output-root /absolute/temporary/staging`; then use `--check --output-root` on that same directory. Copy mkdocs.yml there and build using that staged config. The checkout's older MASTER/MANIFEST are allowed during source editing.
 - **Frozen/generated validation:** run `python scripts/build_docs.py --check` before regenerating anything. A stale MASTER or MANIFEST fails. Validate automatically chooses this lane for generated-only push commits; workflow_dispatch can explicitly select it.
