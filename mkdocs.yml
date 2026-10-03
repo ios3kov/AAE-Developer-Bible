@@ -1,6 +1,11 @@
 site_name: AE Developer Bible
 docs_dir: docs
 site_dir: site
+plugins:
+  - search:
+      lang:
+        - en
+        - ru
 validation:
   nav:
     omitted_files: info
@@ -8,10 +13,14 @@ theme:
   name: material
 nav:
   - Home: README.md
+  - "Reading routes and navigation": NAVIGATION.md
   - Editorial guide: EDITORIAL-GUIDE.md
   - Status: STATUS.md
   - Changelog: CHANGELOG.md
   - Sources: SOURCES.md
+  - Glossary: GLOSSARY.md
+  - Known pitfalls: KNOWN-PITFALLS.md
+  - Navigation audit: NAVIGATION-AUDIT.md
   - External sources review 2026-10-02: EXTERNAL-SOURCES-REVIEW-2026-10-02.md
   - Verification: VERIFICATION.md
   - Coverage: FINAL-COVERAGE-AUDIT.md
@@ -19,7 +28,19 @@ nav:
   - Completion plan: COMPLETION-PLAN.md
   - Completion checklist: COMPLETION-CHECKLIST.md
   - Chapter completion tracker: CHAPTER-COMPLETION-TRACKER.md
-  - Reference implementations: 20-REFERENCE-IMPLEMENTATIONS/README.md
+  - Reference implementations:
+      - "Overview and evidence vocabulary": 20-REFERENCE-IMPLEMENTATIONS/README.md
+      - "Effect — SmartFX / MFR": 20-REFERENCE-IMPLEMENTATIONS/Effect/SmartFX-MFR/README.md
+      - "Effect UI — Drawbot": 20-REFERENCE-IMPLEMENTATIONS/Effect/CustomUI-Drawbot/README.md
+      - "AEGP — MenuTool": 20-REFERENCE-IMPLEMENTATIONS/AEGP/MenuTool/README.md
+      - "AEGP — Keyframer": 20-REFERENCE-IMPLEMENTATIONS/AEGP/Keyframer/README.md
+      - "AEGP — NativePanel": 20-REFERENCE-IMPLEMENTATIONS/AEGP/NativePanel/README.md
+      - "AEIO — MinimalRegistrar": 20-REFERENCE-IMPLEMENTATIONS/AEIO/MinimalRegistrar/README.md
+      - "Artisan — MinimalRegistrar": 20-REFERENCE-IMPLEMENTATIONS/Artisan/MinimalRegistrar/README.md
+      - "Bridge — Effect / AEGP": 20-REFERENCE-IMPLEMENTATIONS/Bridges/Effect-AEGP/README.md
+      - "Bridge — PICA Provider / Consumer": 20-REFERENCE-IMPLEMENTATIONS/Bridges/PICA-Provider-Consumer/README.md
+      - "ScriptUI Panel": 20-REFERENCE-IMPLEMENTATIONS/Scripts/ScriptUI-Panel/README.md
+      - "GPU reference": 20-REFERENCE-IMPLEMENTATIONS/GPU/README.md
   - 00-START-HERE:
       - "Decision tree — что именно вы разрабатываете?": 00-START-HERE/00-DECISION-TREE.md
       - "Extension types": 00-START-HERE/01-EXTENSION-TYPES.md
@@ -40,6 +61,8 @@ nav:
       - "GPU effects": 02-EFFECT-PLUGINS/05-GPU.md
       - "Pixels, color, alpha": 02-EFFECT-PLUGINS/06-COLOR-PIXELS.md
       - "Audio effects": 02-EFFECT-PLUGINS/07-AUDIO.md
+      - "Auxiliary Channels": 02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md
+      - "Custom UI / Drawbot": 02-EFFECT-PLUGINS/09-CUSTOM-UI-DRAWBOT.md
       - "Effect plug-ins": 02-EFFECT-PLUGINS/README.md
   - 03-AEGP:
       - "AEGP hooks and suites": 03-AEGP/01-HOOKS-SUITES.md
@@ -99,6 +122,7 @@ nav:
       - "Platform source review — 2026-10-01": 11-DISTRIBUTION/05-PLATFORM-SOURCE-REVIEW-2026-10-01.md
       - "Release artifacts and update strategy": 11-DISTRIBUTION/05-RELEASE-ARTIFACTS-UPDATES.md
   - 12-RECIPES:
+      - "Recipe index": 12-RECIPES/README.md
       - "Recipe — first native effect": 12-RECIPES/01-FIRST-EFFECT.md
       - "Recipe — migrate an existing effect to MFR": 12-RECIPES/02-MFR-MIGRATION.md
       - "Recipe — plug-in does not load": 12-RECIPES/03-DEBUG-PLUGIN-NOT-LOADING.md
@@ -106,6 +130,7 @@ nav:
       - "Recipe — panel + native core": 12-RECIPES/05-HYBRID-PANEL-NATIVE.md
       - "Recipe — profiling a slow effect": 12-RECIPES/06-PROFILING.md
   - 13-TEMPLATES:
+      - "Template index": 13-TEMPLATES/README.md
       - "Bug report template": 13-TEMPLATES/BUG-REPORT.md
       - "Compatibility matrix template": 13-TEMPLATES/COMPATIBILITY-MATRIX.md
       - "Performance report template": 13-TEMPLATES/PERFORMANCE-REPORT.md
@@ -188,6 +213,7 @@ nav:
       - "Built-in Effects Reverse Engineering": 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/README.md
       - "Execution plan": 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/EXECUTION-PLAN.md
       - "Master effect list": 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/MASTER-EFFECT-LIST.md
+      - "3D Channel Extract — investigation index": 21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/README.md
   - 22-PROJECT-CASE-STUDIES:
       - "Практические кейсы — FSTR Line и AE Hot Loader": 22-PROJECT-CASE-STUDIES/README.md
       - "Reuse audit — 2026-10-01": 22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md

@@ -11,7 +11,7 @@
 - custom parameters в Effect Controls;
 - SmartFX/MFR.
 
-Дальше: `02-EFFECT-PLUGINS/`.
+Дальше: [маршрут «Первый Effect»](../NAVIGATION.md#route-effect).
 
 ## 2. Нужно управлять самим After Effects глубже, чем позволяет scripting?
 
@@ -25,7 +25,7 @@
 - коммуникация с другими native plug-ins;
 - background/idle integration в пределах поддержанного SDK.
 
-Дальше: `03-AEGP/`.
+Дальше: [маршрут «Native integration / AEGP»](../NAVIGATION.md#route-native).
 
 ## 3. Нужен собственный формат видео/изображений/аудио?
 
@@ -37,7 +37,7 @@
 - interpretation/options;
 - передача frames/audio между AE и codec/container implementation.
 
-Дальше: `04-AEIO/`.
+Дальше: [AEIO — media import/export plug-ins](../04-AEIO/README.md).
 
 ## 4. Нужно заменить способ, которым AE рендерит 3D layers?
 
@@ -45,7 +45,7 @@
 
 Но если вы просто рисуете 3D внутри собственного эффекта, Artisan обычно не нужен. Это очень тяжёлый API.
 
-Дальше: `05-ARTISAN/`.
+Дальше: [Artisan](../05-ARTISAN/README.md).
 
 ## 5. Нужна автоматизация без тяжёлого realtime render?
 
@@ -60,16 +60,22 @@
 - batch tools;
 - pipeline automation.
 
-Дальше: `06-SCRIPTING/`.
+Дальше: [маршрут «Automation tool / ScriptUI / CEP»](../NAVIGATION.md#route-automation).
 
 ## 6. Нужна dockable UI-панель?
+
+Dockable UI сам по себе не означает обязательный выбор CEP:
+- для script-based панели рассмотрите [ScriptUI](../06-SCRIPTING/02-SCRIPTUI.md);
+- для HTML/JavaScript UI рассмотрите [CEP](../07-PANELS/01-CEP.md);
+- если нужен именно native panel contract, см.
+  [Native dockable panels](../14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md).
 
 На дату 2026-09-30:
 - production сейчас: **CEP**;
 - стратегическое направление Adobe: **UXP**;
 - UXP public beta для AE заявлена на ноябрь 2026.
 
-Дальше: `07-PANELS/`.
+Дальше: [маршрут выбора и реализации UI](../NAVIGATION.md#route-automation). Ограничения и roadmap: [Panels](../07-PANELS/README.md).
 
 ## 7. Нужны и высокая скорость, и богатый UI?
 
@@ -84,6 +90,10 @@ AE SDK / GPU / MFR
 ```
 
 UI не должен владеть render state. Native core не должен знать о DOM/UI деталях.
+
+Дальше:
+[рецепт panel + native core](../12-RECIPES/05-HYBRID-PANEL-NATIVE.md)
+и [Native ↔ script/panel](../15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md).
 
 ## Red flags выбора
 

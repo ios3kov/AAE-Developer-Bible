@@ -29,18 +29,21 @@ Older `host-test-required` wording is superseded. Lack of a Bible-owned runtime 
 
 | Family | Reference | Editorial status | Purpose |
 |---|---|---|---|
-| Effect | `../16-WORKING-TEMPLATES/effect-basic` | source example | classic pixel-effect shape |
-| Effect | `Effect/SmartFX-MFR` | source example | SmartFX/MFR architecture shape |
-| Effect UI | `Effect/CustomUI-Drawbot` | skeleton | Drawbot acquisition/UI boundary |
-| AEGP | `AEGP/MenuTool` | source example | menu command + callback lifecycle |
-| AEGP | `AEGP/Keyframer` | sample-derived pattern | keyframe batching route |
-| AEGP UI | `AEGP/NativePanel` | guide-only | Panelator path |
-| AEIO | `AEIO/MinimalRegistrar` | guide-only | IO/FBIO registration path |
-| Artisan | `Artisan/MinimalRegistrar` | guide-only | Artie registration path |
-| Bridge | `Bridges/Effect-AEGP` | source pattern | generic-call message ABI |
-| Bridge | `Bridges/PICA-Provider-Consumer` | source pattern | published suite ABI |
-| Script | `Scripts/ScriptUI-Panel` | source example | ScriptUI panel pattern |
-| CEP | `../16-WORKING-TEMPLATES/cep-panel-bridge` | source example | panel ↔ JSX dispatcher |
+| Effect | [Minimal Gain](../16-WORKING-TEMPLATES/effect-basic/README.md) | source example | classic pixel-effect shape |
+| Effect | [SmartFX / MFR](Effect/SmartFX-MFR/README.md) | source example | SmartFX/MFR architecture shape |
+| Effect UI | [Custom UI / Drawbot](Effect/CustomUI-Drawbot/README.md) | skeleton | Drawbot acquisition/UI boundary |
+| AEGP | [MenuTool](AEGP/MenuTool/README.md) | source example | menu command + callback lifecycle |
+| AEGP | [Keyframer](AEGP/Keyframer/README.md) | sample-derived pattern | keyframe batching route |
+| AEGP UI | [NativePanel](AEGP/NativePanel/README.md) | guide-only | Panelator path |
+| AEIO | [MinimalRegistrar](AEIO/MinimalRegistrar/README.md) | guide-only | IO/FBIO registration path |
+| Artisan | [MinimalRegistrar](Artisan/MinimalRegistrar/README.md) | guide-only | Artie registration path |
+| Bridge | [Effect–AEGP](Bridges/Effect-AEGP/README.md) | source pattern | generic-call message ABI |
+| Bridge | [PICA Provider–Consumer](Bridges/PICA-Provider-Consumer/README.md) | source pattern | published suite ABI |
+| Script | [ScriptUI Panel](Scripts/ScriptUI-Panel/README.md) | source example | ScriptUI panel pattern |
+| CEP | [CEP–ExtendScript bridge](../16-WORKING-TEMPLATES/cep-panel-bridge/README.md) | source example | panel ↔ JSX dispatcher |
+
+Additional reference: [GPU](GPU/README.md).
+Its scope and evidence limits are described in that document.
 
 ## Using native references
 

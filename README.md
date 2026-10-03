@@ -65,13 +65,22 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 
 ## Что читать сначала
 
-1. [Decision tree](00-START-HERE/00-DECISION-TREE.md)
-2. [Extension types](00-START-HERE/01-EXTENSION-TYPES.md)
-3. Ветка своей платформы:
-   - [macOS](08-MACOS/README.md)
-   - [Windows](09-WINDOWS/README.md)
-4. Для C++ effect plug-in — [Effect plug-ins](02-EFFECT-PLUGINS/README.md)
-5. Для production/release процесса — [Distribution](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
+1. Выберите тип расширения:
+   [Decision tree](00-START-HERE/00-DECISION-TREE.md).
+   Для сравнения вариантов используйте
+   [Extension types](00-START-HERE/01-EXTENSION-TYPES.md).
+2. Пройдите один маршрут «читать → повторить → проверить»:
+   - [Первый Effect](NAVIGATION.md#route-effect).
+   - [Automation tool / ScriptUI / CEP](NAVIGATION.md#route-automation).
+   - [Native integration / AEGP](NAVIGATION.md#route-native).
+3. Для остальных задач и точечного поиска используйте
+   [полную навигацию](NAVIGATION.md).
+
+Платформенные инструкции:
+[macOS](08-MACOS/README.md) · [Windows](09-WINDOWS/README.md).
+
+Перед выпуском своего продукта:
+[Release checklist](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md).
 
 ## Структура
 
@@ -147,3 +156,7 @@ Adobe 24 сентября 2026 объявила расширение UXP на Af
 ## Источники
 
 См. [SOURCES.md](SOURCES.md). Источники разделены на official/canonical, SDK source review, community-maintained guides и secondary/research evidence.
+
+## Additional reference and notices
+
+[Glossary](GLOSSARY.md) · [Known pitfalls](KNOWN-PITFALLS.md) · [Notices](NOTICE.md) · [Generated combined edition](MASTER-AE-DEVELOPER-BIBLE.md) · [Navigation decisions](NAVIGATION-AUDIT.md).

@@ -67,3 +67,29 @@ The old `16-GATE4-...` / `17-GATE4-...` paths remain only as short compatibility
 See [SDK 25.6 contract audit record](17-SDK25.6-CONTRACT-AUDIT-2026-10-01.md).
 
 The result supports the Bible's current native contract claims. No additional macOS/Windows compilation is required to call the documentation editorially complete.
+
+## SDK 25.6 source-review records
+
+These records document scoped header/sample reviews.
+They are not additional compiler or After Effects runtime results.
+Read each record's provenance and limitations.
+
+1. [Supplied SDK and review scope](05-SUPPLIED-SDK-25.6.md)
+2. [Parameters and pixels](06-PARAMETERS-PIXELS-SDK25.6.md)
+3. [Memory and MFR](07-MEMORY-MFR-SDK25.6.md)
+4. [Registration and AEGP](08-REGISTRATION-AEGP-SDK25.6.md)
+5. [AEGP project and render](09-AEGP-PROJECT-RENDER-SDK25.6.md)
+6. [Streams and keyframes](10-STREAMS-KEYFRAMES-SDK25.6.md)
+7. [Masks, text and footage](11-MASK-TEXT-FOOTAGE-SDK25.6.md)
+8. [AEIO and Artisan](12-AEIO-ARTISAN-SDK25.6.md)
+9. [Panels and BlitHook](13-PANELS-BLITHOOK-SDK25.6.md)
+10. [PICA, bridges and legacy contracts](14-PICA-BRIDGES-LEGACY-SDK25.6.md)
+11. [GPU, audio and custom UI](15-GPU-AUDIO-CUSTOM-UI-SDK25.6.md)
+
+## Generated tooling material
+
+- [Generated material index](generated/README.md)
+- [Fixture inventory](generated/fixture-inventory.md)
+
+Fixture inventory is tooling material, not a substitute for the
+real-SDK contract audit. Consult each document for its provenance.
