@@ -1,5 +1,21 @@
 # Changelog
 
+## Documentation validation lanes — local work 2026-10-04
+
+- Fixed SDK manifest alias-root handling and added a portable symlink regression.
+- Added bounded CEP example, core navigation and evidence-boundary consistency guards.
+- Added relocatable source-content identity and isolated source staging; frozen checks reject stale outputs before regeneration.
+- Pinned documentation dependencies/actions; restricted permissions and disabled checkout credential persistence.
+- Added exact source/generated SHA reporting and a macOS regression CI job. Local checks PASS; new remote CI/bot runs NOT RUN, block 4 remains open.
+
+## Navigation and reading routes — 2026-10-04
+
+- Completed block 3 editorially: reconciled menu/catalogue, three reading routes and decision-tree links; indexed reference guides and SDK evidence.
+- Retained all 46 baseline omission decisions and 27 explained remaining omissions.
+- Verified 153 core/reference pages and 498 local links/anchors; all 183 menu entries are represented in NAVIGATION.
+- Enabled English/Russian search; excluded only generated MASTER while retaining HTML; added the SDK term Auxiliary Channels to the Russian chapter heading.
+- Preserved browser evidence and accepted search limitations; no AE runtime claim.
+
 ## CEP bridge follow-up — 2026-10-04
 
 - Retained distinct INTERNAL_ERROR and RESPONSE_SERIALIZATION_FAILED codes; made the shared invalid-outcome diagnostic neutral.

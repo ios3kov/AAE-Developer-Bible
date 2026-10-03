@@ -1,1 +1,2 @@
+-c requirements-docs.lock
 mkdocs-material==9.6.23

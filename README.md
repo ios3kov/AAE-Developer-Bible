@@ -65,13 +65,22 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 
 ## Что читать сначала
 
-1. [Decision tree](00-START-HERE/00-DECISION-TREE.md)
-2. [Extension types](00-START-HERE/01-EXTENSION-TYPES.md)
-3. Ветка своей платформы:
-   - [macOS](08-MACOS/README.md)
-   - [Windows](09-WINDOWS/README.md)
-4. Для C++ effect plug-in — [Effect plug-ins](02-EFFECT-PLUGINS/README.md)
-5. Для production/release процесса — [Distribution](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md)
+1. Выберите тип расширения:
+   [Decision tree](00-START-HERE/00-DECISION-TREE.md).
+   Для сравнения вариантов используйте
+   [Extension types](00-START-HERE/01-EXTENSION-TYPES.md).
+2. Пройдите один маршрут «читать → повторить → проверить»:
+   - [Первый Effect](NAVIGATION.md#route-effect).
+   - [Automation tool / ScriptUI / CEP](NAVIGATION.md#route-automation).
+   - [Native integration / AEGP](NAVIGATION.md#route-native).
+3. Для остальных задач и точечного поиска используйте
+   [полную навигацию](NAVIGATION.md).
+
+Платформенные инструкции:
+[macOS](08-MACOS/README.md) · [Windows](09-WINDOWS/README.md).
+
+Перед выпуском своего продукта:
+[Release checklist](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md).
 
 ## Структура
 
@@ -147,3 +156,19 @@ Adobe 24 сентября 2026 объявила расширение UXP на Af
 ## Источники
 
 См. [SOURCES.md](SOURCES.md). Источники разделены на official/canonical, SDK source review, community-maintained guides и secondary/research evidence.
+
+## Additional reference and notices
+
+[Glossary](GLOSSARY.md) · [Known pitfalls](KNOWN-PITFALLS.md) · [Notices](NOTICE.md) · [Generated combined edition](MASTER-AE-DEVELOPER-BIBLE.md) · [Navigation decisions](NAVIGATION-AUDIT.md).
+
+## Documentation validation lanes
+
+Block 4 source validation passed locally and on GitHub for b6f99db (Linux/macOS). Later frozen/generated commits and main-only bot execution need their own evidence. Install the pinned documentation dependency set with `python -m pip install -r requirements-docs.txt`; constraints are in `requirements-docs.lock`. This fixes versions, not package hashes or an identical OS/Python environment.
+
+- **Source validation:** run `python -m unittest discover -s tests/consistency -v` and `python scripts/check_docs_consistency.py`. Generate into an external temporary directory with `python scripts/build_docs.py --output-root /absolute/temporary/staging`; then use `--check --output-root` on that same directory. Copy mkdocs.yml there and build using that staged config. The checkout's older MASTER/MANIFEST are allowed during source editing.
+- **Frozen/generated validation:** run `python scripts/build_docs.py --check` before regenerating anything. A stale MASTER or MANIFEST fails. Validate automatically chooses this lane for generated-only push commits; workflow_dispatch can explicitly select it.
+- **Identity:** the MASTER header records a relocatable source-content SHA-256, excluding MASTER/MANIFEST. It is not a Git revision. CI reports checkout SHA, triggering SHA and PR head SHA separately. Bot commits retain a `Source-Git-SHA` trailer and report the resulting generated commit SHA.
+
+Consistency tests check the actual request/success/error JSON examples in four CEP documents, the complete 127-row core inventory against nested menu/NAVIGATION, and three registered current evidence boundaries. They detect regressions and explicit unsupported CURRENT-COMPILE/RUNTIME/HOST claims; they do not certify every prose claim or execute AE. Existing source-driven CEP VM tests remain separate.
+
+PR regeneration checks out the exact PR head with read-only repository permission. It validates, regenerates and uploads a bundle/provenance packet containing the bot-authored generated commit (or an explicit no-change result). Publishing that commit is separate: verify its parent equals the still-current PR source SHA, its changed paths are only MASTER/MANIFEST, and generated --check passes, then fast-forward the PR branch. No write token is passed to PR code; failures are not swallowed. The main-only regeneration workflow remains separate.

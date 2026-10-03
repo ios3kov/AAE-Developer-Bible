@@ -1,14 +1,29 @@
 name: Validate
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      lane:
+        description: Source staging or frozen generated revision
+        type: choice
+        options: [source, frozen]
+        default: source
+permissions:
+  contents: read
 jobs:
   portable-checks:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.11'
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
       - name: CEP bridge portable protocol tests (not AE host tests)
@@ -38,6 +53,39 @@ jobs:
           -I19-NATIVE-CODE-FOUNDATION/code
           19-NATIVE-CODE-FOUNDATION/tests/test_foundation.cpp -o /tmp/foundation-test
       - run: /tmp/foundation-test
-      - name: Generate documentation for validation
-        run: python scripts/build_docs.py
-      - run: mkdocs build --strict
+      - name: Documentation consistency regressions
+        run: |
+          python -m unittest discover -s tests/consistency -v
+          python scripts/check_docs_consistency.py
+      - name: Select validation lane and report exact identities
+        id: docs-lane
+        env:
+          REQUESTED_LANE: ${{ inputs.lane || 'auto' }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python scripts/docs_lane.py --lane "$REQUESTED_LANE" --github-output "$GITHUB_OUTPUT" > "$RUNNER_TEMP/docs-identity.json"
+          cat "$RUNNER_TEMP/docs-identity.json" >> "$GITHUB_STEP_SUMMARY"
+      - name: Reject stale frozen outputs before regeneration
+        if: steps.docs-lane.outputs.lane == 'frozen'
+        run: python scripts/build_docs.py --check
+      - name: Stage source documentation without changing the checkout
+        run: |
+          python scripts/build_docs.py --output-root "$RUNNER_TEMP/bible-validation"
+          python scripts/build_docs.py --check --output-root "$RUNNER_TEMP/bible-validation"
+          cp mkdocs.yml "$RUNNER_TEMP/bible-validation/mkdocs.yml"
+          mkdocs build --strict --site-dir "$RUNNER_TEMP/bible-site" --config-file "$RUNNER_TEMP/bible-validation/mkdocs.yml"
+
+  macos-path-regression:
+    runs-on: macos-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+      - name: Record exact checkout and run native-driver portable regressions
+        run: |
+          git rev-parse HEAD >> "$GITHUB_STEP_SUMMARY"
+          python -m unittest scripts.test_check_native -v

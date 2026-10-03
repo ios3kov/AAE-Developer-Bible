@@ -621,3 +621,49 @@ AE/CEP installation, actual ExtendScript engine, polyfill compatibility, host se
 Base: `366e04114086c2793379e9a4fe94cd2708a772a0`. Separate `INTERNAL_ERROR` handling was already present in that commit; this follow-up does not reclassify serialization failures. Client diagnostic now says `invalid failure outcome` for both conservative fallback codes. Unicode regression creates one client/handshake through `options.clientSource`; replacement callback preserves literal dollar sequences and asserts fixture replacement succeeded.
 
 Fresh local execution of `node scripts/test_cep_bridge.js`: exit 0, 14/14 grouped scenarios PASS, stdout contains fourteen PASS lines and the summary, stderr empty. `internal failure has its own code` verifies host `INTERNAL_ERROR`; the uncertain-host-error scenario verifies client display/blocking. This is Node VM logic evidence, not AE/CEP execution. Local generation/check, strict MkDocs and diff checks PASS for this follow-up before commit. GitHub CI is checked independently against the follow-up commit. AE/CEP runtime remains NOT RUN.
+
+## Block 3: navigation work in progress — 2026-10-04
+
+Base `7bba4b0`. Local routes, decision-tree links, menu/catalogue reconciliation, clickable reference matrix and SDK review index added; research evidence and aliases preserved. NAVIGATION-AUDIT retains all 46 baseline paths and explains 27 current omissions. Strict build, regeneration/check and diff checks PASS for the current local second part. 290 local article links/anchors resolve across six entry pages; all 46 baseline HTML pages exist. Search-index token inspection has matches for six control queries; MASTER has 3200 indexed records and duplicates chapters. Browser search ranking/interaction and full core/reference traversal: NOT RUN. Local work is uncommitted, block 3 OPEN; no new AE/CEP/native results.
+
+### Block 3 MASTER/search follow-up — 2026-10-04
+
+Generator now excludes only MASTER from search while preserving Markdown and HTML. Index assertion PASS: zero MASTER records, nonempty remaining index. Eight browser queries reviewed on a dedicated Chrome tab over local HTTP; four satisfy the target-in-first-five criterion and four fail the stated target criterion. Full private-window replay NOT RUN; one initial Incognito query only. Three Home route clicks PASS. Detailed ranks, click scope, extension-console limitation and unfinished criteria in NAVIGATION-AUDIT. Block 3 remains OPEN; language/ranking unchanged.
+
+## Block 3 completion — 2026-10-04
+
+Completed editorially from base 7bba4b0. Final scope is the 127 core table rows in CHAPTER-COMPLETION-TRACKER, plus all Markdown in working templates (16) and reference implementations (20), GLOSSARY, KNOWN-PITFALLS and SDK Header Tools overview: 26 reference pages, 153 unique pages total. Each has generated HTML and is reachable from a menu entry through explicit article links. 498 local article links/anchors PASS; zero broken targets, zero unreachable scope pages. All 183 menu paths appear in NAVIGATION; additional route/index links resolve. The 46 baseline omissions and explained 27 remaining omissions are retained.
+
+Added only (Auxiliary Channels) to the existing Russian H1; the chapter's index records contain the SDK term. Search languages en/ru and zero MASTER search records PASS; MASTER Markdown/HTML preserved. Earlier browser observations and SDK ranking limitations retained in NAVIGATION-AUDIT. User accepted these search limitations and removed clean-profile/rank experiments from completion requirements. No further search experiments or AE run.
+
+Final generation, --check, strict build and git diff --check PASS. Temporary full-scope checker/report: ../audit/block3_final_scope.py and ../audit/block3-final-scope.json; evidence scope above is retained here. Chapter tracker link axis complete; other content/provenance axes remain independent. Git commit identifies this completed source; push and GitHub CI not performed in this completion step. AE/CEP/native runtime NOT RUN.
+
+## Block 4 local implementation — 2026-10-04
+
+Initial test source base: 9e72ea2828650bda097e5496f2ce7ffc7660e6c8 with local modifications. Reports expose dirty state and source-content SHA-256 separately from Git SHA. The final candidate revision is reported separately after commit; GitHub execution is not claimed.
+
+Reproduced original native manifest test failure on macOS: resolved header paths under /private/var were not relative to an unresolved /var SDK root. sdk_header_manifest now canonicalizes its own root; original test plus explicit symlink-root regression pass without TMPDIR changes: 9/9 native driver portable tests PASS. Fake compiler fixtures do not establish real Adobe compilation.
+
+9/9 documentation consistency tests PASS: actual canonical CEP JSON request/success/error examples in four documents, full 127-row core inventory and nested menu/catalogue consistency, three registered current evidence boundaries, content-digest relocation/sensitivity/output exclusion, source staging and frozen drift detection, and lane classification. Negative mutations reject invalid protocol/prefix/envelope, a removed menu page, a removed boundary/unregistered explicit current PASS, and independently tampered MASTER/MANIFEST. Historical ledger PASS is allowed. These bounded guards do not replace semantic editorial review; the registry contains no new current compiler/runtime PASS claim.
+
+14/14 existing CEP portable scenarios, 9/9 safe-tool regressions and 17/17 SDK header-tool tests PASS. AE/CEP/native runtime NOT RUN. Generation/check, normal and isolated-staging strict MkDocs builds, pinned dependency environment pip check, and workflow YAML/shell validation PASS locally. Pinned package versions are not hash-locked supply-chain certification.
+
+Source PR validation builds regenerated output outside the checkout. Frozen/generated-only push validation runs --check before any regeneration; manual dispatch can select the lane. A dedicated macOS CI job runs native-driver tests without setting TMPDIR. Bot regeneration uses latest fetched main, emits the exact source Git SHA and resulting generated commit SHA, retains Source-Git-SHA in the commit trailer, and checks output before/after committing. GitHub-token bot pushes do not automatically trigger other workflows; the regeneration job's own --check is therefore required. No successful remote run is inferred from YAML/static checks.
+
+All actions pinned to exact official tag targets verified with git ls-remote on 2026-10-04: checkout v4 11d5960a326750d5838078e36cf38b85af677262, setup-python v5 a26af69be951a213d495a4c3e4e4022e16d87065, setup-node v4 49933ea5288caeca8642d1e84afbd3f7d6820020, upload-artifact v4 ea165f8d65b6e75b540449e92b4886f43607fa02. Validate has contents:read; only the regeneration job has contents:write. Checkout credential persistence disabled; authenticated regeneration Git calls use an ephemeral masked header rather than saved checkout credentials.
+
+GitHub CI, dependency installation under the new Linux/Python 3.11 constraints, and actual bot regeneration for this modified source: NOT RUN. Block 4 OPEN pending review and exact-revision remote verification. No main push/publication performed in this iteration.
+
+## Block 4 GitHub source validation — 2026-10-04
+
+Published candidate b6f99db15d0d2b30c5d0e5baa0554eae0198e323 on codex/block4-doc-validation. Push Validate run [37162585691](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37162585691): PASS for Linux portable-checks and macos-path-regression. Downloaded job logs bind checkout and checker output to this exact SHA with dirty:false. Original macOS test and explicit symlink-root regression both pass under CPython 3.11.9; all 9 native-driver tests PASS without TMPDIR override. Linux pinned dependency installation, 9 consistency regressions and isolated source-stage strict build PASS. Frozen pre-regeneration check was skipped as intended for this source commit; negative MASTER/MANIFEST mutations inside the consistency suite failed as expected.
+
+ACX channel gate [37162585692](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37162585692) and input qualification [37162585678](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37162585678): PASS on the same candidate. No Adobe host run. Runner warnings concern pinned actions' older Node runtime, which GitHub forced to Node 24; they did not fail these runs.
+
+[Draft PR 1](https://github.com/ios3kov/AAE-Developer-Bible/pull/1) includes accepted block 3 (9e72ea2), which was not yet on remote main, plus block 4. PR-triggered merge-ref runs are separate evidence from the push run. This report and its following generated-only commit will have their own exact SHA/CI results; the b6f99db result is not assigned to later commits.
+
+Actual main-only bot-regeneration remains NOT RUN for block 4. Publication of this feature branch does not run that workflow or authorize merging. Block 4 remains open pending bot/provenance acceptance; no additional search experiments or AE runs.
+
+## Block 4 PR regeneration packet — implementation 2026-10-04
+
+PR job uses the exact event head SHA, contents:read, no persisted checkout credentials and no pull_request_target/write-token execution. It runs consistency tests, generator/check and strict build, then creates a bot-authored generated-only commit when needed. An uploaded bundle and provenance JSON record source Git SHA, generated Git SHA, source-content digest and run id. No-change runs explicitly report changed:false rather than failing an empty commit or inventing new evidence. PR publication is a separate verified fast-forward; reject stale source, unexpected parent or paths, and stale generated output. Main-only bot publishing remains unchanged. Remote evidence for this newly added job is not inferred from earlier Validate runs.

@@ -22,11 +22,11 @@
 
 ## Прогресс — 2026-10-02
 
-**Блок 1: выполнен; результаты проверок — в [ledger](VERIFICATION.md#block-1-editorial-readiness-and-evidence-2026-10-02).** Устранены active legacy gates, scoped исторический compiler result, согласован FSTR rerun status. [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) охватывает 127 core pages. Блок 2 завершён отдельной итерацией 2026-10-04; следующий блок — **3: навигация и маршруты чтения**.
+**Блок 1: выполнен; результаты проверок — в [ledger](VERIFICATION.md#block-1-editorial-readiness-and-evidence-2026-10-02).** Устранены active legacy gates, scoped исторический compiler result, согласован FSTR rerun status. [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) охватывает 127 core pages. Блок 2 завершён отдельной итерацией 2026-10-04; блок 3 завершён 2026-10-04; следующий блок — **4: проверки и генерация документации**.
 
 Зависимости: блок 1 задаёт общий evidence язык; блоки 2–4 устраняют protocol/navigation/tooling findings; блок 5 задаёт provenance/version таблицу для практических дополнений 6–15. Маршруты блока 3 обновляются по мере появления этих дополнений. Блок 16 принимается после всех обязательных результатов 1–15 и их поглавной сверки. ElasticGridFX lessons выполняются в mapped блоках, а не отдельной необязательной копией материалов.
 
-По дополнительному поручению пользователя выполнен [targeted external source review](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) и небольшой перенос в scripting/CEP/header-first/UXP chapters. Это частичная работа блока 5 и дополнения к блокам 2/10; они не объявляются полностью завершёнными. После review была пауза. По новому поручению блок 2 завершён 2026-10-04: template/chapters согласованы, portable failures проверены. [Ledger](VERIFICATION.md#block-2-cep-protocol-and-failure-paths-2026-10-04). Блок 3 ещё не начат.
+По дополнительному поручению пользователя выполнен [targeted external source review](EXTERNAL-SOURCES-REVIEW-2026-10-02.md) и небольшой перенос в scripting/CEP/header-first/UXP chapters. Это частичная работа блока 5 и дополнения к блокам 2/10; они не объявляются полностью завершёнными. После review была пауза. По новому поручению блок 2 завершён 2026-10-04: template/chapters согласованы, portable failures проверены. [Ledger](VERIFICATION.md#block-2-cep-protocol-and-failure-paths-2026-10-04). Блок 3 завершён 2026-10-04 в редакционной области; см. [navigation audit](NAVIGATION-AUDIT.md).
 
 ## Порядок работ
 
@@ -75,6 +75,8 @@
 
 ## 3. Навигация и маршруты чтения
 
+**Выполнен 2026-10-04 в редакционной области.** Полная статическая сверка: 127 core + 26 reference = 153 страницы, 498 локальных ссылок/якорей, 183 пункта меню представлены в NAVIGATION; ошибок и недостижимых страниц нет. [Реестр и ограничения поиска](NAVIGATION-AUDIT.md). По согласованию пользователя дальнейшее ранжирование и чистый браузерный профиль не являются критериями закрытия.
+
 **Файлы:** `mkdocs.yml`, NAVIGATION, README, decision tree, section READMEs.
 
 Классифицировать 41 omitted thematic document: core, reference, SDK evidence, research, archive/generated. Добавить в menu Auxiliary Channels, Drawbot, reference guides и доступ к SDK source-review records; historical aliases допускается не показывать, но причина должна быть явной.
@@ -84,6 +86,8 @@
 **Готово, когда:** каждый core/reference chapter достижим предсказуемо; NAVIGATION и site nav не расходятся; для omissions есть явные решения; новичок может пройти маршрут без угадывания файлов.
 
 ## 4. Проверки и генерация документации
+
+**В работе 2026-10-04:** локальная реализация и отрицательные регрессии проходят; original macOS alias-path test исправлен без TMPDIR workaround. Source staging и frozen check разделены; content digest и Git SHA различаются. GitHub source Validate на b6f99db PASS (Linux/macOS); frozen follow-up оценивается отдельно. Main-only bot-regeneration ещё не запущена; блок не закрыт. [Ledger](VERIFICATION.md#block-4-local-implementation-2026-10-04).
 
 **Файлы:** `scripts/check_native.py`, его tests, `scripts/build_docs.py`, workflows, requirements-docs.
 

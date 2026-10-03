@@ -1,0 +1,9 @@
+{
+  "scope": "Regression guards for reviewed current boundaries; not semantic certification of all prose. Historical evidence ledgers remain independent.",
+  "required_boundaries": {
+    "02-EFFECT-PLUGINS/01-ANATOMY.md": "SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED",
+    "02-EFFECT-PLUGINS/03-SMARTFX.md": "SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED",
+    "15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md": "SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED"
+  },
+  "current_positive_compile_runtime_claims": []
+}
