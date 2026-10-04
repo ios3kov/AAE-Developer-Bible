@@ -123,6 +123,10 @@ For release automation:
 
 Do not resubmit a silently modified build under the same internal build identity.
 
+## Source and version boundary — 2026-10-04
+
+[Apple Developer ID](https://developer.apple.com/developer-id/), [notarization prerequisites](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution) и [custom workflow](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow) перепроверены. Hardened Runtime requirement для app/CLI targets и запрет release `get-task-allow` не означают, что plug-in может сам изменить entitlements Adobe host. Development re-sign copy из debugger guide не является release distribution workflow. Apple DocC text прочитан через официальный data endpoint; signing/submission в этой итерации NOT RUN. [Review](../BLOCK-5-REVIEW-2026-10-04.md).
+
 ## Stapling
 
 Apple can publish the ticket online, and supported distributable containers can be stapled where applicable.

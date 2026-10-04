@@ -30,6 +30,8 @@ jobs:
           test "$(git rev-parse HEAD)" = "$PR_SOURCE_SHA"
           python -m unittest discover -s tests/consistency -v
           python scripts/check_docs_consistency.py
+          python -m unittest discover -s tests/sources -v
+          python scripts/generate_sources_table.py --check
           python scripts/build_docs.py
           python scripts/build_docs.py --check
           mkdocs build --strict

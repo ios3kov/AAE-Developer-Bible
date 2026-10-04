@@ -683,3 +683,20 @@ Current status supersedes the earlier OPEN/NOT RUN snapshots above; their result
 - Post-merge ledger edits: local 10 consistency regressions, bounded checker, generation/--check, strict build and diff check PASS in the existing documentation virtual environment. A first attempt with system Python lacked PyYAML; rerun used the configured environment. Negative drift-test diagnostics are expected fixture failures, not a stale final artifact.
 
 Block 4 is complete in the editorial/tooling scope. Main auto-publishing is configured, while this main run exercised its no-change path; actual bot commit creation was exercised by the PR job. No AE/CEP/native runtime or further browser/search validation is claimed. Block 5 remains the next separate stage, not started. Later ledger/source revisions require their own CI and generated SHA; c64b303 results are not assigned to them.
+
+
+## Block 5 source/version registry — 2026-10-04
+
+Base: e0acf996133db1fb39df677e42a42cc3231a2568. Scope: 27 claim groups, source identities, retained SDK reviews, fresh platform/roadmap documentation review and selected practical-depth comparison. No full line-by-line external corpus certification.
+
+Local evidence on the edited block 5 candidate:
+
+- Source registry tests: 5/5 PASS, including missing boundaries/records, shortened identity/digest, invalid date, improper evidence class and stale table without overwrite.
+- Existing consistency suite: 10/10 PASS; intentional stale-output negative-fixture diagnostics are expected.
+- Source-table --check, bounded CEP/core/evidence checker, MASTER/MANIFEST generation and --check, MkDocs strict build, git diff --check: PASS.
+- 9 affected rendered content pages: 1,913 internal HTML destination/anchor checks PASS. No full-site/browser/search rerun is inferred.
+- Two historical regeneration records: parent equals source SHA; Source-Git-SHA trailer matches; only MASTER/MANIFEST changed; content digest independently recomputed from each source git archive and matches generated MASTER. 2/2 PASS.
+- Official Apple DocC JSON fallback, direct Adobe/Apple/Microsoft/guide review and licensed-material boundaries are documented in BLOCK-5-REVIEW-2026-10-04.md.
+- Owner decision received 2026-10-04: original text/code license remains undecided; record before release/freeze. No LICENSE grant added.
+
+New exact-SHA remote CI for this block: NOT RUN at this report snapshot; source/generated commits and PR results are separate subsequent evidence. Implementation and editorial criteria of block 5 are complete locally; main publication/merge not performed. Block 6 not started. SDK compile, signing/notarization, ARM64 AE load, CEP/UXP host/runtime and browser ranking: NOT RUN.

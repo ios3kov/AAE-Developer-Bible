@@ -198,3 +198,8 @@ Source candidate b6f99db15d0d2b30c5d0e5baa0554eae0198e323 passed Validate on Lin
 ## Block 4 completion — 2026-10-04
 
 PR #1 merged at c64b3032be815803fe743ad10a995725aac2231f. The bounded consistency guards and source/frozen lanes are complete. Actual GitHub PR regeneration produced 1f0b792 from source 24fef6f; final-head Linux/macOS Validate PASS, repeat regeneration changed:false. Full SHA/run provenance and separate main workflow outcome are in VERIFICATION.md. No additional browser/search experiments or AE/CEP/native runtime checks were performed. Block 3 navigation evidence and accepted search limits remain unchanged; block 5 is next, not started.
+
+
+## Block 5 source entry points — 2026-10-04
+
+Added BLOCK-5-SOURCES.md and BLOCK-5-REVIEW-2026-10-04.md to menu/NAVIGATION and linked from SOURCES. Earlier 183-entry/498-link block 3 results remain historical; this change adds two entries and does not inherit an unperformed full-site rerun. Source table local targets and nine affected rendered content pages were checked separately: 1,913 internal HTML destination/anchor checks PASS. No additional browser ranks, search-profile experiments or AE host runs.

@@ -2,6 +2,10 @@
 
 Обновлено: **2026-10-04**. План: [16 логических блоков](COMPLETION-PLAN.md). Правила: [EDITORIAL-GUIDE](EDITORIAL-GUIDE.md); существующий source/evidence baseline — [coverage matrix](FINAL-COVERAGE-AUDIT.md).
 
+## Block 5 source handoff — 2026-10-04
+
+[Claim/source boundaries](BLOCK-5-SOURCES.md) и [source review](BLOCK-5-REVIEW-2026-10-04.md) завершены в редакционной области: retained SDK records, fresh platform/roadmap review и selected practical-depth comparison. Это не закрывает все оси 127 core rows: содержательные expansion/reconciliation задачи блоков 6–15 остаются. Новые APIs/workflows получают отдельные scoped source records. Лицензия отложена владельцем до freeze; runtime не заявлен.
+
 ## Что здесь учитывается
 
 Это рабочая очередь для **127 core pages**: Markdown непосредственно в разделах 00–15, 17 и 19, включая их обзорные README. Dated source reviews, verification ledgers, вложенные source/reference guides и исследовательские приложения учитываются отдельно ниже. Каждый core page включён ровно один раз.

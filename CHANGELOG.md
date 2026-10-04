@@ -1,5 +1,12 @@
 # Changelog
 
+## Source and version boundaries — 2026-10-04
+
+- Added 27 reviewed claim groups with separate SDK, host, panel and platform boundaries; kept two real regeneration records separate from technical source identity.
+- Added deterministic JSON-to-table generation, drift/evidence-boundary tests and CI checks.
+- Rereviewed debugger, Windows on Arm, Apple distribution, SignTool and AE UXP sources; preserved unknown installed/runtime support.
+- Added selected practical-depth comparison and direct source links. Owner deferred original-content license decision until before release/freeze. Block 6 not started.
+
 ## Block 4 merged and verified — 2026-10-04
 
 - Merged PR #1 at c64b303; completed documentation validation and generation criteria.

@@ -337,6 +337,8 @@
 - [Status](STATUS.md)
 - [Changelog](CHANGELOG.md)
 - [Sources](SOURCES.md)
+- [Source and version boundaries](BLOCK-5-SOURCES.md)
+- [Sources review 2026-10-04](BLOCK-5-REVIEW-2026-10-04.md)
 - [Glossary](GLOSSARY.md)
 - [Known pitfalls](KNOWN-PITFALLS.md)
 - [Navigation audit](NAVIGATION-AUDIT.md)
