@@ -203,3 +203,8 @@ PR #1 merged at c64b3032be815803fe743ad10a995725aac2231f. The bounded consistenc
 ## Block 5 source entry points — 2026-10-04
 
 Added BLOCK-5-SOURCES.md and BLOCK-5-REVIEW-2026-10-04.md to menu/NAVIGATION and linked from SOURCES. Earlier 183-entry/498-link block 3 results remain historical; this change adds two entries and does not inherit an unperformed full-site rerun. Source table local targets and nine affected rendered content pages were checked separately: 1,913 internal HTML destination/anchor checks PASS. No additional browser ranks, search-profile experiments or AE host runs.
+
+
+## Block 5 merged — 2026-10-04
+
+PR #2 merged at 8e95a2df24433bfe2f58a1bb42b50f30c9cdf9c8. Source/version table and reviewed JSON are published in main; exact-head PR source/frozen checks passed. Post-merge workflow evidence is recorded in VERIFICATION.md. No additional full-site or browser evidence is inferred from this status update. Block 6 is Effect state/arbitrary data and remains unstarted.

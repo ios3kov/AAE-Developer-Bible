@@ -87,7 +87,7 @@
 
 ## 4. Проверки и генерация документации
 
-**Выполнен 2026-10-04 в редакционной/tooling области.** PR #1 слит в main на `c64b3032be815803fe743ad10a995725aac2231f`. Exact-head PR bot regeneration: source `24fef6f`, generated `1f0b792`; frozen/source Validate на конечном PR HEAD PASS (Linux/macOS), повторная регенерация `changed:false`. Post-merge main evidence записывается отдельно в [VERIFICATION](VERIFICATION.md). Блок 5 — следующий, ещё не начат.
+**Выполнен 2026-10-04 в редакционной/tooling области.** PR #1 слит в main на `c64b3032be815803fe743ad10a995725aac2231f`. Exact-head PR bot regeneration: source `24fef6f`, generated `1f0b792`; frozen/source Validate на конечном PR HEAD PASS (Linux/macOS), повторная регенерация `changed:false`. Post-merge main evidence записывается отдельно в [VERIFICATION](VERIFICATION.md). На момент закрытия блока 4 блок 5 ещё не был начат; его текущий результат указан ниже.
 
 **Файлы:** `scripts/check_native.py`, его tests, `scripts/build_docs.py`, workflows, requirements-docs.
 
@@ -99,7 +99,7 @@
 
 ## 5. Источники и таблица версий
 
-**Выполнен 2026-10-04 в редакционной области.** [Таблица](BLOCK-5-SOURCES.md): 27 scoped claim/source records с отдельными SDK/host/panel/platform границами и двумя историческими documentation regeneration records. [Review](BLOCK-5-REVIEW-2026-10-04.md): fresh platform/roadmap checks, selected practical-depth comparison и ограничения. По решению владельца лицензия собственного текста/кода пока неопределённа; решить перед freeze (блок 16). Полный построчный review внешних коллекций и host/runtime не заявлены. Следующий блок 6 ещё не начат.
+**Выполнен 2026-10-04 в редакционной области; PR #2 слит в main на `8e95a2df24433bfe2f58a1bb42b50f30c9cdf9c8`.** [Таблица](BLOCK-5-SOURCES.md): 27 scoped claim/source records с отдельными SDK/host/panel/platform границами и двумя историческими documentation regeneration records. [Review](BLOCK-5-REVIEW-2026-10-04.md): fresh platform/roadmap checks, selected practical-depth comparison и ограничения. По решению владельца лицензия собственного текста/кода пока неопределённа; решить перед freeze (блок 16). Полный построчный review внешних коллекций и host/runtime не заявлены. Следующий блок 6 ещё не начат.
 
 **Файлы:** SOURCES, environment/version chapters, SDK records, platform source review, CEP/UXP transition, NOTICE.
 

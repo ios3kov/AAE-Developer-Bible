@@ -1,5 +1,11 @@
 # Changelog
 
+## Block 5 merged — 2026-10-04
+
+- Merged PR #2 at 8e95a2d with the implemented source/version registry, generator and checks.
+- Reconciled post-publication evidence separately from the earlier local NOT RUN snapshot.
+- Preserved the owner-deferred license decision; block 6 remains unstarted.
+
 ## Source and version boundaries — 2026-10-04
 
 - Added 27 reviewed claim groups with separate SDK, host, panel and platform boundaries; kept two real regeneration records separate from technical source identity.

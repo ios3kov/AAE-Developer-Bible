@@ -700,3 +700,18 @@ Local evidence on the edited block 5 candidate:
 - Owner decision received 2026-10-04: original text/code license remains undecided; record before release/freeze. No LICENSE grant added.
 
 New exact-SHA remote CI for this block: NOT RUN at this report snapshot; source/generated commits and PR results are separate subsequent evidence. Implementation and editorial criteria of block 5 are complete locally; main publication/merge not performed. Block 6 not started. SDK compile, signing/notarization, ARM64 AE load, CEP/UXP host/runtime and browser ranking: NOT RUN.
+
+
+## Block 5 merged / exact-revision CI — 2026-10-04
+
+This subsequent record supersedes the pre-publication NOT RUN snapshot for remote documentation CI only.
+
+- Source commit: `31bd862066c6182ffb23ebb2fa50ec2b2bd3c286`; generated/final PR HEAD: `7b7cc4b01ed1c58e23e23650ab3d6e43ee8288c4`. Source-Git-SHA trailer matches the source commit.
+- [Push Validate 37163923136](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37163923136): PASS Linux/macOS, frozen output gate executed.
+- [PR Validate 37163940671](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37163940671): PASS Linux/macOS, source staging on merge ref. Five source-table regressions and existing consistency checks passed remotely.
+- [Exact-head PR regeneration 37163940691](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37163940691): PASS; job 111322906697 reports source/generated SHA both 7b7cc4b, changed:false; content digest `bfe16a8dd1932df335661263b8242de299083aefbea7137fea2baed9d385fd3c`.
+- PR #2 merged at `8e95a2df24433bfe2f58a1bb42b50f30c9cdf9c8`.
+- [Main Validate 37164246982](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37164246982): PASS.
+- [Main regeneration 37164246985](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37164246985): PASS. Job 111323802596 checkout/log binds to 8e95a2d; source-table check and docs generation/check completed without requiring another generated commit.
+
+Block 5 is complete and merged. External-source policy is already canonical in EDITORIAL-GUIDE.md; it is not replaced with a template or placeholder generator. Owner-deferred original-content license remains unresolved before block 16 freeze. SDK/AE/CEP/UXP runtime, signing/notarization and browser checks remain NOT RUN for this documentation milestone. Block 6 (Effect state / arbitrary data) remains unstarted. Subsequent ledger commit receives separate CI and generated identity, not these earlier PASS results.
