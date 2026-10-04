@@ -99,6 +99,8 @@
 
 ## 5. Источники и таблица версий
 
+**Выполнен 2026-10-04 в редакционной области.** [Таблица](BLOCK-5-SOURCES.md): 27 scoped claim/source records с отдельными SDK/host/panel/platform границами и двумя историческими documentation regeneration records. [Review](BLOCK-5-REVIEW-2026-10-04.md): fresh platform/roadmap checks, selected practical-depth comparison и ограничения. По решению владельца лицензия собственного текста/кода пока неопределённа; решить перед freeze (блок 16). Полный построчный review внешних коллекций и host/runtime не заявлены. Следующий блок 6 ещё не начат.
+
 **Файлы:** SOURCES, environment/version chapters, SDK records, platform source review, CEP/UXP transition, NOTICE.
 
 Ввести компактную таблицу: claim group → exact source → review date → SDK/AE/OS boundary → evidence class. Добавить прямые source links рядом с версионными утверждениями. SDK baseline, host support, panel runtime и platform policy должны иметь разные колонки.

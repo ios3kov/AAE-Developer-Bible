@@ -46,6 +46,7 @@ jobs:
             source_sha=$(git rev-parse HEAD)
             echo "Regeneration source Git SHA: $source_sha" >> "$GITHUB_STEP_SUMMARY"
             python3 scripts/docs_lane.py --lane source >> "$GITHUB_STEP_SUMMARY"
+            python3 scripts/generate_sources_table.py --check
             python3 scripts/build_docs.py
             python3 scripts/build_docs.py --check
             git add MASTER-AE-DEVELOPER-BIBLE.md MANIFEST.sha256

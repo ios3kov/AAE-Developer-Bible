@@ -133,3 +133,8 @@ Logs and support reports should identify which shell and protocol version produc
 ## Verification boundary
 
 The timeline is based on Adobe's 2026-09-24 announcement; AE-specific published documentation was checked on 2026-10-02. Public beta/GA availability in a concrete installation and host execution were not verified. No runtime capability is marked PASS from publication alone.
+
+
+## Source rereview — 2026-10-04
+
+[Adobe announcement](https://blog.developer.adobe.com/en/publish/2026/09/investing-in-the-future-of-creative-cloud-extensibility-uxp-comes-to-our-flagship-applications) and [AE UXP landing](https://developer.adobe.com/after-effects/uxp/) reread. The beta-by-November statement remains dated roadmap; published host-specific documentation and installed runtime availability are separate facts. No installed beta/GA or API execution is verified. [Claim/version boundaries](../BLOCK-5-SOURCES.md).

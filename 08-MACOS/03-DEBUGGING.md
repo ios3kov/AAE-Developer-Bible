@@ -1,5 +1,7 @@
 # macOS — debugging After Effects plug-ins
 
+Source/version boundary checked **2026-10-04**: [macOS debugger guide](https://ae-plugins.docsforadobe.dev/intro/debugging-ae-macos/). Non-Beta 26.5+ and Beta 2027+ are distinct later-version guide statements; no attach run on an installed build is claimed. [Review](../BLOCK-5-REVIEW-2026-10-04.md).
+
 ## Normal workflow
 
 - Xcode scheme executable → After Effects;

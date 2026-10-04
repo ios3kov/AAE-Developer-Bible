@@ -8,7 +8,7 @@ All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL
 
 ## План завершения после аудита — 2026-10-02
 
-**Блоки 2–4 выполнены 2026-10-04 в редакционной области.** Навигация: 153 core/reference страницы, 498 ссылок/якорей PASS. Блок 4: exact-head PR bot regeneration и Validate Linux/macOS PASS; PR #1 слит в main на `c64b303`. Детальные SHA и post-merge проверки — в [VERIFICATION](VERIFICATION.md). Блок 5 ещё не начат.
+**Блоки 2–4 выполнены 2026-10-04 в редакционной области.** Навигация: 153 core/reference страницы, 498 ссылок/якорей PASS. Блок 4: exact-head PR bot regeneration и Validate Linux/macOS PASS; PR #1 слит в main на `c64b303`. Детальные SHA и post-merge проверки — в [VERIFICATION](VERIFICATION.md). Блок 5 выполнен редакционно: 27 source/claim records, platform rereview и practical-depth comparison; лицензия по решению владельца пока неопределённа. Блок 6 ещё не начат.
 
 Зафиксирован [аудит текущей редакции](EDITORIAL-AUDIT-2026-10-02.md) и [план из 16 логических блоков](COMPLETION-PLAN.md). **Блок 1 — единая редакционная готовность и evidence: выполнен.** Блок 2 согласовал protocol/envelopes, `renameSelected({prefix})`, bootstrap и unknown-outcome policy. Добавлены portable regression tests в Validate; follow-up изолировал Unicode fixture и повторно проверил отдельный INTERNAL_ERROR: 14/14 portable scenarios PASS, host execution не заявляется. [Результаты и ограничения](VERIFICATION.md#block-2-cep-protocol-and-failure-paths-2026-10-04).
 
@@ -199,9 +199,10 @@ Completed as one native-service/bridge/migration block:
 
 ## Current editorial TODO
 
-1. Start block 5: source/claim/version boundaries and remaining practical-depth comparison.
-2. Follow blocks 6–15 and update each affected row in the chapter tracker.
-3. Complete block 16: source/link/provenance sweep and edition freeze.
+1. Start block 6: Effect state and arbitrary data.
+2. Resolve the owner-deferred license decision before block 16 edition freeze.
+3. Follow blocks 7–15 and update each affected row in the chapter tracker.
+4. Complete block 16: source/link/provenance sweep and edition freeze.
 
 ## Research tracks
 

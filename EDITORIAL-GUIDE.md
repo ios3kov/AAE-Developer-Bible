@@ -201,6 +201,10 @@ In active chapter/example guidance, use RUNTIME-NOT-CLAIMED instead of an unexpl
 
 # 6. Source hierarchy
 
+## Claim registry and build provenance
+
+[Block 5 table](BLOCK-5-SOURCES.md) is generated from reviewed claim records in `sources/claim-registry.json`. Keep SDK baseline, host support, panel runtime and platform policy separate. Technical source identities (SDK bytes / upstream snapshot / dated vendor page) must not be replaced with Bible source/generated Git SHAs. Documentation CI provenance is a separate historical table, not API or runtime evidence. Generator/schema checks cannot certify source truth; review the claim and its exact applicability before adding a record.
+
 ## Native compile-time/API facts
 
 Priority:

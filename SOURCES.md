@@ -1,6 +1,8 @@
 # Sources registry
 
-Research snapshot: 2026-10-01.
+Research snapshots: retained 2026-10-01 / 2026-10-02; selected platform/roadmap rereview **2026-10-04**.
+
+[Claim/source/version table](BLOCK-5-SOURCES.md) separates SDK, host, panel and platform boundaries. [Block 5 review](BLOCK-5-REVIEW-2026-10-04.md) records practical-depth comparison, fresh checks and remaining uncertainty.
 
 ## Внешний source review — 2026-10-02
 

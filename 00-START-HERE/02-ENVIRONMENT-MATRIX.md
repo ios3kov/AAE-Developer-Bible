@@ -41,6 +41,10 @@
 | dependencies | bundled/runtime/framework requirements |
 | host products | AE only vs Premiere compatibility where applicable |
 
+## Source boundaries
+
+[Claim/source/version table](../BLOCK-5-SOURCES.md) keeps SDK ABI, documented host requirements, panel runtime and platform policy in separate columns. SDK 25.6 build 61 is the Bible native baseline, not an AE/OS support range. Current Adobe Windows-on-Arm requirements are documented separately from our unperformed native ARM64 host tests.
+
 ## Platform baseline
 
 | Dimension | macOS | Windows |
