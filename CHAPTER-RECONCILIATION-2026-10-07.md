@@ -264,3 +264,29 @@ unqualified async protocol boundary. No C++ implementation changed; no host resu
 Next queue: scripting → platforms/compatibility → testing/distribution/templates
 → index/source/link reconciliation and final freeze. No new audit branch or mandatory
 host test introduced. Local publication/portable results are in [ledger](VERIFICATION.md).
+
+## Scripting completion reconciliation
+
+Parent `1054917`. Read all four scripting pages, script→AE companion, three
+standalone JSX lessons, ScriptUI reference source/guide and existing portable
+import/queue tests together. Five core rows now C or index-bounded L. Pinned
+FootageItem guide at `7137a990` fetched/read for replace/new FileSource,
+interpretation preservation, media attributes and separate sequence replacement.
+Other per-member/version/provenance boundaries retain the existing dated records.
+
+ScriptUI source now returns plain partial-result data with separate Undo-close
+error, validates/snapshots immediate targets and proposed names, rechecks project/
+queue/comp, restores button state and initializes layout for either root. No
+deferred scheduler or stable-ID persistence invented. Added eight fake-host portable
+scenarios and CI step; they exercise JavaScript control flow, not ExtendScript or
+real ScriptUI/AE behavior. Standalone prefix renamer remains a separate limited IIFE.
+
+Corrected blanket dialogs-before-Undo claim: import template prompt occurs after
+owned object creation inside Undo; source only reads back path, not settings/format.
+Fixed comp duration/fps and cleanup dependency limits explicit. Replace is a worked
+design, not shipped script. Rig checks expression resolution at t0, not numeric
+assertions/all frames; fixed expression names versus script matchNames and literal
+escaping/engine limits explicit. Deferred progress/cancel/stale-target behavior is
+documented separately from synchronous source. No host run or runtime support claim.
+
+Next: platforms/compatibility → testing/distribution/templates → final freeze.

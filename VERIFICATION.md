@@ -2,6 +2,21 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Scripting closure
+
+Parent `1054917`; containing commit identifies source edits. Five core rows
+reconciled in [chapter record](CHAPTER-RECONCILIATION-2026-10-07.md#scripting-completion-reconciliation).
+ScriptUI JSX source changed; eight portable fake-host scenarios PASS, and existing
+import/queue portable safety PASS. These test JS control flow/partial count/Undo
+balance/UI restoration, not host objects, docking/painting, ExtendScript syntax
+compatibility, expression evaluation or media replacement. Pinned FootageItem
+guide read; new replacement workflow remains design only.
+
+Local consistency11/11, docs checker, MASTER/MANIFEST regeneration/freshness,
+strict MkDocs and diff whitespace checks PASS using existing documentation venv.
+No fresh dependency installation, Adobe SDK compiler/AE run or GitHub CI result
+claimed for this head. New CI step executes the same portable ScriptUI test only.
+
 ### Remaining AEGP/native integration closure
 
 Parent `b20806b0bb20434fef8402816904ffd2dc1f68cf`; containing commit identifies

@@ -13,6 +13,17 @@ The source demonstrates:
 - resize handling;
 - non-modal status reporting instead of an alert for normal command errors.
 
+`renameSelectedLayers(prefix)` validates and snapshots immediate targets, then
+returns `{ok, changed, total, error, cleanupError}`. The button uses `Layer_` numbering;
+partial setter failures retain completed count, Undo close errors are separate,
+and controls are re-enabled in finally. Both Panel/Window receive initial layout.
+No progress/cancel scheduler, persistent target IDs, collision policy or rollback
+implementation is included. See [deferred-job design](../../../06-SCRIPTING/02-SCRIPTUI.md#concrete-synchronous-command-and-deferred-job-design).
+
+Portable fake-host tests in `scripts/test_scriptui_command.js` cover validation,
+success, setter failure, Undo-start/close failure and UI restoration. They do not
+emulate ScriptUI painting, docking, host object invalidation or ExtendScript engines.
+
 Communication path:
 
 ~~~text

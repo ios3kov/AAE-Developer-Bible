@@ -4,6 +4,14 @@ Updated: **2026-10-07**
 
 ## Continuous completion — 2026-10-07
 
+Scripting reconciliation complete: five core rows C or index-bounded L. ScriptUI
+reference now reports partial mutations and Undo-close errors through a reusable
+widget-independent command; eight fake-host portable cases added. Import dialog/
+path-readback scope and rig expression evaluation limits corrected; replacement
+and deferred progress/cancel remain explicit command designs.
+[Review](CHAPTER-RECONCILIATION-2026-10-07.md#scripting-completion-reconciliation).
+Next: platforms/compatibility → testing/distribution/templates → final freeze.
+
 Remaining AEGP/native integration reconciliation complete: eleven core rows now
 C or justified L. Actual MenuTool, bridge/PICA headers and scalar keyframe source
 are distinguished from command/worker/service designs. Fixed panel teardown order,

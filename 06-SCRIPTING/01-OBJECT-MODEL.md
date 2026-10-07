@@ -3,8 +3,8 @@
 ## Сквозные automation операции
 
 [Import/queue source](../16-WORKING-TEMPLATES/jsx-tool/import-and-queue.jsx): диалоги
-до Undo → canImportAs → import → comp/layer → disabled queue item → exact template
-selection → reacquire → output readback. Не запускает render и не включает чужие
+input/output диалоги до Undo → canImportAs → import → comp/layer → disabled queue item → exact template
+prompt внутри Undo → reacquire → output path readback. Не запускает render и не включает чужие
 items. Extension/sequence-pattern согласовать с template вручную; path selection
 не доказывает format compatibility. Компенсация касается только созданных objects;
 при failed dependent cleanup footage сохраняется для диагностики.
@@ -47,6 +47,41 @@ invocations, не откатывает уже совершённые измен�
 открытым через произвольные scheduled callbacks.
 
 After Effects scripting exposes the host through an ExtendScript object graph. It is a high-level automation API for project structure, timeline state, properties, import and render queue. It is not the same API surface as Effect or AEGP suites.
+
+## Source composition and remaining operation limits — 2026-10-07
+
+| Operation | Actual source | Design / failure boundary |
+|---|---|---|
+| Bulk rename | [ScriptUI command](../20-REFERENCE-IMPLEMENTATIONS/Scripts/ScriptUI-Panel/AEDeveloperBiblePanel.jsx) snapshots selected layer refs and proposed names, returns changed/total/error/cleanupError | Synchronous, current selection only; not scheduled stable-ID resolution; no rollback or collision-free naming promise |
+| Standalone rename | [Small IIFE](../16-WORKING-TEMPLATES/jsx-tool/rename-selected-layers.jsx) prefixes current names and returns count on success | Repeat adds prefix; failure alerts but does not report partial count; not the reusable command above |
+| Import + queue | Existing import-and-queue IIFE creates owned objects and disabled queue item | Template prompt occurs after creation inside Undo, not all dialogs before Undo; path readback only, not settings/format verification |
+| Rig | Existing build-demo-rig IIFE creates new comp and checks expression resolution | Linear keys; new-comp compensation, no reusable rig command or render proof |
+| Replace | Workflow below | Design only: no replacement script shipped |
+
+**Replace workflow.** Snapshot the intended FootageItem and original file/source
+interpretation for diagnostics. Choose media before mutation, then revalidate the
+same project and target after the dialog; reject a removed/replaced/non-file target
+or newly busy queue. `canImportAs` is import preflight, not a guarantee that `replace`
+will decode or preserve every media characteristic. Inside one successful Undo
+scope call the documented `FootageItem.replace(File)`, re-query the new source and
+check intended dimensions/duration/interpretation and dependent layer expectations.
+Failure after replacement is partial/unknown until readback, not automatically
+restored by Undo or a cached old path. Do not remove the pre-existing footage item
+as compensation. This is a worked command design, not executed source.
+Source: [pinned FootageItem reference](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/item/footageitem.md).
+That reference states `replace` creates a new FileSource, updates media-derived
+name/dimensions/frameDuration/duration, preserves prior interpretation parameters,
+and estimates alpha interpretation for unlabeled alpha. Re-query rather than retain
+the old `mainSource` object. Sequence replacement is a separate `replaceWithSequence`
+operation, not this single-file workflow.
+
+Import lesson chooses input/output before Undo but prompts for an exact template
+after queue creation. User must inspect format, range and output settings before
+enabling; code only compares `om.file.fsName`. A new path is not an exclusive
+filesystem reservation. The two-second/25fps comp is fixed, not matched to imported
+media duration/framerate. If queue removal fails, do not infer all dependent
+cleanup succeeded: the source still attempts comp removal and retains footage
+when earlier cleanup failures were recorded. These limits are not host observations.
 
 ## Mental map
 

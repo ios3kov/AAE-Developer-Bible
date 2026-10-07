@@ -162,6 +162,14 @@ app.executeCommand(id) может вызвать host menu command, но numeric
 
 Machine code должен быть стабильнее human text.
 
+Concrete synchronous source: [ScriptUI rename command](../20-REFERENCE-IMPLEMENTATIONS/Scripts/ScriptUI-Panel/AEDeveloperBiblePanel.jsx)
+returns plain `{ok, changed, total, error, cleanupError}` without widgets/dialogs.
+This local result is **not** the CEP wire envelope above; the transport adapter must
+normalize/serialize it separately. A setter failure preserves completed count;
+Undo-close failure can accompany fully applied edits and makes `ok=false`, not
+`changed=0`. No automatic retry or rollback. The standalone rename IIFE and demo
+rig are separate lessons, not this shared command or a production RPC dispatcher.
+
 ## 10. Long work
 
 ExtendScript — плохое место для heavy CPU, больших binary transforms и tight polling.

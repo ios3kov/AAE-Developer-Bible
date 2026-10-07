@@ -213,6 +213,18 @@ Use versioned commands/IDs.
 
 ## Related chapters
 
+### Reconciled source routes — 2026-10-07
+
+- Object model: actual rename/import/rig source scopes and worked replacement design.
+- ScriptUI: immediate plain-result command versus deferred progress/cancel design.
+- Expressions: complete authored rig, fixed naming, escaping and evaluation limits.
+- Script→AE: local partial result versus transport error envelope.
+
+These routes close the overview's explanatory/provenance axes; it is an index, not
+a standalone implementation. No AE/runtime support matrix is inferred from the
+portable tests. Scripting guide per-member version notes remain independent of the
+native SDK baseline.
+
 - [Object model](01-OBJECT-MODEL.md)
 - [ScriptUI](02-SCRIPTUI.md)
 - [Expressions vs scripts](03-EXPRESSIONS-VS-SCRIPTS.md)

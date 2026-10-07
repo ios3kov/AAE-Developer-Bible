@@ -126,10 +126,10 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [After Effects scripting object model](06-SCRIPTING/01-OBJECT-MODEL.md) | E | E | R | R | C | Добавить bulk rename/import/replace операции со stable targeting и partial failure. **№10** |
-| [ScriptUI](06-SCRIPTING/02-SCRIPTUI.md) | E | E | R | R | C | Связать dockable panel с reusable command, progress/cancel и stale target. **№10** |
-| [Expressions vs scripts](06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md) | E | E | R | R | C | Добавить законченный expression rig с matchName и escaping/version границами. **№10** |
-| [ExtendScript scripting](06-SCRIPTING/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [After Effects scripting object model](06-SCRIPTING/01-OBJECT-MODEL.md) | C | C | C | C | C | Actual rename/import/rig versus replace design; target/partial/source limits; [review](CHAPTER-RECONCILIATION-2026-10-07.md#scripting-completion-reconciliation). |
+| [ScriptUI](06-SCRIPTING/02-SCRIPTUI.md) | C | C | C | C | C | Plain-result synchronous command, dock/layout and separate deferred cancel design; [review](CHAPTER-RECONCILIATION-2026-10-07.md#scripting-completion-reconciliation). |
+| [Expressions vs scripts](06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md) | C | C | C | C | C | Rig matchNames versus fixed expression names, readback/escaping/engine limits; [review](CHAPTER-RECONCILIATION-2026-10-07.md#scripting-completion-reconciliation). |
+| [ExtendScript scripting](06-SCRIPTING/README.md) | C | L | C | L | C | Reconciled route index, not standalone implementation; [review](CHAPTER-RECONCILIATION-2026-10-07.md#scripting-completion-reconciliation). |
 
 ## 07-PANELS
 
@@ -244,7 +244,7 @@ cross-page review. Добавления и результаты:
 | [After Effects → AEGP](15-COMMUNICATION/02-AE-TO-AEGP.md) | C | C | C | C | C | Initializer/partial hooks и worker quiescence сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [AEGP → Effect: generic call](15-COMMUNICATION/03-AEGP-TO-EFFECT.md) | C | C | C | C | C | Fresh ref/layer-time/payload sentinel и delivery/domain/cleanup; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [Plug-in → Plug-in через published PICA suite](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md) | C | C | C | C | C | SDK patterns versus header-only template, release/error/ABI rules; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
-| [ExtendScript → After Effects](15-COMMUNICATION/05-SCRIPT-TO-AE.md) | R | E | R | R | C | Связать reusable commands, undo и partial failure с automation recipes. **№10** |
+| [ExtendScript → After Effects](15-COMMUNICATION/05-SCRIPT-TO-AE.md) | C | C | C | C | C | Local partial result versus wire envelope, Undo/transport/operation routes; [review](CHAPTER-RECONCILIATION-2026-10-07.md#scripting-completion-reconciliation). |
 | [CEP panel <-> ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md) | C | C | C | C | C | Envelopes, parse/type/errors, JSON bootstrap и mutation policy согласованы; отдельный INTERNAL_ERROR и его client blocking проверены portable tests; Unicode fixture изолирован, runtime не заявлен. **№2 выполнен**. |
 | [Native <-> script/panel: как собирать гибридный продукт](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md) | C | C | C | C | C | Correlation/freshness/ordering/cancel/unknown outcome разделены; transport design limits; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [Threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md) | C | C | C | C | C | Worker/generation/quiescence и incident границы разделены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |

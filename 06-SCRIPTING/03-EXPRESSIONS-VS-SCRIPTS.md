@@ -190,3 +190,19 @@ Source example не запускался в AE; host expression engine/support �
 на целевой версии. В error path удаляется только вновь созданная comp; Undo не
 считается atomic rollback. User-edited expression не перезаписывается migration
 без явного согласия.
+
+### Source/readback scope — 2026-10-07
+
+The rig uses scripting match names for transforms/text/effect groups; the expression
+uses fixed English product-controlled layer/effect names and numeric parameter1,
+not match-name lookup or persisted stable IDs. It checks evaluation at t=0 only and
+does not assert the returned numeric value. Expected values for Slider50 are50 at0,
+100 at1; intermediate values follow the chosen linear keys plus clamp. These are
+declared expectations, not assertions already executed by the source.
+
+For dynamic expression source, literal escaping must cover backslash, quote,
+CR/LF and Unicode line separators U+2028/U+2029 for the chosen engine. JSON transport
+escaping and expression-literal escaping are different boundaries; do not assume
+one arbitrary JSON serializer makes injected code safe. The fixed source here avoids
+interpolation entirely. Feature/version and expression-engine qualification remain
+separate from Node syntax checks and native SDK25.6 provenance.

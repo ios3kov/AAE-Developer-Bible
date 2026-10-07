@@ -106,6 +106,29 @@ This separation makes later migration to CEP or UXP much cheaper.
 
 ## Long-running work
 
+### Concrete synchronous command and deferred-job design
+
+The [panel source](../20-REFERENCE-IMPLEMENTATIONS/Scripts/ScriptUI-Panel/AEDeveloperBiblePanel.jsx)
+now contains widget-independent `renameSelectedLayers(prefix)`: validate prefix,
+project/queue/comp/selection → snapshot targets and proposed names → recheck context
+→ open Undo → rename → plain result with changed/total/error/cleanupError. The
+adapter disables/re-enables the button and displays partial count, even if Undo
+close fails. No collision resolution or rollback is promised. Names are not
+identity; this immediate non-structural operation does not retain refs across tasks.
+Docked and floating roots both receive initial layout; only Window uses center/show.
+
+For a **long deferred job**, use an explicit product registry resolvable by the
+scheduled script string, not a closure that disappears when this IIFE exits.
+Capture project epoch + target IDs/descriptions + job/UI generation; each bounded
+callback re-resolves and validates targets, opens/closes its own Undo scope, applies
+one bounded unit and reports completed/failed count. One coherent global Undo across
+arbitrary scheduled callbacks is not promised. Cancel marks the job, cancels a known
+pending task ID, and prevents rescheduling; it cannot interrupt a running synchronous
+DOM call or reverse committed chunks. On panel recreation, old callbacks must not
+touch old controls or whichever targets are currently selected. Detach UI sinks and
+invalidate generation even if task cancellation fails. This registry/progress/cancel
+route is design only, not implemented in the small synchronous panel.
+
 ScriptUI does not turn ExtendScript into a worker-thread environment. A long synchronous loop freezes the tool and can make AE appear hung.
 
 For long jobs:

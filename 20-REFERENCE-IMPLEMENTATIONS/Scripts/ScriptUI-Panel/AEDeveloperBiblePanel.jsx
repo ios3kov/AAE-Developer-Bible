@@ -1,21 +1,39 @@
 (function AEDeveloperBiblePanel(thisObj) {
-    function renameSelectedLayers() {
-        var comp = app.project && app.project.activeItem;
-        if (!(comp instanceof CompItem)) throw new Error("Open a composition first.");
-
-        var layers = comp.selectedLayers;
-        if (!layers || layers.length === 0) throw new Error("Select at least one layer.");
-
-        app.beginUndoGroup("AE Bible Rename");
+    // Synchronous command; no widget dependency or retained selection references.
+    function renameSelectedLayers(prefix) {
+        var result = {ok:false, changed:0, total:0, error:null, cleanupError:null};
+        var project = app.project, opened = false;
         try {
-            for (var i = 0; i < layers.length; i++) {
-                layers[i].name = "Layer_" + (i + 1);
+            if (typeof prefix !== "string" || !prefix.length || /[\r\n]/.test(prefix))
+                throw new Error("Use a non-empty single-line prefix.");
+            if (!project || project.renderQueue.rendering) throw new Error("Project missing or busy.");
+            var comp = project.activeItem;
+            if (!(comp instanceof CompItem)) throw new Error("Open a composition first.");
+            var selected = comp.selectedLayers;
+            if (!selected || selected.length === 0) throw new Error("Select at least one layer.");
+            var targets = [], names = [];
+            for (var i = 0; i < selected.length; i++) {
+                targets.push(selected[i]);
+                names.push(prefix + (i + 1));
             }
+            result.total = targets.length;
+            if (app.project !== project || project.activeItem !== comp || project.renderQueue.rendering)
+                throw new Error("Target context changed.");
+            app.beginUndoGroup("AE Bible Rename"); opened = true;
+            for (var j = 0; j < targets.length; j++) {
+                targets[j].name = names[j];
+                result.changed++;
+            }
+            result.ok = true;
+        } catch (e) {
+            result.error = e.toString();
         } finally {
-            app.endUndoGroup();
+            if (opened) {
+                try { app.endUndoGroup(); }
+                catch (c) { result.cleanupError = c.toString(); result.ok = false; }
+            }
         }
-
-        return layers.length;
+        return result;
     }
 
     function buildUI(host) {
@@ -31,11 +49,17 @@
         var status = group.add("statictext", undefined, "Ready");
 
         btn.onClick = function () {
+            btn.enabled = false;
             try {
-                var changed = renameSelectedLayers();
-                status.text = "Renamed " + changed + " layer(s)";
+                var result = renameSelectedLayers("Layer_");
+                status.text = (result.ok ? "Renamed " : "Stopped after ") + result.changed +
+                    "/" + result.total + " layer(s)" +
+                    (result.error ? ": " + result.error : "") +
+                    (result.cleanupError ? "; Undo close: " + result.cleanupError : "");
             } catch (e) {
                 status.text = "Error: " + e.toString();
+            } finally {
+                btn.enabled = true;
             }
         };
 
@@ -47,6 +71,7 @@
     }
 
     var ui = buildUI(thisObj);
+    ui.layout.layout(true);
     if (ui instanceof Window) {
         ui.center();
         ui.show();

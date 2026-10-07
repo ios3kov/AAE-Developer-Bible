@@ -104,6 +104,14 @@ UI/entry wrapper
 
 Then the same command logic can be called from ScriptUI or a CEP dispatcher without copying mutation logic.
 
+The separate [ScriptUI reference](../../20-REFERENCE-IMPLEMENTATIONS/Scripts/ScriptUI-Panel/README.md)
+implements a widget-independent synchronous rename command with partial counts and
+Undo-close diagnostics. It sets `Layer_1`, etc.; this standalone IIFE instead prefixes
+old names and reports only success count/top-level alert. Do not conflate them.
+The import lesson prompts for a template after creating its disabled queue item,
+inside Undo; readback verifies only output path, not output settings/format. Fixed
+comp duration/framerate and filename-extension checks remain user inspection work.
+
 ## Verification boundary
 
 The source is directly runnable in principle, but the repository only records host verification after the exact AE/OS run and expected project changes are captured.
