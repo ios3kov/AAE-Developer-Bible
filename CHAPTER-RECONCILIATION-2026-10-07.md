@@ -158,4 +158,16 @@ editorial readiness does not grant reuse rights.
 
 Portable codec and scripting safety checks do not emulate AE SDK callbacks.
 Strict generated docs/freshness validate publication consistency, not API semantics.
-Evidence ledger records performed checks; licenses remain owner-undecided.
+Evidence ledger records performed checks; authored reuse license remains intentionally
+not granted by the owner (see NOTICE), not an unresolved editorial decision.
+
+## Remaining audit material closure
+
+Read remaining GPU/audio, AEIO/Artisan, compatibility, ScriptUI, native panel,
+errata, RAII and CEP bootstrap/staging material alongside current authoritative
+chapters and owners. Topic-by-topic transfer/non-transfer decisions are in
+[audit reconciliation](AUDIT-BRANCH-RECONCILIATION-2026-10-07.md). Added owner reset
+hazard, matrix scope/identity/failure route and non-colliding HTML source download.
+Historical build result and current protocol are preserved without old duplicate
+reports or unsupported manifest compatibility. This closes branch review, not
+all remaining chapter tracker rows or final freeze.

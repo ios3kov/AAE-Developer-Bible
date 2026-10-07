@@ -71,6 +71,24 @@ Reviewed header contract uses output `AEGP_LayerH*`.
 
 ## Legacy sample generations
 
+### SmartFX / audio / PiPL reconciliation
+
+The 2026-10-06 audit commit `31fba78` records further guide/header differences.
+Read these through the current baseline chapters, not as replacement signatures:
+
+- SmartFX delete callback is `delete_pre_render_data_func` in SDK 25.6, not the
+  guide's historical `func` rendering. Checkout ID is non-negative in the header;
+  ID1 in the authored Copy satisfies both non-negative and positive guidance.
+- Early layer-pixel checkin is optional in this SmartFX contract; parameter
+  checkin depends on phase. The [SmartFX table](../02-EFFECT-PLUGINS/03-SMARTFX.md)
+  separates pre-render automatic checkin from render explicit checkin.
+- Audio prose about “floating point (24-bit)” is not a buffer storage declaration.
+  Use format and sample size in bytes, as in the [audio chapter](../02-EFFECT-PLUGINS/07-AUDIO.md).
+- Newer PiPL guide Search Keywords/Description notes are scoped to Premiere Pro
+  Beta 27.0, not automatically After Effects or SDK25.6 features. Consult target
+  headers and [the dated guide](https://ae-plugins.docsforadobe.dev/intro/pipl-resources/)
+  before adopting them. This preserves the audit's scope, not a new SDK26.5 review.
+
 Bundled samples can intentionally use old suites.
 
 Examples already documented in Bible include older Stream/Keyframe/DynamicStream generations in samples shipped alongside newer headers.

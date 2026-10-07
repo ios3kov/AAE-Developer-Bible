@@ -146,7 +146,7 @@ UI index and persistent ID are different concepts.
 
 Version your own stored data.
 
-Example:
+Illustrative product policy, **not Bible's tested support matrix**:
 
 ~~~text
 magic
@@ -207,6 +207,21 @@ Example:
 | Beta | lab | no | lab | lab | no customer support promise |
 
 Avoid treating “Beta opened once” as a support claim.
+
+Keep these identities in separate fields, for example:
+
+| Field | Bible example | What it does not establish |
+|---|---|---|
+| SDK release | 25.6 build61 | A supported AE range |
+| Suite type | `AEGP_StreamSuite6` | Numeric public version guessed from suffix |
+| Host | Exact AE build recorded by a product | Every patch in the marketing major |
+| Artifact target | macOS arm64 or Windows x64 | Other slices, dependencies or host support |
+| Evidence | Syntax/type check or source review | Discovery/load/render/signing success |
+
+Failure walkthrough: a command needs a required suite → acquire with the exact
+name/public-version macros → if unavailable, return unsupported before mutation.
+An optional fallback must acquire its own typed older contract and state semantic
+limits; do not cast the unavailable/new table or silently claim equivalent output.
 
 ## New AE release workflow
 

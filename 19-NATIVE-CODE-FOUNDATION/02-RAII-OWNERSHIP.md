@@ -83,6 +83,12 @@ Important: a default-constructed owner has no suite pointer. Do not call reset(n
 
 Prefer constructing with both the correct suite and owned handle.
 
+Do not pass `owner.get()` back to `owner.reset(...)`: the implementation first
+disposes the current handle, then stores the supplied value, leaving a disposed
+handle owned again. Likewise two owners must never own the same handle, even when
+move assignment itself is safe. These are caller preconditions visible in the
+source, not protections implemented by the helpers.
+
 ## Suite lifetime
 
 The stored suite pointer must remain valid until the owner has been reset/destroyed.

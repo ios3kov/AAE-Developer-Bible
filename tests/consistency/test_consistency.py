@@ -12,6 +12,22 @@ check = module('check_docs_consistency')
 build = module('build_docs')
 
 class ConsistencyTests(unittest.TestCase):
+    def test_panel_html_staged_as_download_without_index_collision(self):
+        with tempfile.TemporaryDirectory() as source, tempfile.TemporaryDirectory() as stage:
+            root = Path(source)
+            panel = root / 'panel'
+            panel.mkdir()
+            (panel / 'README.md').write_text('# Panel')
+            (panel / 'index.html').write_text('<html>panel source</html>')
+            with patch.object(build, 'ROOT', root), patch.object(build, 'tracked_files',
+                    return_value=[Path('panel/README.md'), Path('panel/index.html')]):
+                with patch('sys.argv', ['build_docs', '--output-root', stage]):
+                    self.assertEqual(build.main(), 0)
+            self.assertTrue(Path(stage, 'docs/panel/README.md').is_file())
+            self.assertEqual(Path(stage, 'docs/panel/index.html.txt').read_text(),
+                             '<html>panel source</html>')
+            self.assertFalse(Path(stage, 'docs/panel/index.html').exists())
+
     def test_current_repository(self):
         self.assertEqual(check.check(), [])
 

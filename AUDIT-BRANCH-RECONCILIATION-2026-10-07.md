@@ -32,11 +32,12 @@ render helper's borrowed-options/null-cancel/consumer boundaries. Queue chapter
 already states missing STOPPED preflight, path readback and compensation accurately.
 No source implementation changed and no new native compile/AE result is implied.
 
-## Native/source review branch: transfer in progress
+## Native/source review branch: review complete
 
 `audit/source-review-native-builds-2026-10-06` has one unique commit,
 `31fba783df86cb2eff4eba86a897591123857ca3`, touching 55 files including generated
-MASTER/MANIFEST. It must remain until the remaining unique material is reconciled.
+MASTER/MANIFEST. Remaining unique material was reconciled selectively below; the
+commit is retained as immutable provenance, not merged as an old tree.
 
 Transferred in the first selective block:
 
@@ -67,8 +68,24 @@ Not transferred blindly:
 - SmartFX's blanket parameter-checkin guidance must not replace the current
   phase-specific contract: pre-render auto-checkin versus render explicit checkin.
 
-Remaining queue: compare GPU/audio/AEIO/Artisan/native-panel workflow details,
-compatibility/ScriptUI/ownership errata and manifest/bootstrap/staging additions
-with current chapters and integration examples. Similar coverage or missing exact
-lines alone is not proof that useful content has been transferred. **Do not delete
-this sixth branch yet.**
+Final topic comparison and decisions:
+
+| Audit material | Current destination / decision |
+|---|---|
+| GPU capability/device/backend/CPU parity | GPU chapter sections1–12 and Metal walkthrough cover negotiation, failure and ownership; platform GPU chapters retain current sample limitations. No old generic workflow duplicated. |
+| Sound format/range/random access | Audio chapter sections3–10 and bounded DSP walkthrough cover bytes, format, scheduling and absence of matching bundled dispatcher. Do not restore an unsupported sample assertion. |
+| AEIO registration/options/defaults/sample | AEIO overview exact IO route and sections1–17 plus native registration chapter cover options/default codes and partial registration. Keep current exact callback findings. |
+| Artisan normal/interactive/context/workflow | Artisan overview sections1–19 and exact Artie route distinguish renderer/context/interactive behavior; sample limitations retained. No extra renderer implementation promised. |
+| ScriptUI/JSX Undo/indexed group invalidation | ScriptUI architecture/chunk/generation/Panel-vs-Window route, object-model invalidation and scripting Undo/partial failure already expanded; current authored rig and portable tests authoritative. |
+| Panelator match name/container/worker shutdown | Native panel sections1–24 and source record cover exact table, borrowed platform containers, recreation and teardown omissions. |
+| Compatibility identity/matrix | Kept suite gating and added explicit illustrative-matrix label, separate identity table and unsupported-before-mutation walkthrough. |
+| RAII reset/owner preconditions | Added same-handle reset and alias-owner hazards visible in current AegpOwners.h; suite lifetime and diagnostic limits already explicit. |
+| SmartFX/audio/PiPL errata | Consolidated bounded findings in current errata chapter; no obsolete prose overwrites current contracts. |
+| CEP manifest/bootstrap | Current reviewed integration walkthrough intentionally requires user-supplied target manifest/dependencies; old bundled manifest asserts an untested range and bootstrap uses older protocol. Do not revive them. |
+| HTML/XML/CJS staging | Added source staging extensions and HTML-as-download policy with regression test; avoids collision with MkDocs chapter index. |
+| Old tests/link checker/host runner/build driver | Current protocol/consistency and safe-tooling tests supersede old tests. Current host runner has transactional restore and missing-output checks; do not regress to old process-only success. Historical driver remains at immutable commit. |
+| Status/reports/nav/generated files | Current guide/tracker/ledger/evidence plan are authoritative; no stale release gates, duplicate acceptance or generated blob imported. |
+
+All 55 changed paths fall into transferred corrections, current authoritative
+coverage or explicit non-transfer decisions above and in the first-block list.
+The final audit branch is eligible for removal after publication and checks.

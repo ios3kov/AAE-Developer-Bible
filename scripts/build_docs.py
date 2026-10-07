@@ -86,9 +86,12 @@ def main():
         shutil.rmtree(stage)
     stage.mkdir()
     for path in sorted(set(files) | {Path(p) for p in GENERATED}):
-        if path.suffix not in (".md", ".cpp", ".h", ".jsx", ".js", ".py", ".sh", ".ps1", ".json"):
+        if path.suffix not in (".md", ".cpp", ".h", ".jsx", ".js", ".cjs", ".html", ".xml", ".py", ".sh", ".ps1", ".json"):
             continue
         destination = stage / path
+        # Publish panel source for download, not as the chapter's index.html.
+        if path.suffix == ".html":
+            destination = destination.with_suffix(".html.txt")
         destination.parent.mkdir(parents=True, exist_ok=True)
         source = output_root / path if path.as_posix() in GENERATED else ROOT / path
         shutil.copyfile(source, destination)

@@ -4,10 +4,10 @@ Updated: **2026-10-07**
 
 ## Continuous completion — 2026-10-07
 
-Remaining audit branches: five export-only branches reviewed with no chapter/source
-material to transfer. Native/source branch `31fba78` is retained pending full
-reconciliation. First selective transfer fixes CEP paths, documents SignTool warning
-handling and lifecycle boundaries, and adds dependency-preserving SDK workspace mode.
+Remaining audit branches: all six reviewed; five export-only branches removed.
+Native/source commit `31fba78` is selectively reconciled, not wholesale merged.
+Transfers fix CEP paths, SignTool/lifecycle/compatibility and owner preconditions,
+add dependency-preserving SDK workspace mode and publish panel HTML as download.
 [Decisions and remaining queue](AUDIT-BRANCH-RECONCILIATION-2026-10-07.md).
 
 Completion follow-up: current status/plan no longer instruct restarting implemented

@@ -24,6 +24,10 @@ Startup `ping` with `{}` confirms dispatcher readiness. One call may be outstand
 
 ## Package and bootstrap
 
+The documentation site publishes the HTML source as `index.html.txt` beside this
+chapter; rename the downloaded source to `index.html` when packaging. It is not an
+executable extension in the site and cannot overwrite the chapter's generated index.
+
 Follow the [manifest/JSON/bootstrap walkthrough and failure table](../../15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md). HTML loads `./CSInterface.js`, then `./index.js`. Manifest `MainPath` should point to HTML; `ScriptPath` should point to your bootstrap JSX, which loads the vetted JSON implementation before `host/index.jsx`. HTML does not itself load JSX. Do not rely on JSON installed by another panel; record dependency version/hash/license and test the packaged copy against your AE/CEP targets.
 
 No manifest or polyfill is bundled here. The walkthrough is a source integration example, not an install-ready extension.
