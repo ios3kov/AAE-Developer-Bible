@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+Properties/keyframes block records scoped source-reviewed members independently
+of machine literal mentions; practical authoring/invalidation scenarios added.
+
 Fonts/text currentness block adds usage preflight, session font identity, substitution
 policy, non-undoable replacement, range invalidation and fresh composition workflow.
 Source/member boundaries recorded in currentness review; not whole629-member closure.

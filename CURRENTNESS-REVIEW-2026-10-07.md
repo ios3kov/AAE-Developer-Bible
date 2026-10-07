@@ -66,6 +66,21 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### Properties/keyframes operation review — 2026-10-07
+
+Selected Property/PropertyGroup/PropertyBase sections read at pinned revision:
+static/key/time/batch setters, nearest-key vs exact-time identity, removal ordering,
+interpolation/ease/tangent shape, expression evaluation and separated followers,
+indexed-group invalidation and matchName/index limits. Transferred to scripting
+chapter as bounded authoring recipe. No full74-member Property audit inferred.
+Semantic review ledger added separately from the machine mention inventory.
+
+`scripting-api-reviewed-2026-10-07.json` records42 explicitly reviewed members in
+8 source pages with covered operation and Bible chapter. It is not inferred from
+matching text, does not change source extractor's UNASSESSED entries and does not
+assert whole-object/runtime coverage. Remaining587 extracted headings still lack
+this explicit reconciliation record (not necessarily absent from historical Bible).
+
 #### Fonts/text operational reconciliation — 2026-10-07
 
 Reviewed selected Project/FontsObject/FontObject/TextDocument/CharacterRange sections

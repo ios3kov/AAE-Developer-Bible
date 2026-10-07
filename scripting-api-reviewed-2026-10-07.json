@@ -1,0 +1,67 @@
+{
+  "source_revision": "7137a990db4bd8dc9f5869b8ca431c7dfed52bdc",
+  "review_date": "2026-10-07",
+  "evidence": "DOCUMENTED / operation-design review; AE runtime NOT_RUN",
+  "scope": "Explicitly named members only; not signatures/overloads of every object",
+  "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+  "reviews": [
+    {
+      "source_path": "docs/property/property.md",
+      "operation": "Typed animation authoring, evaluation and separated followers",
+      "members": [
+        "Property.setValue", "Property.setValueAtTime", "Property.setValueAtKey",
+        "Property.setValuesAtTimes", "Property.nearestKeyIndex", "Property.removeKey",
+        "Property.isInterpolationTypeValid", "Property.setInterpolationTypeAtKey",
+        "Property.setTemporalEaseAtKey", "Property.setSpatialTangentsAtKey",
+        "Property.expression", "Property.expressionError", "Property.valueAtTime",
+        "Property.dimensionsSeparated", "Property.getSeparationFollower"
+      ]
+    },
+    {
+      "source_path": "docs/property/propertygroup.md",
+      "operation": "Structural mutation and property reference invalidation",
+      "members": ["PropertyGroup.addProperty", "PropertyGroup.canAddProperty", "PropertyGroup.addVariableFontAxis"]
+    },
+    {
+      "source_path": "docs/property/propertybase.md",
+      "operation": "Type identifier and indexed occurrence resolution",
+      "members": ["PropertyBase.matchName", "PropertyBase.propertyIndex"]
+    },
+    {
+      "source_path": "docs/general/project.md",
+      "operation": "Font usage time domain and non-undoable replacement",
+      "members": ["Project.usedFonts", "Project.replaceFont"]
+    },
+    {
+      "source_path": "docs/text/fontsobject.md",
+      "operation": "Font preflight, identity invalidation and environment policy",
+      "members": [
+        "FontsObject.allFonts", "FontsObject.fontServerRevision", "FontsObject.getFontByID",
+        "FontsObject.missingOrSubstitutedFonts", "FontsObject.freezeSyncSubstitutedFonts",
+        "FontsObject.substitutedFontReplacementMatchPolicy"
+      ]
+    },
+    {
+      "source_path": "docs/text/fontobject.md",
+      "operation": "Session identity, variable axes and glyph preflight",
+      "members": [
+        "FontObject.fontID", "FontObject.isSubstitute", "FontObject.designAxesData",
+        "FontObject.designVector", "FontObject.hasGlyphsFor", "FontObject.hasSameDict",
+        "FontObject.postScriptNameForDesignVector"
+      ]
+    },
+    {
+      "source_path": "docs/text/characterrange.md",
+      "operation": "Range validity after paste",
+      "members": ["CharacterRange.isRangeValid", "CharacterRange.pasteFrom"]
+    },
+    {
+      "source_path": "docs/text/textdocument.md",
+      "operation": "Detached text range editing and fresh composition diagnostics",
+      "members": [
+        "TextDocument.characterRange", "TextDocument.paragraphRange",
+        "TextDocument.composedLineRange", "TextDocument.composedLineCount", "TextDocument.boxOverflow"
+      ]
+    }
+  ]
+}

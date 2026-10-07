@@ -2,6 +2,10 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Reconciled property/keyframe authoring: typed batch preconditions, partial error
+  outcomes, key identity/deletion ordering, spatial versus temporal shape, expression
+  evaluation and separated dimensions. Added explicit reviewed-member ledger.
+
 - Added fonts/text operational reconciliation: usage time domain, session identity,
   duplicate-name selection, substitute/glyph policies, non-undoable replacement,
   mixed-style range editing and stale composed-line/overflow diagnostics.

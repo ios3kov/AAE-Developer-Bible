@@ -66,6 +66,74 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Property animation: typed plan before mutation
+
+Reviewed2026-10-07 against pinned scripting source
+`7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`,
+[Property](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/property.md),
+[PropertyGroup](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/propertygroup.md),
+[PropertyBase](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/propertybase.md).
+DOCUMENTED/source operation design, not executed AE animation.
+
+Concrete authoring command: resolve intended layer/property → validate
+propertyValueType/canVaryOverTime and existing keys/expression policy → build
+finite times and correctly shaped values → show overwrite scope → begin Undo
+→ set values → resolve keys by time and verify keyTime → set supported interpolation
+→ verify keys/values/interpolation → end Undo with independent cleanup error.
+Product policy here requires strictly increasing times (reject duplicates), equal
+array lengths and bounded batch size; not an undocumented Adobe uniqueness rule.
+For opacity, request times[0,1] and values[0,100], LINEAR. Preserve unrelated keys;
+if replacing an interval, explicitly list/removal-confirm only that interval.
+
+Property.setValue only sets a static no-key property; it throws when keys exist.
+Property.setValueAtTime creates or updates the key at the requested time;
+Property.setValueAtKey requires an existing valid key index.
+Property.setValuesAtTimes creates/updates each requested time and requires equal
+length arrays; no whole-call transactional rollback is documented. An exception
+can leave a partial outcome: refresh keys and report, never blind retry.
+These setters return nothing, not boolean success.
+
+Property.nearestKeyIndex is not proof a key exists **at** your time. Check numKeys,
+then keyTime with an explicitly chosen numerical tolerance appropriate to product
+time representation. Do not round times to frame boundaries unless that is requested
+policy. Property.removeKey shifts indices; delete selected keys highest-to-lowest.
+Stored key indices do not survive insertion/removal as stable identity.
+
+Check Property.isInterpolationTypeValid before Property.setInterpolationTypeAtKey.
+Omitted outType uses inType. For Property.setTemporalEaseAtKey, ease array length
+is2 for TwoD,3 for ThreeD, **1 for all other types including spatial vectors**;
+do not derive it from value.length. Construct KeyframeEase with valid product values.
+Property.setSpatialTangentsAtKey accepts only TwoD_SPATIAL/ThreeD_SPATIAL, matching
+2/3-component tangent vectors; temporal easing is not a spatial tangent operation.
+Auto-Bezier/continuous/roving policies require their own member checks, not implied
+by this scoped LINEAR operation.
+
+### Structural mutation and expression evaluation
+
+PropertyGroup.canAddProperty guards intended matchName before PropertyGroup.addProperty.
+Adding to an indexed group recreates it and invalidates existing property references;
+save propertyIndex where appropriate and reacquire after subsequent additions.
+Text animator is the documented named-group exception. PropertyBase.matchName avoids
+localized display names but is a **type identifier**, not a unique instance ID when
+the same effect occurs more than once. Resolve intended occurrence/parent and verify
+its matchName after index lookup; stale index alone is not identity.
+
+Property.expression assignment evaluates the expression: invalid string generates
+error and disables expression; empty string disables without error. Validate
+canSetExpression, preserve old string/enabled state for diagnostics, assign, inspect
+Property.expressionError and expressionEnabled. A successful initial evaluation
+does not establish correctness for all times/assets. Property.valueAtTime(time,true)
+reads pre-expression value; false requests evaluated value and can wait for expensive
+expressions such as sampleImage. Bound diagnostic samples; don't run full-frame
+expression sampling in a UI repaint loop. The Source Text layer-time exception is
+described in font usage preflight below.
+
+Property.dimensionsSeparated applies to a separation leader. Before editing Position,
+inspect isSeparationLeader/dimensionsSeparated; when already separated use
+Property.getSeparationFollower(dim) with0-based dimension and author scalar keys.
+Do not toggle separation merely to fit a generic vector setter; separation can
+change animation representation and needs explicit product migration policy.
+
 ### Font preflight: identity, substitutes and project usage
 
 Reviewed2026-10-07 at scripting source `7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`:

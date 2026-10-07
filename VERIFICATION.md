@@ -2,6 +2,13 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Properties/keyframes scoped operation and semantic ledger
+
+Parent `63eb00f`; pinned Property/PropertyGroup/PropertyBase sections actually read.
+No host keys/expressions modified. Ledger identifies named members/source page and
+Bible operation coverage, not entire-object PASS or runtime. Local consistency,
+checker, generated freshness, strict MkDocs and whitespace checks for containing commit.
+
 ### Fonts/text selected scripting contracts
 
 Parent `7455e93`; selected pinned Project/FontsObject/FontObject/TextDocument/
