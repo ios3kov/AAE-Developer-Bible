@@ -6,6 +6,36 @@
   "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
   "reviews": [
     {
+      "source_path": "docs/other/preferences.md",
+      "operation": "Typed preference store, consent, readback and restoration",
+      "members": ["Preferences.deletePref", "Preferences.getPrefAsBool", "Preferences.getPrefAsFloat", "Preferences.getPrefAsLong", "Preferences.getPrefAsString", "Preferences.havePref", "Preferences.reload", "Preferences.savePrefAsBool", "Preferences.savePrefAsFloat", "Preferences.savePrefAsLong", "Preferences.savePrefAsString", "Preferences.saveToDisk"]
+    },
+    {
+      "source_path": "docs/other/settings.md",
+      "operation": "Namespaced bounded script settings and schema migration",
+      "members": ["Settings.getSetting", "Settings.haveSetting", "Settings.saveSetting"]
+    },
+    {
+      "source_path": "docs/other/view.md",
+      "operation": "Selected view options and focus activation",
+      "members": ["View.active", "View.options", "View.setActive"]
+    },
+    {
+      "source_path": "docs/other/viewer.md",
+      "operation": "Typed viewer selection and explicit UI mutation",
+      "members": ["Viewer.active", "Viewer.activeViewIndex", "Viewer.maximized", "Viewer.views", "Viewer.type", "Viewer.setActive"]
+    },
+    {
+      "source_path": "docs/other/viewoptions.md",
+      "operation": "UI-only diagnostic display preset and gated fast preview",
+      "members": ["ViewOptions.channels", "ViewOptions.checkerboards", "ViewOptions.exposure", "ViewOptions.fastPreview", "ViewOptions.guidesLocked", "ViewOptions.guidesSnap", "ViewOptions.guidesVisibility", "ViewOptions.rulers", "ViewOptions.zoom"]
+    },
+    {
+      "source_path": "docs/general/system.md",
+      "operation": "Redacted environment report and trusted file-based helper protocol",
+      "members": ["System.machineName", "System.osName", "System.osVersion", "System.userName", "System.callSystem"]
+    },
+    {
       "source_path": "docs/item/avitem.md",
       "operation": "Typed proxy assignment, source-specific properties and usage diagnostics",
       "members": ["AVItem.duration", "AVItem.footageMissing", "AVItem.frameDuration", "AVItem.frameRate", "AVItem.hasAudio", "AVItem.hasVideo", "AVItem.height", "AVItem.isMediaReplacementCompatible", "AVItem.name", "AVItem.pixelAspect", "AVItem.proxySource", "AVItem.time", "AVItem.usedIn", "AVItem.useProxy", "AVItem.width", "AVItem.setProxy", "AVItem.setProxyToNone", "AVItem.setProxyWithPlaceholder", "AVItem.setProxyWithSequence", "AVItem.setProxyWithSolid"]

@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+Persistence/viewer/system block adds38 source-reviewed headings and operational
+boundaries; ledger212/647, independent of current SDK/host matrix acceptance.
+
 Proxy/shape/mask/marker block adds49 named members with actual full-page source
 review and practical operation boundaries; ledger174/647, no runtime inference.
 

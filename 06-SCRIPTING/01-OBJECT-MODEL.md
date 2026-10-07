@@ -66,6 +66,97 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Script settings and application preferences: separate stores/policies
+
+Reviewed2026-10-07, full6 pages at pinned scripting revision
+`7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`:
+[Preferences](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/preferences.md),
+[Settings](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/settings.md),
+[View](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/view.md),
+[Viewer](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/viewer.md),
+[ViewOptions](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/viewoptions.md),
+[System](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/general/system.md).
+Source workflows, no host-preference/process execution performed.
+
+Concrete tool preference: namespaced section + schema-version key →
+Settings.haveSetting → getSetting → strict bounded parse/validation → default on
+absent/invalid value with visible diagnostic → saveSetting only on user change
+→ getSetting readback. Values are strings; parse boolean explicitly, not
+Boolean("false"). Settings values persist between sessions of that installation,
+not automatically across AE versions or inside project files. Migration needs
+explicit user-approved import, schema compatibility and conflict policy.
+Source warns get/save above1999 bytes throw (observed AE15.0.1): conservative
+small settings only; this dated observation isn't proof exact limit in every later
+build. Use owned UTF-8 file with checked write/close for larger documents, never
+preferences as a secret vault. Internal section prefix is Settings_; do not prepend
+it twice when using Settings API.
+
+Preferences.havePref checks existing section/key in chosen PREFType before typed
+getPrefAsBool/Float/Long/String. savePrefAsBool/Float/Long/String, deletePref,
+saveToDisk/reload are application-level operations, not project Undo commands.
+Keep PREFType identical for read/write/delete: default MACHINE_SPECIFIC differs
+from machine-independent/render/output/composition/text/paint stores. Source prose
+says optional third argument generically; typed save signatures actually take
+value then optional prefType as **fourth** argument. Follow method signature.
+
+For intentional internal-pref change: whitelist documented target key/build →
+record prior existence/value/type/store → explicit consent → typed save → readback
+→ explicitly chosen saveToDisk/reload policy → report. Do not blindly reload whole
+preferences to refresh one setting while user has unrelated unsaved state. Restore
+only owned temporary changes in finally; restore failure is separate error and
+restoring a value does not reverse actions already triggered. Never delete entire
+sections or alter script security permissions silently. Source doesn't guarantee
+every preference takes immediate effect without restart; qualify selected setting,
+not extrapolate API readback to actual host behavior.
+
+### Viewer diagnostic preset: UI state, not output settings
+
+Concrete operation: resolve current app.activeViewer, handle null → check Viewer.type
+and views array → validate activeViewIndex against0-based array → snapshot selected
+View.options fields → set requested channels/checkerboards/exposure/zoom and guide
+display flags → read back → optionally restore snapshot after diagnostic. Validate
+exposure[-40,40], zoom[0.01,16] (normalized, not integer percent). Re-resolve after
+panel closure/focus change; do not act on stale UI references.
+
+Viewer.active / View.active are focus observations; Viewer.setActive / View.setActive
+return boolean activation, not render success. Viewer.maximized and activeViewIndex
+are user-visible mutations; never force them as hidden prerequisite. Viewer.views
+is a JS array, unlike1-based project collections. Viewer.type distinguishes comp,
+layer and footage panels. View.options belongs to that view, not all views/comps.
+
+ViewOptions.channels selects ChannelType; checkerboards affects transparency grid;
+exposure/zoom affect display. guidesVisibility/guidesSnap/guidesLocked/rulers (16.1)
+are view state, not GuideOptions model creation or persistent rendering constraints.
+ViewOptions.fastPreview (12.0) throws in Layer/Footage viewer. Source describes Draft
+only for legacy ray-traced3D, not universal support in Classic/Advanced3D. Do not
+present a historical enum as current renderer capability; gate actual host/renderer
+before offering mode. Source examples use equality comparisons, **not assignments**.
+UI readback and screenshot are not proof encoded output has changed or final quality.
+
+### External helper invocation: shell text is not a job protocol
+
+System.osName can be blank on Windows7+ per source; $.os is suggested alternative.
+System.osVersion / machineName / userName are diagnostic strings, not certified
+architecture/OS support matrix. Redact machine/user names unless user approves
+diagnostic sharing. No vendor support guarantee inferred from local OS strings.
+
+System.callSystem executes command-line text and returns output text. It doesn't
+provide a documented structured exit-code/process handle/cancellation API here.
+Don't interpret empty output or text "success" as delivered artifact. Never build
+shell commands by concatenating project/marker/user text. Prefer fixed trusted
+helper executable with validated file-based request and response; quote arguments
+for the actual platform shell and handle spaces/quotes/newlines explicitly.
+No single shell escaping function applies unchanged to cmd.exe and POSIX shell.
+
+Concrete helper design: prepare owned bounded request file with job/source identity
+→ validate helper path/version and explicit permission → invoke helper using fixed
+protocol → read bounded response after it terminates → validate schema/job ID,
+explicit outcome and expected files → independently decode/check artifact. Refuse
+missing/mismatched response, don't retry unknown outcome. Keep long-running work
+out of UI paint/status callbacks; use a designed external service/IPC for cancelable
+jobs rather than pretend callSystem has timeout/async semantics. Do not launch a
+shell or install software as part of read-only project inspection.
+
 ### Proxy workflow and AVItem type limits
 
 Reviewed2026-10-07 at pinned scripting revision

@@ -2,6 +2,13 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Persistence/viewer/system source operation review
+
+Parent `49fe743`;6 pinned pages read in full,38 headings recorded. No preferences
+changed, helper launched or viewer/AE runtime observed. Ledger/source uniqueness,
+standard scripts/consistency, checker, generated freshness, strict MkDocs and
+whitespace checks run for containing block, not platform support proof.
+
 ### Proxy, shape/mask and marker source review
 
 Parent `47bc31e`; full4 pinned source pages read,49 member headings reconciled.

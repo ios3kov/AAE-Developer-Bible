@@ -2,6 +2,9 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Reconciled Preferences/Settings persistence, viewer diagnostics and System helper
+  invocation; separated user environment/UI/readback from render/runtime outcomes.
+
 - Reconciled proxy/AVItem, Shape/MaskPropertyGroup and MarkerValue: source-specific
   mutation, interpretation, geometry/feather, metadata persistence and readback.
 

@@ -66,6 +66,15 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### Persistence/viewer/system reconciliation
+
+Full Preferences/Settings/View/Viewer/ViewOptions/System pages actually read.
+Transferred38 headings into namespaced persistence, typed store/restoration,
+view-scoped UI diagnostic preset and trusted external-helper protocol designs.
+Preserved historical Settings size observation and fastPreview limitations;
+no current OS support or process exit-code API invented. Ledger212/647,
+435 headings without explicit reconciliation (includes research exceptions).
+
 #### Proxy/mask/shape/marker reconciliation
 
 Full AVItem/Shape/MaskPropertyGroup/MarkerValue source pages read at pinned revision.
