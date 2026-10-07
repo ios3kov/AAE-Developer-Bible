@@ -6,6 +6,50 @@
   "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
   "reviews": [
     {
+      "source_path": "docs/renderqueue/omcollection.md",
+      "operation": "Adding output modules and verifying each destination",
+      "members": ["OMCollection.add"]
+    },
+    {
+      "source_path": "docs/renderqueue/outputmodule.md",
+      "operation": "Local templates/settings, invalidation and output policy",
+      "members": [
+        "OutputModule.applyTemplate", "OutputModule.file", "OutputModule.getSetting",
+        "OutputModule.getSettings", "OutputModule.includeSourceXMP", "OutputModule.name",
+        "OutputModule.postRenderAction", "OutputModule.remove", "OutputModule.saveAsTemplate",
+        "OutputModule.setSetting", "OutputModule.setSettings", "OutputModule.templates"
+      ]
+    },
+    {
+      "source_path": "docs/renderqueue/renderqueue.md",
+      "operation": "Foreign-item protection, blocking execution, callbacks and AME handoff",
+      "members": [
+        "RenderQueue.canQueueInAME", "RenderQueue.item", "RenderQueue.items",
+        "RenderQueue.numItems", "RenderQueue.pauseRendering", "RenderQueue.queueInAME",
+        "RenderQueue.queueNotify", "RenderQueue.render", "RenderQueue.rendering",
+        "RenderQueue.showWindow", "RenderQueue.stopRendering"
+      ]
+    },
+    {
+      "source_path": "docs/renderqueue/renderqueueitem.md",
+      "operation": "Disarmed preparation, range, modules, settings, status and diagnostics",
+      "members": [
+        "RenderQueueItem.applyTemplate", "RenderQueueItem.comp", "RenderQueueItem.duplicate",
+        "RenderQueueItem.elapsedSeconds", "RenderQueueItem.getSetting", "RenderQueueItem.getSettings",
+        "RenderQueueItem.logType", "RenderQueueItem.numOutputModules", "RenderQueueItem.onStatusChanged",
+        "RenderQueueItem.outputModule", "RenderQueueItem.outputModules", "RenderQueueItem.queueItemNotify",
+        "RenderQueueItem.remove", "RenderQueueItem.render", "RenderQueueItem.saveAsTemplate",
+        "RenderQueueItem.setSetting", "RenderQueueItem.setSettings", "RenderQueueItem.skipFrames",
+        "RenderQueueItem.startTime", "RenderQueueItem.status", "RenderQueueItem.templates",
+        "RenderQueueItem.timeSpanDuration", "RenderQueueItem.timeSpanStart"
+      ]
+    },
+    {
+      "source_path": "docs/renderqueue/rqitemcollection.md",
+      "operation": "Creating an owned queue item from validated composition",
+      "members": ["RQItemCollection.add"]
+    },
+    {
       "source_path": "docs/property/property.md",
       "operation": "Typed animation authoring, evaluation and separated followers",
       "members": [

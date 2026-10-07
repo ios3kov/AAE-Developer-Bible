@@ -66,6 +66,16 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### Render queue DOM reconciliation — 2026-10-07
+
+All5 pinned renderqueue pages read in full (48 headings): prepare/disarm/arm/run,
+local template/settings capability, module invalidation, multiple outputs, foreign
+queue protection, callbacks/range/skip diagnostics and AME handoff transferred to
+object-model chapter. Documented source inconsistencies retained (item index0 vs1;
+callback string vs example function); no invented resolution through unrun host code.
+Semantic ledger grows to90 members;539 extracted headings remain without explicit
+ledger reconciliation. No AE/AME render or decoded-output claim.
+
 #### Properties/keyframes operation review — 2026-10-07
 
 Selected Property/PropertyGroup/PropertyBase sections read at pinned revision:
@@ -75,10 +85,10 @@ indexed-group invalidation and matchName/index limits. Transferred to scripting
 chapter as bounded authoring recipe. No full74-member Property audit inferred.
 Semantic review ledger added separately from the machine mention inventory.
 
-`scripting-api-reviewed-2026-10-07.json` records42 explicitly reviewed members in
+Initial `scripting-api-reviewed-2026-10-07.json` recorded42 explicitly reviewed members in
 8 source pages with covered operation and Bible chapter. It is not inferred from
 matching text, does not change source extractor's UNASSESSED entries and does not
-assert whole-object/runtime coverage. Remaining587 extracted headings still lack
+assert whole-object/runtime coverage. At that block587 extracted headings lacked
 this explicit reconciliation record (not necessarily absent from historical Bible).
 
 #### Fonts/text operational reconciliation — 2026-10-07

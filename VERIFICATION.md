@@ -2,6 +2,16 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Renderqueue DOM source reconciliation
+
+Parent `0ec2956`;5 pinned renderqueue pages read in full.48 headings added to
+explicit ledger,90 total/539 not yet ledger-reconciled. No AE/AME render executed;
+template/codec/installer/runtime success not inferred. Containing block validates
+ledger membership/uniqueness, consistency, checker, freshness, strict MkDocs and
+whitespace independently of the documentation source review: PASS (scripts86/86,
+consistency11/11, strict build/freshness). Source example discrepancies are documented,
+not claimed resolved by these local tests.
+
 ### Properties/keyframes scoped operation and semantic ledger
 
 Parent `63eb00f`; pinned Property/PropertyGroup/PropertyBase sections actually read.

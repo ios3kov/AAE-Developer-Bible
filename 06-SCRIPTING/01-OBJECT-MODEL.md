@@ -66,6 +66,124 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Render queue: prepare, arm, execute, validate are separate stages
+
+Reviewed2026-10-07: all5 renderqueue DOM source pages at
+`7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`:
+[RenderQueue](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/renderqueue/renderqueue.md),
+[RenderQueueItem](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/renderqueue/renderqueueitem.md),
+[OutputModule](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/renderqueue/outputmodule.md),
+[RQItemCollection](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/renderqueue/rqitemcollection.md),
+[OMCollection](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/renderqueue/omcollection.md).
+DOCUMENTED/source workflow, no new render/encoded-output result.
+
+Concrete scoped command: validated CompItem → check RenderQueue.rendering false
+→ enumerate existing queue and refuse execution if unrelated items are armed
+→ choose available render/output templates and new output destination before mutation
+→ RQItemCollection.add(comp) → immediately set RenderQueueItem.render=false
+→ apply render template → set requested timeSpanStart/timeSpanDuration/skipFrames
+→ get outputModule(1) → apply output template → reacquire module
+→ configure settable overrides → reacquire module again → set file and read back
+→ leave item unarmed for user review. This extends the existing
+[import-and-queue example](../16-WORKING-TEMPLATES/jsx-tool/import-and-queue.jsx).
+
+Arming is a separate explicit command: revalidate queue/items/paths/settings → set
+owned item.render=true → confirm QUEUED → obtain explicit render confirmation.
+RenderQueue.render() blocks until process complete and starts the **queue**, not
+only your item. Never silently disable/re-enable other people's queued items or
+start while foreign armed items remain. Preparation and filesystem overwrite checks
+do not reserve output atomically; recheck before execution and use unique owned
+destinations or product-specific collision policy. For sequences check the entire
+output pattern/directory, not only one nominal File.
+
+Collection indices are1-based; numItems/numOutputModules count items. RenderQueue.item
+reference table says0..numItems, while RQItemCollection explicitly says first index1:
+preserve this documentation inconsistency and use1..numItems, not a speculative0
+probe. OMCollection.add creates an extra output module; verify every module path,
+format and collision independently. RenderQueueItem.outputModules/items are
+collections, not plain JS arrays. RenderQueueItem.comp is read-only; to change comp,
+remove the owned queue item and create a new one. Never remove foreign items/modules
+as compensation. Removal/duplication shifts index-based resolution; don't use stored
+queue index as persistent identity across structural edits.
+
+### Settings/templates: local capability, not a portable codec contract
+
+RenderQueueItem.templates and OutputModule.templates expose available local names.
+Both applyTemplate calls return nothing; validate membership and read back actual
+settings. RenderQueueItem.saveAsTemplate / OutputModule.saveAsTemplate alter local
+template libraries; require user intent and collision policy, don't write a template
+as a hidden prerequisite. OutputModule.name is display metadata, not a durable ID.
+RenderQueueItem.duplicate of DONE becomes QUEUED: immediately disarm a duplicated
+item before editing and avoid inherited output-file collisions.
+
+getSetting/getSettings/setSetting/setSettings introduced13.0. Use
+GetSettingsFormat.STRING_SETTABLE or NUMBER_SETTABLE to discover applicable writable
+settings; SPEC describes possibilities, STRING/NUMBER describe readable values.
+Read-only dump isn't a valid write-back patch. RenderQueueItem setting key/value
+strings in source examples are English; template names are installation-dependent.
+Validate schema/types against the chosen host rather than deriving numeric enums
+from UI ordering. Source notes OutputModule Format is readable but not settable
+through this interface: select a valid format template, don't promise arbitrary
+codec selection via setSettings({Format: ...}).
+
+**OutputModule is invalidated after settings modification** per source warning.
+Always re-fetch item.outputModule(index) before further mutation/readback. Failed
+setSettings may leave changed settings: reacquire/report actual state, not retry
+the whole preparation and create duplicate items. OutputModule.file takes
+ExtendScript File, unlike reviewed UXP string-path APIs. Use File/Folder path
+handling; don't copy unescaped Windows backslash literals from source examples.
+Output File Info supports template/path components; ensure filename pattern matches
+movie/sequence format and destination policy. includeSourceXMP is an explicit
+metadata/privacy decision. postRenderAction defaults should be selected deliberately:
+NONE avoids automatic IMPORT/IMPORT_AND_REPLACE_USAGE/SET_PROXY project mutations.
+
+### Range, status and callbacks
+
+RenderQueueItem.timeSpanStart and timeSpanDuration are seconds in composition time,
+not frame count or layer time. Validate positive duration and intended comp range;
+read back after template application because template settings may change it.
+RenderQueueItem.skipFrames0 is full coverage;1 skips alternate frames, movie frames
+have doubled duration. Range length unchanged does not mean every requested frame
+was rendered. Do not label a skipFrames preview as full-delivery evidence.
+
+RenderQueueItem.render=true maps to QUEUED, false to UNQUEUED. status also includes
+NEEDS_OUTPUT, RENDERING, WILL_CONTINUE, USER_STOPPED, ERR_STOPPED and DONE.
+RenderQueue.rendering is true during active **or paused** rendering; paused is not
+permission to edit application/queue. RenderQueueItem.onStatusChanged contract is
+function-name string/null, although source example assigns function directly.
+Use documented named callback in the script's actual persistent engine scope,
+record/test build behavior, and preserve previous callbacks. Do not generalize this
+example discrepancy into a guaranteed function-object registration API.
+
+Callbacks can call RenderQueue.pauseRendering(true/false) and stopRendering;
+cannot mutate queue/application while active/paused. Record small status/error data,
+avoid dialogs or heavy processing, then inspect outcome after render returns.
+Preserve/restore app.onError and owned onStatusChanged hooks in finally, report
+restoration errors separately. Synchronous blocking render does not promise a
+browser-like event loop/timer cancellation path. RenderQueue.showWindow is UI only.
+RenderQueue.queueNotify / RenderQueueItem.queueItemNotify (22.0) are notification
+preferences, not completion callbacks or delivery evidence. RenderQueueItem.logType
+selects errors/settings/per-frame logging; startTime and elapsedSeconds may be null
+before rendering and aren't artifact identity.
+
+Post-run report: item status, requested range/skip policy, every output module's
+actual file/settings, errors and cleanup outcomes. DONE is host completion, not
+decoded-file validation. Check sequence frame coverage, dimensions, channel/depth/
+codec, timing, nonempty decodable outputs and expected image content separately.
+Do not delete partial files automatically unless explicitly product-owned and policy
+allows it; preserve diagnostics on ERR_STOPPED/USER_STOPPED.
+
+### AME handoff is not an AE output-module render
+
+RenderQueue.canQueueInAME indicates queued items exist. RenderQueue.queueInAME(false)
+queues without starting; true also starts AME processing. Requires AME11.0+ per
+source and uses AME's **most recently used preset**; true removes the opportunity
+to adjust preset first. Refuse foreign queued items as with AE render. Default to
+false and inspect AME destinations/preset before manual execution. Return is nothing,
+not a job ID or encoded-file success. AME handoff/request, observed AME job and
+validated output are separate evidence. Do not assume AE output-module codec/path
+settings transfer unchanged to AME or that duplicate calls are idempotent.
+
 ### Property animation: typed plan before mutation
 
 Reviewed2026-10-07 against pinned scripting source

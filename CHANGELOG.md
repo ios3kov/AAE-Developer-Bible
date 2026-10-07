@@ -2,6 +2,10 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Reconciled all five scripting renderqueue pages: preparation/arming, multi-output
+  settings and invalidation, range/callback diagnostics, foreign queue protection and
+  AME preset/handoff limits. Explicit ledger now90 members.
+
 - Reconciled property/keyframe authoring: typed batch preconditions, partial error
   outcomes, key identity/deletion ordering, spatial versus temporal shape, expression
   evaluation and separated dimensions. Added explicit reviewed-member ledger.

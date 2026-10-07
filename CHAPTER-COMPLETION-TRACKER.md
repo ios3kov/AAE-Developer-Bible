@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+Renderqueue block: all5 scripting queue/module source pages read; practical workflow
+and exact source conflicts documented,48 headings added to semantic ledger.
+
 Properties/keyframes block records scoped source-reviewed members independently
 of machine literal mentions; practical authoring/invalidation scenarios added.
 
