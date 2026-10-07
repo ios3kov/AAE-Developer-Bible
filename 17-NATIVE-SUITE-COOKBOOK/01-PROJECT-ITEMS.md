@@ -26,6 +26,17 @@ Do not hardcode the assumption “exactly one project” as a permanent API trut
 
 ## Project handle
 
+### Companion source is a bounded query, not project management
+
+[`ProjectItemRecipes.cpp`](code/ProjectItemRecipes.cpp) implements only first-project
+root lookup and item counting. `Bible_GetProjectAndRoot` chooses index 0 after a
+count check; it does not implement project selection, ID resolution, folder creation
+or any mutation described below. On failure its output handles are not a complete
+result (project lookup may succeed before root lookup fails). Initialize outputs and
+consume them only after success. `Bible_CountProjectItems` clears the count before
+traversal but may leave a partial count on error; do not report it as the total.
+These helpers rely on the caller's supported host callback and exception boundary.
+
 `AEGP_ProjectH` is a host-owned project reference.
 
 Do not:

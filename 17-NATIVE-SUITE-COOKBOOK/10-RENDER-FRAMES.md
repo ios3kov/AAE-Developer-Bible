@@ -8,6 +8,15 @@ The existing `RenderRecipes.cpp` source example uses the older-compatible `Rende
 
 ## Core pipeline
 
+Companion [`RenderRecipes.cpp`](code/RenderRecipes.cpp) implements the middle of
+this pipeline only: it borrows already configured options, obtains a receipt,
+calls a consumer with its borrowed world and checks the receipt in. It neither
+creates/disposes options nor inspects/copies pixels. Its cancel callback is null,
+so the cancellation design below is not implemented by this helper. The consumer
+must not dispose the world or retain it/base pointers after return. Receipt RAII
+protects exception paths; ordinary explicit checkin preserves primary error, but
+does not separately report a secondary checkin failure.
+
 ```text
 ItemH
 → RenderOptions.NewFromItem

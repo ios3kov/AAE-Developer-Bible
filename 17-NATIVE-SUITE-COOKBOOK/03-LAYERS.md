@@ -21,6 +21,15 @@ for (A_long i = 0; i < count && !err; ++i) {
 
 Layer index is ordering, not persistent identity.
 
+Companion [`CompLayerRecipes.cpp`](code/CompLayerRecipes.cpp) implements only fixed
+composition creation and bounded LayerID collection. `Bible_GetLayerIds` writes at
+most `capacity` IDs; success does **not** mean all layers fit, and no total count or
+truncation flag is returned. Query the current count separately when completeness
+matters. `writtenPL` is partial on an SDK error, and even capacity 0 currently requires
+a non-null `ids` pointer. Add/rename/duplicate/delete/parent/selection workflows below
+are guidance, not functionality implemented by this collector. Re-resolve comp + IDs
+before later mutation; caller supplies callback guard and Undo.
+
 ## Stable layer ID
 
 Use Layer Suite ID APIs where appropriate:

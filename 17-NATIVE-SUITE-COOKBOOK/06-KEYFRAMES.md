@@ -125,7 +125,10 @@ Keyframe Suite5 предоставляет отдельные функции:
 
 Canonical [OneD recipe](code/KeyframeRecipes.cpp) takes borrowed stream and CompTime
 arrays; [operation chain](../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md) supplies caller
-Undo/guard/lifetime. Validate arrays/count/time scales before batch. Source disposes
+Undo/guard/lifetime. Validate arrays/count/time scales before batch: the helper
+checks pointers/count/type, **not each time scale, numeric finiteness, sorting or
+duplicate-time policy**. Count 0 still requires non-null arrays and enters batch.
+Source disposes
 each acquired value and ends batch after failed SetAddKeyframe. Interpolation/ease
 are separate; separated follower must be resolved correctly before OneD operation.
 
@@ -166,6 +169,12 @@ if (addH) {
 ```
 
 `EndAddKeyframes(FALSE, ...)` — explicit non-commit path batch API. Он не заменяет глобальную Undo-модель команды: если операция одновременно меняет другие части проекта, проектируйте общий undo scope отдельно.
+
+The helper explicitly ends an acquired batch on ordinary returned SDK errors, not
+on every C++ exception: an outer callback guard converts exceptions but does not
+resume skipped value disposal or `EndAddKeyframes`. Use exception-safe owners when
+extending this recipe. A failed End call is reported only when no earlier error
+exists; separate diagnostics are needed to retain both failure details.
 
 Существующий `Bible_AddOneDKeyframes` использует этот pattern и производит value через `AEGP_GetNewStreamValue`, а не вручную заполняет неизвестный union. Это defensive source pattern; Bible не заявляет runtime result для recipe.
 

@@ -8,6 +8,19 @@ Historical/compatibility source examples may use the older `AEGP_EffectSuite4` s
 
 ## Layer effect refs are owned references
 
+### Companion source and partial outcomes
+
+[`EffectStreamRecipes.cpp`](code/EffectStreamRecipes.cpp) contains installed-match
+lookup, apply-and-dispose and static OneD setting, not a complete effect-stack editor.
+Lookup returns generic error for an absent match and leaves key `NONE`; do not use
+that output after failure. `Bible_ApplyEffect` returns no effect ref to configure and
+does not open Undo or remove the added instance if later cleanup fails. An error can
+therefore mean **effect applied, reference cleanup failed**, not “nothing changed”.
+The static setter rejects non-OneD or time-varying streams; it does not bake animation
+or disable expressions. Both mutation helpers require caller target validation,
+supported callback context and exception/Undo policy. Normal return paths preserve
+the primary error, but these helpers are not RAII exception-cleanup examples.
+
 Current header explicitly marks the `AEGP_EffectRefH` returned by `AEGP_GetLayerEffectByIndex` as:
 
 > MUST dispose with `AEGP_DisposeEffect`

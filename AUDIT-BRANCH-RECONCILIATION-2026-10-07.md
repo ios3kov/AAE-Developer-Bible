@@ -20,6 +20,17 @@ one-off CI exports or their older source baselines.
 | gate4-source-export-2026-10-01 | `dfbc99e` | `gate4-source-export.yml` |
 
 These five branches are eligible for removal after publishing this review.
+They were removed from origin after publishing selective transfer `6a3fc0f`.
+
+## Cookbook companion reconciliation
+
+Read project/item, layer, effect, keyframe, frame-render and render-queue chapters
+alongside all six corresponding C++ recipe files. Clarified partial output counts/
+handles, LayerID truncation, apply-versus-cleanup failure, static OneD restrictions,
+caller-only time/value validation, exception gaps in batch/value cleanup and the
+render helper's borrowed-options/null-cancel/consumer boundaries. Queue chapter
+already states missing STOPPED preflight, path readback and compensation accurately.
+No source implementation changed and no new native compile/AE result is implied.
 
 ## Native/source review branch: transfer in progress
 
