@@ -240,6 +240,11 @@ This workflow belongs to the product team. Bible documents the method; it does n
 
 ## New SDK adoption workflow
 
+Published26.5 delta now has a [scoped currentness/source map](../CURRENTNESS-REVIEW-2026-10-07.md#native265-public-contract-reconciliation).
+Guide/ItemView, Comp13 mesh creation and Stream7 sampling stages must be treated
+as feature contracts, not replacements for the entire25.6 baseline. PProBeta27-only
+PiPL metadata/preview additions do not establish AE support.
+
 Do not begin with “fix compiler errors until green”.
 
 Use:

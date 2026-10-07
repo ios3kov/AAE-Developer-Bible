@@ -18,6 +18,39 @@ Primary Bible native baseline — SDK **25.6**.
 
 ## Guide data
 
+### Current public-contract rereview — 2026-10-07
+
+Pinned guide source `6d9b285d9755d1fbf8ead7680ba49de24f94b547`:
+[Guides/Item Views](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/aegp-suites.md#guides).
+Exact supplied25.6 `AE_GeneralPlug.h:551–561` has ItemViewSuite1 with playback-time
+query only; no GuideSuite/ItemViewSuite2 declarations found in reviewed Headers/Util.
+Guide's ItemViewSuite2 detail says **AE26.0+**, although What'sNew groups it with
+26.5 SDK additions. Record both sources rather than raising all members to26.5.
+No corresponding26.x archive/header acquisition or runtime observation here.
+
+GuideSuite2 extended getters preserve position type/color/pinning. **Base getters
+can return a percentage position without indicating its type**; do not interpret
+every returned number as pixels. Guide documents pixel clamp±100000, percentage
+clamp±300%, nonfinite values rejected; these are public-guide facts, not25.6
+header constants. If the feature needs round-trip fidelity, require extended typed
+accessors or refuse conversion; an older getter cannot infer the missing unit.
+
+Concrete preset design: target item1920×1080 → vertical25%/75%, horizontal50%.
+Extended route uses explicit percentage type; pixel fallback yields x480/x1440/y540
+only for this size and loses resize-relative behavior. Report that semantic downgrade
+and omit unsupported color/pinning only with explicit user policy. Do not silently
+claim a percentage preset has survived a later resize.
+
+Use published `AEGP_AddItemGuide2` then `AEGP_GetItemGuideByIndex2` to read back full
+state; range clamping means requested value is not actual state. For edits use
+`AEGP_SetItemGuide2`, read back; list indices again after guide structural mutation.
+Layer variant has separate target/lifecycle, not an ItemH cast. Only after model
+success and valid current view apply optional `AEGP_SetItemViewGuidesVisible`;
+snap and locked are separate setters, not side effects of adding a guide. A failed
+view update leaves model applied; return per-stage outcome, do not retry creation.
+No compiled26.x adapter is supplied: confirm exact suite macros/signatures in the
+actual target distribution before implementing this command.
+
 Guide API описывает model-level guide information.
 
 В более позднем API доступны richer attributes вроде orientation, position, percentage/pixel mode, color и edge/pinning-related state.

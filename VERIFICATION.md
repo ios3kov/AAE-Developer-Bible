@@ -2,6 +2,14 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Native26.5 selected public contracts, retained25.6 exact baseline
+
+Parent `f0ad27f`; local supplied25.6 GeneralPlug/SuiteHandler hashes and public
+source `6d9b285d9755d1fbf8ead7680ba49de24f94b547` recorded in currentness review.
+Guides/ItemView/mesh/stage/PiPL/preview sections read; selected baseline declarations
+inspected. Local checker, consistency11/11, generated freshness, strict MkDocs and
+diff whitespace PASS. No26.5 SDK archive/header audit, compiled adapter or host run.
+
 ### Expanded currentness acceptance — first AE UXP operation block
 
 Parent `227a0ac81f3313bd589c8a2e5a7dea80851249ba`; containing commit identifies

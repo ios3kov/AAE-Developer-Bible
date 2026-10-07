@@ -61,3 +61,64 @@ the current SDK, not guessed declarations copied from overview prose.
 First result: [AE UXP host operations](07-PANELS/03-UXP-HOST-API.md) now documents
 actual published entry/version/identity/Undo/creation/readback boundaries. It closes
 the roadmap-only gap for this bounded operation, **not this whole queue**.
+
+## Native26.5 public-contract reconciliation
+
+User-supplied local SDK checked at
+`/Users/os3kov/Downloads/AfterEffectsSDK_25.6_61_mac/ae25.6_61.64bit.AfterEffectsSDK/Examples`.
+It is25.6build61, not26.5. Fresh SHA256 of `Headers/AE_GeneralPlug.h`:
+`30d12ec3eb5af1a902c7414053b1be1da0204b226e0b1cdc71272be1e137000c`;
+`Util/AEGP_SuiteHandler.h`:
+`2eeec0827ca13f039eb87c961c8c41e77f046379457930d4bb2700c756b40b13`.
+Headers/Util symbol search found ItemViewSuite1 (playback only), not GuideSuite,
+ItemViewSuite2/CompSuite13/StreamSuite7/CreateParametricMesh/EXT3 declarations.
+Negative declaration search is scoped to this tree, not proof about installed hosts.
+
+Public C++ source snapshot pinned to `6d9b285d9755d1fbf8ead7680ba49de24f94b547`;
+reviewed `docs/aegps/aegp-suites.md` SHA256
+`c27d64011443b983b379d1c6c2279d29fc35fb0a50bd6eed5436cf0f872be0c7`.
+Selected exact sections actually read: Guides, ItemView2, Comp13 mesh, Stream7 stage.
+Other suite rows are not declared fully reviewed in this iteration.
+
+### Mesh command, not renderer implementation
+
+Published Comp13 `AEGP_CreateParametricMeshLayerInComp(parent_compH, mesh_type,
+new_layerPH)` adds a project-owned layer; listed shapes are cube/sphere/plane/torus/
+cone/cylinder. Do not dispose returned LayerH as allocated memory. Recommended
+command: late comp resolution → required Comp13 acquisition → validated mesh choice
+→ successful Undo begin → create → object-type readback via LayerSuite9 → end Undo
+→ release suites. No26.5 declaration compiled; acquisition macros/types must come
+from actual26.5 headers. A created layer can remain after readback/Undo-end failure;
+return created identity plus both errors, not pretend rollback. Mesh creation does
+not implement Artisan, guarantee a renderer or prove scene/output compatibility.
+If Comp13 unavailable, disabling mesh command is preferable to creating a solid
+and calling it equivalent. Generic LayerSuite9 callers must handle a new enum
+value without silently treating it as AV/text/model.
+
+### Layer-parameter stage: two independent values
+
+Stream7 published stage symbols: SOURCE(0), ONLY_MASKS(-2), ALL_EFFECTS(-1),
+positive1..N means through effect indexN. LayerID alone no longer describes sampling
+intent. Reviewed calls: Get/SetStreamLayerParamStageValue, Get/SetStreamLayerParamAndStageValue,
+GetStreamInputStageCycleSafeLimit. Combined getter returns StreamValue2 requiring
+DisposeStreamValue; scalar stage requires no disposal. Calls require PF_Param_LAYER,
+otherwise Err_PARAMETER per guide. Re-query cycle-safe limit before applying after
+source/effect add/remove/reorder; don't cache effect-index stage as durable identity.
+
+Concrete design: request sourceLayerID plus stage ALL_EFFECTS → acquire Stream7
+→ resolve layer-param stream/type → query current pair and cycle-safe limit
+→ validate exact documented allowed-stage contract → choose combined setter when
+both change → read back pair → dispose temporary value/stream → release suite.
+Guide says combined setter is atomic single Undo step; this applies to that call,
+**not a batch transaction or compensating subsequent errors**. Unsupported stage
+must not silently downgrade to SOURCE or reuse25.6 SetStreamValue as equivalent.
+Self/dependency cycle policy uses documented query, not numeric guess. No runtime,
+compiled adapter or portable stub of invented26.5 tables added.
+
+### Concrete chapter transfer
+
+Guide preset/units/readback/per-view partial outcome now in
+[guides chapter](17-NATIVE-SUITE-COOKBOOK/13-GUIDES-VIEWS-SELECTION.md).
+PiPL/preview PProBeta-only scope in [PiPL chapter](01-ARCHITECTURE/03-PIPL-AND-LOADING.md).
+Migration map linked from compatibility. Exact archive/header diff remains OPEN;
+this block improves current public-contract coverage without pretending a baseline upgrade.

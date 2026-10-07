@@ -2,6 +2,11 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Reconciled selected native26.5 public contracts against supplied25.6 headers;
+  added guide units/readback/fallback pitfalls and PProBeta-only metadata boundary.
+- Pinned public source and recorded mesh/stage command lifetime/error designs;
+  no exact26.5 SDK or runtime verification inferred.
+
 - Opened stricter current completeness/currency acceptance after1.1 freeze; current
   status no longer equates historical127-page closure with full current API coverage.
 - Added AE UXP27.0 published host-module/operation guide, Undo/path/identity/guide

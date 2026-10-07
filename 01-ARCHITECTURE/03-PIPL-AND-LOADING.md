@@ -1,5 +1,22 @@
 # PiPL, регистрация и загрузка плагина
 
+## Current cross-host metadata boundary — 2026-10-07
+
+[Pinned public PiPL guide](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/intro/pipl-resources.md)
+describes `AE_Effect_Search_Keywords`, `AE_Effect_Description` and
+`PF_REGISTER_EFFECT_EXT3` as SDK26.5 additions for **Premiere Pro Beta27.0 only**,
+not currently After Effects. Search JSON is locale-keyed (include en_US), malformed
+JSON ignored; description is plain string with PiPL code-page caveat. Do not add
+these to an AE25.6 sample and promise AE Effects-panel discovery behavior.
+
+Preview assets are keyed by **binary file title**, not match name; all effects in
+one binary share preview. PProBeta paths: mac bundle `Contents/Resources/Preview`,
+Windows `Preview` next to `.aex`, `<binary-title>.jpg`/`.mp4`,640×360/H.264 video.
+These are [host-specific preview contracts](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/effect-preview-media.md),
+not required AE installer assets. A newer registration macro does not remove the
+need to preserve older-host identity/resource/export requirements. Exact26.5
+entry/resource declarations remain unverified without that SDK distribution.
+
 **Основа: SDK 25.6 build 61, редакция 2026-10-01.** Здесь разбираются исходники Skeleton, его ресурс и проекты сборки, а также AEGP-ресурс Easy Cheese. Это не отчёт о загрузке нового бинарника. [Источники, SHA-256 и границы проверки](../18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md).
 
 Главная практическая мысль: **скомпилированная библиотека, правильно описанный плагин и реально загруженный плагин — три разных результата**. Исправный C++ не компенсирует отсутствующий ресурс; правильное имя в ресурсе не создаёт экспортируемую функцию; наличие файла в папке не подтверждает, что AE использует именно его.

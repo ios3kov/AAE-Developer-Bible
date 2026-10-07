@@ -4,6 +4,12 @@ Updated: **2026-10-07**
 
 ## Active: current completeness and currency review
 
+Native26.5 selected public contracts reconciled against available local25.6 tree:
+guide unit-loss/percentage fallback, ItemView26.0+ versus grouped26.5 notes,
+Comp13 mesh command, Stream7 layer/stage/cycle-safe lifetime and PProBeta-only
+metadata/preview boundaries. Pinned source/hash and transfer record in currentness
+review. Exact26.5 archive/full header diff and full current API inventory still OPEN.
+
 Owner requested a stricter full/current Bible after edition1.1 freeze. Current
 API coverage is **not yet accepted**. [New criteria/source observations](CURRENTNESS-REVIEW-2026-10-07.md):
 current SDK header/archive acquisition remains OPEN; Console Loading, release-notes
