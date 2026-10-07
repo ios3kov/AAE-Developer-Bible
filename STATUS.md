@@ -1,6 +1,6 @@
 # Status
 
-Updated: **2026-10-04**
+Updated: **2026-10-07**
 
 ## Continuous completion — 2026-10-07
 
@@ -18,12 +18,18 @@ Chapter-level follow-up: five Effect-state rows now C with
 closure from build PASS. Corrected payload-field versus new-parameter migration IDs.
 Remaining chapter rows retain their actual open status; final freeze not yet claimed.
 
+AEIO/Artisan: four additional core rows C after eight-page/source reconciliation.
+Evidence/acceptance: four additional core rows C with downloadable NOT_RUN plan.
+Platform GPU/installer/CI routes expanded; other rows remain open until related
+reviews finish. GitHub Validate and Regenerate docs confirmed success for
+`657fff9` and `c4785c5`; later-head observations separate in [ledger](VERIFICATION.md).
+
 Owner authorized continuing between checked blocks without approval pauses.
 Block 6 content implemented: arbitrary data/state migration, SDK ownership map,
 portable codec and Minimal Gain identity table. [Review](BLOCK-6-REVIEW-2026-10-07.md).
-Next: block 7 spatial/temporal SmartFX. No new AE runtime claim.
+Spatial/temporal additions are implemented; cross-page review continues. No new AE runtime claim.
 
-Blocks 7–10 additions now in progress: numeric ROI/temporal dependencies, cache
+Blocks 7–10 practical additions implemented: numeric ROI/temporal dependencies, cache
 receipt and GPU failure routes, bounded Drawbot/audio, scripting demo rig. These
 additions are not a claim that all tracker reconciliation/freeze tasks are closed.
 
@@ -35,9 +41,14 @@ source/recipe review and final checks, not a new product QA requirement.
 
 ## Canonical editorial policy
 
-All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). The mandatory workflow is: finish one logical block → commit/validate → report status to the user → stop before the next block.
+All writing/editing rules are consolidated in [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md).
+Finish logical block → commit/validate → report status. The owner's 2026-10-07
+exception authorizes continuing without approval pauses, not fabricated completion.
 
-## План завершения после аудита — 2026-10-02
+## Исторический baseline плана — 2026-10-04
+
+Следующие dated paragraphs сохраняют состояние той итерации; текущая очередь и
+новые compiler/source results указаны выше. «Ещё не начат» ниже не текущий статус.
 
 **Блоки 2–5 выполнены 2026-10-04 в редакционной области.** Навигация: 153 core/reference страницы, 498 ссылок/якорей PASS. Блок 4: exact-head PR bot regeneration и Validate Linux/macOS PASS; PR #1 слит в main на `c64b303`. Детальные SHA и post-merge проверки — в [VERIFICATION](VERIFICATION.md). Блок 5 слит через PR #2 на `8e95a2d`: 27 source/claim records, platform rereview и practical-depth comparison; лицензия по решению владельца пока неопределённа. Блок 6 ещё не начат.
 

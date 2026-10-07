@@ -176,8 +176,9 @@ See [object model](01-OBJECT-MODEL.md).
 [ES3 demo rig](../16-WORKING-TEMPLATES/jsx-tool/build-demo-rig.jsx) создаёт новую
 640×360 comp, Null/Slider, text, linear opacity keys, marker и mask. Script
 обращается по matchNames; expression связывает opacity с product-controlled
-`Bible Control`/`Bible Amount`. Число в Slider 50 даёт expected opacity=50;
-expression overrides underlying keyed opacity, а keys остаются для demonstration.
+`Bible Control`/`Bible Amount`. Expression прибавляет Slider к анимированному `value`
+и ограничивает 0…100. При Slider50 expected opacity=50 в t=0 и100 в t=1;
+отключение expression возвращает keyed0→100. Это expectations, не host observation.
 `valueAtTime(0,false)` + `expressionEnabled/expressionError` проверяют resolution,
 не все frames. Имена expression не становятся stable IDs: rename/missing control
 сломает rig; duplicate/migration требует policy владельца продукта.
