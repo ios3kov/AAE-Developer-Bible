@@ -4,6 +4,11 @@
 
 ### Subsequent practical additions
 
+Platform follow-up source review: SDK25.6 SDK_Invert_ProcAmp Windows vcxproj custom
+builds declare ARM64 while CUDA commands still use x64 host compiler; `-use_fast_math`
+is explicit. Mac shared-kernel preprocessing/embedded Metal route is documented.
+Added platform owned-file upgrade/rollback and artifact-bound CI designs, all NOT_RUN.
+
 ### Exact clean-source SDK syntax/type check — 2026-10-07
 
 Command: `python3 scripts/check_native.py <licensed SDK Examples> --report

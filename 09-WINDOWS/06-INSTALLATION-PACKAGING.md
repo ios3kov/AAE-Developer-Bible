@@ -4,6 +4,31 @@ A Windows plug-in installer must resolve Adobe's supported install paths, own on
 
 ## Common Adobe plug-in path
 
+## Worked upgrade/rollback design (NOT_RUN)
+
+Example product-owned `BibleGain.aex` + matching private PDB archive (PDB is not
+automatically customer payload). Resolve destination through registry guidance
+below with explicit registry view/scope. Close AE and all hosts loading the common
+plug-in before replacement; locked-file failure is not permission to kill processes.
+
+1. Verify candidate Authenticode and package manifest hashes; stage outside live
+   discovery. Archive prior owned binary/manifest outside MediaCore so duplicate
+   effects are not discovered.
+2. Reject unmanaged name collision, unexpected prior hash or path/reparse-point
+   escape; elevate only for the selected installation scope, not for arbitrary paths.
+3. Journal backup/copy/verification transitions; copy to staging on target volume,
+   verify hash, replace only named owned files. For MSI use actual installer rollback
+   semantics; this design is not a ready MSI implementation.
+4. Launch exact AE; record loaded module path, matching build/symbol identity and
+   smoke outcome. On failure close host and restore old bytes/manifest. Record failed
+   candidate and rollback separately; successful recovery does not turn smoke PASS.
+5. Uninstall only owned files whose identity still matches. Preserve presets/user
+   settings/licenses per product policy; changed files produce a visible conflict.
+
+Expected evidence: registry value/view → chosen path → candidate/installed hashes
+→ loaded module → smoke result; upgrade adds prior/restored hashes and recovery
+status. Execution is NOT_RUN; [worked pack](../13-TEMPLATES/examples/WORKED-EXAMPLE.md).
+
 The AE SDK installer guidance documents the common path through the registry:
 
     HKLM\SOFTWARE\Adobe\After Effects\[version]\CommonPluginInstallPath

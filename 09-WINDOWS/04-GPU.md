@@ -17,6 +17,27 @@ Backend selection — отдельный слой. CPU/CUDA/DirectX не дол�
 
 ## Host framework/device context
 
+### SDK25.6 concrete configuration route (Windows execution NOT_RUN)
+
+`Examples/Effect/SDK_Invert_ProcAmp/Win/SDK_Invert_ProcAmp.vcxproj` declares
+Debug/Release × x64/ARM64, toolset v143. CustomBuild for `.cl` preprocesses with
+`GF_DEVICE_TARGET_OPENCL=1`, CreateCString.py embeds source; `.chlsl` uses
+`GF_DEVICE_TARGET_HLSL=1` and ParseHLSL.py. `.cu` invokes nvcc from
+`CUDA_SDK_BASE_PATH`, `-arch=sm_50 -use_fast_math -m64`, x64 host compiler path.
+BOOST/CUDA paths, Python and generated include outputs are explicit build inputs.
+
+Crucial source defect/limitation: ARM64-conditioned CUDA commands also name x64
+host compiler. Do not infer native ARM64 CUDA support from configuration names;
+review toolchain/output machine/backend support before shipping. `-use_fast_math`
+also needs a declared exceptional-float/tolerance policy, not presumed bitwise parity.
+
+Start with the actual x64 configuration and licensed dependencies, inspect generated
+kernel headers/objects and final `.aex` machine/imports. In a target AE debugger,
+break on dispatcher GPU setup/render selectors, record actual framework/device and
+world format. A GPU project option alone does not prove that this effect used GPU.
+For unsupported backend/format or setup failure use the documented CPU eligibility
+or explicit-error policy; never silently return partially written output.
+
 Если AE передаёт framework/device context, используйте его как source of device identity. Не создавайте скрытую GPU selection policy, расходящуюся с host scheduling.
 
 ## CUDA dependency policy

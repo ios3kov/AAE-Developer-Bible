@@ -24,6 +24,24 @@ CPU и Metal могут иметь разную реализацию, но alpha
 
 ## Host выбирает GPU context
 
+### SDK25.6 concrete source route (execution NOT_RUN)
+
+Начать с `Examples/Effect/SDK_Invert_ProcAmp/Mac/SDK_Invert_ProcAmp.xcodeproj`
+в copied Examples tree. Читать dispatcher/device setup вместе с shared
+`SDK_Invert_ProcAmp_Kernel.cl` и GPUUtils: Mac custom build preprocesses kernel
+с `GF_DEVICE_TARGET_METAL=1`, затем CreateCString.py создаёт embedded `.metal.h`.
+Отдельного checked-in `.metal` это не требует. Старый hardcoded clang3.5 Metal
+include path и invocation `python` требуют adaptation/review под installed toolchain;
+source presence не гарантирует successful modern Xcode build.
+
+Для подтверждения route поставить breakpoints на dispatcher GPU selectors и
+device-setup/render functions sample; записать фактический framework/device index,
+формат worlds и setup result. CPU render hit при выбранной GPU project setting
+не является GPU test. Unsupported format/framework и setup failure проверять
+отдельно по [failure policy](../02-EFFECT-PLUGINS/05-GPU.md), не принуждать host
+исполнять GPU callback с CPU pointers. Device selection не заменять global default.
+Debug attribution/logging build и ordinary timing build — отдельные artifacts.
+
 В GPU selector path After Effects передаёт framework/device context. Не выбирайте самостоятельно «первую GPU» или отдельный global Metal device, если host уже дал нужную device identity/context.
 
 ## Apple Silicon

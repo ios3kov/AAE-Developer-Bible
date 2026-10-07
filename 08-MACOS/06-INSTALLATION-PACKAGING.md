@@ -4,6 +4,34 @@ Development install, product install and delivery packaging are separate concern
 
 ## Development location
 
+## Worked upgrade/rollback design (NOT_RUN)
+
+Example own product `BibleGain.plugin`, not Adobe Skeleton installed under a new
+filename with its old match identity. Resolve intended scope/path below; close AE
+and compatible Adobe hosts before replacing loaded code. Package manifest lists
+only this product bundle plus its identifier/version and hashes; user presets and
+license state are not payload files.
+
+1. Stage signed/notarized candidate outside live discovery directories; verify
+   signature and expected bundle identity/hash. Archive prior owned bundle and
+   its manifest in backup outside discovery. A second live backup bundle risks
+   duplicate match-name discovery.
+2. Refuse conflicting unmanaged destination, symlink escape or unexpected prior
+   hash; never delete all MediaCore to resolve a collision.
+3. Copy candidate to a sibling staging location outside discovery, preserve bundle
+   permissions, verify copy, then perform controlled same-volume replacement.
+   Journal each transition; filesystem rename does not make the entire installer atomic.
+4. Launch exact supported AE, verify loaded path/UUID and smoke fixture. On failure
+   close host, restore prior owned bundle/manifest, verify restored bytes and record
+   rollback result separately. A failed smoke test remains failed after rollback.
+5. Uninstall only manifest-owned unmodified files. If bytes changed unexpectedly,
+   stop/report conflict rather than erasing another installation. Keep user data
+   according to separately declared policy.
+
+Expected record: candidate hash → installed hash → loaded UUID → smoke outcome;
+if rollback, old hash → restored hash and separate recovery outcome. All observations
+here are NOT_RUN; see [worked evidence pack](../13-TEMPLATES/examples/WORKED-EXAMPLE.md).
+
 The AE SDK guide recommends the per-user MediaCore path during development:
 
     ~/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore/

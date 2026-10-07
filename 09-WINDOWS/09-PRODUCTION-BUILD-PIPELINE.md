@@ -4,8 +4,6 @@ This chapter connects the Windows build, signing and installer topics into one r
 
 It is a process definition, not proof that the Bible examples already compile or load on Windows.
 
-## Inputs
-
 ## Конкретный учебный маршрут: Skeleton Win
 
 В SDK 25.6 начать с `Examples/Template/Skeleton/Win/Skeleton.sln` и
@@ -58,7 +56,7 @@ third-party files/preferences. Official path discovery и scope брать из
 [install guidance](06-INSTALLATION-PACKAGING.md). Windows commands — DOCUMENTED
 walkthrough, execution на этой macOS-среде не заявлен.
 
-Pin:
+## Inputs to pin
 
 - source commit;
 - Adobe AE SDK version/build;

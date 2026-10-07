@@ -4,8 +4,6 @@ This chapter connects the individual macOS topics into one reproducible release 
 
 It does **not** mean the Bible examples are host-verified. A production pipeline is only accepted after an actual plug-in bundle is built, installed and loaded in the declared AE/OS matrix.
 
-## Inputs
-
 ## Конкретный учебный маршрут: SDK Skeleton
 
 Использовать локально лицензированный SDK 25.6 `Examples/Template/Skeleton/Mac/Skeleton.xcodeproj`.
@@ -57,7 +55,7 @@ artifact/metadata для rollback, не удаляет presets/чужие plug-i
 на developer Mac не clean-machine result. CI outputs связываются с source/hash,
 toolchain, SDK и UUID, не только названием release ZIP.
 
-Pin:
+## Inputs to pin
 
 - source commit;
 - Adobe AE SDK version/build used for compilation;

@@ -44,6 +44,22 @@ for other AEGP recipes; this entry does not close the whole block11 tracker.
 
 ## SmartFX follow-up
 
+## Platform workflow follow-up
+
+Read macOS/Windows GPU, packaging, CI and production-pipeline chapters together
+with debugger chapters and supplied SDK25.6 SDK_Invert_ProcAmp project custom-build
+commands. Windows ARM64-conditioned CUDA command uses x64 host compiler; reported
+as a source limitation, not a successful build. CUDA `-use_fast_math` means explicit
+numeric policy is necessary. Mac embedded Metal generation and obsolete tool path
+remain source facts, not current Xcode execution evidence.
+
+Added own-file upgrade/rollback designs for each platform with candidate/prior/
+installed/restored identities, stopped-host boundary and conflict refusal. CI routes
+bind source/SDK/toolchain, inspected machine/slices and symbols to candidate/signing/
+package transitions. No installer, GPU, Windows or signing execution claimed. These
+are scoped follow-up results; remaining platform rows require complete related-page
+and version-source reconciliation before full closure.
+
 Read SmartFX chapter, auxiliary chunk section and actual
 `20-REFERENCE-IMPLEMENTATIONS/Effect/SmartFX-MFR/SmartFxMfr.cpp` plus README.
 Source is pass-through: ID1, copy request/result extents, WorldTransform copy,
