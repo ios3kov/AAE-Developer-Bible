@@ -4,6 +4,10 @@
 
 ## Final editorial result — 2026-10-07
 
+After freeze: current inventory expanded to **128** with AE UXP host API chapter.
+Historical127 rows retain their old-plan results; [currentness review](CURRENTNESS-REVIEW-2026-10-07.md)
+is the active completeness/currency queue, not automatically closed by those C/L.
+
 Все127 core rows сверены и закрыты `C` либо explicit `L`. Dated reconciliation
 records в каждой строке — основание closure, не зелёная сборка. `L` сохраняет
 scope overview/UXP/BlitHook/catalogue/source-boundary, не незавершённый host gate.
@@ -145,6 +149,7 @@ cross-page review. Добавления и результаты:
 |---|---|---|---|---|---|---|
 | [CEP development](07-PANELS/01-CEP.md) | C | C | C | C | C | Manifest/bootstrap walkthrough и controlled failure paths согласованы. **№2 выполнен**. |
 | [UXP transition for After Effects](07-PANELS/02-UXP-TRANSITION.md) | C | L | C | L | C | Dated roadmap/published docs, installed availability unknown; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [AE UXP host API operations](07-PANELS/03-UXP-HOST-API.md) | E | C | C | C | C | Published27.0 module/create-comp/readback documented; remaining object/platform/packaging coverage [OPEN](CURRENTNESS-REVIEW-2026-10-07.md). |
 | [Panels: CEP now, UXP transition](07-PANELS/README.md) | C | L | C | L | C | UI route with unknown-outcome/rollout boundaries; [final review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure). |
 
 ## 08-MACOS

@@ -4,6 +4,9 @@
 
 Текущая редакция: [edition1.1 freeze — 2026-10-07](EDITION-FREEZE-2026-10-07.md).
 
+После freeze: [полнота и актуальность — active review](CURRENTNESS-REVIEW-2026-10-07.md).
+AE-specific [UXP host API operations](07-PANELS/03-UXP-HOST-API.md) дополняют transition roadmap.
+
 Маршруты описывают действия читателя. Они не означают, что примеры
 уже собраны или проверены в вашем After Effects. Отделяйте чтение
 контрактов, portable-проверки, компиляцию с SDK и запуск внутри AE.

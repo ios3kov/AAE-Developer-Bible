@@ -2,6 +2,11 @@
 
 This is a dated migration plan, not an assumption that After Effects already exposes the same UXP API surface as Photoshop, Premiere or Media Encoder.
 
+Published AE-specific contracts now have a separate [host API operation guide](03-UXP-HOST-API.md):
+`require("aftereffects")`, reviewed MinVersion27.0, creation/readback, path and Undo
+differences, guide overloads and DeferredCall documentation gaps. Migration roadmap
+alone no longer stands in for that API coverage; remaining currentness work is explicit.
+
 ## Adobe timeline snapshot — 2026-10-01
 
 Adobe's 2026-09-24 developer announcement states:

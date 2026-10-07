@@ -22,6 +22,10 @@
 
 ## Текущая очередь — 2026-10-07
 
+**Новое поручение после freeze:** [expanded currentness acceptance](CURRENTNESS-REVIEW-2026-10-07.md)
+OPEN. Прежняя приёмка ниже сохраняется исторически; она не заменяет актуальный
+SDK/API inventory, полную UXP практическую документацию и readable platform checks.
+
 **Блоки1–16 завершены в редакционной области; edition1.1 frozen 2026-10-07.**
 Практические дополнения6–15 сверены с главами/source/evidence; все127 core rows
 `C` либо явно ограниченный `L`. [Freeze record](EDITION-FREEZE-2026-10-07.md)

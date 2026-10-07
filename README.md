@@ -7,7 +7,9 @@ Edition: **1.1 — editorial freeze, 2026-10-07**
 Native research baseline: **2026-10-01 / SDK25.6 build61**; selected source/platform rereviews through **2026-10-07**.
 
 **Canonical writing/editing rules:** [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md)  
-Status: **editorially complete — 127 core pages reconciled with explicit limits**.
+Status: **edition1.1 frozen; expanded completeness/currentness review IN PROGRESS**.
+The historical127-page closure does not certify the full current API surface.
+[Current review and open criteria](CURRENTNESS-REVIEW-2026-10-07.md).
 [Freeze record and reproduction](EDITION-FREEZE-2026-10-07.md).
 
 ## Цель
@@ -50,7 +52,10 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 
 Отсутствие runtime evidence у source example означает только **«Bible не заявляет этот runtime result»**, а не «Bible обязана теперь собрать и протестировать этот пример».
 
-План этой редакции [завершён](COMPLETION-PLAN.md). [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) содержит результаты всех 127 core pages: `C` либо обоснованный `L`. Это editorial coverage, не новый compiler/runtime PASS. Research appendices и reader-product QA продолжаются отдельно.
+План edition1.1 [завершён](COMPLETION-PLAN.md), но по новому требованию владельца
+полнота/актуальность текущего SDK/API проверяется отдельно. [Исторический tracker](CHAPTER-COMPLETION-TRACKER.md)
+фиксирует127 pages C/L, не исчерпывающий current API inventory. Новая работа не
+заменяется обязательной host-QA всех examples.
 
 ## Главный принцип
 

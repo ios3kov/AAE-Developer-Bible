@@ -253,6 +253,8 @@ Bible documents these areas; it does not need to execute every panel source exam
 
 ## Read next
 
+- [AE UXP host API and concrete project command](03-UXP-HOST-API.md)
+
 - [CEP](01-CEP.md)
 - [UXP transition](02-UXP-TRANSITION.md)
 - [CEP → ExtendScript](../15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md)

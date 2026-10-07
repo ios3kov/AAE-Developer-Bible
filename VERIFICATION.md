@@ -2,6 +2,22 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Expanded currentness acceptance — first AE UXP operation block
+
+Parent `227a0ac81f3313bd589c8a2e5a7dea80851249ba`; containing commit identifies
+new docs/tooling. Adobe AE UXP index/Application/Project/ItemCollection/CompItem/
+DeferredCall pages actually read; MinVersion27.0 versus underlying host26.5 feature
+notes kept separate. C++ What'sNew/preview guide reread; PProBeta27-only feature
+warning retained. SDK Console fetch/browser stayed Loading; release notes HTTP403.
+Search snippet not promoted to verified release matrix. No current SDK bytes,
+host API execution or full object/member coverage observed.
+
+New128th core row explicitly E for remaining coverage, practical operation and
+provenance axes bounded; consistency count guard deliberately128, not weakened.
+Local consistency11/11, checker, regeneration/freshness, strict MkDocs and whitespace
+PASS. Source snippet is documented/source example, not fake-host or AE PASS.
+Historical freeze127-page result preserved, current full/current acceptance OPEN.
+
 ### Edition1.1 editorial freeze
 
 Technical parent `c8d867280b538b48c19fbbec2d1b510388690b93`; final source/generated

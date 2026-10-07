@@ -43,6 +43,11 @@
 
 ## Source boundaries
 
+Current review2026-10-07: published AE UXP members examined here require27.0;
+native guide lists26.5 changes, but actual26.5 SDK headers not acquired/reviewed.
+[Currentness/source map](../CURRENTNESS-REVIEW-2026-10-07.md) separates these from
+retained25.6 exact baseline. Do not assume a26.5 native host exposes27.0 UXP API.
+
 [Claim/source/version table](../BLOCK-5-SOURCES.md) keeps SDK ABI, documented host requirements, panel runtime and platform policy in separate columns. SDK 25.6 build 61 is the Bible native baseline, not an AE/OS support range. Current Adobe Windows-on-Arm requirements are documented separately from our unperformed native ARM64 host tests.
 
 ## Platform baseline

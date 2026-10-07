@@ -2,6 +2,11 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Opened stricter current completeness/currency acceptance after1.1 freeze; current
+  status no longer equates historical127-page closure with full current API coverage.
+- Added AE UXP27.0 published host-module/operation guide, Undo/path/identity/guide
+  overload and DeferredCall gaps;128-page inventory guard updated without dropping rows.
+
 - Froze edition1.1 editorially: all127 core pages C/justified L, final status/plan/
   checklist/coverage aligned; revision-bound freeze record and navigation entry.
 - Preserved SDK25.6/historical evidence, NOT_RUN plans, owner no-license decision

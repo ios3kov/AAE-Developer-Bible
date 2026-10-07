@@ -2,6 +2,15 @@
 
 Updated: **2026-10-07**
 
+## Active: current completeness and currency review
+
+Owner requested a stricter full/current Bible after edition1.1 freeze. Current
+API coverage is **not yet accepted**. [New criteria/source observations](CURRENTNESS-REVIEW-2026-10-07.md):
+current SDK header/archive acquisition remains OPEN; Console Loading, release-notes
+HTTP403. Published AE UXP27.0 host API now has a practical documented operation
+guide; full object/platform/packaging coverage and native26.5 reconciliation remain.
+Historical closure below applies to the old plan, not this expanded acceptance.
+
 ## Current edition — 2026-10-07
 
 **Edition1.1 editorially complete.** All127 core rows reconciled C/explicit L;

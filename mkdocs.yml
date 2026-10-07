@@ -17,6 +17,7 @@ nav:
   - Editorial guide: EDITORIAL-GUIDE.md
   - Status: STATUS.md
   - Edition freeze 2026-10-07: EDITION-FREEZE-2026-10-07.md
+  - Current completeness and currency review: CURRENTNESS-REVIEW-2026-10-07.md
   - Changelog: CHANGELOG.md
   - Sources: SOURCES.md
   - Source and version boundaries: BLOCK-5-SOURCES.md
@@ -83,6 +84,7 @@ nav:
   - 07-PANELS:
       - "CEP development": 07-PANELS/01-CEP.md
       - "UXP transition for After Effects": 07-PANELS/02-UXP-TRANSITION.md
+      - "AE UXP host API operations": 07-PANELS/03-UXP-HOST-API.md
       - "Panels: CEP now, UXP next": 07-PANELS/README.md
   - 08-MACOS:
       - "macOS — Xcode setup": 08-MACOS/01-XCODE-SETUP.md
