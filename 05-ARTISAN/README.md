@@ -6,8 +6,6 @@
 
 Artisan — это не «GPU effect» и не callback, который получает один layer image. Artisan регистрируется как **renderer implementation для 3D composition rendering path** и через render context запрашивает scene information у After Effects.
 
-## 1. Когда Artisan вообще нужен
-
 ## Exact Artie sample reading walkthrough
 
 SDK 25.6 `Examples/AEGP/Artie/Artie.cpp`: registration table → `Artie_GlobalSetup`
@@ -32,6 +30,8 @@ thread permission определяется exact callback/suite, не C++ class 
 Artie shortcuts не становятся production ray tracer или complete scene-coverage
 guarantee. [Deep contract](../14-NATIVE-INTEGRATIONS/09-ARTISAN.md) и reference
 workspace остаются linked layers одной темы. Runtime renderer не заявлен.
+
+## 1. Когда Artisan вообще нужен
 
 Рассматривайте Artisan, если продукт должен:
 

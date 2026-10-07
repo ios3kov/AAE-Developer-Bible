@@ -11,11 +11,15 @@ A_Err RegisterMyArtisan(
     AEGP_SuiteHandler& suites,
     AEGP_PluginID plugin_id,
     void* refcon,
+    A_Version product_version,
     PR_ArtisanEntryPoints* entry_points)
 {
+    A_Version api_version{};
+    api_version.majorS = PR_ARTISAN_API_VERSION_MAJOR;
+    api_version.minorS = PR_ARTISAN_API_VERSION_MINOR;
     return suites.RegisterSuite5()->AEGP_RegisterArtisan(
-        ARTISAN_API_VERSION,
-        MY_ARTISAN_VERSION,
+        api_version,
+        product_version,
         plugin_id,
         refcon,
         "com.myco.renderer",
@@ -25,6 +29,16 @@ A_Err RegisterMyArtisan(
 ~~~
 
 Use exact constants/types from the SDK you compile. Do not invent API-version numbers.
+
+SDK25.6 `AE_GeneralPlug.h:2782–2789` passes both versions **by value** as
+`A_Version`; `PR_Public.h` defines the API major/minor symbols. Product version is
+caller-owned policy, not the Artisan API version. No `ARTISAN_API_VERSION` aggregate
+macro is assumed. The function above is a source fragment, not a standalone TU or
+host-tested renderer; initialize the entry table and callback lifetime first.
+
+Follow the [exact Artie reading route](../../05-ARTISAN/README.md#exact-artie-sample-reading-walkthrough)
+before replacing callbacks. A successful registration call only establishes that
+step; it does not prove renderer selectability, scene correctness or persistence.
 
 ## Why the Artie sample is required
 

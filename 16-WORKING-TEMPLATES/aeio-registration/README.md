@@ -17,8 +17,8 @@ A_Err RegisterMyIO(
     AEGP_SuiteHandler& suites,
     AEGP_PluginID plugin_id,
     AEGP_IORefcon refcon,
-    AEIO_ModuleInfo* module_info,
-    AEIO_FunctionBlock4* funcs)
+    const AEIO_ModuleInfo* module_info,
+    const AEIO_FunctionBlock4* funcs)
 {
     return suites.RegisterSuite5()->AEGP_RegisterIO(
         plugin_id,
@@ -29,6 +29,12 @@ A_Err RegisterMyIO(
 ~~~
 
 The concrete supplied-25.6 review uses AEIO_ModuleInfo and AEIO_FunctionBlock4. Recheck target headers.
+
+Exact SDK25.6 `AE_GeneralPlug.h:2791–2795` takes const pointers for both tables.
+Zero initialization alone does not create a usable function block. Follow the
+[IO sample reading route](../../04-AEIO/README.md#exact-io-sample-reading-walkthrough)
+for callback installation and spec ownership. Sample registration uses local
+tables; do not retain their addresses yourself or generalize unreviewed async lifetime.
 
 ## Module metadata
 

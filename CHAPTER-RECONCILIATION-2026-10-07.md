@@ -42,6 +42,20 @@ for other AEGP recipes; this entry does not close the whole block11 tracker.
 
 ## Validation boundary
 
+## AEIO / Artisan reconciliation
+
+Read both overviews, native-integration companions, working registration guides
+and reference-workspace guides together. Reread supplied AE_GeneralPlug.h:2782–2819,
+IO.cpp:985–1112 and Artie.cpp:1611–1674. Registration fragment now uses actual PR
+API symbols and A_Version product parameter; IO const table arguments match header.
+Reference ownership distinguishes host specs from module options.
+
+Found IO HAS_AUX_DATA advertised but provider slots not populated in zero-initialized
+function block; documented, not accepted as auxiliary support. IO memory-id and
+Artie death-hook registration occur after module/renderer registration; neither
+proves rollback on later failure. Licensed workspace routes are not standalone
+implementations. No codec/scene/host runtime claimed.
+
 ## SmartFX follow-up
 
 ## Platform workflow follow-up

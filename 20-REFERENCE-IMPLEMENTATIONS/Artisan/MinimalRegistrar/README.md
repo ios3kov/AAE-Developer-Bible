@@ -19,6 +19,12 @@ The supplied 25.6 review covers PR_ArtisanEntryPoints, CanvasSuite8 and the glob
 
 ## Development sequence
 
+Follow the [Artie reading route](../../../05-ARTISAN/README.md#exact-artie-sample-reading-walkthrough)
+and [typed registration fragment](../../../16-WORKING-TEMPLATES/artisan-registration/README.md).
+API/product versions are A_Version values. Lifecycle stubs do not provide persistent
+instance settings. RegisterArtisan success followed by failed death-hook registration
+is partial initialization, not automatic renderer unregistration.
+
 ~~~text
 materialize Artie
 → build/load untouched

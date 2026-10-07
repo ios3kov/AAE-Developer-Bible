@@ -75,7 +75,12 @@ A practical importer order:
 
 ## Ownership
 
-Every AEIO-created spec/private object needs explicit owner/dispose behavior.
+Host owns InSpec/OutSpec identity; module owns its attached options/private resources
+according to each API contract. Do not dispose the host spec as a codec object.
+
+The [IO reading route](../../../04-AEIO/README.md#exact-io-sample-reading-walkthrough)
+records HAS_AUX_DATA advertised but auxiliary provider callback slots unassigned.
+Strip unimplemented capabilities rather than treating sample flags as certification.
 
 Never keep callback-scoped buffers or host handles after their documented lifetime.
 

@@ -4,6 +4,11 @@
 
 ### Subsequent practical additions
 
+AEIO/Artisan eight-page reconciliation: RegisterSuite5 signatures and exact IO/Artie
+construction reread. Corrected typed version fragment and spec ownership; IO advertises
+auxiliary data without provider callbacks in its constructed table. Four core rows
+editorially covered with [review](CHAPTER-RECONCILIATION-2026-10-07.md); no runtime.
+
 Platform follow-up source review: SDK25.6 SDK_Invert_ProcAmp Windows vcxproj custom
 builds declare ARM64 while CUDA commands still use x64 host compiler; `-use_fast_math`
 is explicit. Mac shared-kernel preprocessing/embedded Metal route is documented.

@@ -107,13 +107,13 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [AEIO — media import/export plug-ins](04-AEIO/README.md) | E | E | R | R | C | Связать importer/exporter сценарий с exact SDK callback/file paths и cleanup. **№14** |
+| [AEIO — media import/export plug-ins](04-AEIO/README.md) | C | C | C | C | C | Exact IO route, options/cleanup и sample capability mismatch; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 
 ## 05-ARTISAN
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [Artisan — custom composition 3D renderer](05-ARTISAN/README.md) | E | E | R | R | C | Связать normalized scene и render lifecycle с exact Artie path и current suites. **№14** |
+| [Artisan — custom composition 3D renderer](05-ARTISAN/README.md) | C | C | C | C | C | Artie route/current suites и normalized scene/lifetime согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 
 ## 06-SCRIPTING
 
@@ -221,8 +221,8 @@ cross-page review. Добавления и результаты:
 | [AEGP tools — native automation and deep AE integration](14-NATIVE-INTEGRATIONS/05-AEGP-TOOLS.md) | R | E | R | R | C | Связать command/update/idle/death flow со stable targets и partial init. **№11** |
 | [Keyframers](14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md) | R | E | R | R | C | Добавить route к animate recipe, separated dimensions и batch failure cleanup. **№11** |
 | [Native dockable panels](14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md) | R | E | R | R | C | Сверить panel commands/model handoff с stale generations и shutdown recipe. **№11** |
-| [AEIO — registration and callback lifecycle](14-NATIVE-INTEGRATIONS/08-AEIO.md) | R | E | R | R | C | Согласовать callback walkthrough с основным AEIO разделом и exact source paths. **№14** |
-| [Artisan — registration, contexts and render contract](14-NATIVE-INTEGRATIONS/09-ARTISAN.md) | R | E | R | R | C | Согласовать Artie/current-suite walkthrough с основным renderer разделом. **№14** |
+| [AEIO — registration and callback lifecycle](14-NATIVE-INTEGRATIONS/08-AEIO.md) | C | C | C | C | C | Overview/templates/reference ownership и source routes сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Artisan — registration, contexts and render contract](14-NATIVE-INTEGRATIONS/09-ARTISAN.md) | C | C | C | C | C | Typed registration/version и partial init сверены с Artie; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [BlitHook — display-pipeline frame hook](14-NATIVE-INTEGRATIONS/10-BLITHOOK.md) | R | L | R | L | C | Согласовать borrowed buffer/IPC boundary; async lifetime оставить ограниченным известным контрактом. **№11** |
 | [Legacy / historical native integration boundaries](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) | R | E | R | R | C | Сверить old/current suite table и разделить source migration от project compatibility. **№5** |
 | [AEGP suites catalog — After Effects 26.5 snapshot](14-NATIVE-INTEGRATIONS/12-AEGP-SUITES-CATALOG.md) | R | L | R | L | C | Согласовать catalogue с exact baseline; не превращать inventory в runtime coverage claim. **№5** |

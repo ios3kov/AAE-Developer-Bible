@@ -6,8 +6,6 @@
 
 AEIO — native I/O module for media that After Effects imports and/or exports. Это не effect renderer и не универсальный кодек API: module должен сам корректно распознавать, декодировать, кодировать и обслуживать свой format.
 
-## 1. Где AEIO находится в архитектуре
-
 ## Exact IO sample reading walkthrough
 
 SDK 25.6 `Examples/AEGP/IO/IO.cpp`: читать module/function-block construction и
@@ -32,9 +30,19 @@ recommendation, не автоматически показанная в IO guara
 
 Callback names/shape и paired host APIs сверять с target `AE_IO.h` и current
 IOIn7/IOOut6. Sample старые generations не становятся current из-за наличия в SDK.
+
+Source inconsistency: ConstructModuleInfo advertises HAS_AUX_DATA (line1018),
+but ConstructFunctionBlock (1033–1082) does not assign GetNumAuxChannels,
+GetAuxChannelDesc, DrawAuxChannel or FreeAuxChannel slots. Entry zero-initializes
+the table. Thus IO is not evidence of a complete auxiliary provider; do not copy
+its capability flags unchanged into a real importer. It registers IO before
+RegisterWithAEGP obtains the memory id; later failure has no demonstrated unregister
+rollback. Product initialization must address that partial-registration boundary.
 Overview задаёт purpose, [registration chapter](../14-NATIVE-INTEGRATIONS/08-AEIO.md)
 разбирает контракт, reference guide объясняет licensed workspace; не три независимых
 implementation. No runtime import/export claimed.
+
+## 1. Где AEIO находится в архитектуре
 
 ```text
 AEGP EntryPointFunc

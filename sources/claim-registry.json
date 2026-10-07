@@ -2,6 +2,20 @@
   "schema": 1,
   "claims": [
     {
+      "id": "SDK-IO-20261007",
+      "claim": "AEIO/Artisan registration types, sample capability mismatch and partial initialization",
+      "source": "https://developer.adobe.com/after-effects/",
+      "identity": "Supplied TAR SHA-256 eee39a787ab09226a5a08c27496335faf79cbe52dd96f19cf795e48af09e2df6; exact header/sample hashes in 18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md",
+      "review_date": "2026-10-07",
+      "sdk": "25.6 build 61",
+      "host": "Runtime not established by source review",
+      "panel": "Not applicable",
+      "platform": "Registration source only; no platform runtime inferred",
+      "evidence": "SDK-SOURCE-REVIEW",
+      "limits": "IO HAS_AUX_DATA with provider slots unassigned; Artie lifecycle stubs and old suites; no codec/renderer host execution",
+      "record": "CHAPTER-RECONCILIATION-2026-10-07.md"
+    },
+    {
       "id": "SDK-01",
       "claim": "Effect protocol, SmartFX, Auxiliary Channels",
       "source": "https://developer.adobe.com/after-effects/",
