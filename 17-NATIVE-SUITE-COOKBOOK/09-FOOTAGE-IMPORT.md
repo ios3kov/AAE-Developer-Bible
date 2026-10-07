@@ -8,6 +8,12 @@
 
 ## 1. Два разных сценария
 
+Сквозной [import/adopt/create/animate/queue route](../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md)
+использует эту страницу как exact ownership contract. Здесь нет authored compiled
+FootageRecipes.cpp: snippet ниже и SDK sources — evidence basis; не путать наличие
+chapter с отдельным tested implementation. До adoption error dispose caller-owned
+footage; после adoption компенсация через project-item policy, не DisposeFootage.
+
 ### A. Импорт media, который After Effects уже умеет читать
 
 Используйте Footage Suite:

@@ -64,6 +64,31 @@ sudo touch "/Library/Application Support/Adobe/After Effects (Beta)/developer-mo
 
 ## Loaded-image identity lesson
 
+### Concrete LLDB breakpoint route
+
+После version-appropriate launch/attach (не изменяя рабочую AE installation):
+
+```text
+(lldb) image list -v
+(lldb) image lookup -n EffectMain
+(lldb) breakpoint set --name EffectMain
+(lldb) continue
+(lldb) frame variable cmd
+(lldb) thread backtrace
+```
+
+Применить конкретный effect/запросить кадр. Expected observations: named plugin
+image path/UUID в image list; lookup разрешает exported dispatcher; breakpoint
+показывает actual PF_Cmd. Optimized build может скрывать variable — это symbol/
+optimization limit, не доказательство отсутствия cmd. Если breakpoint unresolved,
+проверить loaded image и matching dSYM (`dwarfdump --uuid` для binary/dSYM), затем
+export/resource/discovery; не брать случайный dSYM с тем же filename.
+
+Для AEGP entry ставить breakpoint до launch, поскольку attach после загрузки
+пропускает initializer; позднее command hook можно остановить при menu click.
+Code signing attach denial относится к host policy, не к корректности entrypoint.
+Этот walkthrough документирован, LLDB/AE execution здесь NOT_RUN.
+
 The [AE Hot Loader reuse audit](../22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md) preserves a concrete debugging lesson: installation intent is not proof of the module AE actually loaded. When diagnosing path/version mismatches, record the **real loaded image path and identity** before reasoning from an installer destination.
 
 The source project used macOS dyld enumeration for an experiment. Treat that as a platform diagnostic technique, not a cross-platform After Effects SDK contract.

@@ -19,3 +19,36 @@
 - **UXP** — Adobe's newer extensibility platform replacing CEP over time.
 - **Universal binary** — macOS binary containing Intel x86_64 and Apple Silicon arm64 slices.
 - **MFR-safe** — implementation proven safe under concurrent frame rendering, not merely one that compiles with the flag enabled.
+
+## Ownership, persistence и геометрия
+
+- **Borrowed** — доступ без права уничтожения; срок задаёт API, а не наличие pointer.
+- **Owned** — caller отвечает за соответствующий dispose/checkin или явную передачу.
+- **Adoption** — successful API передаёт объект host/project; прежний caller больше не dispose-ит его.
+- **Receipt** — токен ограниченного доступа к rendered frame/cache value; не собственность на world/value.
+- **Disk ID** — стабильная identity сохраняемого параметра; UI index и arbitrary type ID отдельны.
+- **Flatten** — перевод state в сохраняемые bytes; legacy sequence flatten и independent flattened copy имеют разные ownership transitions.
+- **Wire schema** — explicit encoding/version/length/range policy, не ABI layout C++ struct.
+- **Snapshot** — неизменяемый набор значений для операции; borrowed pointers не становятся long-lived копиями.
+- **ROI** — requested region; не фактический allocation и не max output extent.
+- **Halo** — соседние input samples, нужные для output ROI пространственного kernel.
+- **Origin** — начало coordinate space буфера относительно layer/output; не byte stride.
+- **Rowbytes/stride** — переход между строками памяти; может отличаться от dense pixel width.
+- **PAR** — pixel aspect ratio; display geometry и buffer indexing различаются.
+- **Comp time / layer time** — разные timebases; `A_Time` хранит rational value/scale, не универсальный frame index.
+- **Premultiplied / straight alpha** — RGB содержит/не содержит multiplication by alpha; file export representation проверяется отдельно от effect world.
+- **Separated dimensions** — leader/follower streams; follower и leader не interchangeable handles.
+
+## Проверки и публикация
+
+- **Artifact identity** — bytes/hash + build metadata; source commit сам не идентифицирует установленный binary.
+- **Loaded-image identity** — реально загруженный module path/UUID/symbol identity; install intent не доказательство загрузки.
+- **Calibration** — контроль всей observation/output цепочки известным input до оценки алгоритма.
+- **Bitwise parity** — equality представления; signed zero/NaN policy отличается от numerical tolerance.
+- **Matched-toolchain control** — unchanged source rebuilt с matching settings; отдельное сравнение от original artifact.
+- **BLOCKED / NOT_RUN** — prerequisites мешают test / test не выполнен; ни один статус не PASS.
+- **PROJECT-REPORTED / USER-REPORTED** — результат из named project record / сообщения пользователя, не независимый Bible runtime.
+- **Non-reproduction** — failure не повторён в указанной серии; не causal fix и не broad stability proof.
+- **Undo group / compensation** — grouping history / explicit обратные операции; grouping не atomic rollback.
+- **Generation / correlation ID** — freshness version / привязка ответа к запросу; совпадение ID само не обеспечивает идемпотентность mutation.
+- **Freeze** — фиксируемая редакция с reviewed source и reproducible generated outputs; не product host certification.

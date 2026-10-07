@@ -4,6 +4,10 @@ Updated: **2026-10-04**
 
 ## Continuous completion — 2026-10-07
 
+Fresh real-SDK syntax/type check: 13/13 PASS at clean source
+`ef4e90b1c96c6a9a1cb34b5c2260b2561b20e7eb`, supplied SDK25.6build61,
+Apple Clang21 arm64. [Exact evidence](VERIFICATION.md). Not link/host evidence.
+
 Latest review: MenuTool ping versus recommended mutation chain, queue helper
 missing preflight/path-readback/rollback, fixed comp and truncated LayerID source
 limits are now explicit. Local portable regression sweep recorded against exact

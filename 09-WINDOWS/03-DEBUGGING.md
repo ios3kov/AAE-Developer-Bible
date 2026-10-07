@@ -61,6 +61,21 @@ This matters when:
 
 ## Symbols
 
+### Concrete breakpoint route
+
+Build identifiable Debug `.aex` + matching PDB; launch exact AfterFX.exe from VS or
+attach native debugger. Debug→Windows→Modules: найти plugin, записать full path,
+architecture и Symbol Status; Load Symbols только matching PDB. Function breakpoint
+`EffectMain` для Effect или `EntryPointFunc` при launch AEGP. Apply effect/request
+frame или menu command; inspect actual PF_Cmd/call stack. Attaching после startup
+не повторяет AEGP initializer. Hollow breakpoint → module absent versus symbols
+unmatched versus optimized location — разные ветки, не повод переименовывать PiPL.
+
+Exception Settings включать точечно для native failures; first-chance library
+exception, успешно caught host, не автоматический plugin crash. Capture dump before
+termination и pair PDB/build hashes. Ни один Windows debugger run в этой работе
+не выполнен; expected observations не записаны как PASS.
+
 A breakpoint with hollow warning icon usually means one of:
 
 - module not loaded;

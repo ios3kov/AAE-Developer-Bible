@@ -4,6 +4,19 @@
 
 ### Subsequent practical additions
 
+### Exact clean-source SDK syntax/type check — 2026-10-07
+
+Command: `python3 scripts/check_native.py <licensed SDK Examples> --report
+.build/native-review-2026-10-07.json --require-clean`. Source
+`ef4e90b1c96c6a9a1cb34b5c2260b2561b20e7eb`, dirty=false. Actual supplied SDK25.6
+build61, 81 headers, manifest SHA256
+`796b373fb93fe857d59b6ecd78ec2c23298b78fb4648046e7a7d401687d1860c`.
+Apple Clang21.0.0 (clang-2100.3.34.2), target arm64-apple-darwin25.6.0.
+13/13 translation units PASS, including generated foundation TU. Machine-readable
+local report contains each command/source hash/compiler output; no proprietary
+headers committed. This is **compiler syntax/type** evidence only: no link/resource
+inspection, AE load/render, MFR concurrency, Windows or GPU runtime result.
+
 Local regression sweep at source `429ea45f5d16e5135cc930e0fc7e230cf0ebcf97`,
 2026-10-07: safe-tools/native-driver 18 tests, SDK tooling17,
 source-registry5, consistency10 PASS. Node CEP14, depth13, edge/export22 and withdrawn
