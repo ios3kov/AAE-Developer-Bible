@@ -6,6 +6,16 @@
   "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
   "reviews": [
     {
+      "source_path": "docs/item/item.md",
+      "operation": "Project-scoped identity, owned organization/deletion and versioned guide model edits",
+      "members": ["Item.comment", "Item.dynamicLinkGUID", "Item.guides", "Item.id", "Item.label", "Item.name", "Item.parentFolder", "Item.selected", "Item.typeName", "Item.addGuide", "Item.getGuideAsObject", "Item.remove", "Item.removeGuide", "Item.setGuide"]
+    },
+    {
+      "source_path": "docs/item/compitem.md",
+      "operation": "Scoped composition presets, selection/lookup, duplication and explicit MOGRT export; research counter excluded, controller index contract gap retained",
+      "members": ["CompItem.activeCamera", "CompItem.bgColor", "CompItem.displayStartFrame", "CompItem.displayStartTime", "CompItem.draft3d", "CompItem.dropFrame", "CompItem.frameBlending", "CompItem.frameDuration", "CompItem.hideShyLayers", "CompItem.layers", "CompItem.markerProperty", "CompItem.motionBlur", "CompItem.motionBlurAdaptiveSampleLimit", "CompItem.motionBlurSamplesPerFrame", "CompItem.motionGraphicsTemplateControllerCount", "CompItem.motionGraphicsTemplateName", "CompItem.numLayers", "CompItem.preserveNestedFrameRate", "CompItem.preserveNestedResolution", "CompItem.renderer", "CompItem.renderers", "CompItem.resolutionFactor", "CompItem.selectedLayers", "CompItem.selectedProperties", "CompItem.shutterAngle", "CompItem.shutterPhase", "CompItem.workAreaDuration", "CompItem.workAreaStart", "CompItem.duplicate", "CompItem.exportAsMotionGraphicsTemplate", "CompItem.getMotionGraphicsTemplateControllerName", "CompItem.setMotionGraphicsControllerName", "CompItem.layer", "CompItem.openInEssentialGraphics", "CompItem.openInViewer"]
+    },
+    {
       "source_path": "docs/other/preferences.md",
       "operation": "Typed preference store, consent, readback and restoration",
       "members": ["Preferences.deletePref", "Preferences.getPrefAsBool", "Preferences.getPrefAsFloat", "Preferences.getPrefAsLong", "Preferences.getPrefAsString", "Preferences.havePref", "Preferences.reload", "Preferences.savePrefAsBool", "Preferences.savePrefAsFloat", "Preferences.savePrefAsLong", "Preferences.savePrefAsString", "Preferences.saveToDisk"]

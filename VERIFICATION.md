@@ -2,6 +2,18 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Item/CompItem source operation review
+
+Parent `4a0d032`;2 pinned pages read in full, SHA256 matches inventory.49 documented
+headings added; research-only counters excluded and unspecified EGP controller index
+base preserved. No composition/save/MOGRT/consumer execution. Containing block runs
+scripts/consistency, checker, generated freshness, strict MkDocs and whitespace checks;
+these validate repository evidence, not SDK/compiler/AE runtime contracts.
+Local results: scripts86/86 PASS, consistency11/11 PASS, docs checker PASS;
+pinned inventory regenerated49 pages/647 headings. Generated freshness, strict
+MkDocs and whitespace checks PASS for this block. Negative consistency fixtures
+print intentional stale-file diagnostics; suite result is OK.
+
 ### Persistence/viewer/system source operation review
 
 Parent `49fe743`;6 pinned pages read in full,38 headings recorded. No preferences

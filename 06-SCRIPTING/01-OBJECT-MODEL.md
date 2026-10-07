@@ -66,6 +66,95 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Item identity and composition preset: resolve before changing
+
+Reviewed2026-10-07: full pinned
+[Item](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/item/item.md) and
+[CompItem](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/item/compitem.md)
+pages. DOCUMENTED/source operation design; no composition or MOGRT executed.
+
+Item.id survives saving/reopening the same project, but project import assigns new
+IDs. Persist project context plus item ID, not an index/name as global identity.
+Item.dynamicLinkGUID identifies Dynamic Link; it is not a generic lookup or delivery
+API. Item.typeName is localized display text: use concrete CompItem/FootageItem/
+FolderItem checks, not a translated-name regex. Item.name changes Project panel
+metadata. comment is user metadata (limit15,999 bytes after encoding conversion),
+not a secret vault or behavior switch. label0..16 indexes user label preferences;
+it doesn't assign arbitrary RGB. selected is UI state, not ownership/cleanup consent.
+
+Concrete bin operation: snapshot intended IDs/current parentFolder/name/label/comment
+→ validate existing project and destination FolderItem after any dialog → move via
+parentFolder and edit only requested fields → read back → report partial mutations.
+Item.remove deletes project objects, not disk files; removing a folder recursively
+removes its contents. Never implement failed-import cleanup by deleting a nonempty
+shared bin. Resolve current membership and dependencies before explicit deletion.
+
+Concrete comp preset: resolve intended CompItem → snapshot requested fields only
+→ validate renderer against current renderers array and finite bounded values
+→ obtain successful Undo scope → apply requested settings in dependency-aware order
+→ read back each field → report changed fields/error/cleanupError. Do not reset
+unrequested settings to defaults. CompItem.duplicate returns a new comp with the same
+layers; it is not a documented recursive clone of all nested media/compositions.
+Track returned identity and shared dependencies before editing a duplicated rig.
+
+| Setting group | Contract and operation boundary |
+|---|---|
+| Time display | displayStartFrame (17.1+) avoids floating calculation of start frame; displayStartTime is seconds, range -10800..86339 on17.1+, older minimum0. dropFrame changes timecode representation, not frameRate or frame count |
+| Timing/range | frameDuration is reciprocal of frameRate. workAreaStart/workAreaDuration are seconds; validate intended interval against comp duration and read both after setting. Work area doesn't automatically set RenderQueueItem timeSpan |
+| Renderer/nesting | renderer must belong to renderers (installed modules, not a universal hardcoded list). preserveNestedFrameRate/preserveNestedResolution choose nesting policy, not proof all layers/effects support requested renderer |
+| Resolution/background | resolutionFactor is two integers1..99; [1,1] full, [2,2] half. bgColor is RGB0..1; composition background isn't a substitute for an explicit opaque rendered background layer/output-alpha policy |
+| Motion sampling | motionBlur is comp switch; shutterAngle0..720, shutterPhase-360..360. motionBlurSamplesPerFrame2..64 concerns Classic3D/shapes/certain effects; motionBlurAdaptiveSampleLimit16..256 concerns2D motion. No universal sample/image guarantee across renderers |
+| Preview/UI | draft3d is Composition-panel mode; hideShyLayers changes Timeline visibility, not render eligibility. frameBlending is comp switch, not automatic qualification of layer modes/result |
+
+CompItem.layers/numLayers enumerate1-based layer collection; layer(index),
+layer(otherLayer, relIndex), layer(name) are distinct overloads. Validate same-comp
+relative reference and current bounds; names can collide and indices shift.
+selectedLayers and selectedProperties are **0-based arrays**, the latter includes
+PropertyGroup as well as Property. Snapshot selection before structural edits and
+re-resolve invalidated property references. activeCamera is the front-most enabled
+camera or null; null isn't a failed composition. markerProperty may be null; apply
+the marker value/commit workflow only after checking it. openInViewer returns Viewer
+or null and changes focus, not output. openInEssentialGraphics is UI activation
+returning nothing. CompItem.counters is explicitly research-only, app-wide and
+described as doing nothing: not a supported progress counter or documented ledger row.
+
+### Item guides: array indices and model state, not viewer visibility
+
+Item.guides is read-only0-based array. Read fresh state before addGuide/removeGuide/
+setGuide; getGuideAsObject requires26.5. addGuide returns the new index; removal shifts
+higher indices downward. Delete a prevalidated owned subset descending, then relist;
+never persist guide indices as stable IDs. Positional add/move use pixels with finite
+positions clamped to±100,000. Preserve26.5 units/color/pinning through GuideOptions,
+not a positional rewrite; use the partial-update recipe above. Legacy positional
+setGuide cannot change orientation. Current guide state and ViewOptions visibility/
+snap/lock are separate operations. Source retains legacy0/1 orientation table while
+warning enum integers changed; version-gate legacy pixel path and use current typed
+constants for26.5, never one raw-integer mapping across releases.
+
+### Essential Graphics export: explicit project save and filesystem outcome
+
+motionGraphicsTemplateName (15.0+) determines exported filename, not comp.name.
+motionGraphicsTemplateControllerCount and getMotionGraphicsTemplateControllerName /
+setMotionGraphicsControllerName (16.1+) inspect/rename existing panel controllers.
+Names are display metadata, not persistent property IDs. The pinned CompItem page
+does **not specify the controller index base**: do not infer it from layer indices
+or guess a bulk loop; implementation must first establish the host's controller
+index contract. The setter returns String per source, not boolean mutation success.
+Adding eligible properties requires separately reviewed Property capability/add APIs;
+renaming a controller doesn't add it or certify MOGRT compatibility.
+
+Concrete export design: validate target comp/controllers/fonts/dependencies → choose
+safe template name, existing destination folder and explicit overwrite policy
+→ confirm project save destination/state → save only with user consent (dirty project
+otherwise prompts during export) → exportAsMotionGraphicsTemplate(false, folderPath)
+→ inspect returned boolean and expected .mogrt artifact → report separately from
+consumer import/render validation. folderPath is a **String folder path**, not output
+File or complete filename. Omitted path uses user's common Motion Graphics Templates
+folder. true allows overwriting, not versioned/atomic publication; default to false
+and don't retry unknown outcomes. Successful export doesn't prove Premiere/font/
+media compatibility. Saving the project and exporting a file are external side
+effects, not undone by the composition Undo group.
+
 ### Script settings and application preferences: separate stores/policies
 
 Reviewed2026-10-07, full6 pages at pinned scripting revision

@@ -2,6 +2,10 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Reconciled full Item/CompItem sources into identity/organization/guides, composition
+  presets/selection/duplication and MOGRT export workflows; retained controller-index
+  source gap and research-only counters. Semantic ledger261/647, not runtime PASS.
+
 - Reconciled Preferences/Settings persistence, viewer diagnostics and System helper
   invocation; separated user environment/UI/readback from render/runtime outcomes.
 

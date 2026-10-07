@@ -4,6 +4,10 @@
 
 ## Final editorial result — 2026-10-07
 
+Item/CompItem block adds49 documented headings: identity, deletion/guides, scoped
+composition presets and MOGRT save/export boundaries; ledger261/647. Research counter
+excluded and unspecified controller index base retained as implementation gap.
+
 Persistence/viewer/system block adds38 source-reviewed headings and operational
 boundaries; ledger212/647, independent of current SDK/host matrix acceptance.
 

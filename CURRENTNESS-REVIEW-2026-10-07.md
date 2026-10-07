@@ -66,6 +66,17 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### Item/CompItem reconciliation
+
+Full Item/CompItem pages read at pinned revision; downloaded bytes match inventory
+SHA256. Added49 documented headings covering project-scoped identity, organization/
+deletion, guides, composition preset/readback/selection and explicit MOGRT save/export.
+CompItem.counters reviewed as research-only and excluded. Controller index base is
+absent from pinned page; bulk rename implementation remains a concrete contract gap,
+not invented1-based behavior. Ledger261/647;386 headings lack explicit documented
+reconciliation (includes research exceptions), not386 proven missing Bible members.
+No comp/EGP/export/consumer runtime executed; expanded acceptance remains IN PROGRESS.
+
 #### Persistence/viewer/system reconciliation
 
 Full Preferences/Settings/View/Viewer/ViewOptions/System pages actually read.

@@ -16,7 +16,9 @@
         },
         {
           "name": "app.activeViewer",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -565,7 +567,9 @@
       "members": [
         {
           "name": "System.callSystem",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -575,12 +579,16 @@
         },
         {
           "name": "System.osName",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
           "name": "System.osVersion",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -638,7 +646,9 @@
         },
         {
           "name": "AVItem.name",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -714,7 +724,9 @@
         },
         {
           "name": "CompItem.counters",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -739,7 +751,9 @@
         },
         {
           "name": "CompItem.duplicate",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -769,12 +783,16 @@
         },
         {
           "name": "CompItem.layer",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
           "name": "CompItem.layers",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -972,7 +990,9 @@
         },
         {
           "name": "Item.dynamicLinkGUID",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -982,12 +1002,16 @@
         },
         {
           "name": "Item.guides",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
           "name": "Item.id",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -997,7 +1021,9 @@
         },
         {
           "name": "Item.name",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -1007,7 +1033,9 @@
         },
         {
           "name": "Item.remove",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -1027,7 +1055,9 @@
         },
         {
           "name": "Item.typeName",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         }
       ]
@@ -1765,7 +1795,9 @@
         },
         {
           "name": "Preferences.havePref",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -1811,7 +1843,9 @@
         },
         {
           "name": "Settings.haveSetting",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -1867,7 +1901,9 @@
         },
         {
           "name": "Shape.inTangents",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -1888,17 +1924,23 @@
       "members": [
         {
           "name": "View.active",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
           "name": "View.options",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
           "name": "View.setActive",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         }
       ]
@@ -1909,7 +1951,9 @@
       "members": [
         {
           "name": "Viewer.active",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -1919,22 +1963,30 @@
         },
         {
           "name": "Viewer.maximized",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
           "name": "Viewer.setActive",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
           "name": "Viewer.type",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
           "name": "Viewer.views",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         }
       ]
@@ -1945,7 +1997,9 @@
       "members": [
         {
           "name": "ViewOptions.channels",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -1960,7 +2014,9 @@
         },
         {
           "name": "ViewOptions.fastPreview",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -1996,7 +2052,9 @@
       "members": [
         {
           "name": "MaskPropertyGroup.color",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -2313,7 +2371,9 @@
         },
         {
           "name": "Property.setAlternateSource",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
