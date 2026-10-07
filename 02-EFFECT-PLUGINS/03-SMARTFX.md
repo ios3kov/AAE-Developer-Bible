@@ -101,9 +101,7 @@ PF_Cmd_SMART_RENDER → PF_SmartRenderExtra
 
 Подход для собственной реализации: перечислить внешние зависимости, получить воспроизводимое представление их значений и использовать поддержанный механизм смешивания. Адрес объекта или неинициализированный padding не являются хорошим представлением содержимого. Это проектная рекомендация; конкретная схема должна пройти проверку изменения результата после изменения зависимости.
 
-## 9. SmartFX, float, GPU и MFR — не один флаг
-
-## Spatial walkthrough: halo и origin
+## 9. Spatial walkthrough: halo и origin
 
 Авторская math/policy схема поверх S1, не новый SDK sample. Rectangles half-open.
 Non-expanding blur: source `[0,640)×[0,360)`, requested output
@@ -125,7 +123,7 @@ rect не гарантирует allocation такого размера. За bo
 нелинейной карты с внутренним экстремумом. Separable-axis reuse допустим только
 при проверенной eligibility, с fallback, сохраняющим прежний arithmetic.
 
-## Temporal walkthrough: один слой, три IDs
+## 10. Temporal walkthrough: один слой, три IDs
 
 Policy: `(previous + 2*current + next)/4` в согласованном premult representation.
 Пример t=1000, step=40, scale=1000: checkout IDs 1/2/3, каждый parameter index=0,
@@ -149,7 +147,7 @@ transparent edges, start/end times, remapped source, missing input и cancel м�
 checkouts. Math expectation фиксируется до измерения. Runtime этих walkthroughs
 не заявлен.
 
-## Capabilities остаются независимыми
+## 11. SmartFX, float, GPU и MFR — независимые capabilities
 
 В [S2] отдельно определены `PF_OutFlag2_SUPPORTS_SMART_RENDER`, `PF_OutFlag2_FLOAT_COLOR_AWARE`, `PF_OutFlag2_SUPPORTS_GPU_RENDER_F32` и `PF_OutFlag2_SUPPORTS_THREADED_RENDERING`. Объявление одной возможности не подтверждает остальные.
 

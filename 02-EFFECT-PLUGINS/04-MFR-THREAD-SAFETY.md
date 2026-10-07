@@ -197,9 +197,7 @@ Header описывает multi-checkout pattern: сначала запроси�
 
 Память следует оценивать вместе с параллельностью. Как расчётная модель, не замер AE: если одному запросу нужно S байт scratch, то N одновременно активным запросам может потребоваться примерно N×S плюс общие данные. Глобальный mutex способен сделать обработку безопаснее, но ограничить её масштабирование; измерять нужно и корректность, и пиковую память, и время.
 
-## 12. Граница текущей готовности
-
-## Walkthrough: таблица resampling в Compute Cache
+## 12. Walkthrough: таблица resampling в Compute Cache
 
 Design example: cache value содержит immutable indices/weights для осевого
 mapping, но не input pixels. Key сериализует algorithm/schema version, source/output

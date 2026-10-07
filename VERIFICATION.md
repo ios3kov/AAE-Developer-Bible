@@ -4,6 +4,10 @@
 
 ### Subsequent practical additions
 
+Scripting safety regression now also verifies changed project and newly busy queue
+after file dialogs prevent import. SmartFX source README distinguishes normal-path
+early checkin, null-world rejection and separate temporal design policy.
+
 Effect-state chapter review recorded in [reconciliation](CHAPTER-RECONCILIATION-2026-10-07.md):
 five rows covered, exact arbitrary declarations reread; numeric IDs may coincide,
 new payload field does not require a new parameter disk ID. No host run.

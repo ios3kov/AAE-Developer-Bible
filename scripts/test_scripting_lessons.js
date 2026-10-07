@@ -23,7 +23,11 @@ function run(options = {}) {
   const context = {
     app:{project:options.noProject?null:project,
       beginUndoGroup(){log.undo++;},endUndoGroup(){log.undo--;}},
-    File:{openDialog(){return options.cancel?null:{exists:true};},saveDialog(){return output;}},
+    File:{openDialog(){return options.cancel?null:{exists:true};},saveDialog(){
+      if(options.changedProject)context.app.project={renderQueue:{rendering:false}};
+      if(options.becameBusy)project.renderQueue.rendering=true;
+      return output;
+    }},
     ImportOptions:function(){this.canImportAs=()=>!options.unsupported;},
     ImportAsType:{FOOTAGE:1},FootageItem,
     alert(message){log.alerts.push(message);},
@@ -33,7 +37,7 @@ function run(options = {}) {
   assert.strictEqual(log.undo,0);
   return {log,rq,oldModule,freshModule,output};
 }
-for (const opt of ['noProject','busy','collision','cancel','unsupported']) {
+for (const opt of ['noProject','busy','collision','cancel','unsupported','changedProject','becameBusy']) {
   const {log}=run({[opt]:true});assert.strictEqual(log.imported,0);
 }
 const ok=run();

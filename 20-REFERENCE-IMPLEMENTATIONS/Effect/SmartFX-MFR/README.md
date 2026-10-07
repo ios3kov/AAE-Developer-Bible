@@ -57,6 +57,17 @@ The reference:
 5. always checks input pixels back in if checkout succeeded;
 6. preserves the first operation error unless checkin is the first error.
 
+Early input checkin is optional in SDK 25.6, not a proof that omitting it leaks.
+This source elects to release early on its normal returned-error path. It rejects
+null worlds; it does not implement the transparent-missing-input policy of the
+chapter's temporal design example. With both operation/checkin errors, secondary
+error is not logged here. The surrounding catch guards ABI exceptions; it is not
+an RAII early-checkin implementation for an exception thrown by a host callback.
+
+The [halo/temporal walkthrough](../../../02-EFFECT-PLUGINS/03-SMARTFX.md) is separate
+math/design guidance, not implemented by this pass-through source. It requires
+its own checkouts, snapshots and region math before becoming a compiled effect.
+
 This avoids manual rowbytes/pixel-format loops in the pass-through baseline.
 
 ## What to test before extending

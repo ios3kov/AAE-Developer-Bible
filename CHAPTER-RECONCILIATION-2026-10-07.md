@@ -35,6 +35,18 @@ for other AEGP recipes; this entry does not close the whole block11 tracker.
 
 ## Validation boundary
 
+## SmartFX follow-up
+
+Read SmartFX chapter, auxiliary chunk section and actual
+`20-REFERENCE-IMPLEMENTATIONS/Effect/SmartFX-MFR/SmartFxMfr.cpp` plus README.
+Source is pass-through: ID1, copy request/result extents, WorldTransform copy,
+early checkin normal-error path, no MFR flag. Math blur/temporal walkthrough is
+not its implementation. Source null-world rejection differs from illustrative
+temporal empty-input-as-black policy and is now explicit. Catch-all is an ABI
+boundary, not an early-checkin RAII owner for callback exceptions. No native build
+rerun or host ROI/depth/empty-input success claimed. These distinctions are reviewed;
+full block7 pixel/channel cross-page acceptance is still separately pending.
+
 Portable codec and scripting safety checks do not emulate AE SDK callbacks.
 Strict generated docs/freshness validate publication consistency, not API semantics.
 Evidence ledger records performed checks; licenses remain owner-undecided.
