@@ -66,6 +66,20 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### Import/relink/source reconciliation and inventory correction
+
+Found extractor scope omission: docs/sources wasn't included. Added source folder,
+retaining pinned revision; report now49 pages/647 headings, not45/629. Four source
+pages read in full along with ImportOptions/FootageItem/FolderItem/ItemCollection.
+Added import/relink/interpretation/bin recipes and source dependency ordering;
+undocumented rangeStart/rangeEnd/isFileNameNumbered explicitly research-only.
+No research member promoted to public contract. Semantic ledger records documented
+members only for this block; source enumeration does not establish host runtime.
+
+Ledger totals after this block:125 named members;522 inventory headings without
+explicit documented-member reconciliation. Three research helpers reviewed as
+unsupported public-contract dependencies stay outside that documented ledger.
+
 #### Render queue DOM reconciliation — 2026-10-07
 
 All5 pinned renderqueue pages read in full (48 headings): prepare/disarm/arm/run,

@@ -9,7 +9,7 @@ from urllib.request import urlopen
 ROOT = Path(__file__).resolve().parent.parent
 REVISION = "7137a990db4bd8dc9f5869b8ca431c7dfed52bdc"
 REPO = "docsforadobe/after-effects-scripting-guide"
-DOM_FOLDERS = {"general", "item", "layer", "property", "text", "renderqueue", "other"}
+DOM_FOLDERS = {"general", "item", "layer", "property", "text", "renderqueue", "other", "sources"}
 
 
 def members(text):

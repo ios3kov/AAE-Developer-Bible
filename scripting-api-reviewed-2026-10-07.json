@@ -6,6 +6,41 @@
   "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
   "reviews": [
     {
+      "source_path": "docs/item/folderitem.md",
+      "operation": "Immediate-child bins and owned cleanup",
+      "members": ["FolderItem.item", "FolderItem.items", "FolderItem.numItems"]
+    },
+    {
+      "source_path": "docs/item/footageitem.md",
+      "operation": "Shared-source relink, replacement and readback",
+      "members": ["FootageItem.file", "FootageItem.mainSource", "FootageItem.openInViewer", "FootageItem.replace", "FootageItem.replaceWithPlaceholder", "FootageItem.replaceWithSequence", "FootageItem.replaceWithSolid"]
+    },
+    {
+      "source_path": "docs/item/itemcollection.md",
+      "operation": "Owned comp/bin creation and parent assignment",
+      "members": ["ItemCollection.addComp", "ItemCollection.addFolder"]
+    },
+    {
+      "source_path": "docs/other/importoptions.md",
+      "operation": "Explicit import capability/type/sequence policy; research helpers excluded",
+      "members": ["ImportOptions.canImportAs", "ImportOptions.file", "ImportOptions.forceAlphabetical", "ImportOptions.importAs", "ImportOptions.sequence"]
+    },
+    {
+      "source_path": "docs/sources/filesource.md",
+      "operation": "Missing path, read-only file and main-source reload",
+      "members": ["FileSource.file", "FileSource.missingFootagePath", "FileSource.reload"]
+    },
+    {
+      "source_path": "docs/sources/footagesource.md",
+      "operation": "Alpha/time/field dependency gates and interpretation diagnostics",
+      "members": ["FootageSource.alphaMode", "FootageSource.conformFrameRate", "FootageSource.displayFrameRate", "FootageSource.fieldSeparationType", "FootageSource.guessAlphaMode", "FootageSource.guessPulldown", "FootageSource.hasAlpha", "FootageSource.highQualityFieldSeparation", "FootageSource.invertAlpha", "FootageSource.isStill", "FootageSource.loop", "FootageSource.nativeFrameRate", "FootageSource.premulColor", "FootageSource.removePulldown"]
+    },
+    {
+      "source_path": "docs/sources/solidsource.md",
+      "operation": "Shared solid color editing and color-domain boundary",
+      "members": ["SolidSource.color"]
+    },
+    {
       "source_path": "docs/renderqueue/omcollection.md",
       "operation": "Adding output modules and verifying each destination",
       "members": ["OMCollection.add"]

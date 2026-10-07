@@ -2,6 +2,14 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Import/source inventory correction and operation review
+
+Parent `963882e`. Four source pages plus ImportOptions/FootageItem/FolderItem/
+ItemCollection actually read at pinned revision. Extractor previously excluded
+sources; regenerated report adds18 headings/4 pages. Undocumented sequence helpers
+excluded from DOCUMENTED ledger; no import/relink/runtime or enum-conflict resolution
+executed. Ledger/source uniqueness tests and docs/freshness checks accompany block.
+
 ### Renderqueue DOM source reconciliation
 
 Parent `0ec2956`;5 pinned renderqueue pages read in full.48 headings added to

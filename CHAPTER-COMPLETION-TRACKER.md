@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+Import/source block corrects inventory omission (docs/sources), transfers scoped
+relink/interpretation/bin contracts and research exclusions to scripting chapter.
+
 Renderqueue block: all5 scripting queue/module source pages read; practical workflow
 and exact source conflicts documented,48 headings added to semantic ledger.
 

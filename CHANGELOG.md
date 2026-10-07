@@ -2,6 +2,10 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Corrected scripting inventory scope to include sources:49 pages/647 headings.
+- Added import/relink/source interpretation and bin workflows; preserved research-only
+  sequence helpers and source enum inconsistency rather than claiming public stability.
+
 - Reconciled all five scripting renderqueue pages: preparation/arming, multi-output
   settings and invalidation, range/callback diagnostics, foreign queue protection and
   AME preset/handoff limits. Explicit ledger now90 members.

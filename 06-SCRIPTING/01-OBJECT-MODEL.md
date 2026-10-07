@@ -66,6 +66,91 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Import/relink: distinguish source replacement from interpretation
+
+Reviewed2026-10-07 at pinned scripting revision
+`7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`: ImportOptions, FootageItem,
+FolderItem/ItemCollection and all4 source pages. Source links:
+[ImportOptions](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/importoptions.md),
+[FootageItem](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/item/footageitem.md),
+[FootageSource](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/sources/footagesource.md),
+[FileSource](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/sources/filesource.md).
+DOCUMENTED for documented members; research-only exceptions below.
+
+Concrete import: choose existing File and sequence policy → ImportOptions(file)
+→ canImportAs desired type → set importAs/sequence/forceAlphabetical explicitly
+→ Project.importFile → validate returned item/source type and duration/dimensions
+→ apply intended supported interpretation → organize into owned FolderItem
+→ report created identities and actual source state. canImportAs is a capability
+check, not proof all sequence frames exist/decode or import cannot fail. Importing
+as PROJECT/COMP can create multiple dependent items; compensation must track actual
+created objects, never delete arbitrary project contents on an exception.
+
+ImportOptions.rangeStart/rangeEnd/isFileNameNumbered are explicitly **officially
+undocumented research APIs** in guide. Do not label them Adobe public contracts.
+Range setters can conflict with forceAlphabetical, reset range on invalid ordering,
+or create missing frames past sequence length. Baseline recipe doesn't depend on
+them: import verified sequence, then set requested layer/queue range explicitly.
+A filename containing digits does not prove a contiguous valid sequence. This
+research warning applies even though these members appear in the inventory.
+
+FootageItem.file is null for non-FileSource; mainSource is read-only and replaced
+by replace(file), replaceWithSequence(file, forceAlphabetical), replaceWithPlaceholder
+or replaceWithSolid. Never assign mainSource/file as a generic relink setter.
+FileSource.file is also read-only; FileSource.reload is mainSource-only, not proxy.
+For missing source report FileSource.missingFootagePath and AVItem.footageMissing;
+do not dereference a null File or claim current local bytes from the missing path.
+FootageItem.openInViewer can return null; viewer activation isn't relink success.
+
+Concrete relink: identify intended FootageItem and all affected uses → confirm
+new source/type → snapshot old path/type/interpretation and project backup policy
+→ replace/replaceWithSequence → reacquire mainSource → compare actual dimensions,
+timing, alpha interpretation and representative output → report partial outcome.
+Replacement preserves previous interpretation but unlabeled alpha may be estimated;
+do not assume automatic interpretation matches delivery intent. Existing layer
+usage is affected by replacing shared source. Readback failure does not justify a
+second replacement/retry. A missing old file cannot be restored by merely saving
+its pathname. Placeholders/solids have separate width/height/fps/PAR bounds; validate
+against selected method, not one universal constructor signature.
+
+### Source interpretation: gated fields and dependency order
+
+FootageSource.hasAlpha gates alphaMode/invertAlpha/premulColor relevance. IGNORE
+ignores alpha inversion; premulColor applies only to PREMULTIPLIED. A deliberate
+alpha change sets mode then applicable fields and reads them back. guessAlphaMode
+mutates estimates (no change without alpha), not a correctness oracle. SolidSource.color
+is RGB0..1, not pixel buffer or linear/display color equivalence; editing a shared
+solid source affects its usages. PlaceholderSource adds no own members; inherited
+isStill depends on duration (zero-duration placeholder is still).
+
+FootageSource.isStill gates conformFrameRate/loop/fieldSeparationType/removePulldown;
+still sources reject those time-based setters. nativeFrameRate is read-only;
+conformFrameRate0 means native only when pulldown is OFF. displayFrameRate is read-only
+and, with pulldown, conform rate×0.8. Don't report conformFrameRate as final effective
+rate unconditionally. loop requires non-still source and valid count1..9999.
+
+For resetting to native progressive timing: disable removePulldown first, then
+field separation OFF, then conformFrameRate0; don't set OFF while dependent pulldown
+is active. For requested pulldown: establish appropriate field separation, conform
+rate, then selected phase; read back effective rate. highQualityFieldSeparation
+requires non-still footage and field separation not OFF. guessPulldown mutates
+field separation and phase estimates; only run with explicit intent.
+Source prose uses PulldownPhase.OFF while its list says PulldownPhase.RemovePulldown.*:
+record inconsistency and verify actual enum on supported host before implementation,
+not invent a portable enum namespace. No host execution of that conflict claimed.
+
+### Project bins and owned creation
+
+ItemCollection.addComp creates comp with validated name/dimensions/PAR/duration/fps;
+ItemCollection.addFolder creates bin. Collection belonging to a non-root folder
+sets created item's parentFolder to that folder. Existing item move uses parentFolder,
+not filesystem File/Folder rename. FolderItem.items/numItems/item enumerate immediate
+children only; project.items contains all project items. Avoid counting nested
+children twice in recursive traversal. Snapshot target identities before moving or
+removing items; don't mutate live1-based index traversal and skip shifted entries.
+Folder deletion cleanup must be restricted to owned empty bins; don't infer ownership
+from a shared name or delete user contents because your import failed.
+
 ### Render queue: prepare, arm, execute, validate are separate stages
 
 Reviewed2026-10-07: all5 renderqueue DOM source pages at
