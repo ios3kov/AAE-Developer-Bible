@@ -2,7 +2,15 @@
 
 Обновлено: **2026-10-07**. План: [16 логических блоков](COMPLETION-PLAN.md). Правила: [EDITORIAL-GUIDE](EDITORIAL-GUIDE.md); существующий source/evidence baseline — [coverage matrix](FINAL-COVERAGE-AUDIT.md).
 
-## Дополнения 2026-10-07 — reconciliation queue
+## Final editorial result — 2026-10-07
+
+Все127 core rows сверены и закрыты `C` либо explicit `L`. Dated reconciliation
+records в каждой строке — основание closure, не зелёная сборка. `L` сохраняет
+scope overview/UXP/BlitHook/catalogue/source-boundary, не незавершённый host gate.
+[Freeze record](EDITION-FREEZE-2026-10-07.md). Ниже initial handoff/history;
+формулировки «остаётся» в этих dated дополнениях superseded итоговыми rows.
+
+## Дополнения 2026-10-07 — historical reconciliation handoff
 
 Ниже сохранены исходные задачи аудита; строки без C **не означают отсутствие уже
 добавленного текста**. До freeze каждому затронутому row требуется отдельный

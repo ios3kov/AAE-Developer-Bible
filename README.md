@@ -2,10 +2,13 @@
 
 **Практическая библия по разработке инструментов, скриптов, панелей и нативных plug-in'ов для Adobe After Effects.**
 
-Research snapshot: **2026-10-01**  
+Edition: **1.1 — editorial freeze, 2026-10-07**
+
+Native research baseline: **2026-10-01 / SDK25.6 build61**; selected source/platform rereviews through **2026-10-07**.
 
 **Canonical writing/editing rules:** [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md)  
-Status: **working editorial edition — real SDK 25.6 contract-reviewed knowledge base**
+Status: **editorially complete — 127 core pages reconciled with explicit limits**.
+[Freeze record and reproduction](EDITION-FREEZE-2026-10-07.md).
 
 ## Цель
 
@@ -47,7 +50,7 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 
 Отсутствие runtime evidence у source example означает только **«Bible не заявляет этот runtime result»**, а не «Bible обязана теперь собрать и протестировать этот пример».
 
-Работа над следующей редакцией ведётся по [плану](COMPLETION-PLAN.md). [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) содержит конкретные оставшиеся результаты для всех 127 core pages и не смешивает их с историческими compiler/runtime записями.
+План этой редакции [завершён](COMPLETION-PLAN.md). [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) содержит результаты всех 127 core pages: `C` либо обоснованный `L`. Это editorial coverage, не новый compiler/runtime PASS. Research appendices и reader-product QA продолжаются отдельно.
 
 ## Главный принцип
 

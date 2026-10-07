@@ -52,3 +52,8 @@
 - **Undo group / compensation** — grouping history / explicit обратные операции; grouping не atomic rollback.
 - **Generation / correlation ID** — freshness version / привязка ответа к запросу; совпадение ID само не обеспечивает идемпотентность mutation.
 - **Freeze** — фиксируемая редакция с reviewed source и reproducible generated outputs; не product host certification.
+- **Eligibility / execution failure** — backend допустим для выбора / уже начатая операция отказала; второе не гарантирует автоматический CPU retry.
+- **Source content digest** — hash paths/bytes исходников без generated outputs; не commit SHA и не installed binary identity.
+- **Candidate / submitted / final artifact** — этапы release bytes; signing/stapling/repackaging могут менять hash, поэтому цепочка сохраняется отдельно.
+- **Confidence / status / disposition** — достоверность вывода / результат проверки / принятое решение; accepted risk не превращает FAIL в PASS.
+- **FIXED / NOT_PLANNED** — подтверждённое исправление с regression evidence / решение не исправлять; non-reproduction само не FIXED.

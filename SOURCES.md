@@ -2,6 +2,13 @@
 
 Research snapshots: retained 2026-10-01 / 2026-10-02; selected platform/roadmap rereview **2026-10-04**.
 
+Freeze rereview **2026-10-07**: Apple notarization workflow, sample-first/install/
+debugger guides, Windows ARM build/SignTool and AE UXP landing reviewed within
+[macOS/Windows reconciliation](CHAPTER-RECONCILIATION-2026-10-07.md).
+Adobe host requirements fetch HTTP403; dated2026-10-04 support snapshot retained
+explicitly, not freshly certified. No exhaustive external-link/API audit or installed
+beta/GA/native host verification. SDK25.6 baseline and per-record dates unchanged.
+
 [Claim/source/version table](BLOCK-5-SOURCES.md) separates SDK, host, panel and platform boundaries. [Block 5 review](BLOCK-5-REVIEW-2026-10-04.md) records practical-depth comparison, fresh checks and remaining uncertainty.
 
 ## Внешний source review — 2026-10-02

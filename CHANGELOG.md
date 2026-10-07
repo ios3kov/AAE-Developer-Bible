@@ -2,6 +2,11 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Froze edition1.1 editorially: all127 core pages C/justified L, final status/plan/
+  checklist/coverage aligned; revision-bound freeze record and navigation entry.
+- Preserved SDK25.6/historical evidence, NOT_RUN plans, owner no-license decision
+  and platform/public-source unknowns; no fabricated host or final CI result.
+
 - Closed final nine entry/index rows; all 127 core pages editorially C/explicit L.
 - Removed stale Suite4/queue/mandatory-host-gate claims from overview pages.
 

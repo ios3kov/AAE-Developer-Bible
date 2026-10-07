@@ -2,7 +2,19 @@
 
 Updated: **2026-10-07**
 
-## Continuous completion — 2026-10-07
+## Current edition — 2026-10-07
+
+**Edition1.1 editorially complete.** All127 core rows reconciled C/explicit L;
+blocks1–16 closed in documentation scope. [Freeze/reproduction record](EDITION-FREEZE-2026-10-07.md)
+names parent, containing source revision convention, local checks and retained limits.
+No new real-SDK/host result or final GitHub CI success is asserted. Owner's no-reuse-
+license decision retained. Next edition work is optional research/host evidence,
+not an outstanding mandatory closure queue.
+
+## Completion history — 2026-10-07
+
+Following progress entries preserve their chronological next steps; they are
+superseded by the current edition status above.
 
 Final nine entry/index rows reconciled; all 127 core rows now C/explicit L.
 Corrected stale current-suite/queue/host-gate/catalogue claims in overview pages.
@@ -171,7 +183,8 @@ Core structure covers:
 - reverse-engineering atlas;
 - real-project case studies.
 
-The current priority is a **section-by-section editorial completeness and consistency sweep**.
+The section-by-section editorial completeness and consistency sweep is complete;
+exact results and intentional limits are recorded in the chapter tracker.
 
 ## SDK 25.6 baseline
 
@@ -311,17 +324,13 @@ Completed as one native-service/bridge/migration block:
 - legacy current-generation typo fixed and migration guidance split into source modernization versus behavior/project compatibility;
 - templates/references/source-review evidence wording aligned with `EDITORIAL-GUIDE.md`.
 
-## Current editorial TODO
+## Post-freeze work
 
-1. Finish the individual cross-page reviews for the already implemented additions
-   in blocks 6–15. Use [the chapter tracker](CHAPTER-COMPLETION-TRACKER.md) as the
-   authoritative page-level queue; do not restart these blocks as unwritten work.
-2. Reconcile each source example with its canonical chapter and state the actual
-   implementation limits before closing the affected tracker row.
-3. Retain the owner's 2026-10-07 decision to continue without a reuse license in
-   [NOTICE](NOTICE.md). Do not introduce MIT/CC terms or imply copying permission.
-4. Complete block 16: source/link/provenance sweep, regenerated outputs and a
-   revision-bound freeze report. Final completion is not yet claimed.
+1. Preserve revision-bound source/evidence and regenerate outputs for later edits.
+2. Extend research or host-observed examples only in a new scoped iteration.
+3. Retain owner's no-reuse-license decision in [NOTICE](NOTICE.md); later license
+   terms require a new owner decision.
+4. Do not convert authored NOT_RUN plans or historical evidence into new PASS.
 
 ## Research tracks
 

@@ -1,6 +1,10 @@
 # AE Developer Bible — editorial completion checklist
 
-Updated: **2026-10-02**
+Updated: **2026-10-07 — edition1.1 editorial freeze**
+
+All mandatory editorial criteria closed via individual chapter reconciliation and
+[freeze record](EDITION-FREEZE-2026-10-07.md). Historical audit/compiler results keep
+their own dates/source identities; optional atlas work is not a completion gate.
 
 Canonical writing rules: [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). This file tracks progress only.
 
@@ -28,7 +32,7 @@ Bible готова как редакция, когда читатель може
 - [x] Required parser diagnostics: 0.
 - [x] Non-required parser limitations сохраняются явно.
 - [x] Historical sample/header discrepancies документируются как version boundaries.
-- [ ] Перед freeze редакции повторно проверить датированные внешние roadmap/platform facts.
+- [x] Platform/roadmap rereview2026-10-07 recorded; requirements HTTP403 retains explicitly dated snapshot, not fresh host certification.
 - [x] Targeted external-source review: четыре закреплённых источника, selected API/version/provenance findings и bounded transfer в core — 2026-10-02.
 
 ## C. Evidence vocabulary
@@ -38,7 +42,7 @@ Bible готова как редакция, когда читатель може
 - [x] RECONSTRUCTED claims маркируются отдельно.
 - [x] Source examples не называются готовыми binaries.
 - [x] Отсутствие собственного host-run не считается незакрытым completion task Bible.
-- [ ] Финальным проходом проверить старые главы на устаревшие verification labels.
+- [x] Final cross-page/entry sweep reconciled stale suite/queue/host-gate labels; historical records retained.
 - [x] Блок 1: убрать active host-test-pending labels и legacy completion stages; dated records снабдить пояснениями исторического процесса.
 - [x] Блок 1: объяснить missing source identity compiler baseline от 2026-09-30 и снять current-source compilation claims.
 
@@ -46,18 +50,18 @@ Bible готова как редакция, когда читатель може
 
 Для каждого основного направления проверить наличие:
 
-- [ ] зачем/когда использовать;
-- [ ] когда не использовать;
-- [ ] architecture/lifecycle;
-- [ ] ключевые suites/selectors/entry points;
-- [ ] ownership/lifetime;
-- [ ] threading/main-thread boundaries;
-- [ ] version/platform caveats;
-- [ ] error/failure behavior;
-- [ ] production workflow;
-- [ ] debugging/testing guidance;
-- [ ] related recipes/templates;
-- [ ] sources/version boundary.
+- [x] зачем/когда использовать;
+- [x] когда не использовать;
+- [x] architecture/lifecycle;
+- [x] ключевые suites/selectors/entry points;
+- [x] ownership/lifetime;
+- [x] threading/main-thread boundaries;
+- [x] version/platform caveats;
+- [x] error/failure behavior;
+- [x] production workflow;
+- [x] debugging/testing guidance;
+- [x] related recipes/templates;
+- [x] sources/version boundary.
 
 Этот пункт закрывается **редакционным проходом по главам**, а не сборкой примеров.
 
@@ -218,9 +222,9 @@ Checked and reconciled as one logical block:
 - [x] Recipes/source examples отделены от лицензированных Adobe sample projects.
 - [x] Для native examples объяснён sample-first подход.
 - [x] Examples используют source-level evidence labels, а не обязательный host-test TODO.
-- [ ] Проверить все examples/recipes на противоречия с текущими основными главами.
-- [ ] Проверить snippets на устаревшие suite generations/названия.
-- [ ] Удалить остаточные формулировки, где example ошибочно выглядит как обязательный release artifact Bible.
+- [x] Core-linked examples/recipes reconciled with chapters in dated topic/source records; no exhaustive vendor/research collection audit implied.
+- [x] Baseline versus compatibility/later suites explicit; stale current-suite claim in communication index corrected.
+- [x] Remaining entry host-gates removed; examples are not mandatory Bible release binaries.
 
 ## F. Cross-section consistency
 
@@ -228,24 +232,24 @@ Checked and reconciled as one logical block:
 - [x] Compile/host evidence сохранён как evidence, а не как условие готовности Bible.
 - [x] Research atlas больше не блокирует core edition.
 - [x] Сверить README / STATUS / coverage / VERIFICATION и удалить старую mandatory build/host gate model.
-- [ ] Проверить cross-links и navigation.
+- [x] Strict build and final static core/reference/link/anchor sweep; browser ranking limits retained.
 
 ## G. Research appendices
 
 - [x] Case-study reuse audit сохранён.
 - [x] 3D Channel Extract pilot имеет evidence audit и superseded-claim handling.
 - [x] Private/internal API experiments отделены от supported SDK guidance.
-- [ ] Продолжать atlas по мере ценности; полный каталог не обязателен для core release.
+- Optional post-freeze: продолжать atlas по мере ценности; полный каталог не обязателен.
 
 ## H. Editorial release
 
-- [ ] Проверить public links и датированные факты.
-- [ ] Проверить third-party/provenance notices.
+- [x] Selected critical public-source links/facts reread; blocked requirements fetch recorded. Not an exhaustive external-URL scan.
+- [x] NOTICE owner no-license decision and vendor/third-party provenance boundaries reviewed.
 - [x] Пересобрать MASTER и manifest после editorial-model correction.
 - [x] Прогнать strict documentation build после editorial-model correction.
 - [x] Проверить generated navigation / MkDocs strict validation.
 - [x] Обновить STATUS / coverage / changelog под documentation mission.
-- [ ] Зафиксировать edition date/version.
+- [x] Edition1.1, 2026-10-07, containing-commit/source-content identity convention in freeze record.
 
 ## Не требуется для закрытия этого чеклиста
 
@@ -262,10 +266,9 @@ Checked and reconciled as one logical block:
 
 ## Current next step
 
-**2026-10-07:** блоки 1–5 сохранены как выполненные baseline; практические
-дополнения 6–15 отражены в [tracker](CHAPTER-COMPLETION-TRACKER.md). Текущая очередь:
-chapter/source/recipe reconciliation и block16 freeze. По поручению владельца
-работа продолжается без approval-пауз. Полная готовность ещё не объявлена.
+**2026-10-07:** blocks1–16 complete editorially; all127 core rows C/explicit L.
+Freeze/local checks documented; no new whole-source compiler/runtime or final CI
+success implied. Subsequent research/evidence is separate optional work.
 
 ## Audit-based completion plan — 2026-10-02
 
@@ -275,8 +278,8 @@ chapter/source/recipe reconciliation и block16 freeze. По поручению 
 - [x] Блок 1: создать поглавный трекер и указать зависимости плана.
 - [x] Блок 2: исправить CEP schema/error-path defects; portable protocol checks, strict docs и ledger. Runtime не заявлен.
 - [x] Исправить core/reference navigation и targeted tooling/CI findings (блоки 3/4, 2026-10-04; ledger scope).
-- [ ] Выполнить практические и source-review блоки 5–15; progress фиксируется в поглавном трекере.
-- [ ] Перенести scoped ElasticGridFX lessons в соответствующих блоках; tool adaptation только после review.
-- [ ] Завершить block 16: editorial review, exact generated identity и freeze.
+- [x] Practical/source-review blocks5–15 and individual reconciliation recorded in tracker.
+- [x] Scoped ElasticGridFX lessons/case study transferred with primary-record limits; tool adaptation deferred, not required/copied.
+- [x] Block16: editorial review, generated identity/freshness and revision-bound freeze.
 
 Исторические отметки выше сохраняют дату и область прежних итераций. Их наличие не закрывает новые findings аудита.

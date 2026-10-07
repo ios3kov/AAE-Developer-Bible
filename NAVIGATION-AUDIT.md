@@ -1,5 +1,15 @@
 # Navigation audit — block 3
 
+## Current edition status — 2026-10-07
+
+Block3 is editorially complete; OPEN/next-step wording below is historical.
+Freeze static build checks core/reference HTML, local destinations/anchors, search
+index and MASTER exclusion; browser ranking/private-profile findings below are
+not rewritten. New block/reconciliation ledgers remain linked from STATUS/tracker;
+filled pack from template index; legal/generated records from Home. Omitted menu
+entries are evidence/archive/generated/service pages, not missing core chapters.
+[Freeze record](EDITION-FREEZE-2026-10-07.md).
+
 Baseline: `7bba4b0`, 46 omissions (41 thematic + 5 root) copied from retained `block2-followup-build.log`. Current local edits are uncommitted; block 3 OPEN. Omission means absent from menu, not unreachable.
 
 ## Access keys and scope

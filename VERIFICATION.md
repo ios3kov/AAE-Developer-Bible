@@ -2,6 +2,33 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Edition1.1 editorial freeze
+
+Technical parent `c8d867280b538b48c19fbbec2d1b510388690b93`; final source/generated
+revision is containing freeze commit (no separate bot commit). MASTER content digest
+and MANIFEST bind final source/file bytes; exact SHA resolve via freeze-record git log.
+
+Local portable sweep PASS: scripts Python83/83, SDK-tool fixtures17/17,
+consistency11/11, source-table5/5 and table freshness; CEP14 scenarios, scripting
+safety, ScriptUI8, depth13, edge22 and withdrawn-Mega checks; protocol/state-codec/
+foundation C++ compile/run against portable headers/stubs. Bash runner syntax PASS.
+No real SDK/link/AE run inferred. PowerShell parser not run locally; GitHub CI final
+status not observed (`gh` unavailable). Owner's `b20806b` check remains separate.
+
+Static site sweep PASS:188 menu pages exist,42746 local link/anchor checks including
+repeated shared navigation,127 tracker rows exclusively C/L; nonempty search index
+(3371 records in this build), MASTER excluded. Counts are snapshot diagnostics, not
+future acceptance constants. No browser/private-profile/ranking rerun claimed.
+Checker, MASTER/MANIFEST regeneration/freshness, strict MkDocs and diff whitespace
+PASS. Rerun checks after final ledger edits; same containing commit binds outcomes.
+
+Initial ad-hoc Python module invocation failed two research imports (scripts not on
+module path); standard discovery from scripts rerun83/83 PASS. Initial static probe
+mistook nested README URLs for README/index; corrected MkDocs index mapping PASS.
+New freeze menu entry initially missing from NAVIGATION; added canonical link and
+checker PASS. Markdown trailing whitespace corrected before freeze. These are
+retained local check failures/corrections, not host defects or hidden PASS.
+
 ### Entry and index closure
 
 Parent `a1d03bc`; final nine core rows reconciled in entry/index chapter record.

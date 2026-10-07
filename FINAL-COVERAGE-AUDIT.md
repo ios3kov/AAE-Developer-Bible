@@ -1,6 +1,6 @@
 # Coverage matrix
 
-Edition: **working line**, updated 2026-10-02.
+Edition: **1.1 editorial freeze**, updated 2026-10-07.
 
 This matrix describes **documentation coverage, reference material and evidence boundaries**. It is not a product QA scoreboard.
 
@@ -55,6 +55,9 @@ A section can be editorially complete without a Bible-owned host run when:
 
 Compilation or host execution matters only when the text makes a claim that depends on that execution.
 
-Block 1 reconciled legacy completion labels and scoped the 2026-09-30 compiler record. Core expansion and consistency work remains in the tracker. Existing SDK audit results belong to their recorded snapshots; no new whole-repository native/host result was produced.
+Block1 scoped legacy labels and historical compiler evidence. All127 core rows
+are now individually reconciled C/explicit L; [freeze](EDITION-FREEZE-2026-10-07.md)
+records completion, reproducibility and intentional limits. Existing SDK/compiler
+results belong to their snapshots; no new whole-repository native/host result.
 
 See [COMPLETION-CHECKLIST.md](COMPLETION-CHECKLIST.md).
