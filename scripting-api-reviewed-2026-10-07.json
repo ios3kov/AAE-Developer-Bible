@@ -6,6 +6,26 @@
   "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
   "reviews": [
     {
+      "source_path": "docs/item/avitem.md",
+      "operation": "Typed proxy assignment, source-specific properties and usage diagnostics",
+      "members": ["AVItem.duration", "AVItem.footageMissing", "AVItem.frameDuration", "AVItem.frameRate", "AVItem.hasAudio", "AVItem.hasVideo", "AVItem.height", "AVItem.isMediaReplacementCompatible", "AVItem.name", "AVItem.pixelAspect", "AVItem.proxySource", "AVItem.time", "AVItem.usedIn", "AVItem.useProxy", "AVItem.width", "AVItem.setProxy", "AVItem.setProxyToNone", "AVItem.setProxyWithPlaceholder", "AVItem.setProxyWithSequence", "AVItem.setProxyWithSolid"]
+    },
+    {
+      "source_path": "docs/other/shape.md",
+      "operation": "Path geometry/tangents and feather-preserving edits",
+      "members": ["Shape.closed", "Shape.featherInterps", "Shape.featherRadii", "Shape.featherRelCornerAngles", "Shape.featherRelSegLocs", "Shape.featherSegLocs", "Shape.featherTensions", "Shape.featherTypes", "Shape.inTangents", "Shape.outTangents", "Shape.vertices"]
+    },
+    {
+      "source_path": "docs/property/maskpropertygroup.md",
+      "operation": "Mask rendering versus UI state and RotoBezier policy",
+      "members": ["MaskPropertyGroup.color", "MaskPropertyGroup.inverted", "MaskPropertyGroup.locked", "MaskPropertyGroup.maskFeatherFalloff", "MaskPropertyGroup.maskMode", "MaskPropertyGroup.maskMotionBlur", "MaskPropertyGroup.rotoBezier"]
+    },
+    {
+      "source_path": "docs/other/markervalue.md",
+      "operation": "Exact-time marker edit, metadata preservation and commit",
+      "members": ["MarkerValue.chapter", "MarkerValue.comment", "MarkerValue.cuePointName", "MarkerValue.duration", "MarkerValue.eventCuePoint", "MarkerValue.frameTarget", "MarkerValue.url", "MarkerValue.label", "MarkerValue.protectedRegion", "MarkerValue.getParameters", "MarkerValue.setParameters"]
+    },
+    {
       "source_path": "docs/item/folderitem.md",
       "operation": "Immediate-child bins and owned cleanup",
       "members": ["FolderItem.item", "FolderItem.items", "FolderItem.numItems"]

@@ -2,6 +2,13 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Proxy, shape/mask and marker source review
+
+Parent `47bc31e`; full4 pinned source pages read,49 member headings reconciled.
+No proxy assignment, geometry/marker mutation or rendered coverage observed.
+Ledger counts174/647 checked; containing block runs standard scripts/consistency,
+checker, freshness, strict MkDocs and whitespace validations.
+
 ### Import/source inventory correction and operation review
 
 Parent `963882e`. Four source pages plus ImportOptions/FootageItem/FolderItem/

@@ -66,6 +66,107 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Proxy workflow and AVItem type limits
+
+Reviewed2026-10-07 at pinned scripting revision
+`7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`:
+[AVItem](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/item/avitem.md).
+Logical base classes **AVItem and Item are undefined in ExtendScript**. Validate
+actual CompItem/FootageItem constructors and capabilities; `instanceof AVItem`
+throws instead of safely filtering project items. AVItem.name changes project display
+name, not file name. usedIn is copied membership; refresh after structural changes.
+hasAudio/hasVideo indicate source components, not enabled/audible/visible output.
+
+Concrete attach-proxy command: late resolve target CompItem/FootageItem → choose
+existing file/sequence and confirm replacement of existing proxy → record old
+proxySource/useProxy/interpretation → call setProxy or setProxyWithSequence
+→ reacquire proxySource → validate actual type/geometry/timing/alpha → apply intended
+proxy interpretation with source gates → explicitly choose final useProxy state
+→ report result. Proxy setters enable useProxy automatically and **do not preserve
+interpretation**, using preferences and possibly estimated unlabeled alpha. This
+differs from FootageItem.replace. A successful proxy assignment isn't preview parity
+or proof Render Queue uses proxies: verify render-settings Proxy Use separately.
+
+proxySource is read-only; setProxyToNone removes it and disables useProxy. Toggling
+useProxy=false leaves the assigned source available; disabling is not removal.
+setProxyWithSolid / setProxyWithPlaceholder create respective typed sources and
+enable useProxy, using their own bounds; no filesystem creation/export occurs.
+Do not use placeholders/solids as successful media-delivery substitutes. Partial
+failure can leave assigned/enabled proxy; report actual state, don't automatically
+remove a user proxy as compensation. FileSource.reload isn't proxy reload.
+
+Read/write policy depends on concrete source: CompItem duration/frameRate/frameDuration
+are writable; FootageItem timing is read-only through AVItem and changed through
+mainSource.conformFrameRate. width/height are writable on comps or solid footage,
+not generic movie/still FileSource. Changing shared solid geometry affects usages.
+frameDuration/frameRate are reciprocals with floating roundoff; use explicit tolerances.
+pixelAspect readback may differ from rounded UI values (e.g.1.33 vs1.33333).
+time sets direct preview time, rejecting still footage; not a keyframe or delivery
+range setter. footageMissing can mean placeholder as well as missing file: only
+read missingFootagePath from a valid FileSource. isMediaReplacementCompatible (18.0)
+is an alternate-source capability check with source/cycle restrictions, not blanket
+permission for every target Property.setAlternateSource or proxy operation.
+
+### Shape and mask authoring: geometry, feather and UI state
+
+Sources fully read:
+[Shape](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/shape.md),
+[MaskPropertyGroup](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/maskpropertygroup.md).
+Concrete rectangle: validate intended layer/mask and coordinate-space policy →
+resolve or add ADBE Mask Atom with indexed-group reacquisition → set maskMode ADD,
+inverted=false and explicit rotoBezier policy → new Shape with four finite vertices
+in path-local coordinates, closed=true and zero tangents → write ADBE Mask Shape
+using static/key policy → reacquire/read back vertices/closed/mode → qualify image
+separately. Do not cast comp-space points directly into arbitrary transformed layer
+or shape-group paths. A visible mask outline is not proof expected rendered coverage.
+
+Shape.inTangents/outTangents are vectors **relative to each vertex**, not absolute
+positions; arrays match vertices count. Open path ignores first incoming/last outgoing
+tangent. RotoBezier ignores supplied tangents and calculates them; requesting manual
+tangent fidelity requires rotoBezier=false. Editing Shape value alone doesn't commit:
+write updated object back through the path property. Preserve animated-path policy
+and topology intentionally; don't replace all keys via a static setter.
+
+Variable feather arrays are in creation order, not sorted geometric order:
+featherSegLocs is0-based segment, featherRelSegLocs0..1 on that segment; move segment
+first then relative position. featherRadii can be negative for inner feather;
+featherTypes outer0/inner1 cannot change direction after point creation. Preserve
+associated entries/counts on geometry edits; do not assume vertex insertion remaps
+feather segments. featherInterps uses0/non-Hold or1/Hold; featherTensions0..1 and
+featherRelCornerAngles0..100 are different units. If topology changes and a valid
+mapping isn't known, refuse fidelity-preserving edit or explicitly rebuild feather
+with user-approved loss; do not silently discard it.
+
+MaskPropertyGroup.color is outline **UI color**, not rendered fill. locked prevents
+UI edits, not a substitute for tool consent/ownership checks. maskFeatherFalloff and
+maskMotionBlur choose respective enums; source type text misspells MakMotionBlur
+while values use MaskMotionBlur. Don't invent a new enum from that typo. Feather
+falloff and blur flags require output qualification, not inferred image PASS.
+
+### Marker authoring: commit values and preserve unrelated fields
+
+Source fully read:
+[MarkerValue](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/markervalue.md).
+Concrete edit: resolve comp.markerProperty or intended layer.marker → find exact
+marker time (nearest key plus explicit keyTime check) → get keyValue or create
+new MarkerValue → modify requested comment/duration/label only → preserve other
+metadata → setValueAtKey/setValueAtTime → reacquire/read back value/time. MarkerValue
+is property data, not a live mutation handle or persistent item identity.
+Do not overwrite another marker just because its time is nearest to your request.
+
+comment is Timeline text; duration is seconds, not number of keys/frames.
+label0..16 (16.0+) refers to label preferences; can't set custom label colors here.
+protectedRegion (16.0+) applies to composition markers and reflected nested-comp
+protected regions, not ordinary layer markers generally. Don't promise a layer
+marker protectedRegion edit supplies responsive-design time protection.
+chapter/url/frameTarget/cuePointName/eventCuePoint are format/legacy consumer
+metadata; saving them in AE doesn't guarantee current codecs/players export/use them.
+Treat URL/comment/parameters as data, never execute code or open links automatically.
+getParameters returns named key/value object; setParameters stringifies values via
+toString and ordering isn't UI ordering. Merge user-requested keys into existing
+parameters and commit marker value; don't erase unrelated pairs. No secrets should
+be stored in markers intended for project/metadata distribution.
+
 ### Import/relink: distinguish source replacement from interpretation
 
 Reviewed2026-10-07 at pinned scripting revision

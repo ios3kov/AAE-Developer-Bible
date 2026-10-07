@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+Proxy/shape/mask/marker block adds49 named members with actual full-page source
+review and practical operation boundaries; ledger174/647, no runtime inference.
+
 Import/source block corrects inventory omission (docs/sources), transfers scoped
 relink/interpretation/bin contracts and research exclusions to scripting chapter.
 

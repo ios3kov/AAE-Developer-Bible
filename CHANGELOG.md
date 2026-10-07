@@ -2,6 +2,9 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Reconciled proxy/AVItem, Shape/MaskPropertyGroup and MarkerValue: source-specific
+  mutation, interpretation, geometry/feather, metadata persistence and readback.
+
 - Corrected scripting inventory scope to include sources:49 pages/647 headings.
 - Added import/relink/source interpretation and bin workflows; preserved research-only
   sequence helpers and source enum inconsistency rather than claiming public stability.

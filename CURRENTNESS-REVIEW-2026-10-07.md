@@ -66,6 +66,15 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### Proxy/mask/shape/marker reconciliation
+
+Full AVItem/Shape/MaskPropertyGroup/MarkerValue source pages read at pinned revision.
+Transferred49 headings into concrete operation/readback guidance: proxy interpretation
+vs source replacement, AVItem undefined constructor, source-specific writable fields,
+geometry/tangent/feather/UI boundaries and marker metadata commit/preservation.
+Ledger grows to174 members,473 headings not explicitly ledger-reconciled. These
+counts remain source-review coverage, not host/image/runtime tests.
+
 #### Import/relink/source reconciliation and inventory correction
 
 Found extractor scope omission: docs/sources wasn't included. Added source folder,
