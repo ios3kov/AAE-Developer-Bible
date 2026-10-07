@@ -130,10 +130,24 @@ AEGP сначала должен получить `AEGP_EffectRefH`, вызва�
 
 Concrete [protocol lesson](../16-WORKING-TEMPLATES/effect-aegp-generic-bridge/README.md)
 implements Ping only; ReloadResources returns domain refusal until a real service
-exists. Route: late layer/effect resolution → exact CompTimeToLayerTime API → fresh
+exists. Route: late layer/effect resolution → AEGP_ConvertCompToLayerTime → fresh
 EffectRef owner → payload with non-success result sentinel → COMPLETELY_GENERAL
 call → delivery A_Err first → domain result if delivery succeeded → dispose ref.
 Cleanup error must not erase delivery failure; log separately if both fail.
+
+`AEGP_ConvertCompToLayerTime` из Layer Suite — точное имя host API для этого
+преобразования (не функция с именем `CompTimeToLayerTime`). После свежего разрешения
+слоя конвертируйте исходный `A_Time`, проверьте ошибку, получите текущий effect ref
+и проверьте ожидаемую identity, а не только прежний effect index. Это command design;
+шаблон не содержит готового AEGP resolver/caller.
+
+В actual `Protocol.h` default `result_code` равен **0**, а не sentinel. Caller должен
+перед вызовом выставить согласованное non-success значение и проверять его только
+при успешном delivery. Иначе необработанное сообщение выглядит как domain success.
+Ping записывает 0; ReloadResources/GetStatus/unknown opcode в иллюстративном handler
+отказываются через -1. Size не доказывает читаемость произвольного pointer: обе стороны
+обязаны использовать корректно выделенную shared storage. Effect не владеет payload
+или EffectRef и не сохраняет их после return.
 
 Есть минимум два уровня результата:
 

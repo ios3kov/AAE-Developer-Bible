@@ -46,6 +46,11 @@ new stream ref
 
 Use the exact suite generation and call signatures from the target SDK headers.
 
+The diagram describes product composition, not all functions in the forwarded
+source: the actual helper writes OneD values in CompTime, borrows the stream and
+does not set interpolation/ease, Undo or cancellation. See the [scalar recipe and
+handoff comparison](../../../14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md#actual-scalar-recipe-and-async-command-composition-2026-10-07).
+
 ## Time/value rules
 
 Before writing a keyframe define:

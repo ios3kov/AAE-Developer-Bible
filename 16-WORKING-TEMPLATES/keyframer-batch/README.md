@@ -17,8 +17,8 @@ validate stream
 → for each desired key:
     AddKeyframes(time → new index)
     SetAddKeyframe(index, value)
-    configure interpolation/ease when needed
 → EndAddKeyframes
+→ after successful finalization, resolve current key indexes for interpolation/ease
 → release temporary values/refs
 → end undo group
 ~~~
@@ -55,6 +55,12 @@ Keep:
 - cleanup errors where they matter.
 
 Do not early-return from the loop and leak the batch transaction.
+
+Call End only for a successfully obtained batch; normal failure closes with
+commit=FALSE, success with TRUE. This does not promise Undo/compensation for other
+mutations. The [actual scalar source comparison](../../14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md#actual-scalar-recipe-and-async-command-composition-2026-10-07)
+documents CompTime, borrowed stream, per-value disposal and the absence of Undo,
+interpolation, cancellation and exception-safe batch ownership in the shipped helper.
 
 ## Existing keyframes
 

@@ -194,6 +194,12 @@ Registration может упасть после успешной регистр�
 
 Не предполагайте, что failed EntryPoint автоматически unregister-ит всё.
 
+Практическая [таблица initializer → update/command/idle → shutdown](../03-AEGP/01-HOOKS-SUITES.md#12-сквозная-команда-и-частичная-регистрация-сверка-2026-10-07)
+различает локальное владение до регистрации и resident/degraded state после неё.
+MenuTool не разрешает цели и не делает mutation: для настоящей операции подключите
+[cookbook operation route](../17-NATIVE-SUITE-COOKBOOK/15-RECIPE-INDEX.md), повторную
+проверку целей, successful-Start-only Undo и отдельный partial-result report.
+
 ## Performance
 
 Типичные traps: repeated full-project traversal, one-key-per-transaction, repeated string conversion, script bridge per tiny operation.

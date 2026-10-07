@@ -121,6 +121,12 @@ protocol/result error
 
 Это три разные категории.
 
+Keep cleanup/release failure as a fourth independent category; do not overwrite
+the service failure. The shared Bible header declares only two function pointers,
+not an implemented provider/consumer. The [concrete source-boundary walkthrough](../14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md#actual-shared-header-versus-service-implementation-2026-10-07)
+sets out caller-buffer ownership, capacity/output-size rules and publication failure.
+Those service semantics remain product design, not behavior demonstrated by this header.
+
 ## Product validation guidance
 
 If a concrete product claims these service behaviors, useful runtime cases include:

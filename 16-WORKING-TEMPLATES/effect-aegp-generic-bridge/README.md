@@ -57,9 +57,15 @@ caller must allocate the complete shared struct.
 1. resolve the target `AEGP_EffectRefH`;
 2. convert time to the target layer timebase when needed;
 3. build a versioned payload;
+   set a product-defined non-success result sentinel explicitly (`Protocol.h`
+   defaults to zero); `AEGP_ConvertCompToLayerTime` is the host conversion API;
 4. call `AEGP_EffectCallGeneric(..., PF_Cmd_COMPLETELY_GENERAL, &payload)`;
 5. distinguish the returned `A_Err` from `payload.result_code`;
 6. dispose the effect ref according to its ownership contract.
+
+This is a caller design, not a shipped AEGP resolver/caller implementation. Recheck
+effect identity after resolving the current layer; a remembered index alone is not
+stable across reorder/removal. Preserve delivery error first and cleanup separately.
 
 ## Do not
 

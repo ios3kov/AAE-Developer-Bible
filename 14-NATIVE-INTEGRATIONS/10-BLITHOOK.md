@@ -344,6 +344,7 @@ mark shutting_down
 → prevent late UI/IPC callbacks into AE
 → drain/drop queued product-owned frames by policy
 → join/stop worker with bounded policy
+→ establish no remaining worker/callback can reach staging or hook state
 → free staging buffers
 → return from death hook
 ~~~
@@ -351,6 +352,8 @@ mark shutting_down
 Death hook is `void`; do not throw.
 
 Do not wait indefinitely for remote/network consumers during AE shutdown.
+An expired wait budget alone does not make freeing still-reachable state safe.
+Keep the simple synchronous-copy route distinct from the unqualified async protocol.
 
 ## 25. Reentrancy and state
 

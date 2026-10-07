@@ -183,6 +183,31 @@ Benefits:
 
 Do not forget to close the batch if a middle operation fails. Use structured cleanup/RAII around host transactions where practical.
 
+### Actual scalar recipe and async command composition — 2026-10-07
+
+[`Bible_AddOneDKeyframes`](../17-NATIVE-SUITE-COOKBOOK/code/KeyframeRecipes.cpp)
+borrows its stream and times/values arrays, validates OneD and uses **CompTime** for
+both sampling and insertion. It acquires/disposes each StreamValue and calls
+`EndAddKeyframes(FALSE, addH)` on ordinary error, TRUE on success. If End itself
+fails, commit outcome is not proved; it preserves an earlier error but does not
+log the secondary error. No interpolation/ease, Undo, cancellation token, target
+resolver or exception-safe batch owner is implemented by this helper.
+
+Worked command design: capture project epoch + layer/property identity and desired
+scalar keys; worker computes only owned finite times/values; host callback checks
+cancel/freshness, resolves the current stream and separated follower if required,
+validates type/expression/duplicate-time policy, successfully starts Undo, calls
+the scalar helper, disposes caller-owned refs and ends the opened Undo scope.
+Configure interpolation/ease only in a separate legal step after successful batch
+finalization and fresh key-index resolution, not through a guessed staged index.
+This links the [Animate route](../17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md) without
+attributing the command layer to the helper.
+
+The helper has no mid-loop cancellation support. Check cancel before calling it;
+after return report committed/failed/uncertain work honestly. A product needing
+interruptible batches must implement explicit safe-point/End(FALSE) handling and
+preserve partial-result and cleanup diagnostics; dropping a response is not rollback.
+
 ## Undo
 
 Wrap user-visible mutation in an appropriate undo group.

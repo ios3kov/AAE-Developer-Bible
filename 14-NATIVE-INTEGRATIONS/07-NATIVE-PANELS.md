@@ -250,8 +250,8 @@ Because the source review does not prove Panelator teardown semantics, use a con
 ~~~text
 stop new product work
 → invalidate panel generation/callback targets
-→ destroy product-owned child UI/controller state
 → ensure no worker can call the panel
+→ detach platform callbacks and destroy product-owned child UI/controller state
 → unregister panel factory when appropriate
 → release global panel services
 ~~~
@@ -320,6 +320,30 @@ panel event
 ~~~
 
 Do not retain borrowed `NSView*`, `HWND`, panel handle or project ref on a worker unless the exact contract explicitly permits it.
+
+<a id="freshness-cancellation-and-teardown-сверка-2026-10-07"></a>
+
+### Freshness, cancellation and teardown — сверка 2026-10-07
+
+Use distinct request ID, project epoch, target identity/revision and panel-instance
+generation. Correlation says which request replied; generation rejects a reply for
+an old view; neither proves the layer/property is unchanged. On the host-safe path,
+re-resolve targets and check current prerequisites before mutation, then route the
+new snapshot only to the still-live panel instance. Never let an old reply resurrect
+the panel or change whichever layer happens to be selected now.
+
+Worker owns only request/result bytes. Obtain the idle wake function on the host
+thread in advance and keep its dependency alive through worker shutdown. Release
+queue locks before host calls; apply a bounded number of results per callback.
+
+Cancellation before commit drops the result. During a bounded mutation, stop at a
+defined safe point, close any open batch/Undo scope and report partial/committed
+work; hiding a stale UI response does not undo project edits. On close/recreate,
+invalidate that view and detach callbacks while keeping any service-owned task
+independent of widget memory. On module shutdown, close admission and establish
+worker/callback quiescence **before freeing controller/service state**. A timeout
+alone is not permission to free reachable state, and joining a worker waiting for
+this host thread's idle callback deadlocks. See [threading boundaries](../15-COMMUNICATION/08-THREADING-BOUNDARIES.md).
 
 ## 20. Resize / HiDPI / platform lifecycle
 

@@ -4,6 +4,14 @@ Updated: **2026-10-07**
 
 ## Continuous completion — 2026-10-07
 
+Remaining AEGP/native integration reconciliation complete: eleven core rows now
+C or justified L. Actual MenuTool, bridge/PICA headers and scalar keyframe source
+are distinguished from command/worker/service designs. Fixed panel teardown order,
+batch metadata placement and generic-payload default/sentinel explanation.
+[Review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure).
+Next: scripting → platforms/compatibility → testing/distribution/templates → freeze.
+No new native compile/host result; CI for `b20806b` remains the owner's separate check.
+
 Remaining audit branches: all six reviewed and removed after selective preservation.
 Native/source commit `31fba78` is selectively reconciled, not wholesale merged.
 Transfers fix CEP paths, SignTool/lifecycle/compatibility and owner preconditions,

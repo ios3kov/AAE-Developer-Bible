@@ -2,6 +2,22 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Remaining AEGP/native integration closure
+
+Parent `b20806b0bb20434fef8402816904ffd2dc1f68cf`; containing commit identifies
+the edits. Eleven core rows reconciled in [chapter record](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure).
+Actual C++ sources were read, not changed. Strict C++17 `-Wall -Wextra -Werror`
+portable protocol-header compile/run PASS; this checks shared header layout/defaults,
+not provider/consumer execution, generic delivery or Adobe SDK callback legality.
+
+Local consistency regressions11/11 and checker PASS using existing `.venv`.
+Initial system Python3.14 attempt failed to import PyYAML; rerun in documentation
+venv passed. Expected stale-file messages belong to negative temporary fixtures.
+Generated MASTER/MANIFEST regeneration/freshness, strict MkDocs and diff whitespace
+checks PASS for containing edits. No new SDK compilation/link/AE run; no clean
+dependency installation or GitHub CI result claimed. Owner checks `b20806b` CI
+separately; it is not established by this local review.
+
 ### Remaining cookbook closure
 
 Parent `d564f6f`; eleven remaining cookbook rows reconciled using prior complete

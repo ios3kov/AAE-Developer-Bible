@@ -233,3 +233,34 @@ Local evidence/source guides now link the existing exact-source compiler snapsho
 `ef4e90b` separately from identity-incomplete 2026-09-30 evidence. No compiler rerun
 or attribution of historical PASS to every later publication head. All cookbook
 core rows now C or explicit L; other native integration/hook/bridge rows remain open.
+
+## Remaining AEGP/native integration closure
+
+Parent `b20806b`. Read complete hooks, host flows, PICA, AEGP tools, keyframers,
+native panels, BlitHook, AE→AEGP, generic-call, plug-in PICA and native/script/panel
+chapters together. Read actual MenuTool.cpp, Protocol.h, SharedSuite.h and scalar
+KeyframeRecipes.cpp; matching working/reference guides and portable protocol test.
+SDK declarations/sample observations retain the dated registration, streams,
+panels/BlitHook and PICA source-review provenance: no new direct proprietary-source
+review or target-SDK compiler run claimed by this pass.
+
+Eleven core rows close editorially; BlitHook scenario/source axes remain bounded L.
+Added initializer→command/update/idle→shutdown ownership/failure table. MenuTool is
+ping, has no idle/worker/target mutation; ordinary degraded return and exception
+fallback are distinct. Generic caller design now names ConvertCompToLayerTime and
+explicit non-success sentinel: actual Protocol.h defaults result_code to zero.
+PICA shared header is declarations only, not a provider/consumer; public ABI,
+publication failure, caller-buffer ownership and separate release errors clarified.
+
+Scalar helper borrows stream/arrays, uses CompTime and ordinary End(FALSE/TRUE),
+not interpolation/ease/Undo/cancel/exception-safe batch ownership. Working/reference
+diagrams now put optional metadata after successful finalization and fresh index
+resolution. Native panel teardown now establishes worker/callback quiescence before
+destroying reachable controller state; cancel/generation/timeout do not prove it.
+Hybrid command ordering, unknown-outcome retry and late target revalidation are
+separate from response correlation. BlitHook retains synchronous-copy versus
+unqualified async protocol boundary. No C++ implementation changed; no host result.
+
+Next queue: scripting → platforms/compatibility → testing/distribution/templates
+→ index/source/link reconciliation and final freeze. No new audit branch or mandatory
+host test introduced. Local publication/portable results are in [ledger](VERIFICATION.md).

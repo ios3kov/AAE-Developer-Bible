@@ -111,3 +111,11 @@ The later pass adds/reconciles:
 The staging/backpressure design is a conservative product architecture recommendation. It is **not** presented as an Adobe-documented asynchronous BlitHook contract.
 
 **Evidence level after this pass:** SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.
+
+## Teardown wording correction — 2026-10-07
+
+The historical child-destroy → worker-stop wording above is superseded by the
+current [panel handoff guidance](../14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md):
+invalidate/detach admission, stop access and establish worker/callback quiescence
+before freeing reachable controller/service state. Generation/cancel/timeout alone
+does not prove quiescence. This corrects design prose, not SDK source or host evidence.

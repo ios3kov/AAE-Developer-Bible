@@ -90,6 +90,11 @@ AE loads AEGP
 
 Entry point — прежде всего registration phase, не application loop.
 
+Сквозной source/design маршрут и таблица partial registration находятся в
+[hooks lifecycle](../03-AEGP/01-HOOKS-SUITES.md#12-сквозная-команда-и-частичная-регистрация-сверка-2026-10-07).
+MenuTool реализует command/update/death и ping; idle/worker/mutation в этой
+композиции — отдельно описанный design, не его скрытые функции.
+
 ### Command flow
 
 ```text

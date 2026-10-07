@@ -283,6 +283,23 @@ Do not collapse all four into one generic `-1` if callers need recovery/diagnost
 
 ## 17. Product validation guidance
 
+### Actual shared header versus service implementation — 2026-10-07
+
+[`SharedSuite.h`](../16-WORKING-TEMPLATES/pica-shared-suite/SharedSuite.h) declares
+`GetApiVersion` and `ProcessBytes` only: no AddSuite provider, consumer, allocator,
+thread policy or error-code implementation is shipped. Sweetie/Checkout are the
+dated SDK source patterns, not implementations of BibleCoreSuite1.
+
+For a concrete `ProcessBytes` service, define caller-owned input/output storage,
+borrowed-for-call pointers, capacity and required/output-size semantics, aliasing
+policy and insufficient-capacity result **before** implementing either side. Do not
+read output after service failure unless the contract explicitly defines that output.
+`GetApiVersion` success cannot repair acquisition of the wrong table ABI; matching
+name/public version and calling convention are prerequisites to calling it at all.
+Publication failure leaves the provider unpublished; successful publication followed
+by a later initializer failure must retain reachable table/backing state according
+to the actual host lifecycle, not free it as ordinary local rollback.
+
 If a concrete provider/consumer product claims these behaviors, useful runtime cases include:
 
 1. provider absent;

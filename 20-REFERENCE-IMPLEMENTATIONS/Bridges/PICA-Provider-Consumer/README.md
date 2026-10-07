@@ -20,6 +20,8 @@ The supplied SDK review uses Sweetie as the provider pattern and Checkout as an 
 ## ABI design
 
 Treat the suite struct as a C ABI.
+The forwarding header is C++-source-only with C-shaped ABI data, not a C-compatible
+header or a provider/consumer implementation. See the [actual source boundary](../../../14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md#actual-shared-header-versus-service-implementation-2026-10-07).
 
 Use:
 

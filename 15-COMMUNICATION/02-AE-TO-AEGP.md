@@ -79,6 +79,11 @@ Design initialization as a state machine with explicit partial-failure policy.
 
 The Bible MenuTool keeps valid state for already-registered callbacks and disables the command when later registration fails.
 
+Это относится к обычной error-return ветке; exception guard сам не выполняет
+disable/report rollback. [Подробная lifecycle таблица](../03-AEGP/01-HOOKS-SUITES.md#12-сквозная-команда-и-частичная-регистрация-сверка-2026-10-07)
+связывает initializer с command/update/idle/shutdown и отличает actual MenuTool ping
+от рекомендуемого command-layer design.
+
 ## Suite use
 
 AEGP callbacks usually access host services through PICA suites.
@@ -139,6 +144,7 @@ Death/shutdown path should:
 ~~~text
 stop accepting new work
 → signal/cancel product workers
+→ ensure workers/late callbacks cannot access state or wake the host anymore
 → release product-owned host resources
 → release provider acquisitions
 → destroy state

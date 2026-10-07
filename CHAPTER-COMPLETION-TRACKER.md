@@ -106,7 +106,7 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [AEGP: инициализация, hooks и suites](03-AEGP/01-HOOKS-SUITES.md) | R | E | R | R | C | Проследить menu command от resolve target до cleanup, ошибки и report. **№11** |
+| [AEGP: инициализация, hooks и suites](03-AEGP/01-HOOKS-SUITES.md) | C | C | C | C | C | Actual ping/partial registration versus command/idle/shutdown design; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [AEGP: операции с проектом и рендером](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md) | C | C | C | C | C | Chains и фактические source/partial-cleanup limits сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [AEGP](03-AEGP/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
 
@@ -222,15 +222,15 @@ cross-page review. Добавления и результаты:
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
 | [Native SDK taxonomy](14-NATIVE-INTEGRATIONS/01-TAXONOMY.md) | R | E | R | R | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
-| [Host call flows](14-NATIVE-INTEGRATIONS/02-HOST-CALL-FLOWS.md) | R | E | R | R | C | Сопоставить call flows с одним сквозным AEGP command и resource cleanup. **№11** |
-| [PICA suites — versioned native service bus](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md) | R | E | R | R | C | Согласовать ABI/version/ownership ошибки с bridge/cookbook examples. **№11** |
+| [Host call flows](14-NATIVE-INTEGRATIONS/02-HOST-CALL-FLOWS.md) | C | C | C | C | C | Command flow связан с actual source/design и cleanup; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
+| [PICA suites — versioned native service bus](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md) | C | C | C | C | C | Public ABI, buffers/errors/publication и header-only scope; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [Effect plug-ins — native capability map](14-NATIVE-INTEGRATIONS/04-EFFECTS.md) | C | C | C | C | C | Canonical state route без duplicate contracts; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [AEGP tools — native automation and deep AE integration](14-NATIVE-INTEGRATIONS/05-AEGP-TOOLS.md) | R | E | R | R | C | Связать command/update/idle/death flow со stable targets и partial init. **№11** |
-| [Keyframers](14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md) | R | E | R | R | C | Добавить route к animate recipe, separated dimensions и batch failure cleanup. **№11** |
-| [Native dockable panels](14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md) | R | E | R | R | C | Сверить panel commands/model handoff с stale generations и shutdown recipe. **№11** |
+| [AEGP tools — native automation and deep AE integration](14-NATIVE-INTEGRATIONS/05-AEGP-TOOLS.md) | C | C | C | C | C | Stable targets/partial init и operation route согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
+| [Keyframers](14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md) | C | C | C | C | C | Actual CompTime scalar batch versus follower/cancel/Undo design; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
+| [Native dockable panels](14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md) | C | C | C | C | C | Freshness/cancel/quiescence и guide-only platform scope; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [AEIO — registration and callback lifecycle](14-NATIVE-INTEGRATIONS/08-AEIO.md) | C | C | C | C | C | Overview/templates/reference ownership и source routes сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Artisan — registration, contexts and render contract](14-NATIVE-INTEGRATIONS/09-ARTISAN.md) | C | C | C | C | C | Typed registration/version и partial init сверены с Artie; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [BlitHook — display-pipeline frame hook](14-NATIVE-INTEGRATIONS/10-BLITHOOK.md) | R | L | R | L | C | Согласовать borrowed buffer/IPC boundary; async lifetime оставить ограниченным известным контрактом. **№11** |
+| [BlitHook — display-pipeline frame hook](14-NATIVE-INTEGRATIONS/10-BLITHOOK.md) | C | L | C | L | C | Synchronous owned-copy/IPC и quiescence; async protocol намеренно ограничен; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [Legacy / historical native integration boundaries](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) | R | E | R | R | C | Сверить old/current suite table и разделить source migration от project compatibility. **№5** |
 | [AEGP suites catalog — After Effects 26.5 snapshot](14-NATIVE-INTEGRATIONS/12-AEGP-SUITES-CATALOG.md) | R | L | R | L | C | Согласовать catalogue с exact baseline; не превращать inventory в runtime coverage claim. **№5** |
 | [Public SDK docs errata / verification notes](14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md) | R | L | R | L | C | Связать errata с dated sources; сохранить superseded finding и later correction. **№5** |
@@ -241,12 +241,12 @@ cross-page review. Добавления и результаты:
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
 | [After Effects → Effect plug-in](15-COMMUNICATION/01-AE-TO-EFFECT.md) | C | C | C | C | C | Selector/borrowed values согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [After Effects → AEGP](15-COMMUNICATION/02-AE-TO-AEGP.md) | R | E | R | R | C | Согласовать initializer/hooks/main-thread lifecycle с command walkthrough. **№11** |
-| [AEGP → Effect: generic call](15-COMMUNICATION/03-AEGP-TO-EFFECT.md) | R | E | R | R | C | Добавить generic-call chain с fresh EffectRef, layer time и separate error classes. **№11** |
-| [Plug-in → Plug-in через published PICA suite](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md) | R | E | R | R | C | Согласовать version/ownership/service failure с provider/consumer source example. **№11** |
+| [After Effects → AEGP](15-COMMUNICATION/02-AE-TO-AEGP.md) | C | C | C | C | C | Initializer/partial hooks и worker quiescence сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
+| [AEGP → Effect: generic call](15-COMMUNICATION/03-AEGP-TO-EFFECT.md) | C | C | C | C | C | Fresh ref/layer-time/payload sentinel и delivery/domain/cleanup; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
+| [Plug-in → Plug-in через published PICA suite](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md) | C | C | C | C | C | SDK patterns versus header-only template, release/error/ABI rules; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [ExtendScript → After Effects](15-COMMUNICATION/05-SCRIPT-TO-AE.md) | R | E | R | R | C | Связать reusable commands, undo и partial failure с automation recipes. **№10** |
 | [CEP panel <-> ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md) | C | C | C | C | C | Envelopes, parse/type/errors, JSON bootstrap и mutation policy согласованы; отдельный INTERNAL_ERROR и его client blocking проверены portable tests; Unicode fixture изолирован, runtime не заявлен. **№2 выполнен**. |
-| [Native <-> script/panel: как собирать гибридный продукт](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md) | R | E | R | R | C | Разнести transport correlation, freshness, cancellation и host command ordering. **№2** |
+| [Native <-> script/panel: как собирать гибридный продукт](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md) | C | C | C | C | C | Correlation/freshness/ordering/cancel/unknown outcome разделены; transport design limits; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [Threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md) | C | C | C | C | C | Worker/generation/quiescence и incident границы разделены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Data ownership and lifetime](15-COMMUNICATION/09-DATA-OWNERSHIP.md) | C | C | C | C | C | Phase-specific checkin и borrowed cache-value/payload lifetime согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Как компоненты общаются друг с другом и с After Effects](15-COMMUNICATION/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |

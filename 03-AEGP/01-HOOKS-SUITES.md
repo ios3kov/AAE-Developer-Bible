@@ -209,7 +209,37 @@ SDK содержит `AEGP_GetSuppressInteractiveUI`. Его комментар�
 
 Эта глава не переносит автоматически правила ScriptUI, Effect-render или Render Queue на AEGP hooks. Подробный цикл проектных операций — тема [следующего раздела](02-PROJECT-RENDER-AUTOMATION.md).
 
-## 12. Как проверить такую интеграцию
+<a id="12-сквозная-команда-и-частичная-регистрация-сверка-2026-10-07"></a>
+
+## 12. Сквозная команда и частичная регистрация — сверка 2026-10-07
+
+MenuTool выше — actual source для регистрации и ping. Следующая композиция —
+**command-layer design**, связывающая его с уже разобранными cookbook операциями;
+она не реализована внутри `DoWork`.
+
+| Фаза | Действие и отказ | Владелец / следующий шаг |
+|---|---|---|
+| Initializer до hooks | Проверить входы и получить необходимые suites | Локальный owner удаляет state при отказе |
+| Death registration успешна | Передать global refcon; записать успешные registrations | State сохраняется для последующих callbacks, не удаляется на позднем отказе |
+| Menu/command/update registration | Проверять каждую ошибку; readiness только после нужных шагов | MenuTool на обычной поздней ошибке выключает/обнуляет команду и остаётся resident; это degraded, не ready |
+| Update menu | Быстро проверить текущую доступность | Snapshot не разрешение на будущую mutation |
+| Command | Фильтр command/already-handled → заново resolve project/layer/property → preflight | Нельзя использовать refs из прежнего update-menu snapshot |
+| Mutation | Только после успешного StartUndoGroup выполнить [операцию](../17-NATIVE-SUITE-COOKBOOK/15-RECIPE-INDEX.md) | Освободить refs/values/batch; EndUndoGroup только после успешного Start; Undo не rollback |
+| Result | Сохранить primary error и отдельно cleanup/partial result | ReportInfo не заменяет результат операции; учитывать suppress-interactive-UI |
+| Idle, если продукт его добавляет | Снять owned result из очереди, отпустить mutex, проверить generation и текущие цели | MenuTool не регистрирует idle и не запускает worker |
+| Shutdown | Закрыть admission, отменить работу, обеспечить quiescence, затем освободить state/dependencies | MenuTool только удаляет свой простой ToolState; расширенный shutdown требует отдельной реализации |
+
+Различайте обычный error-return после registration и исключение: внешний
+`GuardAeHostCallback` возвращает fallback, но **не исполняет автоматически**
+локальную ветку disable/report и не отменяет registrations. В текущем source
+это ограничение, не обещание безопасного recovery от любого частичного initializer.
+
+Для idle handoff cancellation/generation проверяются до первой mutation; поздняя
+отмена после commit не означает «изменений не было». Не ожидайте на shutdown worker,
+который сам ждёт idle callback этого же host thread. Указатель wake-функции и suite
+dependency должны оставаться живыми до последнего возможного worker-вызова.
+
+## 13. Как проверить такую интеграцию
 
 Для рабочего AEGP примера нужны раздельные наблюдения: правильный Kind и экспорт, успешный initializer, ровно один пункт меню, реальное выполнение собственной команды, отсутствие перехвата чужих команд, корректная доступность при смене контекста и завершение без потерянного state.
 

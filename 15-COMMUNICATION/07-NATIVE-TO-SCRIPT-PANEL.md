@@ -200,6 +200,25 @@ A robust protocol returns to a known state instead of assuming all components ha
 
 ## Versioning
 
+### Ordering, freshness and cancellation — native handoff reconciliation
+
+`request_id` correlates replies; it does not order mutations or prove target
+freshness. Carry a session/project epoch, target identity/revision and UI-instance
+generation separately. Serialize host mutations in a product-defined command
+queue and revalidate targets just before applying them. Coalesce replaceable reads,
+not non-idempotent edits; do not retry a timed-out edit blindly when its outcome is
+unknown. Re-query host state before deciding whether to retry.
+
+Cancel before host commit means no mutation; cancel/timeout after commit may mean
+an edit already happened. Report committed/partial/unknown outcome rather than
+pretending an ignored response reverses it. Worker cancellation and stale-response
+rejection are independent. For native panel shutdown, keep service/controller and
+wake-function dependencies alive until workers and callbacks can no longer reach
+them; see the [panel handoff route](../14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md#freshness-cancellation-and-teardown-сверка-2026-10-07).
+
+These are architectural contracts, not a direct CEP→native transport implementation
+in the supplied templates. UXP routes remain conditional on a published AE host API.
+
 Protocol compatibility should be explicit.
 
 Example:

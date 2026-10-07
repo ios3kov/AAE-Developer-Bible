@@ -78,13 +78,18 @@ A conservative order:
 ~~~text
 stop new product work
 → invalidate per-panel async generations
-→ destroy product-owned child UI/controller state
 → stop workers/helpers that can target the panel
+→ detach callbacks and destroy product-owned child UI/controller state
 → UnRegisterCreatePanelHook when appropriate
 → release global panel services
 ~~~
 
 The existence of UnRegisterCreatePanelHook does not prove it destroys already-created child UI for the product.
+
+Stopping means no remaining worker/callback can enter freed state, not merely
+setting a cancel flag or expiring a timeout. Do not join a worker that waits for the
+same host thread's idle callback. The [handoff/cancellation walkthrough](../../14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md#freshness-cancellation-and-teardown-сверка-2026-10-07)
+separates request correlation, project/target freshness and panel generation.
 
 ## Threading
 
