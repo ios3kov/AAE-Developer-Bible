@@ -2,6 +2,15 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Remaining cookbook closure
+
+Parent `d564f6f`; eleven remaining cookbook rows reconciled using prior complete
+chapter/source read plus map/overview/evidence/source-guide review. All cookbook
+rows now C or bounded L; target SDK direction and source/evidence routes corrected.
+No C++ source changed. Local consistency11/11, checker, MASTER/MANIFEST regeneration
+and freshness, strict MkDocs and diff whitespace checks PASS for containing edits.
+No fresh SDK/compiler/link/AE run or later-head GitHub CI success inferred.
+
 ### Render/cache/UI closure and audit publication
 
 Cookbook composition follow-up at parent `ef37a74`: read chapters00–15, six C++

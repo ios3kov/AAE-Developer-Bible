@@ -3,6 +3,25 @@
 **Purpose:** быстрый указатель «какая suite / какая функция нужна».  
 **Not a header replacement:** exact types, optional arguments and version macros always come from the SDK headers used for the build.
 
+Primary baseline is supplied SDK **25.6 build 61**. This is a selected capability
+index, not a per-member availability matrix. Explicit 26.5 entries are later public
+research, not review of supplied proprietary 26.5 headers or runtime coverage.
+
+| Operation family | 25.6 explanatory baseline | Companion source choice |
+|---|---|---|
+| Project / item / comp / layer | ProjSuite6 / ItemSuite9 / CompSuite12 / LayerSuite9 | Same generations |
+| Effect / stream / dynamic stream | EffectSuite5 / StreamSuite6 / DynamicStreamSuite4 | EffectSuite5 / StreamSuite6 for implemented subset |
+| Keyframes / masks / text / markers / footage | KeyframeSuite5 / MaskSuite6 / MaskOutlineSuite3 / TextDocumentSuite1 / MarkerSuite3 / FootageSuite5 | KeyframeSuite5 batch; other families have contract/design routes |
+| Frame / world | RenderOptionsSuite4 / RenderSuite5 / WorldSuite3 | RenderSuite4 receipt subset, borrowed options |
+| Queue / item / output | RenderQueueSuite1 / RQItemSuite4 / OutputModuleSuite4 | RQItemSuite3 subset with named enum; other two same |
+
+These are struct generations, **not numeric AcquireSuite versions**. Use the target
+header's name/version macros. Exact source boundaries and implemented functions:
+[recipe index](15-RECIPE-INDEX.md), [source guide](code/README.md),
+[evidence](VERIFICATION.md). CompSuite13, StreamSuite7, GuideSuite2 and ItemViewSuite2
+must not silently replace the 25.6 contracts. Other families below require checking
+their specific target declarations, not inference from this abbreviated table.
+
 ## Host / registration
 
 ### Memory Suite
@@ -428,7 +447,8 @@ Families:
 
 1. Найти operation здесь.
 2. Перейти в recipe в `17-NATIVE-SUITE-COOKBOOK/`.
-3. Для exact signature открыть 26.5 header.
+3. Для exact signature открыть header целевого SDK: baseline Bible — 25.6;
+   later feature требует своего version/source gate, не автоматического перехода на 26.5.
 4. Для lifecycle посмотреть ближайший официальный Adobe sample.
 5. Добавить ownership + invalidation + undo.
 6. Только потом писать business logic.

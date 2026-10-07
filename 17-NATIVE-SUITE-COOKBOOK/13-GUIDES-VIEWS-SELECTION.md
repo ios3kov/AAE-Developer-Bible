@@ -211,6 +211,15 @@ resolve target item
 
 Не смешивайте model guide creation с view visibility как одну implicit operation.
 
+Bounded failure route: selection captured at click → normalize project/comp context
+and IDs → prepare pure guide preset → on host callback re-resolve item and view.
+If project changed, target vanished or required suite is unavailable, refuse before
+mutation. An older-suite fallback maps only supported fields explicitly; unsupported
+color/pinning is reported, not silently claimed. If model write succeeds but the view
+closes before visibility update, report model applied/view update unavailable rather
+than pretending both were atomic. No GuidesRecipes.cpp or tested fallback adapter is
+shipped; this is UI-command guidance, not baseline availability proof for later APIs.
+
 ## Product testing guidance
 
 Полезные cases: no active item, empty/mixed selection, item closed during command, selection changed during async compute, older-suite fallback, multiple views, save/reopen for model data.

@@ -1,6 +1,6 @@
 # Cookbook — границы доказательств
 
-Обновлено: **2026-10-02**. Правила: [EDITORIAL-GUIDE](../EDITORIAL-GUIDE.md); первичные записи: [общий evidence ledger](../VERIFICATION.md).
+Обновлено: **2026-10-07**. Правила: [EDITORIAL-GUIDE](../EDITORIAL-GUIDE.md); первичные записи: [общий evidence ledger](../VERIFICATION.md).
 
 ## Исторический compiler result — 2026-09-30
 
@@ -8,7 +8,16 @@
 
 В сохранённой записи нет точного source SHA или хэшей проверенных translation units. Поэтому её PASS сохраняется как исторически сообщённый результат с пробелом идентичности; нельзя заключить, что именно нынешние файлы проходили компиляцию. Коммит, публикующий отчёт, сам по себе не доказывает identity проверенного source tree.
 
-После этого результата менялись исходники: `EffectStreamRecipes.cpp` перешёл на `EffectSuite5`, а `RenderQueueRecipes.cpp` получил named enum `AEGP_RenderItemStatus_QUEUED` и readback. Эти исправления имеют source-level evidence, а новый exact-SDK compiler result для них здесь не заявлен.
+После этого результата менялись исходники: `EffectStreamRecipes.cpp` перешёл на `EffectSuite5`, а `RenderQueueRecipes.cpp` получил named enum `AEGP_RenderItemStatus_QUEUED` и readback. Исторический PASS сам по себе эти corrections не покрывает; позднейшая exact-source запись приведена отдельно ниже.
+
+## Exact-source compiler record — 2026-10-07
+
+[Общий ledger](../VERIFICATION.md#exact-clean-source-sdk-syntaxtype-check-2026-10-07)
+records 13/13 syntax/type PASS at clean source
+`ef4e90b1c96c6a9a1cb34b5c2260b2561b20e7eb`, supplied SDK25.6build61,
+Apple Clang21 arm64, including cookbook recipes. This is an identified compiler
+snapshot, not a rerun at today's publication head, link/resource inspection or
+AE runtime result. Later editorial reconciliation did not change these C++ recipes.
 
 ## Текущий контракт и source examples
 

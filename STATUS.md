@@ -21,6 +21,12 @@ recipe index (applicable route axes). Corrected unconditional Undo end after fai
 start, exposed balance-only helper diagnostics and linked actual code versus design
 operations. Other cookbook/native integration rows remain in the tracker queue.
 
+Remaining cookbook reconciliation finished: eleven further rows now C or justified
+L; all cookbook core rows closed editorially. Fixed target-SDK direction in function
+map, added source/current-suite boundary table, selection partial-failure and frame
+calibration routes, and linked existing exact-source compiler evidence. Native
+hooks/bridges/panels remain next; no new compiler or AE runtime result.
+
 Completion follow-up: current status/plan no longer instruct restarting implemented
 blocks. SmartFX Copy/Gain limitations are now directly documented in canonical
 chapters. Foundation overview, four chapters, headers, tests and related render/

@@ -121,6 +121,14 @@ while receipt valid
 
 Do not keep base-address pointer after checkin.
 
+Before comparing the owned copy with an exported file, calibrate both paths with
+identity/ramp/impulse controls and record actual world type versus decoded file
+precision, alpha/profile/transforms. A 32-bpc project exported as unsigned RGBA16
+does not validate native HDR or NaN preservation. Use the
+[pixel calibration route](../02-EFFECT-PLUGINS/06-COLOR-PIXELS.md) and
+[worked NOT_RUN evidence plan](../13-TEMPLATES/examples/WORKED-EXAMPLE.md);
+the receipt helper does not implement this calibration or decoder.
+
 ## Checkin is mandatory
 
 ```cpp

@@ -212,3 +212,24 @@ mask failure and existing-marker write flows; helper composition limits and actu
 code/evidence route table. Corrected the automation table's stale wording that
 read the historical TRUE defect as current. These are editorial/source comparisons,
 not new API signatures, compiler evidence, host mutation or exception-safety tests.
+
+## Remaining cookbook rows — closure
+
+Eleven remaining cookbook rows closed using the complete chapter00–15/six-recipe
+comparison recorded above, plus function map, overview, local evidence and source
+guides read in this pass. No blanket SDK26.5/header audit is implied. The selected
+function map now directs exact-signature work to the target SDK (25.6 baseline),
+not unconditionally 26.5, and lists current versus deliberately older source suites.
+
+Project queries/partial count; LayerID truncation/context; apply/dispose/mutation;
+static OneD/expression restrictions; CompTime batch/ordinary versus exception cleanup;
+footage adoption/proxy/replace; frame options/receipt/read-only world; stopped queue,
+named enum/readback and partial item creation are reconciled against actual helper
+scope. Added direct frame-copy/output calibration link and selection/model/view
+failure route. Guide fallback remains design only (source axis L); map/overview are
+route indexes (scenario/source axes L). No authored mask/text/footage/guide TU invented.
+
+Local evidence/source guides now link the existing exact-source compiler snapshot
+`ef4e90b` separately from identity-incomplete 2026-09-30 evidence. No compiler rerun
+or attribution of historical PASS to every later publication head. All cookbook
+core rows now C or explicit L; other native integration/hook/bridge rows remain open.

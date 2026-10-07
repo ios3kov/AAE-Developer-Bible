@@ -28,6 +28,13 @@
 
 ## Уровни доверия
 
+For complete import/create/animate/queue or frame operations, read
+[automation chains](../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md) with the
+[actual source index](15-RECIPE-INDEX.md). The table routes to capabilities, not a
+promise that all tasks have standalone C++ implementations. Later Guide/ItemView
+features remain separately gated; the [function map](16-SUITE-FUNCTION-MAP.md)
+explicitly separates baseline generations and source compatibility choices.
+
 - **SDK source-reviewed** — declaration/ownership statement сверены с конкретным supplied SDK snapshot; это не runtime result.
 - **sample-derived** — pattern найден в официальном sample-проекте Adobe; sample может использовать старую suite generation.
 - **syntax/type baseline** — отдельный recorded compiler check для конкретного source snapshot.

@@ -256,23 +256,23 @@ cross-page review. Добавления и результаты:
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
 | [Как пользоваться cookbook](17-NATIVE-SUITE-COOKBOOK/00-HOW-TO-USE.md) | C | C | C | C | C | Source/operation route и successful-Start-only Undo balance уточнены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [Project + Item recipes](17-NATIVE-SUITE-COOKBOOK/01-PROJECT-ITEMS.md) | R | E | R | R | C | Добавить import/resolve/adopt chain с dangerous New/Open и invalidation policy. **№11** |
+| [Project + Item recipes](17-NATIVE-SUITE-COOKBOOK/01-PROJECT-ITEMS.md) | C | C | C | C | C | Query source/partial outputs, New/Open и import route сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Composition recipes](17-NATIVE-SUITE-COOKBOOK/02-COMPOSITIONS.md) | C | C | C | C | C | Fixed create source отделён от config/Undo/compensation design; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [Layer recipes](17-NATIVE-SUITE-COOKBOOK/03-LAYERS.md) | R | E | R | R | C | Связать stable LayerID/fresh resolution с create/edit/remove сценариями. **№11** |
-| [Effect recipes](17-NATIVE-SUITE-COOKBOOK/04-EFFECTS.md) | R | E | R | R | C | Связать find/apply/dispose EffectRef с stream mutation и generic-call errors. **№11** |
-| [Streams / properties / expressions](17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md) | R | E | R | R | C | Проследить acquire/sample/set/dispose с expression/separated-dimension границами. **№11** |
-| [Keyframes: чтение, изменение, batch insert, interpolation](17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md) | R | E | R | R | C | Дать animate chain и batch error path с timebase/interpolation ownership. **№11** |
+| [Layer recipes](17-NATIVE-SUITE-COOKBOOK/03-LAYERS.md) | C | C | C | C | C | ID/context resolution и bounded/truncated collector scope сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Effect recipes](17-NATIVE-SUITE-COOKBOOK/04-EFFECTS.md) | C | C | C | C | C | Apply/dispose versus mutation compensation и generic-call route сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Streams / properties / expressions](17-NATIVE-SUITE-COOKBOOK/05-STREAMS-PROPERTIES.md) | C | C | C | C | C | OneD/source policy, expression stage и separated followers сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Keyframes: чтение, изменение, batch insert, interpolation](17-NATIVE-SUITE-COOKBOOK/06-KEYFRAMES.md) | C | C | C | C | C | Actual CompTime batch cleanup/preconditions и interpolation limits сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Masks: reference lifetime, outline stream и geometry](17-NATIVE-SUITE-COOKBOOK/07-MASKS.md) | C | C | C | C | C | Partial create/edit flow, disposal versus deletion и sample limits сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Text documents and markers](17-NATIVE-SUITE-COOKBOOK/08-TEXT-MARKERS.md) | C | C | C | C | C | Typed write/readback и payload/UTF-16 ownership сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [Footage / import: ownership, interpretation, sequences and proxies](17-NATIVE-SUITE-COOKBOOK/09-FOOTAGE-IMPORT.md) | E | E | R | R | C | Дать import/adopt/replace chain с caller-owned failure rollback. **№11** |
-| [Render frame → pixels](17-NATIVE-SUITE-COOKBOOK/10-RENDER-FRAMES.md) | E | E | R | R | C | Дать configure→checkout→world→checkin chain с calibration/output scope. **№11** |
-| [Render Queue recipes](17-NATIVE-SUITE-COOKBOOK/11-RENDER-QUEUE.md) | E | E | R | R | C | Дать add/configure/queue/readback chain с named enum, state и artifact identity. **№11** |
+| [Footage / import: ownership, interpretation, sequences and proxies](17-NATIVE-SUITE-COOKBOOK/09-FOOTAGE-IMPORT.md) | C | C | C | C | C | Adoption/error ownership и interpretation/proxy/replace design сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Render frame → pixels](17-NATIVE-SUITE-COOKBOOK/10-RENDER-FRAMES.md) | C | C | C | C | C | Options/receipt/world/source subset и calibration/output scope сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Render Queue recipes](17-NATIVE-SUITE-COOKBOOK/11-RENDER-QUEUE.md) | C | C | C | C | C | Named enum/readback, STOPPED/partial mutation и actual helper limits сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Memory / Undo / Persistent Data](17-NATIVE-SUITE-COOKBOOK/12-MEMORY-UNDO-PERSISTENCE.md) | C | C | C | C | C | Actual helper composition и observable transaction limits раскрыты; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [Guides / Item Views / Selection](17-NATIVE-SUITE-COOKBOOK/13-GUIDES-VIEWS-SELECTION.md) | R | E | R | R | C | Согласовать current/later API gates со stable selection и UI-only workflow. **№11** |
+| [Guides / Item Views / Selection](17-NATIVE-SUITE-COOKBOOK/13-GUIDES-VIEWS-SELECTION.md) | C | C | C | L | C | Selection freshness и model/view partial failure; later API gate, no adapter source; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Lifetime + threading rules](17-NATIVE-SUITE-COOKBOOK/14-LIFETIME-THREADING.md) | C | C | C | C | C | Render owner/suite lifetimes и отдельный async shutdown route сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Native recipe index](17-NATIVE-SUITE-COOKBOOK/15-RECIPE-INDEX.md) | C | L | C | L | C | Index связывает actual code, design chains и evidence; не implementation; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [AEGP Suite function map — native capability index](17-NATIVE-SUITE-COOKBOOK/16-SUITE-FUNCTION-MAP.md) | R | L | R | L | C | Сверить function/suite version map с exact SDK records, сохранять compatibility choices. **№5** |
-| [Native Suite Cookbook](17-NATIVE-SUITE-COOKBOOK/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [AEGP Suite function map — native capability index](17-NATIVE-SUITE-COOKBOOK/16-SUITE-FUNCTION-MAP.md) | C | L | C | L | C | Selected capability map с 25.6/source-subset/later gates; не exact inventory; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Native Suite Cookbook](17-NATIVE-SUITE-COOKBOOK/README.md) | C | L | C | L | C | Overview routes/current contracts/evidence и actual source index согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 
 ## 19-NATIVE-CODE-FOUNDATION
 

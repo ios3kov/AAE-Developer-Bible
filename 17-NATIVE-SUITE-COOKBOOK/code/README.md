@@ -37,3 +37,8 @@ This closes the **source-level argument-selection defect**. It does **not** prov
 **Evidence boundary:** the historical SDK 25.6 syntax/type record from 2026-09-30 lacks exact tested source identity. It cannot establish current-source compilation; later EffectSuite and render-queue source corrections were not covered by that recorded run. Current recipes are SOURCE EXAMPLES / SDK-CONTRACT-REVIEWED where noted, with RUNTIME-NOT-CLAIMED. The render-queue enum defect is corrected at source level.
 
 Команда и результаты: [VERIFICATION.md](../../VERIFICATION.md). Сохраните relative includes к `19-NATIVE-CODE-FOUNDATION` или перенесите helpers вместе с recipes. Host callbacks, вызывающие recipes, должны иметь exception boundary.
+
+Later exact-source record: clean `ef4e90b1c96c6a9a1cb34b5c2260b2561b20e7eb`,
+SDK25.6build61, Clang21 arm64, 13/13 syntax/type PASS including these recipes.
+[Cookbook ledger](../VERIFICATION.md) separates it from the identity-incomplete
+2026-09-30 record. It is not a new check at the publication head or host evidence.
