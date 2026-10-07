@@ -1,5 +1,8 @@
 # Minimal Gain effect — working template
 
+Historical [2026-10-06 link evidence](../../BUILD-EVIDENCE.md) has exact source/binary
+hashes; current `.cpp` bytes matched on2026-10-07. Not a new reader-artifact or host result.
+
 Status: **source example / SDK 25.6 contract-aligned; runtime result not claimed by Bible**.
 
 Requires C++17, the SDK utility sources and the official sample project/PiPL build configuration.

@@ -4,6 +4,14 @@
 
 ### Subsequent practical additions
 
+### Historical link record reconciliation — 2026-10-07
+
+Read audit commit `31fba783df86cb2eff4eba86a897591123857ca3` BUILD-EVIDENCE;
+old/current canonical Gain and SmartFX source bytes identical (SHA256 in
+[preserved link record](BUILD-EVIDENCE.md)). Historical arm64 Debug link/export/
+resource results remain scoped to original artifacts. No fresh build, private-log
+reinspection, host execution or Universal result inferred.
+
 ### Published GitHub workflow observations — 2026-10-07
 
 Read public GitHub Actions API, not inferred from local checks:

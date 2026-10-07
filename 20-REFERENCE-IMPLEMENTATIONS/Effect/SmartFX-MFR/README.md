@@ -1,5 +1,9 @@
 # SmartFX pass-through reference
 
+Historical [2026-10-06 arm64 Debug link evidence](../../../BUILD-EVIDENCE.md) has
+exact source/binary hashes; current `.cpp` bytes match. Not a new build, host ROI
+test or MFR/Universal support result.
+
 Status: **SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED**. SDK contract basis: 25.6 build 61; historical compiler evidence is scoped below.
 
 SmartFxMfr.cpp is intentionally a small pass-through reference with SmartFX support. It does **not** currently declare MFR support.
