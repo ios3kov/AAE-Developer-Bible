@@ -171,8 +171,6 @@ actual device test
 
 «GPU быстрее» без размера кадра, backend, device, warm/cold state и transfer cost — не benchmark.
 
-## Verification boundary
-
 ## Один backend: маршрут Metal sample
 
 Source-level walkthrough SDK 25.6 `Effect/SDK_Invert_ProcAmp`: открыть основной
@@ -201,5 +199,7 @@ CPU fallback — спроектированный маршрут host negotiatio
 dispatch. Log actual selector/framework/device/format/route для attribution.
 Настройка проекта «GPU» и существование Metal kernel не доказывают его исполнение.
 Throughput считать с preparation/transfer/sync, не одним kernel timestamp.
+
+## Verification boundary
 
 Текст сверён с SDK/source sample. Bible не заявляет собственный GPU runtime result; сборка demo binary не является условием редакционной готовности главы.

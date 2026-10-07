@@ -186,8 +186,6 @@ Interaction state может быть transient, но любое состоян�
 - async rendered-frame cancellation;
 - error injection/resource leak check.
 
-## Verification boundary
-
 ## Rectangle draw → hit → parameter → Undo
 
 Exact reading path SDK 25.6: `UI/Custom_ECW_UI/Custom_ECW_UIUI.cpp:95–209`.
@@ -215,5 +213,7 @@ Async boundary: generation-tagged request → available image/placeholder DRAW �
 stale cancellation → no callback writes into closed view. Это conservative design,
 не полная implementation async-manager suite. Ни lifetime beyond documented receipt,
 ни host-tested cancellation здесь не обещаны.
+
+## Verification boundary
 
 Bundled Custom_ECW_UI/CCU source reviewed. Bible не заявляет собственный UI runtime result; отдельная demo implementation/host QA не является completion requirement документации.

@@ -171,3 +171,27 @@ hazard, matrix scope/identity/failure route and non-colliding HTML source downlo
 Historical build result and current protocol are preserved without old duplicate
 reports or unsupported manifest compatibility. This closes branch review, not
 all remaining chapter tracker rows or final freeze.
+
+## Effect render / cache / UI completion reconciliation
+
+Read complete SmartFX, pixels, auxiliary, MFR, GPU, audio and Drawbot chapters;
+memory/performance architecture; threading/ownership companions; MFR migration
+and CPU/GPU equivalence recipes; bounded ElasticGridFX incident record. Copy/Gain
+source comparison is recorded above; GPU and UI walkthroughs retain the dated
+SDK sample-review provenance, not a new claim of direct proprietary source review.
+
+| Closed core pages | Reconciled result | Limit retained |
+|---|---|---|
+| SmartFX / pixels / auxiliary | Halo/origin/time IDs; actual Copy scope; Gain truncation; channel type/geometry and mandatory checkin | Math/DSP recommendations are not new render implementations |
+| Memory / MFR | Receipt independent of primary error; borrowed cache value; request scratch; shutdown quiescence | No concurrency or leak run |
+| Performance architecture | Route attribution, core/export/Preview timings and N×scratch | Case study is PROJECT-REPORTED, not replicated |
+| GPU / CPU-GPU equivalence | Metal source route, negotiation versus execution; no assumed CPU retry; numeric policy and fallback fixtures | Backend build/platform details retain scoped source limits |
+| MFR migration | Inventory → snapshots → cache → candidate flag → observed overlap/output checks | Product acceptance criteria, not Bible runtime gate |
+| Threading / data ownership | Generation is not worker cancellation; shutdown dependency; phase-specific cleanup replaces generic checkout rule | No universal suite thread-safety or lifetime promise |
+| Audio | Bounded float32 arithmetic/range and independent audio checkout | No matching bundled AUDIO_RENDER dispatcher; field wiring remains explicitly limited |
+| Custom UI / Drawbot | Owned drawing objects versus borrowed supplier/surface; hit/drag/persistence/Undo observations separated | Interaction design and async-manager limits explicit, no shipped gesture implementation |
+
+These thirteen rows close applicable editorial axes against recorded contracts and
+current examples. Removing empty verification headings improves section scope.
+No C++ implementation changed; no new compilation, AE execution, audio/UI/GPU
+result, MFR repair or performance result is inferred from this reconciliation.

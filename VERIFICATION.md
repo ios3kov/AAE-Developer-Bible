@@ -2,6 +2,26 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Render/cache/UI closure and audit publication
+
+Source parent `20b0413cd2ac81844afdb4e644ceca40eee28833`; changes are identified by
+the commit containing this entry. Thirteen core rows reconciled as detailed in
+[chapter record](CHAPTER-RECONCILIATION-2026-10-07.md), with audio source-composition
+axis intentionally L. Phase-specific cleanup and worker shutdown clarifications
+do not introduce native implementations or observed host results.
+
+Public GitHub Actions API observed 2026-10-07:
+
+| Exact head | Validate | Regenerate docs |
+|---|---|---|
+| `6a3fc0f808e89e23db12b164ceeb842c4e0b83fd` | [37637357261](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37637357261): completed/success | [37637357601](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37637357601): completed/success |
+| `e58ec7faa2f1ba2f932dffcace27dae914e4c21f` | [37637863343](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37637863343): completed/success | [37637863614](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37637863614): completed/success |
+| `20b0413cd2ac81844afdb4e644ceca40eee28833` | [37639133475](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37639133475): completed/success | [37639133448](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37639133448): completed/success |
+
+Local closure checks: consistency regressions 11/11, consistency checker,
+MASTER/MANIFEST regeneration and freshness, strict MkDocs and diff whitespace
+check PASS. These validate publication only; no new SDK compilation or AE run.
+
 Source parent: `8d78e067b11f9f219215f8f940c951f30a66d51c`; the follow-up changes
 are identified by the commit containing this record, not by that parent. Reviewed
 current status/plan/tracker and SmartFX/pixel/auxiliary explanations against the

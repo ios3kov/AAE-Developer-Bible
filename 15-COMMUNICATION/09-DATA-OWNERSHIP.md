@@ -25,6 +25,9 @@ AcquireSuite
 
 ### Checkout/checkin resource
 
+Это класс временного доступа, а не единое правило для всех API. Таблица ниже
+относится к явно парным acquisitions; фазовые исключения сверять по контракту.
+
 ~~~text
 checkout
 → use
@@ -45,6 +48,17 @@ Product memory не продлевает lifetime borrowed host pointer, кот�
 | owned AEGP memory handle | matching free |
 | product worker | explicit stop/join policy |
 | IPC/file handle | close |
+
+Для Effect paths различать четыре случая: параметры в SmartFX pre-render
+автоматически checkin-ятся по документированному SmartyPants route; параметры
+в SmartFX render требуют явного checkin. Ранний `checkin_layer_pixels` необязателен,
+но после него pixels недействительны; без него доступ заканчивается вместе с
+командой. Auxiliary chunk требует `PF_CheckinLayerChannel`, Compute Cache receipt —
+`AEGP_CheckinComputeReceipt` до возврата host. Receipt не продлевает чужой pixel
+checkout и не передаёт consumer владение cache value. Exact phase/source table:
+[SmartFX](../02-EFFECT-PLUGINS/03-SMARTFX.md),
+[auxiliary](../02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md),
+[Compute Cache](../02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md).
 
 Если cleanup API возвращает meaningful error, не теряйте его автоматически в destructor.
 

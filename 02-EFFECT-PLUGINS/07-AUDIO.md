@@ -191,8 +191,6 @@ AUDIO_SETDOWN
 
 Эти пункты требуют compiler/host fixture.
 
-## Verification boundary
-
 ## Bounded stateless DSP walkthrough
 
 Concrete **DSP example**, not an AUDIO_RENDER dispatcher: gain=0.5, mono/stereo
@@ -215,5 +213,7 @@ request state. Sample count is not seconds; start/duration use their specified
 scale. This arithmetic lesson does not establish host block ordering, AUDIO_IIR
 history, actual field wiring or sample-perfect automation. Those remain intentionally
 limited because no matching bundled AUDIO_RENDER implementation was found.
+
+## Verification boundary
 
 Bible не заявляет собственный audio runtime result. Создание отдельного audio demo effect не является условием редакционной готовности главы.

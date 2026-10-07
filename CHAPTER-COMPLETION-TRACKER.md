@@ -80,10 +80,10 @@ cross-page review. Добавления и результаты:
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
 | [Native plug-in lifecycle](01-ARCHITECTURE/01-LIFECYCLE.md) | C | C | C | C | C | Recovery/partial failure связан с versioned codec; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [Память, время жизни ресурсов и ошибки](01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) | R | E | R | R | C | Сверить memory/thread policy с receipt lifecycle Compute Cache и bounded MFR incident. **№8** |
+| [Память, время жизни ресурсов и ошибки](01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) | C | C | C | C | C | Receipt/error cleanup и incident limits согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [PiPL, регистрация и загрузка плагина](01-ARCHITECTURE/03-PIPL-AND-LOADING.md) | R | E | R | R | C | Связать PiPL/resource chain с конкретными macOS/Windows sample walkthroughs. **№13** |
 | [Version compatibility](01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md) | R | E | R | R | C | Добавить читаемую таблицу SDK/AE/suite/architecture и сценарий отказа при несовместимости. **№5** |
-| [Performance architecture](01-ARCHITECTURE/05-PERFORMANCE-ARCHITECTURE.md) | E | E | R | R | C | Разделить native core, host render, RAM Preview и измеренную конкурентность. **№8** |
+| [Performance architecture](01-ARCHITECTURE/05-PERFORMANCE-ARCHITECTURE.md) | C | C | C | C | C | Core/export/Preview и observed overlap разделены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Build system strategy](01-ARCHITECTURE/06-BUILD-SYSTEM.md) | R | E | R | R | C | Связать общие правила с конкретными resource/export/build маршрутами обеих платформ. **№13** |
 | [Communication architecture](01-ARCHITECTURE/07-COMMUNICATION-ARCHITECTURE.md) | C | C | C | C | C | Envelopes, correlation и mutation ordering/idempotency согласованы. **№2 выполнен**. |
 
@@ -93,13 +93,13 @@ cross-page review. Добавления и результаты:
 |---|---|---|---|---|---|---|
 | [Устройство Effect-плагина: от регистрации до кадра](02-EFFECT-PLUGINS/01-ANATOMY.md) | C | C | C | C | C | Identity/source и state route согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Параметры и интерфейс Effect-плагина](02-EFFECT-PLUGINS/02-PARAMETERS-UI.md) | C | C | C | C | C | Arbitrary selectors/ownership/schema/disk IDs раскрыты; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [SmartFX: зависимости, области и время жизни буферов](02-EFFECT-PLUGINS/03-SMARTFX.md) | E | E | R | R | C | Добавить blur/transform/temporal walkthrough с checkout IDs, ROI и time conversion. **№7** |
-| [MFR: параллельный рендер, состояние и Compute Cache](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md) | E | E | R | R | C | Добавить receipt/error cleanup схему и ограниченный incident record из ElasticGridFX. **№8** |
-| [GPU effects](02-EFFECT-PLUGINS/05-GPU.md) | E | E | R | R | C | Разобрать device state, one backend, fallback и подтверждение реально исполненной ветки. **№8** |
-| [Пиксели, цвет и прозрачность в Effect-плагине](02-EFFECT-PLUGINS/06-COLOR-PIXELS.md) | E | E | R | R | C | Добавить calibrated output, exact sampling, NaN/Inf и integer/float/alpha правила. **№7** |
-| [Audio effects](02-EFFECT-PLUGINS/07-AUDIO.md) | E | E | R | R | C | Дать bounded sound-world walkthrough; сохранять отсутствие sample-backed AUDIO_RENDER guarantees. **№9** |
-| [Дополнительные каналы: глубина, ID, нормали и сырые данные](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md) | R | E | R | R | C | Связать channel checkout/checkin, dimensions и coordinate conversion с SmartFX walkthrough. **№7** |
-| [Custom UI and Drawbot](02-EFFECT-PLUGINS/09-CUSTOM-UI-DRAWBOT.md) | E | E | R | R | C | Добавить один draw/hit/drag путь с cleanup и scoped async-manager границей. **№9** |
+| [SmartFX: зависимости, области и время жизни буферов](02-EFFECT-PLUGINS/03-SMARTFX.md) | C | C | C | C | C | ROI/time math и actual Copy scope согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [MFR: параллельный рендер, состояние и Compute Cache](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md) | C | C | C | C | C | Receipt/key/scratch/cleanup и bounded incident сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [GPU effects](02-EFFECT-PLUGINS/05-GPU.md) | C | C | C | C | C | Metal route, device ownership и eligibility/error policy согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Пиксели, цвет и прозрачность в Effect-плагине](02-EFFECT-PLUGINS/06-COLOR-PIXELS.md) | C | C | C | C | C | Calibration/exceptional floats и actual Gain truncation разделены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Audio effects](02-EFFECT-PLUGINS/07-AUDIO.md) | C | C | C | L | C | Bounded DSP arithmetic; AUDIO_RENDER wiring намеренно не обещан без matching sample; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Дополнительные каналы: глубина, ID, нормали и сырые данные](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md) | C | C | C | C | C | Descriptor/chunk geometry и mandatory checkin согласованы с RGBA route; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Custom UI and Drawbot](02-EFFECT-PLUGINS/09-CUSTOM-UI-DRAWBOT.md) | C | C | C | C | C | Sample draw cleanup и authored gesture/async limits разделены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Effect plug-ins](02-EFFECT-PLUGINS/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
 
 ## 03-AEGP
@@ -199,9 +199,9 @@ cross-page review. Добавления и результаты:
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
 | [Recipe — first native effect](12-RECIPES/01-FIRST-EFFECT.md) | E | E | R | R | C | Связать конкретный sample, build steps, expected gain и evidence boundaries. **№12** |
-| [Recipe — migrate an existing effect to MFR](12-RECIPES/02-MFR-MIGRATION.md) | E | E | R | R | C | Добавить state inventory→immutable snapshot→cache receipt→concurrency workflow. **№8** |
+| [Recipe — migrate an existing effect to MFR](12-RECIPES/02-MFR-MIGRATION.md) | C | C | C | C | C | Inventory/snapshot/cache/candidate/observed overlap route согласован; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Recipe — plug-in does not load](12-RECIPES/03-DEBUG-PLUGIN-NOT-LOADING.md) | R | E | R | R | C | Связать failure tree с resources/exports/architecture/logs обеих платформ. **№13** |
-| [Recipe — CPU/GPU equivalence](12-RECIPES/04-CPU-GPU-EQUIVALENCE.md) | E | E | R | R | C | Добавить matched identity/toolchain, exact/tolerance/NaN и fallback comparisons. **№15** |
+| [Recipe — CPU/GPU equivalence](12-RECIPES/04-CPU-GPU-EQUIVALENCE.md) | C | C | C | C | C | Identity, numeric policy, actual route и fallback comparisons согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Recipe — panel + native core](12-RECIPES/05-HYBRID-PANEL-NATIVE.md) | C | C | C | C | C | Prefix schema, ordering и error outcomes согласованы. **№2 выполнен**. |
 | [Recipe — profiling a slow effect](12-RECIPES/06-PROFILING.md) | E | E | R | R | C | Добавить воспроизводимый profiling record с warmup/repeats/core-host-Preview scopes. **№15** |
 | [Practical recipes](12-RECIPES/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
@@ -247,8 +247,8 @@ cross-page review. Добавления и результаты:
 | [ExtendScript → After Effects](15-COMMUNICATION/05-SCRIPT-TO-AE.md) | R | E | R | R | C | Связать reusable commands, undo и partial failure с automation recipes. **№10** |
 | [CEP panel <-> ExtendScript](15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md) | C | C | C | C | C | Envelopes, parse/type/errors, JSON bootstrap и mutation policy согласованы; отдельный INTERNAL_ERROR и его client blocking проверены portable tests; Unicode fixture изолирован, runtime не заявлен. **№2 выполнен**. |
 | [Native <-> script/panel: как собирать гибридный продукт](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md) | R | E | R | R | C | Разнести transport correlation, freshness, cancellation и host command ordering. **№2** |
-| [Threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md) | R | E | R | R | C | Согласовать workers/MFR/UI handoff с cache и bounded incident схемами. **№8** |
-| [Data ownership and lifetime](15-COMMUNICATION/09-DATA-OWNERSHIP.md) | R | E | R | R | C | Согласовать payload/receipt lifetimes, stale generations и failure cleanup. **№8** |
+| [Threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md) | C | C | C | C | C | Worker/generation/quiescence и incident границы разделены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Data ownership and lifetime](15-COMMUNICATION/09-DATA-OWNERSHIP.md) | C | C | C | C | C | Phase-specific checkin и borrowed cache-value/payload lifetime согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Как компоненты общаются друг с другом и с After Effects](15-COMMUNICATION/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
 
 ## 17-NATIVE-SUITE-COOKBOOK

@@ -4,11 +4,17 @@ Updated: **2026-10-07**
 
 ## Continuous completion — 2026-10-07
 
-Remaining audit branches: all six reviewed; five export-only branches removed.
+Remaining audit branches: all six reviewed and removed after selective preservation.
 Native/source commit `31fba78` is selectively reconciled, not wholesale merged.
 Transfers fix CEP paths, SignTool/lifecycle/compatibility and owner preconditions,
 add dependency-preserving SDK workspace mode and publish panel HTML as download.
-[Decisions and remaining queue](AUDIT-BRANCH-RECONCILIATION-2026-10-07.md).
+[Transfer decisions](AUDIT-BRANCH-RECONCILIATION-2026-10-07.md).
+
+Render/cache/UI reconciliation: thirteen additional core rows closed after related
+chapter/recipe/source-scope review. Cleanup now distinguishes SmartFX phases,
+auxiliary and cache receipts; shutdown generation is not cancellation or quiescence.
+[Review](CHAPTER-RECONCILIATION-2026-10-07.md). This closes these editorial rows,
+not remaining platform/AEGP/scripting/final-freeze work; no new host evidence.
 
 Completion follow-up: current status/plan no longer instruct restarting implemented
 blocks. SmartFX Copy/Gain limitations are now directly documented in canonical

@@ -71,7 +71,10 @@ Check every lock:
 - whether independent instances contend;
 - whether a host suite/checkout is called while held.
 
-Do not hold blocking product locks across host calls; SDK MFR guidance warns this can deadlock.
+Avoid holding blocking product locks across host calls: this is the Bible's
+conservative architecture policy, not a blanket prohibition on every SDK call.
+The [memory chapter](../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) preserves the
+specific source warning and separates it from this broader recommendation.
 
 ## Phase 5 — make callbacks re-entrant
 

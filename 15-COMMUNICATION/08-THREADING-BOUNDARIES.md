@@ -128,6 +128,18 @@ stop accepting new work
 
 Worker после teardown не должен обращаться к unloaded code/host handle.
 
+Практический render counterpart — [Compute Cache receipt route](../02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md):
+immutable cached indices/weights могут разделяться, mutable intermediate rows
+принадлежат request. Error/cancel после receipt не отменяет checkin; unregister
+возможен только после quiescence. Generation token отклоняет stale UI result,
+но сам по себе не останавливает worker и не разрешает освободить его buffer.
+Если worker ждёт main-thread completion, блокирующий join на этом main thread
+создаёт shutdown deadlock: сначала спроектировать cancel/drain без такого ожидания.
+
+[Bounded MFR incident](../22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md)
+показывает границу диагностики: шесть retries без воспроизведения не доказывают
+concurrency, баланс ресурсов или causal fix. Для этого нужны отдельные observations.
+
 ## 13. Diagnostics
 
 В debug log полезны thread ID, selector/callback, requestId, generation, lock wait duration, shutdown state.
