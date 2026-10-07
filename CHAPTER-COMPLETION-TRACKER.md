@@ -4,6 +4,11 @@
 
 ## Final editorial result — 2026-10-07
 
+Expanded third-block review: scripting26.x operational delta and shared UXP
+permissions/development/distribution workflow now documented. AE host setup ID and
+full member reconciliation stay in active currentness queue; historical C rows are
+not converted to full-current acceptance by this bounded review.
+
 After freeze: current inventory expanded to **128** with AE UXP host API chapter.
 Historical127 rows retain their old-plan results; [currentness review](CURRENTNESS-REVIEW-2026-10-07.md)
 is the active completeness/currency queue, not automatically closed by those C/L.

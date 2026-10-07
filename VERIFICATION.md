@@ -2,6 +2,14 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Scripting26.x delta and shared UXP workflow
+
+Parent `ec4c684`; containing commit identifies new source documentation. Pinned
+scripting source and actual Adobe common UXP pages recorded in currentness review.
+Scoped changelog delta reviewed; whole inventory and AE-specific host manifest not
+claimed. Checker/consistency, generated freshness, strict MkDocs and whitespace
+PASS for this block (consistency11/11); no host/installer/packager execution or current SDK acquisition.
+
 ### Native26.5 selected public contracts, retained25.6 exact baseline
 
 Parent `f0ad27f`; local supplied25.6 GeneralPlug/SuiteHandler hashes and public

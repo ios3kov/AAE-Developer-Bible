@@ -2,6 +2,11 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Added scoped scripting26.x operations: typed guides, layer/stage pairs, mesh and
+  variable-font axes. Separated scripting introduction versions from native/UXP.
+- Added shared UXP development/least-privilege/CCX/install workflow; documented
+  missing AE host ID in common manifest reference rather than inventing a starter.
+
 - Reconciled selected native26.5 public contracts against supplied25.6 headers;
   added guide units/readback/fallback pitfalls and PProBeta-only metadata boundary.
 - Pinned public source and recorded mesh/stage command lifetime/error designs;

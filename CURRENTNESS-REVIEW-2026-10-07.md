@@ -64,6 +64,21 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ## Native26.5 public-contract reconciliation
 
+### Third block: scripting delta and shared UXP workflow
+
+Scripting source pinned `7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`: changelog,
+GuideOptions, ParametricMeshLayer, selected Item/Property/PropertyGroup/LayerCollection
+sections actually read. Scoped26.0/26.3/26.5 change mapping and operational designs
+added to scripting chapter. Whole scripting/expression inventory remains OPEN.
+
+Adobe UXP first-plugin/manifest/package/install pages read2026-10-07. Shared lifecycle,
+least privilege, distribution ID/CCX and install workflow added to host API chapter.
+Manifest HostDefinition lists PS/ID/Premiere/AME only; no AE host ID validated.
+Shared workflow is covered; AE-specific setup/availability and detailed platform
+API review remain OPEN, not erased by copying a Photoshop manifest.
+Repeated official release/system-requirement routes still HTTP403. No new matrix
+verification or installed product observation. Full queue above remains active.
+
 User-supplied local SDK checked at
 `/Users/os3kov/Downloads/AfterEffectsSDK_25.6_61_mac/ae25.6_61.64bit.AfterEffectsSDK/Examples`.
 It is25.6build61, not26.5. Fresh SHA256 of `Headers/AE_GeneralPlug.h`:

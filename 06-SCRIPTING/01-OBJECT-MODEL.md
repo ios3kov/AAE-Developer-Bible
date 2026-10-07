@@ -1,5 +1,69 @@
 # After Effects scripting object model
 
+## Current scripting delta — review 2026-10-07
+
+Source snapshot: [scripting changelog](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/introduction/changelog.md).
+These are **ExtendScript DOM introduction versions**, not native SDK generations
+or UXP availability. DOCUMENTED/source designs; no new host runtime observed.
+
+| Introduced | Operation and contract | Safe workflow |
+|---|---|---|
+| 26.0 | Property.propertyParameters / valueText: dropdown strings / selected text, read-only | Use numeric value for selection and strings for display; labels are not durable/localization-independent IDs |
+| 26.0 | PropertyGroup.addVariableFontAxis(axisTag) on ADBE Text Animator Properties only | Discover actual font designAxesData; add valid 4-character axis; reacquire invalidated indexed-group properties; use actual font bounds, not universal wght100–900 |
+| 26.3 | LayerCollection.addParametricMesh(name, meshType); ParametricMeshLayer and mesh/bevel options | Validate comp/type before Undo; create, read back layer type/mesh, report partial result; do not replace unavailable mesh with solid as equivalent |
+| 26.3 | Camera FocusAreaWidth/NearFarBlurMultiplier | Advanced3D-only; property presence does not prove active renderer supports desired image |
+| 26.5 | GuideOptions, typed enums, getGuideAsObject and object overloads | Full-state readback and explicit units; never persist raw guide enum integers across versions |
+| 26.5 | layerInputStage/inputLayerAndStage, setters and cycle-safe query | Require LAYER_INDEX property; revalidate source/index/stage after structural mutation |
+
+### Guide edit: partial update without destroying units
+
+Preconditions: selected intended Item/Layer; valid current guide index; AE26.5+
+API actually available. Read `getGuideAsObject(index)` to show current state.
+Create `new GuideOptions()`, set only `color = [0,0,1]`, then call
+`target.setGuide(index, options)` within an Undo group. Read back full state; verify
+color and unchanged orientation/positionType/position/pinned. Older positional
+form is **setGuide(position, index)**, reversed arguments! Do not turn a percentage
+guide into pixels accidentally. Structural insertion/removal invalidates index
+selection; re-list before mutation. Undo grouping is not transactional rollback.
+
+Scripting guide warns orientationType/positionType integer values differ between
+AE versions: compare `GuideOrientationType` / `GuidePositionType` constants, not0/1.
+If constants or object getters unavailable, refuse fidelity-preserving edit or offer
+explicit lossy pixel-only operation; never assert identical semantics.
+
+### Layer input stage: source pair, not just property.value
+
+[Property reference](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/property.md)
+documents `inputLayerAndStage` as `[layerIndex, stageIndex]`;0 means no source layer.
+`setInputLayerAndStage(layerIndex, stageIndex)` changes both in one Undo step;
+returns nothing, so do not impose UXP Application boolean-success behavior.
+`setLayerInputStage(stage)` changes stage only. Non-LAYER_INDEX property throws.
+
+Concrete conservative command: late resolve target property and source layer in
+its comp → validate integer index0..numLayers and LAYER_INDEX → snapshot old pair
+→ use documented SOURCE constant and combined setter → read back both. SOURCE
+is documented always cycle-safe. For richer stages re-query
+`getInputStageCycleSafeLimit()` with the relevant current source; do not compare
+sentinel integers using a guessed numeric ordering. An old-source safe limit does
+not certify a proposed different-source pair. If allowed-stage policy is unclear,
+do not offer that mutation. Readback failure leaves possible mutation; no blind retry.
+
+### Variable font axis: discovery before creation
+
+Set the actual installed variable font on a copied TextDocument and write it back.
+Inspect `FontObject.designAxesData`; validate requested tag/range. Resolve Text →
+Animators → intended animator → `ADBE Text Animator Properties`; addVariableFontAxis
+only here. Save necessary indices, reacquire group/property after indexed additions,
+set bounded value/keyframes, verify keys and render-font availability separately.
+`ADBE Text Variable Font Spacing` appears only after an active axis; its dropdown
+affects character spacing compensation, not a generic font substitution fix.
+Missing font/axis: stop without silently selecting another font. Source:
+[PropertyGroup](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/propertygroup.md).
+
+This closes the scoped26.x changelog delta, not a full historical scripting/expression
+member audit. Mesh shape/options source:
+[ParametricMeshLayer](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/layer/parametricmeshlayer.md).
+
 ## Сквозные automation операции
 
 [Import/queue source](../16-WORKING-TEMPLATES/jsx-tool/import-and-queue.jsx): диалоги
