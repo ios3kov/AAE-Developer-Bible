@@ -101,6 +101,14 @@ boundary, not an early-checkin RAII owner for callback exceptions. No native bui
 rerun or host ROI/depth/empty-input success claimed. These distinctions are reviewed;
 full block7 pixel/channel cross-page acceptance is still separately pending.
 
+Pixel/color chapter reread with actual GainPixel source and auxiliary descriptor/
+chunk contract. Gain uses clamp then integer cast (truncation), not the chapter's
+optional round-to-nearest formula; the formula is explicitly a design alternative.
+PF_Pixel16 white32768, ARGB field order and semantic RGBA plan arrays agree.
+Exceptional float/output calibration guidance is separate from Gain's integer-only
+implementation. Removed empty duplicate heading. This review does not establish
+new color conversion, ROI math implementation or auxiliary runtime output.
+
 ## Validation boundary
 
 Portable codec and scripting safety checks do not emulate AE SDK callbacks.

@@ -5,6 +5,11 @@ hashes; current `.cpp` bytes matched on2026-10-07. Not a new reader-artifact or 
 
 Status: **source example / SDK 25.6 contract-aligned; runtime result not claimed by Bible**.
 
+Numeric policy: RGB is multiplied, clamped to0…255 or0…32768, then cast to integer
+(truncated for nonnegative finite values). Alpha is copied. The color chapter's
+round-to-nearest formula is an alternative design example, not this source's rule.
+No float/HDR/NaN policy is implemented by this classic integer-only lesson.
+
 Requires C++17, the SDK utility sources and the official sample project/PiPL build configuration.
 
 ## Base project
