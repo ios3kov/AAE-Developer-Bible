@@ -143,16 +143,16 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [macOS — Xcode setup](08-MACOS/01-XCODE-SETUP.md) | E | E | R | R | C | Дать exact sample/target/settings путь до build artifact, объяснить SDK path/resource шаги. **№12** |
-| [macOS — Apple Silicon / Universal binary](08-MACOS/02-UNIVERSAL-BINARY.md) | R | E | R | R | C | Добавить проверку slices/ресурсов/export на одном конкретном product artifact. **№12** |
-| [macOS — debugging After Effects plug-ins](08-MACOS/03-DEBUGGING.md) | E | E | R | R | C | Добавить attach/breakpoint/LLDB/symbols walkthrough и диагностические развилки. **№12** |
-| [macOS — GPU development](08-MACOS/04-GPU.md) | R | E | R | R | C | Связать backend/device policy с macOS sample и подтверждением выбранного GPU пути. **№12** |
-| [macOS — signing and notarization](08-MACOS/05-SIGNING-NOTARIZATION.md) | E | E | R | R | C | Дать конкретный signing/notary/stapling маршрут с identity и проверяемым результатом. **№12** |
-| [macOS — installation and packaging](08-MACOS/06-INSTALLATION-PACKAGING.md) | E | E | R | R | C | Добавить staging/install/upgrade/rollback пример с владением установленными файлами. **№12** |
-| [macOS — CI pipeline](08-MACOS/07-CI.md) | R | E | R | R | C | Связать CI outputs, symbol archive и signed artifact с точным source/build identity. **№12** |
-| [macOS — native SDK validation](08-MACOS/08-NATIVE-SDK-VALIDATION.md) | R | E | R | R | C | Согласовать alias-path fix и source report; optional compile не смешивать с docs readiness. **№4** |
-| [macOS — production build pipeline](08-MACOS/09-PRODUCTION-BUILD-PIPELINE.md) | E | E | R | R | C | Свести sample→resources→bundle→symbols→package в воспроизводимый учебный маршрут. **№12** |
-| [macOS developer bible](08-MACOS/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [macOS — Xcode setup](08-MACOS/01-XCODE-SETUP.md) | C | C | C | C | C | Copied Examples/Skeleton/settings/resource route; [review](CHAPTER-RECONCILIATION-2026-10-07.md#macos-platform-completion-reconciliation). |
+| [macOS — Apple Silicon / Universal binary](08-MACOS/02-UNIVERSAL-BINARY.md) | C | C | C | C | C | Actual slices/dependencies/resources/exports versus settings; [review](CHAPTER-RECONCILIATION-2026-10-07.md#macos-platform-completion-reconciliation). |
+| [macOS — debugging After Effects plug-ins](08-MACOS/03-DEBUGGING.md) | C | C | C | C | C | Dated attach policy, LLDB/UUID/symbol failure route; [review](CHAPTER-RECONCILIATION-2026-10-07.md#macos-platform-completion-reconciliation). |
+| [macOS — GPU development](08-MACOS/04-GPU.md) | C | C | C | C | C | Embedded Metal source route, attribution and no assumed CPU retry; [review](CHAPTER-RECONCILIATION-2026-10-07.md#macos-platform-completion-reconciliation). |
+| [macOS — signing and notarization](08-MACOS/05-SIGNING-NOTARIZATION.md) | C | C | C | C | C | Identity/PKG/notary log/staple commands, NOT_RUN; [review](CHAPTER-RECONCILIATION-2026-10-07.md#macos-platform-completion-reconciliation). |
+| [macOS — installation and packaging](08-MACOS/06-INSTALLATION-PACKAGING.md) | C | C | C | C | C | Owned-file conflict/update/rollback design, not shipped installer; [review](CHAPTER-RECONCILIATION-2026-10-07.md#macos-platform-completion-reconciliation). |
+| [macOS — CI pipeline](08-MACOS/07-CI.md) | C | C | C | C | C | Candidate/signing/package hashes and exact symbols; product CI design; [review](CHAPTER-RECONCILIATION-2026-10-07.md#macos-platform-completion-reconciliation). |
+| [macOS — native SDK validation](08-MACOS/08-NATIVE-SDK-VALIDATION.md) | C | C | C | C | C | Actual driver/runner, symlink-root regression and exact-source evidence; [review](CHAPTER-RECONCILIATION-2026-10-07.md#macos-platform-completion-reconciliation). |
+| [macOS — production build pipeline](08-MACOS/09-PRODUCTION-BUILD-PIPELINE.md) | C | C | C | C | C | Skeleton→inspection→symbols→package transitions, not build/load PASS; [review](CHAPTER-RECONCILIATION-2026-10-07.md#macos-platform-completion-reconciliation). |
+| [macOS developer bible](08-MACOS/README.md) | C | L | C | L | C | Reconciled platform route index, not standalone implementation; [review](CHAPTER-RECONCILIATION-2026-10-07.md#macos-platform-completion-reconciliation). |
 
 ## 09-WINDOWS
 

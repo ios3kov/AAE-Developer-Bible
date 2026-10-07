@@ -4,6 +4,13 @@ Source/version boundary checked **2026-10-04**: [macOS debugger guide](https://a
 
 ## Normal workflow
 
+Attach policy и development signing guidance повторно прочитаны **2026-10-07**:
+[attach guide](https://ae-plugins.docsforadobe.dev/intro/debugging-ae-macos/) и
+[debugging guide](https://ae-plugins.docsforadobe.dev/intro/debugging-plug-ins/).
+Это published guide statements, не проверка installed AE. Beta developer mode
+не относится к non-Beta; re-signing разрешён только для явно выбранной development
+copy, не production installation и не release entitlement policy.
+
 - Xcode scheme executable → After Effects;
 - breakpoints в plug-in;
 - Build & Run или Debug → Attach to Process;

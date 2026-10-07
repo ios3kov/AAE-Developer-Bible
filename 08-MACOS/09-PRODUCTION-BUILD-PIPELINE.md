@@ -153,7 +153,11 @@ The pipeline should retain:
 - exact artifact hash submitted;
 - final stapled package hash where stapling applies.
 
-A rebuilt package is a different artifact and needs to go through the gate again.
+A rebuilt package with changed executable payload is a new candidate and needs
+validation/notarization as applicable. Documented stapling or re-archiving stapled
+items is a separate delivery transition, not recompilation: retain submitted and
+final hashes and validate the final container. See the concrete
+[PKG signing/notary route](05-SIGNING-NOTARIZATION.md).
 
 ## Installation test
 

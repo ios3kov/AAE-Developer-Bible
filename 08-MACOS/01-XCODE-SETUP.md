@@ -2,6 +2,12 @@
 
 ## Start from an Adobe SDK sample
 
+Конкретные project/commands/output и resource/export checks приведены в
+[Skeleton walkthrough](09-PRODUCTION-BUILD-PIPELINE.md).
+Копируйте весь `Examples` tree либо явно сохраняйте его relative dependencies;
+одна папка Skeleton без Headers/Util/Resources не является автономным проектом.
+Команды описывают ожидаемый маршрут, не новый recorded build PASS.
+
 For a native effect, start from Skeleton or the closest supplied SDK example instead of reconstructing an Xcode target from scratch.
 
 This preserves host-specific pieces that are easy to miss:

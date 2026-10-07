@@ -290,3 +290,33 @@ escaping/engine limits explicit. Deferred progress/cancel/stale-target behavior 
 documented separately from synchronous source. No host run or runtime support claim.
 
 Next: platforms/compatibility → testing/distribution/templates → final freeze.
+
+## macOS platform completion reconciliation
+
+Parent `4693980`. Read all ten macOS pages together with environment/version,
+PiPL/build-system and first-effect chapters, actual Minimal Gain source/guide,
+native compiler driver/portable tests, macOS runner and repository Validate workflow.
+Skeleton/SDK_Invert_ProcAmp project observations retain existing dated supplied-SDK
+records; this pass does not claim fresh proprietary project inspection or build.
+
+Ten macOS rows close editorially; overview scenario/source axes remain index-bounded L.
+Linked setup and Universal inspection to copied-Examples/Skeleton commands. Settings
+are not inspected slices; resource presence is not content/discovery proof. Actual
+driver canonicalizes symlink root and reports source/compiler/header identity;
+Finder alias files and full SDK resource/tool identity are not covered by that test.
+Historical exact-source compiler evidence remains scoped to `ef4e90b`.
+
+Reread public sample-first, installer-path and debugger guides on 2026-10-07;
+community-maintained guide is not new host evidence. Beta2027 developer mode and
+non-Beta26.5 development-copy re-sign policy stay separate. Reread Apple's official
+custom notarization workflow via DocC data: PKG/UDIF/ZIP submission, success logs,
+ZIP stapling limit and third-party/network installer distinction. Added concrete
+identity→signed PKG→submit/status/log→staple/validate/assessment commands with explicit
+placeholders, no successful outputs. Changed payload rebuild and documented stapling/
+re-archive delivery transitions are distinct; retain submitted/final hashes.
+
+Corrected GPU fallback wording: failure during GPU render does not establish automatic
+CPU retry. Owned-file update/rollback and artifact-bound CI remain recommended designs,
+not a shipped installer/release pipeline. No C++ source changed, SDK compiler/link,
+Universal/GPU/LLDB/signing/notary/install/AE execution performed. Windows and remaining
+compatibility rows remain open; first-effect/PiPL cross-platform closure awaits Windows.

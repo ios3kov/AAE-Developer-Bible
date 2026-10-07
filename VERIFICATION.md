@@ -2,6 +2,22 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### macOS platform closure
+
+Parent `4693980b07566d6b4e411fd88b2dbe24ea8a052a`; containing commit identifies
+editorial edits. Ten platform rows reconciled in the
+[chapter record](CHAPTER-RECONCILIATION-2026-10-07.md#macos-platform-completion-reconciliation).
+Public debugger/sample-first/install guide and official Apple custom-workflow
+DocC data reread; no installed-host or signing/notary execution. Existing supplied
+SDK project observations retained, not reclassified as a fresh source inspection.
+
+Local native-driver portable regressions9/9 (fake compiler, symlink/identity checks),
+consistency11/11 and docs checker PASS. Expected stale messages are negative fixtures.
+MASTER/MANIFEST regeneration/freshness, strict MkDocs and diff whitespace checks PASS
+using existing documentation venv. No clean dependency installation, new SDK compile/
+link, Universal/GPU/LLDB/signing/notary/installer/AE result or GitHub CI observation.
+Windows/remaining compatibility and final freeze are not closed by this block.
+
 ### Scripting closure
 
 Parent `1054917`; containing commit identifies source edits. Five core rows

@@ -40,6 +40,14 @@ For a Universal release, the expected result contains both arm64 and x86_64.
 
 ## Verify the staged artifact
 
+Для конкретного `Products/Skeleton.plugin` используйте
+[Skeleton build/inspection route](09-PRODUCTION-BUILD-PIPELINE.md).
+`ARCHS='arm64 x86_64' ONLY_ACTIVE_ARCH=NO` задаёт намерение сборки; проверяйте
+оба slice, exports, PiPL output и зависимости в произведённом bundle. `nm -gU`
+может показать slices раздельно: наличие entry только в одном не закрывает второй.
+Повторите inspection после final signing на shipping copy. Resource presence
+сама по себе не подтверждает корректность его полей или AE discovery.
+
 Run architecture inspection on the exact bundle that will be signed and packaged.
 
 Do not validate one build directory and then release a separately rebuilt copy.

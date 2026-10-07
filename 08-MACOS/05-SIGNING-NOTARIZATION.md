@@ -21,6 +21,57 @@ Ad-hoc signing is not the release trust model.
 
 ## Release identity
 
+### Конкретный PKG маршрут (commands, NOT_RUN)
+
+Пример — собственный staged `BibleGain.plugin`, не vendor Skeleton с неизменённым
+match name. `STAGE`/`OUT` — подготовленные product-owned directories;
+`APP_ID`/`INSTALLER_ID` — точные identity strings из вашего Keychain,
+`NOTARY_PROFILE` — заранее сохранённые credentials. Placeholders не сертификаты.
+Вложенный code, если он есть, подписать явно inside-out до outer bundle:
+
+```bash
+security find-identity -v -p codesigning
+codesign --force --timestamp --sign "$APP_ID" "$STAGE/BibleGain.plugin"
+codesign --verify --deep --strict --verbose=2 "$STAGE/BibleGain.plugin"
+codesign -d --verbose=4 "$STAGE/BibleGain.plugin"
+pkgbuild --component "$STAGE/BibleGain.plugin" \
+  --install-location '/Library/Application Support/Adobe/Common/Plug-ins/7.0/MediaCore' \
+  --identifier com.example.biblegain.pkg --version 1.0.0 \
+  --sign "$INSTALLER_ID" "$OUT/BibleGain.pkg"
+pkgutil --check-signature "$OUT/BibleGain.pkg"
+xcrun notarytool submit "$OUT/BibleGain.pkg" \
+  --keychain-profile "$NOTARY_PROFILE" --wait --output-format json
+```
+
+Проверить actual TeamIdentifier/Authority, bundle identity и отсутствие debug
+entitlements. `pkgbuild --component` — учебная single-bundle упаковка, не реализация
+owned-file upgrade/rollback. Общий MediaCore destination допустим только при
+соответствующей host policy; AE-only product выбирает version-specific destination.
+Helpers/app/CLI Hardened Runtime и entitlement requirements проверять отдельно;
+подпись plug-in не меняет права host.
+
+Из returned JSON сохранить submission ID в `SUBMISSION_ID`; требовать `Accepted`,
+а не только успешную отправку/exit. Затем:
+
+```bash
+xcrun notarytool log "$SUBMISSION_ID" --keychain-profile "$NOTARY_PROFILE" "$OUT/notary-log.json"
+xcrun stapler staple "$OUT/BibleGain.pkg"
+xcrun stapler validate "$OUT/BibleGain.pkg"
+spctl --assess --type install --verbose=4 "$OUT/BibleGain.pkg"
+shasum -a 256 "$OUT/BibleGain.pkg"
+```
+
+Читать log даже при Accepted. Зафиксировать submitted hash отдельно от final
+stapled hash. Signature/notary/stapler/assessment failures останавливают promotion;
+эти команды не подтверждают AE load, offline install или rollback. ZIP нельзя
+staple напрямую: staple supported contained items и заново создать delivery ZIP,
+сохранив обе identities. Custom third-party/network installers требуют отдельного
+review payload/installer notarization, не автоматически этого single-PKG маршрута.
+
+Источник перепрочитан **2026-10-07**: [Apple custom workflow](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow)
+(официальный DocC data endpoint): signed flat PKG/UDIF/ZIP submissions, log on
+success, supported stapling и ZIP limitation. Signing/submission здесь NOT_RUN.
+
 Apple's distribution documentation uses Developer ID for software distributed outside the Mac App Store.
 
 Depending on what you ship, release artifacts can include:

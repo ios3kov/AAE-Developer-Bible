@@ -124,7 +124,12 @@ MFR и GPU — два разных concurrency layers. Проверяйте per-
 - render cancellation;
 - setdown after failed setup.
 
-Если product обещает CPU fallback, backend failure должен чисто выключить GPU path и перейти на CPU, а не генерировать dialog/error каждый frame.
+Если product обещает CPU fallback, заранее определите, какие capability/eligibility
+отказы позволяют не выбирать GPU path. Ошибка уже начатого GPU render не означает,
+что host автоматически повторит кадр на CPU. Не передавайте GPU worlds в CPU
+итератор и не подменяйте ошибку fabricated success. Cleanup и returned error следуют
+точному callback contract; retry/fallback требует отдельно подтверждённого маршрута
+из [канонической failure policy](../02-EFFECT-PLUGINS/05-GPU.md).
 
 ## Debugging
 

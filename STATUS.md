@@ -4,6 +4,13 @@ Updated: **2026-10-07**
 
 ## Continuous completion — 2026-10-07
 
+macOS reconciliation complete: ten platform rows C or index-bounded L. Linked exact
+Skeleton routes; corrected assumed GPU CPU retry; added concrete identity/PKG/notary
+log/staple commands and source-driver identity limits. Dated debugger/install and
+Apple workflow reread, no new native/signing/host result.
+[Review](CHAPTER-RECONCILIATION-2026-10-07.md#macos-platform-completion-reconciliation).
+Next: Windows + remaining compatibility → testing/distribution/templates → freeze.
+
 Scripting reconciliation complete: five core rows C or index-bounded L. ScriptUI
 reference now reports partial mutations and Undo-close errors through a reusable
 widget-independent command; eight fake-host portable cases added. Import dialog/

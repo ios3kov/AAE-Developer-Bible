@@ -59,6 +59,17 @@ Only run gates relevant to the current development/release stage, but keep their
 
 ## Artifact identity
 
+`scripts/check_native.py` канонизирует SDK Examples root через `Path.resolve()`;
+portable symlink-root regression проверяет одинаковый header manifest для alias
+и physical path. Это filesystem symlink test, не гарантия поддержки Finder alias
+files. Report хранит source Git SHA/dirty, source hashes, compiler identity/commands
+и SDK header-manifest hash. `--require-clean` отказывает при dirty/unknown source;
+report размещайте в ignored output, чтобы сам report не загрязнил source identity.
+Header digest не идентифицирует весь SDK resource/tool/sample tree.
+
+Сохранённая [проверка 2026-10-07](../VERIFICATION.md) относится к exact source
+`ef4e90b`, не ко всем последующим documentation heads.
+
 Record with validation:
 
 - SDK version/build;

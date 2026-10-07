@@ -2,8 +2,6 @@
 
 Development install, product install and delivery packaging are separate concerns.
 
-## Development location
-
 ## Worked upgrade/rollback design (NOT_RUN)
 
 Example own product `BibleGain.plugin`, not Adobe Skeleton installed under a new
@@ -31,6 +29,8 @@ license state are not payload files.
 Expected record: candidate hash → installed hash → loaded UUID → smoke outcome;
 if rollback, old hash → restored hash and separate recovery outcome. All observations
 here are NOT_RUN; see [worked evidence pack](../13-TEMPLATES/examples/WORKED-EXAMPLE.md).
+
+## Development location
 
 The AE SDK guide recommends the per-user MediaCore path during development:
 

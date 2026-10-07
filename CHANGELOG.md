@@ -2,6 +2,11 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Closed ten macOS platform rows editorially after related source/workflow review;
+  linked Skeleton inspection, clarified symlink/header identity limits and GPU retry.
+- Added concrete Developer ID/PKG/notary log/staple commands with NOT_RUN scope;
+  separated changed-payload rebuild from documented delivery/stapling transitions.
+
 - Owner chose to continue without a reuse license; NOTICE states the current
   decision separately from the historical deferred-choice record.
 - Foundation guidance now traces the actual render receipt operation and
