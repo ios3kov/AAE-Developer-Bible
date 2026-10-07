@@ -76,6 +76,13 @@ temporary/local dynamically built character buffer
 
 The helper does not copy the name.
 
+`SuiteT` is also a caller assertion: the cast in `acquire` does not check that
+the requested name/public version really describes that C++ table. Pair all three
+from the same contract. When acquisition is retried on an existing owner, the old
+suite is reset **before** the new request; a failed replacement leaves the owner
+empty, rather than preserving the old service. This is a documented helper policy,
+not a transactional upgrade mechanism.
+
 ## Version policy
 
 Public suite version is part of compatibility.

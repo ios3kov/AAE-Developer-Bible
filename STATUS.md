@@ -4,6 +4,14 @@ Updated: **2026-10-07**
 
 ## Continuous completion — 2026-10-07
 
+Completion follow-up: current status/plan no longer instruct restarting implemented
+blocks. SmartFX Copy/Gain limitations are now directly documented in canonical
+chapters. Foundation overview, four chapters, headers, tests and related render/
+keyframe sources were read together: five additional tracker rows are editorially
+closed, with cleanup/exception/compensation limits explicit. This is not whole-core
+completion or a new native/host PASS. The owner chose no reuse license for now;
+[NOTICE](NOTICE.md) states that decision.
+
 Fresh real-SDK syntax/type check: 13/13 PASS at clean source
 `ef4e90b1c96c6a9a1cb34b5c2260b2561b20e7eb`, supplied SDK25.6build61,
 Apple Clang21 arm64. [Exact evidence](VERIFICATION.md). Not link/host evidence.

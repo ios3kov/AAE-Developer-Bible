@@ -6,6 +6,8 @@
   decision separately from the historical deferred-choice record.
 - Foundation guidance now traces the actual render receipt operation and
   distinguishes ordinary cleanup, exception fallback and mutation compensation.
+- Closed five foundation tracker rows after reading all helpers/tests/chapters;
+  documented type/name/version matching and nonzero callback fallback prerequisites.
 - Removed current-status instructions to restart already implemented blocks;
   historical progress remains dated rather than rewritten as current completion.
 - Corrected checkout ID wording: chosen by the effect, not selecting an effect.

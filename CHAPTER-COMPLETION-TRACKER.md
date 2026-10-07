@@ -278,11 +278,11 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [Suite acquisition](19-NATIVE-CODE-FOUNDATION/01-SUITE-ACQUISITION.md) | R | E | R | R | C | Согласовать acquire/release/failure с command lifetime и optional dependency. **№11** |
-| [AEGP ownership / RAII](19-NATIVE-CODE-FOUNDATION/02-RAII-OWNERSHIP.md) | R | E | R | R | C | Проследить owner cleanup/adoption при частично выполненной operation chain. **№11** |
-| [Undo groups and transaction boundaries](19-NATIVE-CODE-FOUNDATION/03-UNDO-TRANSACTIONS.md) | R | E | R | R | C | Связать Undo grouping с explicit rollback и partial mutation example. **№11** |
-| [Host callback ABI boundary](19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md) | R | E | R | R | C | Проследить exceptions/host errors/cleanup через один command callback. **№11** |
-| [Native C++ foundation — reusable safety layer](19-NATIVE-CODE-FOUNDATION/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [Suite acquisition](19-NATIVE-CODE-FOUNDATION/01-SUITE-ACQUISITION.md) | C | C | C | C | C | Type/name/version, optional failure, replacement и teardown сверены с helper; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [AEGP ownership / RAII](19-NATIVE-CODE-FOUNDATION/02-RAII-OWNERSHIP.md) | C | C | C | C | C | Actual render chain, ownership/adoption и secondary-error limits сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Undo groups and transaction boundaries](19-NATIVE-CODE-FOUNDATION/03-UNDO-TRANSACTIONS.md) | C | C | C | C | C | Helper balance отделён от command compensation и actual mutation; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Host callback ABI boundary](19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md) | C | C | C | C | C | Guard/fallback/cleanup и unsupported fatal recovery сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Native C++ foundation — reusable safety layer](19-NATIVE-CODE-FOUNDATION/README.md) | C | C | C | C | C | Overview/helper/test/source limits согласованы; route, не standalone plugin; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 
 ## Поддерживающие материалы и приложения
 

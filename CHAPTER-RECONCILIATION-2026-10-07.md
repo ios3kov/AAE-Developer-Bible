@@ -144,6 +144,14 @@ EffectRef disposal and footage adoption from safe mutation compensation; the
 operation table is a recommended command-layer design, not shipped transaction
 code. No new SDK declaration or host result introduced.
 
+Also read all four foundation headers, overview and portable test source. Added
+two caller prerequisites visible in the code: template type/name/public version
+must match because typed acquisition is a cast, and callback fallback must be
+nonzero to avoid success after exception. Failed replacement acquisition resets
+the former owner; it is not a transactional service upgrade. Existing stub tests
+cover local mechanics, not host legality. Foundation page closure refers only to
+the applicable editorial questions and these explicit limitations.
+
 Owner decision during completion: keep the authored material without a reuse
 license for now. NOTICE preserves the earlier record and states the new decision;
 editorial readiness does not grant reuse rights.

@@ -126,6 +126,12 @@ Choose fallback based on:
 
 Record the project policy instead of scattering magic integers.
 
+The supplied `fallback_err` must be **nonzero**. The helper does not validate this
+argument: choosing `A_Err_NONE` can turn an unexpected exception or a thrown zero
+into apparent success. A nonzero returned domain error still does not communicate
+whether partial mutation occurred; retain that distinction in the command's
+operation record. This guard is neither rollback nor an error-report serializer.
+
 ## Test coverage
 
 tests/test_foundation.cpp verifies:
