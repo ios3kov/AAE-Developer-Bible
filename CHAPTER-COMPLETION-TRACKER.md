@@ -72,7 +72,7 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [Native plug-in lifecycle](01-ARCHITECTURE/01-LIFECYCLE.md) | R | E | R | R | C | Связать lifecycle с versioned persistence и failure/recovery состояниями Effect. **№6** |
+| [Native plug-in lifecycle](01-ARCHITECTURE/01-LIFECYCLE.md) | C | C | C | C | C | Recovery/partial failure связан с versioned codec; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Память, время жизни ресурсов и ошибки](01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) | R | E | R | R | C | Сверить memory/thread policy с receipt lifecycle Compute Cache и bounded MFR incident. **№8** |
 | [PiPL, регистрация и загрузка плагина](01-ARCHITECTURE/03-PIPL-AND-LOADING.md) | R | E | R | R | C | Связать PiPL/resource chain с конкретными macOS/Windows sample walkthroughs. **№13** |
 | [Version compatibility](01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md) | R | E | R | R | C | Добавить читаемую таблицу SDK/AE/suite/architecture и сценарий отказа при несовместимости. **№5** |
@@ -84,8 +84,8 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [Устройство Effect-плагина: от регистрации до кадра](02-EFFECT-PLUGINS/01-ANATOMY.md) | R | E | R | R | C | Связать lifecycle с migration/resetup/flatten и sample state example. **№6** |
-| [Параметры и интерфейс Effect-плагина](02-EFFECT-PLUGINS/02-PARAMETERS-UI.md) | E | E | R | R | C | Добавить arbitrary data, schema evolution, compare/interpolate/flatten и disk-ID migration. **№6** |
+| [Устройство Effect-плагина: от регистрации до кадра](02-EFFECT-PLUGINS/01-ANATOMY.md) | C | C | C | C | C | Identity/source и state route согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Параметры и интерфейс Effect-плагина](02-EFFECT-PLUGINS/02-PARAMETERS-UI.md) | C | C | C | C | C | Arbitrary selectors/ownership/schema/disk IDs раскрыты; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [SmartFX: зависимости, области и время жизни буферов](02-EFFECT-PLUGINS/03-SMARTFX.md) | E | E | R | R | C | Добавить blur/transform/temporal walkthrough с checkout IDs, ROI и time conversion. **№7** |
 | [MFR: параллельный рендер, состояние и Compute Cache](02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md) | E | E | R | R | C | Добавить receipt/error cleanup схему и ограниченный incident record из ElasticGridFX. **№8** |
 | [GPU effects](02-EFFECT-PLUGINS/05-GPU.md) | E | E | R | R | C | Разобрать device state, one backend, fallback и подтверждение реально исполненной ветки. **№8** |
@@ -217,7 +217,7 @@ cross-page review. Добавления и результаты:
 | [Native SDK taxonomy](14-NATIVE-INTEGRATIONS/01-TAXONOMY.md) | R | E | R | R | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
 | [Host call flows](14-NATIVE-INTEGRATIONS/02-HOST-CALL-FLOWS.md) | R | E | R | R | C | Сопоставить call flows с одним сквозным AEGP command и resource cleanup. **№11** |
 | [PICA suites — versioned native service bus](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md) | R | E | R | R | C | Согласовать ABI/version/ownership ошибки с bridge/cookbook examples. **№11** |
-| [Effect plug-ins — native capability map](14-NATIVE-INTEGRATIONS/04-EFFECTS.md) | R | E | R | R | C | Связать native Effect model со state/arbitrary migration walkthrough. **№6** |
+| [Effect plug-ins — native capability map](14-NATIVE-INTEGRATIONS/04-EFFECTS.md) | C | C | C | C | C | Canonical state route без duplicate contracts; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [AEGP tools — native automation and deep AE integration](14-NATIVE-INTEGRATIONS/05-AEGP-TOOLS.md) | R | E | R | R | C | Связать command/update/idle/death flow со stable targets и partial init. **№11** |
 | [Keyframers](14-NATIVE-INTEGRATIONS/06-KEYFRAMERS.md) | R | E | R | R | C | Добавить route к animate recipe, separated dimensions и batch failure cleanup. **№11** |
 | [Native dockable panels](14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md) | R | E | R | R | C | Сверить panel commands/model handoff с stale generations и shutdown recipe. **№11** |
@@ -233,7 +233,7 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [After Effects → Effect plug-in](15-COMMUNICATION/01-AE-TO-EFFECT.md) | R | E | R | R | C | Согласовать selector/state/persistence границы с Effect migration примером. **№6** |
+| [After Effects → Effect plug-in](15-COMMUNICATION/01-AE-TO-EFFECT.md) | C | C | C | C | C | Selector/borrowed values согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [After Effects → AEGP](15-COMMUNICATION/02-AE-TO-AEGP.md) | R | E | R | R | C | Согласовать initializer/hooks/main-thread lifecycle с command walkthrough. **№11** |
 | [AEGP → Effect: generic call](15-COMMUNICATION/03-AEGP-TO-EFFECT.md) | R | E | R | R | C | Добавить generic-call chain с fresh EffectRef, layer time и separate error classes. **№11** |
 | [Plug-in → Plug-in через published PICA suite](15-COMMUNICATION/04-PLUGIN-TO-PLUGIN-PICA.md) | R | E | R | R | C | Согласовать version/ownership/service failure с provider/consumer source example. **№11** |

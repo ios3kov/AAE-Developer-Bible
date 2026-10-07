@@ -4,6 +4,11 @@ Updated: **2026-10-04**
 
 ## Continuous completion — 2026-10-07
 
+Chapter-level follow-up: five Effect-state rows now C with
+[explicit source reconciliation](CHAPTER-RECONCILIATION-2026-10-07.md), not automatic
+closure from build PASS. Corrected payload-field versus new-parameter migration IDs.
+Remaining chapter rows retain their actual open status; final freeze not yet claimed.
+
 Owner authorized continuing between checked blocks without approval pauses.
 Block 6 content implemented: arbitrary data/state migration, SDK ownership map,
 portable codec and Minimal Gain identity table. [Review](BLOCK-6-REVIEW-2026-10-07.md).

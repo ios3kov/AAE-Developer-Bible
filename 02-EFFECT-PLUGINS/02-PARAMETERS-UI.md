@@ -198,8 +198,9 @@ Arbitrary parameter нужен для составного пользовате�
 | Sequence state | Восстанавливаемая конфигурация экземпляра | Отдельный lifecycle flatten/resetup; не подмена анимируемого stream |
 | Transient cache/scratch | Таблица выборки для данного кадра | Пересоздаваемый результат; не сериализовать в project |
 
-`PF_ArbitraryDef.id` различает arbitrary types эффекта и **не равен disk ID**
-из `PF_ParamDef.uu.id`. При ADD_PARAM `dephault` переходит host, `value` передаётся
+`PF_ArbitraryDef.id` различает arbitrary types эффекта и **не является тем же полем,
+что disk ID** из `PF_ParamDef.uu.id`; numeric значения могут случайно совпадать.
+При ADD_PARAM `dephault` переходит host, `value` передаётся
 NULL; во время render `value` принадлежит host. Сначала проверять
 `PF_Cmd_ARBITRARY_CALLBACK`, затем `PF_ArbParamsExtra.which_function` и `id`,
 и только после этого нужную ветку union. Header comment ошибочно употребляет
@@ -246,7 +247,8 @@ parameter flag. Это product design, не автоматическая гар�
 
 | Изменение продукта | Policy | Проверка продукта |
 |---|---|---|
-| Добавлен Mode | Новый disk ID; old-project value отдельно от Reset default | Старый project сохраняет прежнее изображение; Reset даёт новый default |
+| Добавлен отдельный UI parameter Mode | Новый disk ID; old-project value отдельно от Reset default | Старый project сохраняет прежнее изображение; Reset даёт новый default |
+| Добавлено поле Mode внутри arbitrary payload | Сохранить disk ID parameter; versioned payload migration | v1 получает legacy Mode=0, v2 сохраняет явное значение |
 | Amount переставлен в UI | Сохранить disk ID и смысл | Ключи остаются Amount, не переходят другому контролу |
 | Arbitrary schema v1→v2 | Decode v1, explicit migration, encode v2 | Save/reopen, duplicate, Undo сохраняют значение и анимацию |
 | Неизвестный future schema | Не перезаписывать неизвестное состояние defaults | Явный unsupported diagnostic вместо тихой потери данных |

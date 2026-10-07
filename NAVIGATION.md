@@ -269,6 +269,7 @@
 - [CEP -> ExtendScript JSON bridge](16-WORKING-TEMPLATES/cep-panel-bridge/README.md)
 - [Effect <-> AEGP generic bridge](16-WORKING-TEMPLATES/effect-aegp-generic-bridge/README.md)
 - [Minimal Gain effect — drop-in for SDK Skeleton](16-WORKING-TEMPLATES/effect-basic/README.md)
+- [Versioned state codec — portable lesson](16-WORKING-TEMPLATES/effect-state/README.md)
 - [Standalone JSX tool](16-WORKING-TEMPLATES/jsx-tool/README.md)
 - [Keyframer batch pattern](16-WORKING-TEMPLATES/keyframer-batch/README.md)
 - [Native dockable panel registration — Panelator-shaped template](16-WORKING-TEMPLATES/native-panel-registration/README.md)
@@ -328,6 +329,7 @@
 - [Практические кейсы — FSTR Line и AE Hot Loader](22-PROJECT-CASE-STUDIES/README.md)
 - [Reuse audit — 2026-10-01](22-PROJECT-CASE-STUDIES/REUSE-AUDIT-2026-10-01.md)
 - [ElasticGridFX transfer plan — 2026-10-02](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md)
+- [ElasticGridFX performance scopes — 2026-10-07](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md)
 
 ## Editorial and reference entries
 

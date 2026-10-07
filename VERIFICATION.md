@@ -4,6 +4,10 @@
 
 ### Subsequent practical additions
 
+Effect-state chapter review recorded in [reconciliation](CHAPTER-RECONCILIATION-2026-10-07.md):
+five rows covered, exact arbitrary declarations reread; numeric IDs may coincide,
+new payload field does not require a new parameter disk ID. No host run.
+
 Scripting import/queue: Node syntax and portable safety PASS: busy/cancel/collision/
 unsupported preflight, disabled queue, fresh OutputModule, compensation. AE NOT_RUN.
 Generic bridge review: ReloadResources stub now refuses domain command rather than
