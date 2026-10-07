@@ -193,6 +193,12 @@ Stored numeric index is also not durable identity after reorder.
 
 ## Partial failure
 
+Source limitation: [RenderQueueRecipes.cpp](code/RenderQueueRecipes.cpp) is only
+add→fresh last-item ref→first output path→QUEUED→state readback. Caller supplies
+STOPPED preflight, allowed path/format, Undo/compensation and protection of existing
+queue items. Source does not verify path readback or remove its added item after
+failure. Do not call global RENDERING as an implicit continuation of this helper.
+
 Example:
 
 ```text

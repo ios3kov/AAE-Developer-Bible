@@ -249,6 +249,13 @@ active item и тип. Нельзя сохранить active LayerH из menu u
 содержит completed actions и primary/cleanup errors, не «ничего не изменилось».
 MenuTool — shell этого пути, не произвольное worker разрешение на suites.
 
+Actual `MenuTool.cpp` лишь ReportInfo ping: command hook guard, handled after
+success, update-menu enable and death cleanup. It does **not** implement active-item
+preflight or mutation; those steps above are extensions the reader must supply.
+Initializer resolves suites before registration, registers death first and retains
+global state after partial hook registration, disabling failed command. This is a
+source-level conservative pattern, not observed host failure recovery.
+
 ### Import → adopt → create → animate → queue
 
 1. Current project/root через [ProjectItemRecipes](../17-NATIVE-SUITE-COOKBOOK/code/ProjectItemRecipes.cpp), без New/Open.
@@ -264,6 +271,15 @@ MenuTool — shell этого пути, не произвольное worker р�
    output settings/readback, named QUEUED/readback. Не запускать чужие queue items.
 6. Primary error сохраняется; rollback касается только own created objects и
    заранее разрешённых обратимых actions. Undo не является DB transaction.
+
+Actual queue helper only adds, resolves last item, sets path and named QUEUED plus
+state readback. It does not implement STOPPED preflight, output-path readback,
+format selection, owned-item rollback or global-queue safety. Before invoking it
+caller must validate those conditions; do not attribute the complete walkthrough
+to that small source function. Comp helper creates fixed 1920×1080/25fps/10s;
+LayerIDs helper writes up to capacity and can return a truncated list without error.
+Effect Apply helper disposes the acquired ref, **not** the newly installed effect;
+it supplies neither Undo nor compensation for project mutation.
 
 `Bible_AddOneDKeyframes` uses CompTime and checks OneD type, disposes acquired
 values on errors and calls EndAddKeyframes(commit=false) after failed mutation.

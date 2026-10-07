@@ -25,6 +25,13 @@ with illustrative spec; deep flag only, outflags2=0, no sequence state.
 
 ## AEGP/source follow-up
 
+Further source read: CompLayerRecipes.cpp, EffectStreamRecipes.cpp,
+RenderQueueRecipes.cpp and MenuTool.cpp. Documented exact source limits:
+fixed comp settings; bounded LayerID list can silently truncate; ApplyEffect disposes
+ref rather than reverting applied effect; queue helper lacks preflight/path readback/
+rollback; MenuTool is ping, not target mutation. Walkthrough recommends caller work
+without attributing it to these snippets. Compiler/runtime not rerun here.
+
 Read RenderRecipes.cpp, KeyframeRecipes.cpp, AegpOwners.h, HostCallbackGuard.h,
 generic-bridge protocol chapter/template and queue chapter. Render cleanup returns
 secondary failure only if primary absent; destructor fallback ignores cleanup errors.

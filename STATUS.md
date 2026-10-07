@@ -4,6 +4,11 @@ Updated: **2026-10-04**
 
 ## Continuous completion — 2026-10-07
 
+Latest review: MenuTool ping versus recommended mutation chain, queue helper
+missing preflight/path-readback/rollback, fixed comp and truncated LayerID source
+limits are now explicit. Local portable regression sweep recorded against exact
+source `429ea45f5d16e5135cc930e0fc7e230cf0ebcf97`; no host result implied.
+
 Chapter-level follow-up: five Effect-state rows now C with
 [explicit source reconciliation](CHAPTER-RECONCILIATION-2026-10-07.md), not automatic
 closure from build PASS. Corrected payload-field versus new-parameter migration IDs.

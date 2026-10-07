@@ -4,6 +4,16 @@
 
 ### Subsequent practical additions
 
+Local regression sweep at source `429ea45f5d16e5135cc930e0fc7e230cf0ebcf97`,
+2026-10-07: safe-tools/native-driver 18 tests, SDK tooling17,
+source-registry5, consistency10 PASS. Node CEP14, depth13, edge/export22 and withdrawn
+Mega no-access checks PASS; scripting lesson safety PASS. C++17 `-Wall -Wextra
+-Werror` codec, protocol headers and stub foundation compile/run PASS. These are
+portable/stub tests, not Adobe SDK compilation or host execution. Consistency tests
+deliberately print stale-file diagnostics for mutated temporary fixtures; suite OK
+is distinct from `build_docs.py --check` on actual checkout. Windows pwsh parser
+and GitHub CI were not run by this local sweep.
+
 Scripting safety regression now also verifies changed project and newly busy queue
 after file dialogs prevent import. SmartFX source README distinguishes normal-path
 early checkin, null-world rejection and separate temporal design policy.
