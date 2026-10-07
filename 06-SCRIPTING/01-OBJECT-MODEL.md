@@ -213,6 +213,49 @@ function importFootageFile(inputFile) {
 
 ## Command layer instead of UI-driven scripting
 
+### OneD temporal ease: самостоятельная операция
+
+Prerequisite: caller passes an already resolved, tool-owned OneD property in a
+disposable comp, with no enabled expression and no keys. Caller opens/closes Undo
+and compensates only its newly created comp on failure; this helper does not remove
+user keys to force eligibility. Source example / AE NOT_RUN:
+
+```jsx
+function addEasedOneD(prop) {
+    if (!prop || prop.propertyValueType !== PropertyValueType.OneD ||
+        !prop.canVaryOverTime || prop.expressionEnabled || prop.numKeys !== 0 ||
+        !prop.isInterpolationTypeValid(KeyframeInterpolationType.BEZIER))
+        throw new Error("Need unkeyed expression-free OneD property");
+    prop.setValuesAtTimes([0, 1], [0, 100]);
+    for (var k = 1; k <= 2; k++) {
+        prop.setInterpolationTypeAtKey(k, KeyframeInterpolationType.BEZIER,
+            KeyframeInterpolationType.BEZIER);
+        prop.setTemporalAutoBezierAtKey(k, false);
+        prop.setTemporalEaseAtKey(k, [new KeyframeEase(0, 33.333)],
+            [new KeyframeEase(0, 33.333)]);
+    }
+    return {keys: prop.numKeys, firstTime: prop.keyTime(1), lastTime: prop.keyTime(2),
+        firstOutSpeed: prop.keyOutTemporalEase(1)[0].speed};
+}
+```
+
+Expected: keys at0/1s with values0/100, Bezier interpolation, zero endpoint speeds;
+inspect readback interpolation/ease before treating it as accepted. Failure after
+the first setter can leave partial keys; caller compensation is necessary. OneD
+uses one ease object per direction. TwoD/ThreeD quantitative properties need
+dimension-matched arrays; spatial properties have separate temporal/spatial
+semantics. Do not copy this helper into a Position leader/follower by cast.
+Source: [pinned Property guide](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/property.md),
+setValuesAtTimes, setInterpolationTypeAtKey, setTemporalAutoBezierAtKey,
+setTemporalEaseAtKey and keyOutTemporalEase. This is separate from the linear rig.
+
+Source-quality caveat: that guide's setTemporalAutoBezierAtKey paragraph refers
+to keySpatialContinuous even though its keyTemporalAutoBezier attribute paragraph
+describes Bezier temporal interpolation; setTemporalContinuousAtKey's newVal text
+also calls continuity auto-Bezier. Treat these as documentation inconsistencies,
+not authority to invoke spatial APIs on OneD. The fragment explicitly disables
+temporal auto-Bezier and declares manual ease; verify actual readback in target AE.
+
 Do not bury the entire product in a button callback.
 
 Prefer:

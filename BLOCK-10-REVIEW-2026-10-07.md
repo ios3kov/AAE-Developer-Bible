@@ -14,3 +14,7 @@ Follow-up source review: demo originally replaced keyed opacity with slider-only
 expression; now adds slider to animated value with clamp and checks canSetExpression.
 Expected t=0/1 values documented. Busy render queue refuses entry. No host result
 or keyframe-ease implementation inferred.
+
+Added separate OneD ease source fragment after rereading pinned Property guide:
+unkeyed/expression-free capability preflight, Bezier keys, manual temporal ease,
+readback, explicit partial failure and caller Undo/compensation. Not AE execution.
