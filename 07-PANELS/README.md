@@ -74,7 +74,9 @@ Use versioned envelope with:
 - payload;
 - structured success/error.
 
-Async responses should be rejectable when stale.
+Async responses should be rejectable when stale. Rejection/timeout does not cancel
+host mutation; unknown outcome must be reconciled before retrying. Actual teaching
+contract is `protocol/requestId/command/payload`; see [CEP bridge](../15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md).
 
 ## State refresh
 

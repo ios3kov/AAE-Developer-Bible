@@ -4,6 +4,11 @@ Updated: **2026-10-07**
 
 ## Continuous completion — 2026-10-07
 
+Final nine entry/index rows reconciled; all 127 core rows now C/explicit L.
+Corrected stale current-suite/queue/host-gate/catalogue claims in overview pages.
+[Entry review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure).
+Next: final navigation/provenance/generated checks and revision-bound freeze.
+
 Testing/distribution/templates reconciliation complete: seventeen rows C or index L.
 Filled Gain NOT_RUN pack/source and scoped project records linked; fixed closure
 semantics and updater atomicity overpromise. License/provenance decision explicit.

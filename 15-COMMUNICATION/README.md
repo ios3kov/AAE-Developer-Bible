@@ -90,7 +90,9 @@ JSON/evalScript подходит в основном для control plane. Heavy
 
 ## Source/verification status
 
-Native bridge chapters 03/04 были rechecked against SDK 25.6 AEGP_EffectSuite4, SPBasicSuite, SPSuitesSuite, Sweetie, Checkout, ProjDumper and Shifter.
+Native bridge chapters 03/04 используют SDK25.6 `AEGP_EffectSuite5`, SPBasicSuite,
+SPSuitesSuite и reviewed sample patterns Sweetie/Checkout/ProjDumper/Shifter.
+Исторические Suite4 call shapes сохраняются только с compatibility boundary.
 
 См. [source-review record](../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md).
 

@@ -71,8 +71,8 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [Decision tree — что именно вы разрабатываете?](00-START-HERE/00-DECISION-TREE.md) | E | E | R | R | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
-| [Extension types](00-START-HERE/01-EXTENSION-TYPES.md) | R | E | R | R | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [Decision tree — что именно вы разрабатываете?](00-START-HERE/00-DECISION-TREE.md) | C | C | C | C | C | Concrete choice/routes and dated panel boundary; [final review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure). |
+| [Extension types](00-START-HERE/01-EXTENSION-TYPES.md) | C | C | C | C | C | State/initiator/latency choices versus canonical family chapters; [final review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure). |
 | [Environment matrix](00-START-HERE/02-ENVIRONMENT-MATRIX.md) | C | C | C | C | C | Separate SDK/host/platform/policy/evidence fields; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 
 ## 01-ARCHITECTURE
@@ -100,7 +100,7 @@ cross-page review. Добавления и результаты:
 | [Audio effects](02-EFFECT-PLUGINS/07-AUDIO.md) | C | C | C | L | C | Bounded DSP arithmetic; AUDIO_RENDER wiring намеренно не обещан без matching sample; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Дополнительные каналы: глубина, ID, нормали и сырые данные](02-EFFECT-PLUGINS/08-AUXILIARY-CHANNELS.md) | C | C | C | C | C | Descriptor/chunk geometry и mandatory checkin согласованы с RGBA route; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Custom UI and Drawbot](02-EFFECT-PLUGINS/09-CUSTOM-UI-DRAWBOT.md) | C | C | C | C | C | Sample draw cleanup и authored gesture/async limits разделены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [Effect plug-ins](02-EFFECT-PLUGINS/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [Effect plug-ins](02-EFFECT-PLUGINS/README.md) | C | L | C | L | C | Family route, not full implementation; [final review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure). |
 
 ## 03-AEGP
 
@@ -108,7 +108,7 @@ cross-page review. Добавления и результаты:
 |---|---|---|---|---|---|---|
 | [AEGP: инициализация, hooks и suites](03-AEGP/01-HOOKS-SUITES.md) | C | C | C | C | C | Actual ping/partial registration versus command/idle/shutdown design; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [AEGP: операции с проектом и рендером](03-AEGP/02-PROJECT-RENDER-AUTOMATION.md) | C | C | C | C | C | Chains и фактические source/partial-cleanup limits сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [AEGP](03-AEGP/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [AEGP](03-AEGP/README.md) | C | L | C | L | C | Corrected historical queue finding and retired host-gate wording; [final review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure). |
 
 ## 04-AEIO
 
@@ -137,7 +137,7 @@ cross-page review. Добавления и результаты:
 |---|---|---|---|---|---|---|
 | [CEP development](07-PANELS/01-CEP.md) | C | C | C | C | C | Manifest/bootstrap walkthrough и controlled failure paths согласованы. **№2 выполнен**. |
 | [UXP transition for After Effects](07-PANELS/02-UXP-TRANSITION.md) | C | L | C | L | C | Dated roadmap/published docs, installed availability unknown; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
-| [Panels: CEP now, UXP transition](07-PANELS/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [Panels: CEP now, UXP transition](07-PANELS/README.md) | C | L | C | L | C | UI route with unknown-outcome/rollout boundaries; [final review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure). |
 
 ## 08-MACOS
 
@@ -204,7 +204,7 @@ cross-page review. Добавления и результаты:
 | [Recipe — CPU/GPU equivalence](12-RECIPES/04-CPU-GPU-EQUIVALENCE.md) | C | C | C | C | C | Identity, numeric policy, actual route и fallback comparisons согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Recipe — panel + native core](12-RECIPES/05-HYBRID-PANEL-NATIVE.md) | C | C | C | C | C | Prefix schema, ordering и error outcomes согласованы. **№2 выполнен**. |
 | [Recipe — profiling a slow effect](12-RECIPES/06-PROFILING.md) | C | C | C | C | C | Attribution versus timing, complete frames and scoped project records; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
-| [Practical recipes](12-RECIPES/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [Practical recipes](12-RECIPES/README.md) | C | L | C | L | C | Six reconciled routes, reader acceptance versus editorial completion; [final review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure). |
 
 ## 13-TEMPLATES
 
@@ -221,7 +221,7 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [Native SDK taxonomy](14-NATIVE-INTEGRATIONS/01-TAXONOMY.md) | R | E | R | R | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [Native SDK taxonomy](14-NATIVE-INTEGRATIONS/01-TAXONOMY.md) | C | C | C | C | C | Initiator/state/category decisions, SDK25.6 boundary; [final review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure). |
 | [Host call flows](14-NATIVE-INTEGRATIONS/02-HOST-CALL-FLOWS.md) | C | C | C | C | C | Command flow связан с actual source/design и cleanup; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [PICA suites — versioned native service bus](14-NATIVE-INTEGRATIONS/03-PICA-SUITES.md) | C | C | C | C | C | Public ABI, buffers/errors/publication и header-only scope; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [Effect plug-ins — native capability map](14-NATIVE-INTEGRATIONS/04-EFFECTS.md) | C | C | C | C | C | Canonical state route без duplicate contracts; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
@@ -234,7 +234,7 @@ cross-page review. Добавления и результаты:
 | [Legacy / historical native integration boundaries](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) | C | C | C | C | C | Old/current contracts versus project semantics; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 | [AEGP suites catalog — After Effects 26.5 snapshot](14-NATIVE-INTEGRATIONS/12-AEGP-SUITES-CATALOG.md) | C | L | C | L | C | Public-guide inventory, not exact 26.5 header/runtime audit; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 | [Public SDK docs errata / verification notes](14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md) | C | L | C | L | C | Dated mismatches/corrections, no standalone implementation; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
-| [Native integrations — карта всего нативного SDK After Effects](14-NATIVE-INTEGRATIONS/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [Native integrations — карта всего нативного SDK After Effects](14-NATIVE-INTEGRATIONS/README.md) | C | L | C | L | C | Family index with public-guide catalogue limits; [final review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure). |
 
 ## 15-COMMUNICATION
 
@@ -249,7 +249,7 @@ cross-page review. Добавления и результаты:
 | [Native <-> script/panel: как собирать гибридный продукт](15-COMMUNICATION/07-NATIVE-TO-SCRIPT-PANEL.md) | C | C | C | C | C | Correlation/freshness/ordering/cancel/unknown outcome разделены; transport design limits; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
 | [Threading boundaries](15-COMMUNICATION/08-THREADING-BOUNDARIES.md) | C | C | C | C | C | Worker/generation/quiescence и incident границы разделены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Data ownership and lifetime](15-COMMUNICATION/09-DATA-OWNERSHIP.md) | C | C | C | C | C | Phase-specific checkin и borrowed cache-value/payload lifetime согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [Как компоненты общаются друг с другом и с After Effects](15-COMMUNICATION/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [Как компоненты общаются друг с другом и с After Effects](15-COMMUNICATION/README.md) | C | L | C | L | C | Bridge index corrected to EffectSuite5 current baseline; [final review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure). |
 
 ## 17-NATIVE-SUITE-COOKBOOK
 

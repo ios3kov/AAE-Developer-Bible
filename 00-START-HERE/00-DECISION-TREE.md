@@ -70,10 +70,10 @@ Dockable UI сам по себе не означает обязательный 
 - если нужен именно native panel contract, см.
   [Native dockable panels](../14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md).
 
-На дату 2026-09-30:
-- production сейчас: **CEP**;
-- стратегическое направление Adobe: **UXP**;
-- UXP public beta для AE заявлена на ноябрь 2026.
+На rereview **2026-10-07** AE-specific UXP documentation опубликована; это не
+доказательство installed beta/GA availability. CEP выбирается для конкретного
+поддерживающего host; UXP — по exact target contract. Announcement о public beta
+к ноябрю 2026 сохраняется как dated roadmap, не current availability promise.
 
 Дальше: [маршрут выбора и реализации UI](../NAVIGATION.md#route-automation). Ограничения и roadmap: [Panels](../07-PANELS/README.md).
 

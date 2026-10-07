@@ -11,7 +11,7 @@ AEGP (After Effects General Plug-in) — интеграция с приложе�
 
 Регистрация/PiPL и lifecycle hooks расширены **2026-10-01 по SDK 25.6 build 61**. [Запись сверки](../18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md) содержит 19 source hashes, диапазоны строк, сохранённые расхождения и разбор [MenuTool](../16-WORKING-TEMPLATES/aegp-menu-command/MenuTool.cpp). Проект/render automation разобран в [следующей сверке](../18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md), а streams/keyframes — в [SDK 25.6 review](../18-SDK-HEADER-TOOLS/10-STREAMS-KEYFRAMES-SDK25.6.md). Старые Adobe samples используются как pattern evidence; актуальные signatures берутся из current headers.
 
-[Сверка проекта и рендера](../18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md) добавляет диапазоны шести SDK-файлов и разбор трёх существующих рецептов. У RenderQueueRecipes обнаружено использование TRUE вместо именованного статуса: это не QUEUED. Ошибка и необходимость исправления кода отмечены в главе и README рецептов; host-проверка не заявляется.
+[Сверка проекта и рендера](../18-SDK-HEADER-TOOLS/09-AEGP-PROJECT-RENDER-SDK25.6.md) добавляет диапазоны шести SDK-файлов и разбор трёх существующих рецептов. Историческая ошибка TRUE вместо именованного статуса QUEUED исправлена в текущем source; это не означает выполнение host-проверки очереди.
 
 ## Когда рассматривать AEGP
 
@@ -23,9 +23,9 @@ AEGP (After Effects General Plug-in) — интеграция с приложе�
 
 Текст сверяется с declarations и samples; архитектурные рекомендации помечены отдельно. Source review не равен native build, удачная компиляция не равна загрузке, а успешный initializer не равен готовности всех функций.
 
-[COMPLETION-CHECKLIST](../COMPLETION-CHECKLIST.md) сохраняет отдельную приёмку MenuTool: сборка/регистрация, отсутствие дублей меню, действие команды, update hook, ошибки и завершение. Редакционное обновление этих пунктов не закрывает. Следующий редакционный блок — AEIO и Artisan; это порядок чтения/написания, не закрытие более ранних gates.
+[MenuTool/source review](../CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure) отличает actual ping от recommended project mutation. Сборка/регистрация, отсутствие дублей меню, действие команды, update hook, ошибки и завершение — проверки reader product, не открытые gates Bible.
 
 
 ## Текущий редакционный статус
 
-Streams/properties, keyframes, masks, text/markers и footage/import теперь сверены с supplied SDK 25.6. Исправлены утечки later-SDK generations: baseline здесь использует `StreamSuite6`, `DynamicStreamSuite4`, `KeyframeSuite5` и `CompSuite12`. [Сверка masks/text/footage](../18-SDK-HEADER-TOOLS/11-MASK-TEXT-FOOTAGE-SDK25.6.md) отдельно фиксирует ownership MaskRef, Text/Marker MemHandle и переход владения FootageH при adoption. Host execution этих cookbook операций всё ещё требует отдельной приёмки по `COMPLETION-CHECKLIST.md`.
+Streams/properties, keyframes, masks, text/markers и footage/import сверены с supplied SDK 25.6. Baseline использует `StreamSuite6`, `DynamicStreamSuite4`, `KeyframeSuite5` и `CompSuite12`. [Сверка masks/text/footage](../18-SDK-HEADER-TOOLS/11-MASK-TEXT-FOOTAGE-SDK25.6.md) фиксирует ownership MaskRef, Text/Marker MemHandle и adoption FootageH. Host execution не заявлено; validation собственного продукта описана в [testing strategy](../10-TESTING/README.md).

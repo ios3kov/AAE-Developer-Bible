@@ -367,3 +367,15 @@ candidate/signed/package/loaded identities. Added owner's no-reuse-license decis
 and vendor SDK rights separately from product entitlement architecture. UXP path
 chapter no longer implies unpublished AE documentation. No measurements, product
 release, installer/security implementation, runtime or new compiler result introduced.
+
+## Entry and index closure
+
+Parent `a1d03bc`. Read final nine entry/index pages with their already reconciled
+family chapters/routes and evidence. Decision tree, extension comparison and native
+taxonomy close applicable scenario/source axes; six route indexes retain L because
+they do not implement standalone operations. Corrected stale Suite4 current claim
+in communication index, unresolved-TRUE queue finding and retired mandatory host
+acceptance wording in AEGP index, exact26.5 catalogue overclaim, and panel roadmap
+availability wording. Panel index now states timeout/stale rejection is not mutation
+cancellation. Recipe acceptance belongs to reader products. All 127 rows now C/L;
+this closes editorial coverage only. Final freeze record/checks follow separately.

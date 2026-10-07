@@ -2,6 +2,13 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Entry and index closure
+
+Parent `a1d03bc`; final nine core rows reconciled in entry/index chapter record.
+Local checker, regeneration/freshness, strict MkDocs and whitespace checks PASS.
+All127 rows C/L denotes editorial coverage, not whole-source runtime certification.
+No new native/compiler/host or GitHub CI observation.
+
 ### Testing distribution and templates closure
 
 Parent `8a74a7b`; containing edits close seventeen rows as recorded in chapter review.

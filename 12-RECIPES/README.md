@@ -25,6 +25,8 @@ preconditions
 → acceptance gate
 ~~~
 
-Do not call a recipe complete because a compiler, documentation build or one manual preview was green.
+Do not call a reader-product acceptance gate complete because a compiler,
+documentation build or one manual preview was green. Editorial recipe completion
+means sourced/reconciled instructions with explicit limits, not mandatory host runs.
 
 For release evidence, see [Testing strategy](../10-TESTING/README.md) and [Release checklist](../11-DISTRIBUTION/03-RELEASE-CHECKLIST.md).

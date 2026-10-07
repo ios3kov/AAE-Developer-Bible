@@ -2,6 +2,9 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Closed final nine entry/index rows; all 127 core pages editorially C/explicit L.
+- Removed stale Suite4/queue/mandatory-host-gate claims from overview pages.
+
 - Closed seventeen testing/distribution/template rows against filled Gain plan and
   scoped project records; corrected FIXED versus NOT_PLANNED closure semantics.
 - Linked release identity/rollback designs; removed atomic-update overpromise and

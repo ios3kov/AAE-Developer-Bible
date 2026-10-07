@@ -74,7 +74,7 @@ Primary acceptance/source-review baseline: **After Effects SDK 25.6 build 61**. 
 - [`07-NATIVE-PANELS.md`](07-NATIVE-PANELS.md) — native dockable panel.
 - [`08-AEIO.md`](08-AEIO.md), [`09-ARTISAN.md`](09-ARTISAN.md), [`10-BLITHOOK.md`](10-BLITHOOK.md).
 - [`11-LEGACY-NATIVE.md`](11-LEGACY-NATIVE.md) — deprecated/legacy.
-- [`12-AEGP-SUITES-CATALOG.md`](12-AEGP-SUITES-CATALOG.md) — полный AEGP suite map 26.5.
+- [`12-AEGP-SUITES-CATALOG.md`](12-AEGP-SUITES-CATALOG.md) — dated public-guide inventory и later-version notes; не полный exact SDK26.5 header audit.
 
 Sources: supplied Adobe After Effects SDK 25.6 build 61 headers/samples plus the maintained C++ SDK Guide for context. Exact source reviews include [`12-AEIO-ARTISAN-SDK25.6.md`](../18-SDK-HEADER-TOOLS/12-AEIO-ARTISAN-SDK25.6.md), [`13-PANELS-BLITHOOK-SDK25.6.md`](../18-SDK-HEADER-TOOLS/13-PANELS-BLITHOOK-SDK25.6.md) and [`14-PICA-BRIDGES-LEGACY-SDK25.6.md`](../18-SDK-HEADER-TOOLS/14-PICA-BRIDGES-LEGACY-SDK25.6.md). Later SDK history remains a separate compatibility source.
 
