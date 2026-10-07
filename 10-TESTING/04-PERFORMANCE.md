@@ -1,5 +1,13 @@
 # Performance testing
 
+Filled [illustrative report](../13-TEMPLATES/examples/WORKED-EXAMPLE.md) и
+[primary-record comparison](../22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md):
+preparation throughput, actual native render, ordinary export wall-time, Preview
+cache-fill и displayed playback — пять scopes. Warmups/repeats/order/cache policy
+и frame coverage входят в report. Неполный набор outputs исключается из принятого
+timing aggregate, но остаётся в failure history. Screenshot-bracketed interval не
+точная latency и не observer-free performance.
+
 Performance work needs a fixed workload, fixed environment and defined regression threshold. "Feels faster" is not a benchmark.
 
 ## Metrics

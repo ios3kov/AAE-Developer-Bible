@@ -1,5 +1,12 @@
 # Build system strategy
 
+Concrete reference projects/settings: [SDK Skeleton macOS route](../08-MACOS/09-PRODUCTION-BUILD-PIPELINE.md)
+и [Windows resource/link route](../09-WINDOWS/09-PRODUCTION-BUILD-PIPELINE.md).
+Copied Examples tree сохраняет relative Headers/Util/Resources paths; свежий output
+не является installation. Build identity включает resource tools/macros/configuration,
+не только C++ compiler. Universal resources/exports и Windows `.res` проверяются в
+final artifact отдельно; successful compile одного TU не закрывает pipeline.
+
 The first build-system goal is not elegance. It is preserving the exact host integration machinery required to produce a loadable After Effects component.
 
 ## Phase 1 — prove Adobe sample projects

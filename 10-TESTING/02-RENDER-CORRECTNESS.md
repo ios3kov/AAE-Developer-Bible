@@ -1,5 +1,11 @@
 # Render correctness
 
+Worked [NOT_RUN fixture](../13-TEMPLATES/examples/WORKED-EXAMPLE.md) и
+[project-reported calibrated decode scope](../22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md).
+Для native float выбрать NaN/Inf/signed-zero policy и matched-toolchain control до
+измерения; [numeric/bitwise distinctions](../02-EFFECT-PLUGINS/06-COLOR-PIXELS.md).
+Export equality относится к actual decoded precision/alpha/profile, не raw HDR world.
+
 Render tests should compare actual output data, not screenshots of the After Effects UI.
 
 ## Golden strategy

@@ -1,5 +1,16 @@
 # Standalone JSX tool
 
+Дополнительные source lessons (AE execution NOT_RUN):
+
+- [build-demo-rig.jsx](build-demo-rig.jsx): comp/null/text, slider, expression,
+  keys/interpolation, mask/marker, own-comp-only compensation.
+- [import-and-queue.jsx](import-and-queue.jsx): один visual file, новая comp,
+  disabled output queue, exact template и path readback; не запускает render.
+
+Запускать на disposable project. Scripts используют host APIs; Node syntax check
+не доказывает ExtendScript/AE support. User files и существующие queue items не
+удаляются. Undo grouping не atomic rollback.
+
 Status: **SOURCE EXAMPLE — complete command source / RUNTIME-NOT-CLAIMED**.
 
 rename-selected-layers.jsx is intentionally small enough to audit as one complete Script-menu command.

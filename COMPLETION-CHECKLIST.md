@@ -262,9 +262,10 @@ Checked and reconciled as one logical block:
 
 ## Current next step
 
-**Блок 3 [плана завершения](COMPLETION-PLAN.md): навигация и маршруты чтения.** Блоки 1/2 выполнены; scope и проверки — в ledger.
-
-После прежней паузы выполнен блок 2 (2026-10-04). Дополнения external review не закрывают блоки 5/10 целиком. После отчёта блока 2 остановка перед блоком 3.
+**2026-10-07:** блоки 1–5 сохранены как выполненные baseline; практические
+дополнения 6–15 отражены в [tracker](CHAPTER-COMPLETION-TRACKER.md). Текущая очередь:
+chapter/source/recipe reconciliation и block16 freeze. По поручению владельца
+работа продолжается без approval-пауз. Полная готовность ещё не объявлена.
 
 ## Audit-based completion plan — 2026-10-02
 
@@ -273,7 +274,7 @@ Checked and reconciled as one logical block:
 - [x] Блок 1: устранить подтверждённые противоречия policy/evidence; сохранить исторические границы результатов.
 - [x] Блок 1: создать поглавный трекер и указать зависимости плана.
 - [x] Блок 2: исправить CEP schema/error-path defects; portable protocol checks, strict docs и ledger. Runtime не заявлен.
-- [ ] Исправить core/reference navigation и targeted tooling/CI findings.
+- [x] Исправить core/reference navigation и targeted tooling/CI findings (блоки 3/4, 2026-10-04; ledger scope).
 - [ ] Выполнить практические и source-review блоки 5–15; progress фиксируется в поглавном трекере.
 - [ ] Перенести scoped ElasticGridFX lessons в соответствующих блоках; tool adaptation только после review.
 - [ ] Завершить block 16: editorial review, exact generated identity и freeze.

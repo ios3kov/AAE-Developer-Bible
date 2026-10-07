@@ -1,5 +1,11 @@
 # Crash diagnostics
 
+Filled [bounded incident record](../22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md):
+control build/loaded UUID + raw hash + 19/60 outputs + SIGABRT/thread17. Cause UNKNOWN,
+fix NONE, six bounded retries not reproduced. Termination stack не устанавливает
+первопричину; user closure не означает FIXED. Сохранять symbols UUID отдельно:
+record без matching symbols не даёт права придумывать symbolicated plugin cause.
+
 Crash investigation is much easier when every shipped artifact has an identity and matching symbols.
 
 ## Every build needs identity

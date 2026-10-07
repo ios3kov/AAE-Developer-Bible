@@ -265,7 +265,12 @@ MenuTool — shell этого пути, не произвольное worker р�
 6. Primary error сохраняется; rollback касается только own created objects и
    заранее разрешённых обратимых actions. Undo не является DB transaction.
 
-Exact per-operation ownership/suite generations находятся в
+`Bible_AddOneDKeyframes` uses CompTime and checks OneD type, disposes acquired
+values on errors and calls EndAddKeyframes(commit=false) after failed mutation.
+It does not select interpolation/ease, acquire the stream or open Undo; caller
+must provide callback guard, time-scale preflight and stream lifetime.
+
+Per-operation ownership/suite generations находятся в
 [cookbook](../17-NATIVE-SUITE-COOKBOOK/15-RECIPE-INDEX.md), а не в независимо
 переписанном псевдо-dispatcher. Это design chain, не единый compiled plugin.
 
@@ -277,7 +282,9 @@ Exact per-operation ownership/suite generations находятся в
 Consumer validate type/size/rowbytes/region, копирует row-aware в own bytes для
 worker, затем helper checkin. Suite4 source сохраняется compatibility-shaped;
 current Suite5 contracts не подставляются cast-ом. Destructor cleanup не равен
-наблюдаемому success: normal path сохраняет checkin error отдельно от primary.
+наблюдаемому success: normal path returns checkin error only when no primary error
+exists. With both errors source preserves primary but does not log secondary;
+caller instrumentation is required for that separate diagnostic.
 
 Async route — separate request record: request ID + generation + target/time/options
 identity + refcon lifetime. Cancellation помечает obsolete и вызывает разрешённый

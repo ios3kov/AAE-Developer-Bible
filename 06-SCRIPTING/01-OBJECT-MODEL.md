@@ -2,6 +2,13 @@
 
 ## Сквозные automation операции
 
+[Import/queue source](../16-WORKING-TEMPLATES/jsx-tool/import-and-queue.jsx): диалоги
+до Undo → canImportAs → import → comp/layer → disabled queue item → exact template
+selection → reacquire → output readback. Не запускает render и не включает чужие
+items. Extension/sequence-pattern согласовать с template вручную; path selection
+не доказывает format compatibility. Компенсация касается только созданных objects;
+при failed dependent cleanup footage сохраняется для диагностики.
+
 Начать с [demo rig](../16-WORKING-TEMPLATES/jsx-tool/build-demo-rig.jsx): validated
 project → create comp/layers → resolve matchNames → set keys/interpolation →
 write TextDocument/Shape/MarkerValue → expression resolution → explicit cleanup.

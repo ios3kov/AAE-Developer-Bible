@@ -122,6 +122,11 @@ API-числа проверены по `AE_EffectVers.h:13–14` и `AE_Effect.h
 
 ## 8. Как `.r` становится частью артефакта
 
+Практическое продолжение exact Skeleton resource chain:
+[macOS Xcode/resources/slices/exports](../08-MACOS/09-PRODUCTION-BUILD-PIPELINE.md) и
+[Windows preprocessing/PiPLTool/rc/res/link](../09-WINDOWS/09-PRODUCTION-BUILD-PIPELINE.md).
+Это commands и expected result types, не recorded build/load PASS.
+
 ### Windows: сохраняем весь resource pipeline
 
 В `Examples/Template/Skeleton/Win/Skeleton.vcxproj:317–345` задана цепочка:

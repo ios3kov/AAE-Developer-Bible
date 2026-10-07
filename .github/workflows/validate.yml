@@ -28,6 +28,8 @@ jobs:
           node-version: '22'
       - name: CEP bridge portable protocol tests (not AE host tests)
         run: node scripts/test_cep_bridge.js
+      - name: Scripting lesson portable safety (not AE host tests)
+        run: node scripts/test_scripting_lessons.js
       - name: Z-depth collector portable safety tests (not AE host tests)
         run: node scripts/test_acx_depth_probe.js
       - name: Edge and frame-export portable safety tests (not AE host tests)

@@ -123,6 +123,12 @@ Keyframe Suite5 предоставляет отдельные функции:
 
 ## 8. Batch insert: один transaction на серию ключей
 
+Canonical [OneD recipe](code/KeyframeRecipes.cpp) takes borrowed stream and CompTime
+arrays; [operation chain](../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md) supplies caller
+Undo/guard/lifetime. Validate arrays/count/time scales before batch. Source disposes
+each acquired value and ends batch after failed SetAddKeyframe. Interpolation/ease
+are separate; separated follower must be resolved correctly before OneD operation.
+
 Для серии keyframes используйте:
 
 ```text

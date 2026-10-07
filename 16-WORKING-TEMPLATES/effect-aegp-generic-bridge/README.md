@@ -35,7 +35,8 @@ case PF_Cmd_COMPLETELY_GENERAL: {
             msg->result_code = 0;
             return PF_Err_NONE;
         case bible_bridge::Op::ReloadResources:
-            msg->result_code = 0;
+            // This protocol lesson has no resource reload implementation.
+            msg->result_code = -1;
             return PF_Err_NONE;
         default:
             msg->result_code = -1;
@@ -45,6 +46,11 @@ case PF_Cmd_COMPLETELY_GENERAL: {
 ```
 
 This example assumes the effect command is already on the correct SDK callback path. It does not permit storing `extra` after return.
+
+Ping is the only implemented illustrative operation. ReloadResources refuses the
+domain command until a concrete service/dependency invalidation is implemented.
+Size is a declaration, not proof of arbitrary pointer readability; the same-product
+caller must allocate the complete shared struct.
 
 ## AEGP side
 

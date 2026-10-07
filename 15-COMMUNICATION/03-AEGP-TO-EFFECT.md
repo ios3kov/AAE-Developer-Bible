@@ -128,6 +128,13 @@ AEGP сначала должен получить `AEGP_EffectRefH`, вызва�
 
 ## 10. Error model
 
+Concrete [protocol lesson](../16-WORKING-TEMPLATES/effect-aegp-generic-bridge/README.md)
+implements Ping only; ReloadResources returns domain refusal until a real service
+exists. Route: late layer/effect resolution → exact CompTimeToLayerTime API → fresh
+EffectRef owner → payload with non-success result sentinel → COMPLETELY_GENERAL
+call → delivery A_Err first → domain result if delivery succeeded → dispose ref.
+Cleanup error must not erase delivery failure; log separately if both fail.
+
 Есть минимум два уровня результата:
 
 1. `A_Err` самого AEGP call;

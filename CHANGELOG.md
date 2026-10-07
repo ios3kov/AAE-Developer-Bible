@@ -2,6 +2,10 @@
 
 ## Practical completion additions — 2026-10-07
 
+- Follow-up: bounded JSX import/disabled-queue source and portable safety regressions;
+  Generic bridge ReloadResources stub returns refusal, not fabricated domain success.
+- Reconciled frame-helper secondary-error limitation and linked source keyframe batch.
+
 - `607a7a9`: Effect arbitrary callbacks, state migration and tested portable codec.
 - `26c1bf7`: SmartFX ROI/time, Compute Cache, GPU failure routes, UI/audio and JSX rig.
 - AEGP orchestration, exact Skeleton platform routes, IO/Artie reading maps and

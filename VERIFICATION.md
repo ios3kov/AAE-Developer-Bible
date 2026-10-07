@@ -4,6 +4,12 @@
 
 ### Subsequent practical additions
 
+Scripting import/queue: Node syntax and portable safety PASS: busy/cancel/collision/
+unsupported preflight, disabled queue, fresh OutputModule, compensation. AE NOT_RUN.
+Generic bridge review: ReloadResources stub now refuses domain command rather than
+falsely succeeding. Frame-helper prose corrected: secondary checkin error is not
+logged by source when primary already exists. No native/runtime result inferred.
+
 Blocks 11–15: strict MkDocs build and 10 consistency regression tests PASS locally.
 Primary ElasticGridFX JSON records fetched at immutable snapshot and reviewed in
 [case study](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md)
