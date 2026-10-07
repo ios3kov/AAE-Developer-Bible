@@ -2,6 +2,10 @@
 
 ## 1. Product identity
 
+Filled [Gain specification/evidence pack](examples/WORKED-EXAMPLE.md): actual
+8/16-bpc source, disk ID1, no sequence/arbitrary state, no float/MFR/GPU claim.
+Reader release identities and host observations remain NOT_RUN.
+
 - Name:
 - Codename:
 - Version target:

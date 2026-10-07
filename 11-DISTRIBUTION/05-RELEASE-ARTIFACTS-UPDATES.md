@@ -4,6 +4,14 @@ Distribution is the point where a technically correct plug-in becomes a supporta
 
 ## Release set
 
+Worked [NOT_RUN Gain pack](../13-TEMPLATES/examples/WORKED-EXAMPLE.md) separates
+source lesson from hypothetical product artifact. Platform designs bind unsigned
+candidate → signed binary → package → installed/loaded identity, with matching
+[macOS UUID/dSYM](../08-MACOS/07-CI.md) or [Windows PDB](../09-WINDOWS/07-CI.md).
+Owned-file [macOS](../08-MACOS/06-INSTALLATION-PACKAGING.md)/
+[Windows](../09-WINDOWS/06-INSTALLATION-PACKAGING.md) rollback restores prior bytes,
+not automatically downgraded project schemas. Candidate FAIL remains FAIL after recovery.
+
 A release should have a defined artifact set, for example:
 
 ```text
@@ -81,7 +89,7 @@ check metadata
  -> download to staging
  -> verify signature/hash
  -> ask for/coordinate AE shutdown
- -> installer performs atomic upgrade
+ -> installer performs controlled owned-file upgrade with journal/rollback
  -> next AE launch loads new build
 ```
 

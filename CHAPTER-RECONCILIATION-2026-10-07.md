@@ -344,3 +344,26 @@ generic-call differences retain exact prior review; source modernization is not
 project compatibility. Disk ID versus payload schema linked to actual Gain/codec.
 Both platform routes provide commands/expected observations, not Windows build,
 GPU, debugger, signing, installer or AE runtime evidence. Local checks in ledger.
+
+## Testing distribution and templates closure
+
+Parent `8a74a7b`. Read remaining test matrix/correctness/MFR/performance/crash pages,
+testing index, all distribution/template pages, profiling recipe, filled Gain pack/
+JSON and scoped ElasticGridFX record together with actual Gain source previously
+reconciled. Seventeen rows close editorially, overview scenario/source axes L.
+Existing four evidence pages retain their separately recorded closure.
+
+Added direct filled-plan links and source/format/identity boundaries. Gain expected
+channels are concrete; actual host/artifact observations remain null/NOT_RUN.
+Project incident UUID/raw hash versus private fixture/symbol limits remain explicit;
+MFR requested mode is not measured overlapping callbacks. Native/export/Preview
+metrics are separate workloads; incomplete 19/60 runs remain failure history, not
+accepted timing. Primary records retain prior immutable provenance, not a new rerun.
+
+Corrected bug-template closure contradiction: FIXED needs fix/regression evidence,
+NOT_PLANNED/non-reproduction closure is a separate decision, not rewritten PASS.
+Removed updater atomicity overpromise; linked owned-file journal/rollback and
+candidate/signed/package/loaded identities. Added owner's no-reuse-license decision
+and vendor SDK rights separately from product entitlement architecture. UXP path
+chapter no longer implies unpublished AE documentation. No measurements, product
+release, installer/security implementation, runtime or new compiler result introduced.

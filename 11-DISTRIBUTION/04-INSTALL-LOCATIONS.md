@@ -72,7 +72,10 @@ CEP runtime/version and signing/debug-mode policy still apply. A directory exist
 
 After Effects UXP is in a transition period in this 2026 snapshot. Do not invent AE UXP install paths from another Adobe host.
 
-When AE UXP public beta/GA documentation is available, follow the AE-specific packaging/install workflow and update this chapter with a dated source.
+AE-specific documentation is already published (landing reread 2026-10-07);
+publication is not installed beta/GA evidence. Follow exact AE-specific packaging/
+install contracts for the chosen host/runtime; this cheat sheet does not invent a
+cross-host UXP filesystem location. See [transition boundary](../07-PANELS/02-UXP-TRANSITION.md).
 
 ## Common vs AE-specific policy
 
@@ -81,6 +84,12 @@ Prefer common MediaCore only when the plug-in can safely be discovered by other 
 Use AE-specific placement when the product depends on After Effects-only suites/behavior and discovery by another host would be misleading or unsafe.
 
 ## Installer rules
+
+Native installer path guide reread 2026-10-07; CEP paths retain dated platform
+source review. Concrete owned-file upgrade/conflict/rollback designs:
+[macOS](../08-MACOS/06-INSTALLATION-PACKAGING.md),
+[Windows registry/view](../09-WINDOWS/06-INSTALLATION-PACKAGING.md).
+Path existence is not discovery or permission evidence; no installer executed here.
 
 Regardless of path:
 

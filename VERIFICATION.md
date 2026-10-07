@@ -2,6 +2,14 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Testing distribution and templates closure
+
+Parent `8a74a7b`; containing edits close seventeen rows as recorded in chapter review.
+Local evidence-plan tests2/2, consistency11/11, checker, generated regeneration/
+freshness, strict MkDocs and whitespace checks PASS. Evidence-plan tests verify
+authored structure/arithmetic, not rendered pixels or installer outcomes. No new
+project measurement, SDK/compiler/AE/signing/security/runtime or GitHub CI result.
+
 ### Windows and compatibility closure
 
 Parent `255c78c`; containing commit identifies edits. Twenty-one rows reconciled in

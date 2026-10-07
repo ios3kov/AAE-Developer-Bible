@@ -4,6 +4,12 @@ A full Cartesian product of every AE version, OS, CPU, color depth, GPU and scen
 
 ## Axes
 
+Заполненный [Gain plan](../13-TEMPLATES/examples/WORKED-EXAMPLE.md) и
+[machine-readable scenarios](../13-TEMPLATES/examples/gain-evidence-plan.json)
+связывают SDK25.6, 8/16-bpc expected channels и upgrade policy; observations/host/
+artifact identities остаются null/NOT_RUN. Это authored plan, не зелёная матрица.
+MFR/GPU/float не заявлены actual Gain source; такие lanes не присваивать ему.
+
 | Axis | Values |
 |---|---|
 | AE | every claimed major/minor family |

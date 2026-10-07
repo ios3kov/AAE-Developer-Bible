@@ -2,6 +2,10 @@
 
 # Product X.Y.Z
 
+Filled [source-lesson release example](examples/WORKED-EXAMPLE.md) declares
+no tested AE/OS support range and no installable release artifact. Documentation
+completion is not permission to turn NOT_RUN cells into customer support promises.
+
 Release date:
 
 Build:

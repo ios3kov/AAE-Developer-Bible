@@ -2,6 +2,10 @@
 
 ## Product identity
 
+Filled [ILLUSTRATIVE/NOT_RUN example](examples/WORKED-EXAMPLE.md) uses SDK25.6
+and separate mac arm64/Win x64 rows with unrecorded host/artifact identities.
+Historical compiler evidence must not be copied into this hypothetical release.
+
 - Product/version:
 - Build:
 - Git SHA:

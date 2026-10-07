@@ -177,4 +177,7 @@ Evidence/result:
 
 ## Closure rule
 
-Close only when the original failure is reproduced or sufficiently characterized, the root cause/fix is recorded, and the relevant regression test passes on the claimed environment.
+Для closure как FIXED нужны characterized failure, подтверждённая root cause/fix
+и matching regression result. NOT_REPRODUCED, NOT_PLANNED, DUPLICATE и accepted-risk
+closure — отдельные решения с rationale/reopen condition, не исправление и не PASS.
+Исходный FAIL сохраняется immutable; bounded retries не доказывают отсутствие дефекта.

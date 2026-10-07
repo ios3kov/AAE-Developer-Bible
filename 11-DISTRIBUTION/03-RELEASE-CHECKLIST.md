@@ -2,6 +2,13 @@
 
 A release is the exact artifact that passed these gates. Rebuilding after approval creates a new candidate.
 
+Это reader-product checklist, не обязательные host gates Bible. Filled
+[documentation/source lesson versus product release](../13-TEMPLATES/examples/WORKED-EXAMPLE.md)
+оставляет runtime claims BLOCKED/NOT_RUN; actual artifact gate references source,
+binary/package/loaded identity и retained observations. Для macOS documented
+stapling/re-archive transition хранит submitted/final hashes; changed executable
+payload требует новой candidate validation, не просто прежнего version label.
+
 ## Source and provenance
 
 - [ ] release commit/tag fixed

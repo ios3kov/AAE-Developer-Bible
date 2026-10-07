@@ -4,6 +4,12 @@ Updated: **2026-10-07**
 
 ## Continuous completion — 2026-10-07
 
+Testing/distribution/templates reconciliation complete: seventeen rows C or index L.
+Filled Gain NOT_RUN pack/source and scoped project records linked; fixed closure
+semantics and updater atomicity overpromise. License/provenance decision explicit.
+[Review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure).
+Next: remaining index/entry rows → final source/link/provenance sweep and freeze.
+
 Windows/compatibility reconciliation complete: twenty-one rows C or explicit L.
 Corrected GPU retry assumption and catalogue guide-heading versus exact-header scope;
 linked driver/resource/source identity. Vendor requirements reread blocked by HTTP403;

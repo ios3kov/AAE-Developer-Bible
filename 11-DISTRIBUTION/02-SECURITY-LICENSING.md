@@ -4,6 +4,14 @@ Security and licensing run inside or next to a large creative host process. Prot
 
 ## Primary rule
 
+### Bible authored material versus product licensing
+
+[NOTICE](../NOTICE.md) records the owner's 2026-10-07 decision: no reuse license
+granted for authored prose/examples. Public availability/editorial completion does
+not grant copying/adaptation rights. Vendor SDK samples/headers and third-party
+assets retain their own terms; use a locally licensed SDK and do not republish it.
+This decision is separate from the runtime entitlement architecture below.
+
 Licensing failure should degrade the product deliberately.
 
 It should not:

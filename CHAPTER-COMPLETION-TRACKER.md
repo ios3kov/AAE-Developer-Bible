@@ -173,26 +173,26 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [Test matrix](10-TESTING/01-TEST-MATRIX.md) | E | E | R | R | C | Добавить заполненную учебную матрицу с expected/observed и exact identity. **№15** |
-| [Render correctness](10-TESTING/02-RENDER-CORRECTNESS.md) | E | E | R | R | C | Добавить identity calibration, exceptional floats и matched-toolchain parity recipe. **№15** |
-| [MFR stress tests](10-TESTING/03-MFR-STRESS.md) | E | E | R | R | C | Добавить bounded hang/cancel incident template с доказательствами concurrency. **№15** |
-| [Performance testing](10-TESTING/04-PERFORMANCE.md) | E | E | R | R | C | Показать раздельные core/render/Preview метрики, повторения и frame coverage. **№15** |
-| [Crash diagnostics](10-TESTING/05-CRASH-DIAGNOSTICS.md) | E | E | R | R | C | Добавить заполненный crash/hang record с artifact/symbol identity и границами вывода. **№15** |
+| [Test matrix](10-TESTING/01-TEST-MATRIX.md) | C | C | C | C | C | Filled Gain plan/identity/expected versus NOT_RUN; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
+| [Render correctness](10-TESTING/02-RENDER-CORRECTNESS.md) | C | C | C | C | C | Calibration/precision/float/toolchain/actual Gain limits; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
+| [MFR stress tests](10-TESTING/03-MFR-STRESS.md) | C | C | C | C | C | Bounded incident/complete outputs versus unmeasured concurrency; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
+| [Performance testing](10-TESTING/04-PERFORMANCE.md) | C | C | C | C | C | Distinct core/export/Preview scopes and primary-record limits; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
+| [Crash diagnostics](10-TESTING/05-CRASH-DIAGNOSTICS.md) | C | C | C | C | C | Incident identity/symbol/raw limits, cause UNKNOWN; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
 | [Evidence and acceptance](10-TESTING/06-EVIDENCE-AND-ACCEPTANCE.md) | C | C | C | C | C | Status/origin/decision связаны с filled NOT_RUN record; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Host verification in After Effects](10-TESTING/06-HOST-VERIFICATION.md) | C | C | C | C | C | Expected channels, calibration/actual route/frame coverage и ladder согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Test evidence and acceptance records](10-TESTING/07-TEST-EVIDENCE.md) | C | C | C | C | C | Downloadable filled plan и separate primary JSON/raw hash references; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Clean-machine release acceptance](10-TESTING/08-CLEAN-MACHINE-ACCEPTANCE.md) | C | C | C | C | C | Scoped own-file upgrade/rollback record и NOT_RUN observations; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [Testing strategy](10-TESTING/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [Testing strategy](10-TESTING/README.md) | C | L | C | L | C | Evidence-layer route index, no host qualification; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
 
 ## 11-DISTRIBUTION
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
 | [Versioning and compatibility](11-DISTRIBUTION/01-VERSIONING-COMPATIBILITY.md) | C | C | C | C | C | Disk IDs/schema/source/artifact support domains; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
-| [Security and licensing architecture](11-DISTRIBUTION/02-SECURITY-LICENSING.md) | R | E | R | R | C | Зафиксировать license/provenance правила примеров и происхождение third-party SDK assets. **№5** |
-| [Release checklist](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md) | R | E | R | R | C | Добавить filled documentation/product evidence пример и artifact-bound release gate. **№15** |
-| [Install locations cheat sheet](11-DISTRIBUTION/04-INSTALL-LOCATIONS.md) | R | E | R | R | C | Сверить официальные platform paths и связать их с owned-file installers. **№13** |
-| [Release artifacts, installers and update strategy](11-DISTRIBUTION/05-RELEASE-ARTIFACTS-UPDATES.md) | E | E | R | R | C | Связать binary/PiPL/UI identity, symbols и upgrade/rollback evidence. **№15** |
+| [Security and licensing architecture](11-DISTRIBUTION/02-SECURITY-LICENSING.md) | C | C | C | C | C | Owner no-license decision/vendor terms versus entitlement design; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
+| [Release checklist](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md) | C | C | C | C | C | Filled source lesson versus artifact-bound reader release; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
+| [Install locations cheat sheet](11-DISTRIBUTION/04-INSTALL-LOCATIONS.md) | C | C | C | C | C | Dated native/CEP paths and own-file routes, UXP limited; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
+| [Release artifacts, installers and update strategy](11-DISTRIBUTION/05-RELEASE-ARTIFACTS-UPDATES.md) | C | C | C | C | C | Candidate/symbol/package/loaded/rollback identities; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
 
 ## 12-RECIPES
 
@@ -203,19 +203,19 @@ cross-page review. Добавления и результаты:
 | [Recipe — plug-in does not load](12-RECIPES/03-DEBUG-PLUGIN-NOT-LOADING.md) | C | C | C | C | C | Both artifact inspection routes and unresolved identity limits; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 | [Recipe — CPU/GPU equivalence](12-RECIPES/04-CPU-GPU-EQUIVALENCE.md) | C | C | C | C | C | Identity, numeric policy, actual route и fallback comparisons согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Recipe — panel + native core](12-RECIPES/05-HYBRID-PANEL-NATIVE.md) | C | C | C | C | C | Prefix schema, ordering и error outcomes согласованы. **№2 выполнен**. |
-| [Recipe — profiling a slow effect](12-RECIPES/06-PROFILING.md) | E | E | R | R | C | Добавить воспроизводимый profiling record с warmup/repeats/core-host-Preview scopes. **№15** |
+| [Recipe — profiling a slow effect](12-RECIPES/06-PROFILING.md) | C | C | C | C | C | Attribution versus timing, complete frames and scoped project records; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
 | [Practical recipes](12-RECIPES/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
 
 ## 13-TEMPLATES
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [Bug report template](13-TEMPLATES/BUG-REPORT.md) | E | E | R | R | C | Добавить заполненный example с exact artifact, raw evidence и bounded conclusion. **№15** |
-| [Compatibility matrix template](13-TEMPLATES/COMPATIBILITY-MATRIX.md) | E | E | R | R | C | Показать filled rows с SDK/AE/OS/architecture и честными NOT RUN. **№15** |
-| [Performance report template](13-TEMPLATES/PERFORMANCE-REPORT.md) | E | E | R | R | C | Добавить filled report с раздельными performance layers и frame coverage. **№15** |
-| [Plug-in specification template](13-TEMPLATES/PLUGIN-SPEC.md) | E | E | R | R | C | Связать filled spec с persistence, errors, expected output и verification matrix. **№15** |
-| [Working templates](13-TEMPLATES/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
-| [Release notes template](13-TEMPLATES/RELEASE-NOTES.md) | E | E | R | R | C | Показать filled release record с artifact identity и реальными evidence limits. **№15** |
+| [Bug report template](13-TEMPLATES/BUG-REPORT.md) | C | C | C | C | C | FIXED versus bounded/non-planned closure, failure retained; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
+| [Compatibility matrix template](13-TEMPLATES/COMPATIBILITY-MATRIX.md) | C | C | C | C | C | Filled NOT_RUN matrix and evidence identity; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
+| [Performance report template](13-TEMPLATES/PERFORMANCE-REPORT.md) | C | C | C | C | C | Authored plan versus separate real primary metrics; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
+| [Plug-in specification template](13-TEMPLATES/PLUGIN-SPEC.md) | C | C | C | C | C | Actual Gain IDs/state/format claims versus planned acceptance; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
+| [Working templates](13-TEMPLATES/README.md) | C | L | C | L | C | Filled-pack route index, not product implementation; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
+| [Release notes template](13-TEMPLATES/RELEASE-NOTES.md) | C | C | C | C | C | Source-lesson release with no invented artifacts/support; [review](CHAPTER-RECONCILIATION-2026-10-07.md#testing-distribution-and-templates-closure). |
 
 ## 14-NATIVE-INTEGRATIONS
 

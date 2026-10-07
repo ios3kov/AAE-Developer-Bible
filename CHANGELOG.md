@@ -2,6 +2,11 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Closed seventeen testing/distribution/template rows against filled Gain plan and
+  scoped project records; corrected FIXED versus NOT_PLANNED closure semantics.
+- Linked release identity/rollback designs; removed atomic-update overpromise and
+  distinguished authored reuse rights from product entitlement architecture.
+
 - Closed Windows/compatibility editorial rows; separated public-guide catalogue
   headings from exact target SDK contracts and retained dated host-support limits.
 - Clarified MSVC syntax-only report and GPU failure policy; no native/host PASS added.
