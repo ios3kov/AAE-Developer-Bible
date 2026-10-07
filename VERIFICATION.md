@@ -4,6 +4,11 @@
 
 ### Subsequent practical additions
 
+Evidence-plan follow-up adds downloadable ILLUSTRATIVE/NOT_RUN JSON and two portable
+structure/arithmetic tests. It does not copy historical compiler success into the
+hypothetical artifact or invent observations/raw logs. Four related evidence chapters
+read with GainPixel source and worked pack; no host/package execution.
+
 AEIO/Artisan eight-page reconciliation: RegisterSuite5 signatures and exact IO/Artie
 construction reread. Corrected typed version fragment and spec ownership; IO advertises
 auxiliary data without provider callbacks in its constructed table. Four core rows

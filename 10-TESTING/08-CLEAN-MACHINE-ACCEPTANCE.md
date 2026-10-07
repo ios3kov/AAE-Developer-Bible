@@ -109,6 +109,14 @@ Any change after that — even a tiny binary patch — creates a new candidate a
 
 ## Acceptance report
 
+Concrete design routes: [macOS owned-bundle upgrade/rollback](../08-MACOS/06-INSTALLATION-PACKAGING.md)
+and [Windows owned-file upgrade/rollback](../09-WINDOWS/06-INSTALLATION-PACKAGING.md).
+The [filled plan](../13-TEMPLATES/examples/gain-evidence-plan.json) deliberately has
+no candidate or observed hashes. Populate candidate/prior/installed/restored hashes
+only from actual artifacts; report recovery separately from failed candidate smoke.
+If prior files are unmanaged or changed unexpectedly, the expected result is a
+visible conflict, not deletion of all MediaCore or user presets.
+
 Record:
 
 ```text

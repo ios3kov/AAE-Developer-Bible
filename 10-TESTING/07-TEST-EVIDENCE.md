@@ -22,6 +22,13 @@ The Bible can reference hashes and conclusions without redistributing proprietar
 
 ## Manifest
 
+Filled [machine-readable plan](../13-TEMPLATES/examples/gain-evidence-plan.json)
+and [human-readable pack](../13-TEMPLATES/examples/WORKED-EXAMPLE.md) distinguish
+expected values from null observations. For actual raw-record references see the
+[project-reported JSON hashes](../22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md).
+Those records identify private raw evidence without pretending it is publicly
+reproducible. Keep evidence origin, test status and acceptance decision separate.
+
 Recommended fields:
 
 ```json

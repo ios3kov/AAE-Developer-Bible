@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "kind": "ILLUSTRATIVE",
+  "product": "Bible Minimal Gain source lesson",
+  "evidenceOrigin": "AUTHORED-PLAN",
+  "sourcePath": "16-WORKING-TEMPLATES/effect-basic/EffectMain.cpp",
+  "sourceCommit": null,
+  "artifactSha256": null,
+  "sdk": "25.6 build 61",
+  "hostBuild": null,
+  "loadedImageIdentity": null,
+  "status": "NOT_RUN",
+  "decision": "not accepted for runtime claims",
+  "scenarios": [
+    {
+      "id": "GAIN-8-001",
+      "requirement": "8-bpc gain=2 preserves alpha and doubles unclipped RGB",
+      "fixture": {"depth": 8, "gain": 2, "inputRGBA": [100, 50, 0, 127]},
+      "expectedRGBA": [200, 100, 0, 127],
+      "observedRGBA": null,
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "GAIN-16-001",
+      "requirement": "16-bpc gain clamps at SDK integer white, not 65535",
+      "fixture": {"depth": 16, "gain": 2, "inputRGBA": [20000, 0, 32768, 16384]},
+      "expectedRGBA": [32768, 0, 32768, 16384],
+      "observedRGBA": null,
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "GAIN-INSTALL-001",
+      "requirement": "Upgrade replaces only owned payload and failed smoke permits controlled rollback",
+      "expected": "Candidate/prior/installed/restored hashes recorded separately; user data untouched",
+      "observed": null,
+      "status": "NOT_RUN"
+    }
+  ],
+  "rawEvidence": [],
+  "limits": [
+    "Not a host run or package record",
+    "RGBA arrays express semantic channels, not PF_Pixel memory field order",
+    "Output precision, alpha representation, profile and decoder need calibration before export comparisons",
+    "Historical compiler evidence is recorded separately in VERIFICATION.md"
+  ]
+}

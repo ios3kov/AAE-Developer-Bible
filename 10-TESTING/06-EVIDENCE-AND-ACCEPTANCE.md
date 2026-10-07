@@ -44,6 +44,12 @@ evidence:
 
 ## Status vocabulary
 
+The [filled lesson plan](../13-TEMPLATES/examples/gain-evidence-plan.json) remains
+NOT_RUN even though unrelated portable tests and historical syntax checks pass.
+Its [illustrative failed frame-set example](../13-TEMPLATES/examples/WORKED-EXAMPLE.md)
+is a teaching scenario, not observed Gain behavior. BLOCKED requires a named missing
+prerequisite; NOT_RUN must not automatically be rewritten BLOCKED for a greener table.
+
 Use a small vocabulary:
 
 - NOT_RUN — required test exists but was not executed;

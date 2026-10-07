@@ -33,6 +33,13 @@ Never collapse these into one "works" status.
 
 ## Test identity
 
+Concrete [expected Gain inputs/outputs](../13-TEMPLATES/examples/gain-evidence-plan.json)
+give semantic RGBA values, not raw PF_Pixel byte ordering. Calibrate the actual
+export/decode chain (precision, straight/premultiplied alpha, profile) with known
+control frames before accepting comparisons; an RGBA16 PNG cannot prove raw float
+HDR equality. Record actual selector/backend and complete decoded frame set, not
+just the project GPU/MFR option or a successful launcher exit.
+
 Every host result must record:
 
 - Bible/source commit;

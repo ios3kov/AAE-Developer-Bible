@@ -41,6 +41,13 @@ AE/OS support range. Install/signing/upgrade NOT_RUN; no distribution artifact.
 
 ## Machine-readable форма
 
+Downloadable [filled plan JSON](gain-evidence-plan.json) contains concrete 8/16-bpc
+input/expected channel values and an upgrade scenario. Observations/identities are
+null because execution did not occur; rawEvidence is empty, not a fabricated log.
+The illustrative failure above is a separate teaching scenario, not the observed
+result of this plan. Historical real SDK compiler evidence belongs to VERIFICATION,
+not to this hypothetical release artifact.
+
 ```json
 {"kind":"ILLUSTRATIVE","product":"Gain lesson","sourceSha":null,"artifactHash":null,"hostBuild":null,"status":"NOT_RUN","confidence":"SOURCE EXAMPLE","decision":"not accepted for runtime claims","expectedFrames":60,"decodedFrames":null,"rawEvidence":[]}
 ```

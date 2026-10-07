@@ -42,6 +42,16 @@ for other AEGP recipes; this entry does not close the whole block11 tracker.
 
 ## Validation boundary
 
+## Evidence record follow-up
+
+Read test-evidence, evidence/acceptance, host-verification and clean-machine chapters
+together with worked Gain pack and actual GainPixel source. Added downloadable
+authored plan JSON with predeclared 8/16-bpc values, null observations and no invented
+raw evidence. Portable structure/arithmetic tests validate the document, not renderer.
+Source does clamp RGB and retain alpha; semantic RGBA arrays are not PF_Pixel layout.
+Actual project JSON evidence is linked separately with immutable hashes and private
+raw-data limits. Upgrade/rollback design is explicitly NOT_RUN, not a release PASS.
+
 ## AEIO / Artisan reconciliation
 
 Read both overviews, native-integration companions, working registration guides

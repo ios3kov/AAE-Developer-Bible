@@ -171,10 +171,10 @@ cross-page review. Добавления и результаты:
 | [MFR stress tests](10-TESTING/03-MFR-STRESS.md) | E | E | R | R | C | Добавить bounded hang/cancel incident template с доказательствами concurrency. **№15** |
 | [Performance testing](10-TESTING/04-PERFORMANCE.md) | E | E | R | R | C | Показать раздельные core/render/Preview метрики, повторения и frame coverage. **№15** |
 | [Crash diagnostics](10-TESTING/05-CRASH-DIAGNOSTICS.md) | E | E | R | R | C | Добавить заполненный crash/hang record с artifact/symbol identity и границами вывода. **№15** |
-| [Evidence and acceptance](10-TESTING/06-EVIDENCE-AND-ACCEPTANCE.md) | R | E | R | R | C | Согласовать PASS/FAIL/BLOCKED/NOT RUN с заполненным sample record. **№15** |
-| [Host verification in After Effects](10-TESTING/06-HOST-VERIFICATION.md) | R | E | R | R | C | Связать evidence ladder с калибровкой output и actual route/frame coverage. **№15** |
-| [Test evidence and acceptance records](10-TESTING/07-TEST-EVIDENCE.md) | E | E | R | R | C | Добавить machine-readable filled record и отдельную raw evidence reference. **№15** |
-| [Clean-machine release acceptance](10-TESTING/08-CLEAN-MACHINE-ACCEPTANCE.md) | R | E | R | R | C | Показать scoped install/upgrade/rollback record без фиктивных выполненных проверок. **№15** |
+| [Evidence and acceptance](10-TESTING/06-EVIDENCE-AND-ACCEPTANCE.md) | C | C | C | C | C | Status/origin/decision связаны с filled NOT_RUN record; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Host verification in After Effects](10-TESTING/06-HOST-VERIFICATION.md) | C | C | C | C | C | Expected channels, calibration/actual route/frame coverage и ladder согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Test evidence and acceptance records](10-TESTING/07-TEST-EVIDENCE.md) | C | C | C | C | C | Downloadable filled plan и separate primary JSON/raw hash references; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
+| [Clean-machine release acceptance](10-TESTING/08-CLEAN-MACHINE-ACCEPTANCE.md) | C | C | C | C | C | Scoped own-file upgrade/rollback record и NOT_RUN observations; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Testing strategy](10-TESTING/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
 
 ## 11-DISTRIBUTION
