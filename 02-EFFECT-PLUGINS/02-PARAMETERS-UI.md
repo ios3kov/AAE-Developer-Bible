@@ -182,3 +182,77 @@ Popup хранит value и количество вариантов, а стро
 Проверить новое применение и Reset отдельно от открытия проекта старой версии; минимальные/максимальные вводимые значения отдельно от шкалы; сохранение IDs и типов; наличие/отсутствие ключей; undo/redo supervised-операций; изменение времени при открытой и закрытой панели. Проверить UI-only действия и сохранённый результат, а не только внешний вид кнопки. Для point-параметров нужны разные размеры источника; для custom UI — события, координаты и масштаб интерфейса.
 
 На каждый PASS требуются конкретный build, проект и наблюдение. Исходный header подтверждает контракт, но не то, что конкретный плагин правильно его реализовал.
+
+## 13. Сохраняемое состояние и arbitrary data {#13-сохраняемое-состояние-и-arbitrary-data}
+
+Проверено 2026-10-07 по SDK 25.6 build 61: `Headers/AE_Effect.h:1961–2169`
+(`PF_ArbitraryDef`, `PF_ArbParamsExtra`), `UI/ColorGrid/ColorGrid.h` и
+`ColorGrid_Arb_Handler.cpp`. Это SDK-CONTRACT-REVIEWED; исполнение в AE не заявлено.
+Arbitrary parameter нужен для составного пользовательского значения, которому
+недостаточно обычных sliders/points. Это не способ спрятать несериализуемый cache.
+
+| Хранилище | Пример | Правило |
+|---|---|---|
+| Обычный parameter stream | Amount с ключами | Host хранит значения и анимацию; читать на нужном времени |
+| Arbitrary parameter | Набор контрольных точек | Effect предоставляет операции копирования, сравнения, persistence и интерполяции |
+| Sequence state | Восстанавливаемая конфигурация экземпляра | Отдельный lifecycle flatten/resetup; не подмена анимируемого stream |
+| Transient cache/scratch | Таблица выборки для данного кадра | Пересоздаваемый результат; не сериализовать в project |
+
+`PF_ArbitraryDef.id` различает arbitrary types эффекта и **не равен disk ID**
+из `PF_ParamDef.uu.id`. При ADD_PARAM `dephault` переходит host, `value` передаётся
+NULL; во время render `value` принадлежит host. Сначала проверять
+`PF_Cmd_ARBITRARY_CALLBACK`, затем `PF_ArbParamsExtra.which_function` и `id`,
+и только после этого нужную ветку union. Header comment ошибочно употребляет
+plural `PF_Cmd_ARBITRARY_CALLBACKS`; реальный enum — singular.
+
+| Selector | Операция и владение | Failure policy собственной реализации |
+|---|---|---|
+| `PF_Arbitrary_NEW_FUNC` | Выделить и заполнить новый handle через `new_func_params.arbPH` | Не публиковать частично созданный объект |
+| `PF_Arbitrary_DISPOSE_FUNC` | Освободить переданный allocated value | Не трогать соседние host values/refcon |
+| `PF_Arbitrary_COPY_FUNC` | Deep-copy borrowed `src_arbH`; новый `dst_arbPH` принадлежит caller | Ошибка allocation не меняет источник |
+| `PF_Arbitrary_FLAT_SIZE_FUNC` | Вернуть число bytes | Проверить overflow до вычисления длины |
+| `PF_Arbitrary_FLATTEN_FUNC` | Записать в уже выделенный host buffer, соблюдая `buf_sizeLu` | Не писать вне buffer; не освобождать его |
+| `PF_Arbitrary_UNFLATTEN_FUNC` | Validate bytes, выделить новый `arbPH` для caller | Reject unsupported/corrupt schema до публикации |
+| `PF_Arbitrary_INTERP_FUNC` | Borrow left/right, создать новый `interpPH` | Не менять endpoints; velocity уже включена в `tF` |
+| `PF_Arbitrary_COMPARE_FUNC` | Вернуть `PF_ArbCompareResult` | Сравнивать смысл, не адреса или padding |
+| `PF_Arbitrary_PRINT_SIZE_FUNC` / `PRINT_FUNC` | Размер и bounded textual representation | Учесть terminator и print flags в собственной согласованной policy |
+| `PF_Arbitrary_SCAN_FUNC` | Bounded parse `bytes_to_scanLu` → новый handle | Не искать terminator за размером input |
+
+В compare comment указаны 0/1, но тип и enum включают EQUAL, LESS, MORE,
+NOT_EQUAL. Использовать именованные constants и согласованную equality policy,
+не объявлять комментарий единственным ordering contract. UI refs и refcon не
+сериализуются. Для каждого allocated SDK handle требуется paired disposal; входные
+handles и flat buffers остаются borrowed. Callback availability не разрешает
+произвольные project mutations или thread access.
+
+### Конкретная эволюция payload
+
+[Portable codec](../16-WORKING-TEMPLATES/effect-state/README.md) хранит `BSTA`,
+u16 little-endian version, length, Amount в тысячных и в v2 добавляет Mode.
+v1 занимает 10 bytes, v2 — 12. Это авторская схема, не Adobe wire format.
+Декодирование v1 добавляет Mode=0; truncated/invalid payload оставляет destination
+неизменным; future version выдаёт unsupported. Adapter переводит ошибку в выбранный
+SDK error и UI diagnostic, но не заменяет неизвестное состояние defaults молча.
+`memcpy(sizeof(MyStruct))` непригоден для persistence: ABI padding, endian, pointers
+и platform-size поля не являются схемой. Encode принимает уже валидированную модель.
+
+Для набора точек интерполировать только одинаковую topology; разную topology
+обрабатывать выбранной дискретной policy или запрещать interpolation соответствующим
+parameter flag. Это product design, не автоматическая гарантия arbitrary API.
+Сравнение должно учитывать все render-affecting fields; NaN нужно либо отвергать,
+либо канонизировать по заранее выбранной policy.
+
+### Migration и наблюдаемый результат
+
+| Изменение продукта | Policy | Проверка продукта |
+|---|---|---|
+| Добавлен Mode | Новый disk ID; old-project value отдельно от Reset default | Старый project сохраняет прежнее изображение; Reset даёт новый default |
+| Amount переставлен в UI | Сохранить disk ID и смысл | Ключи остаются Amount, не переходят другому контролу |
+| Arbitrary schema v1→v2 | Decode v1, explicit migration, encode v2 | Save/reopen, duplicate, Undo сохраняют значение и анимацию |
+| Неизвестный future schema | Не перезаписывать неизвестное состояние defaults | Явный unsupported diagnostic вместо тихой потери данных |
+| Изменился sampling implementation | Не менять arithmetic/persistence незаметно | Legacy fixture + matched implementation comparison |
+
+Дублирование должно давать независимые mutable values; cache не участвует в
+семантическом compare. Восстановление sequence state строит новый runtime объект
+из валидированной плоской модели, а не доверяет адресу из старого project. См.
+[memory/flatten lifecycle](../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md).

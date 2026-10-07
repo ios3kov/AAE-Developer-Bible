@@ -1,5 +1,11 @@
 # After Effects → Effect plug-in
 
+Сквозной [state/arbitrary walkthrough](../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md#13-сохраняемое-состояние-и-arbitrary-data)
+связывает command dispatch, borrowed input, owned callback output и wire schema.
+Не читать arbitrary union до проверки команды/type ID; обычный render не передаёт
+плагину владение parameter value. Copy/flatten не является отправкой runtime cache
+между процессами.
+
 An Effect plug-in is primarily reactive: After Effects calls the exported effect dispatcher with selector commands and selector-specific data.
 
 ## Dispatcher boundary

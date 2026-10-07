@@ -116,4 +116,19 @@ Skeleton устанавливает `PF_OutFlag_DEEP_COLOR_AWARE` с комме�
 
 ## 8. От контракта к собственному продукту
 
+### Одна identity-таблица для Minimal Gain
+
+| Изменение | Где менять согласованно | Что не менять случайно |
+|---|---|---|
+| Название нового продукта | `PF_REGISTER_EFFECT`, PiPL Name, bundle metadata | Match name существующего shipping effect |
+| Обработчик | `EffectMain` declaration/definition, export, PiPL code property | ABI arguments/ calling convention |
+| Версия продукта | `PF_VERSION` в GlobalSetup и AE_Effect_Version PiPL | SDK protocol version в AE_EffectVers.h |
+| Capabilities | GlobalSetup flags и corresponding PiPL flags | Не ставить MFR/float flags без реализации |
+| Новое сохраняемое поле | Parameter disk ID / arbitrary wire schema | Старые IDs и прежний смысл значений |
+
+Minimal Gain сейчас не использует sequence или arbitrary data: Gain — обычный
+анимируемый slider, scratch `GainInfo` существует в render call. Добавлять persistence
+лишь ради наличия struct не нужно. Для составного состояния см.
+[arbitrary walkthrough](02-PARAMETERS-UI.md#13-сохраняемое-состояние-и-arbitrary-data).
+
 Для чтения SDK эта глава даёт проверенную карту команд и структур: **SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED**. Если разработчик превращает Minimal Gain в свой плагин, сборка, согласование ресурсов/экспортов, загрузка и пиксельные проверки дают доказательства именно для его артефакта и целевой среды. Они не являются условием редакционной готовности главы. Переход к областям и float: [SmartFX](03-SMARTFX.md); к данным глубины, ID и нормалей: [дополнительные каналы](08-AUXILIARY-CHANNELS.md).

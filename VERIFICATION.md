@@ -1,5 +1,12 @@
 # Verification purpose
 
+## Block 6 — 2026-10-07
+
+Scope: [review](BLOCK-6-REVIEW-2026-10-07.md), authored codec and SDK 25.6 header reading.
+Portable tests are not AE callback/persistence tests; runtime is not claimed.
+
+Local: strict C++17 codec compile/test PASS; generated docs and strict MkDocs PASS.
+
 This file is an **evidence ledger**, not the completion checklist for AE Developer Bible.
 
 It records what was actually reviewed, compiled, observed or not run so the text never overstates evidence. A missing host/compiler result means only that Bible must not claim that result. It does **not** create an obligation to build or run every example before the documentation can be complete.

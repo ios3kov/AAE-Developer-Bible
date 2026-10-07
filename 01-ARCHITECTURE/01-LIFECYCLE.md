@@ -67,6 +67,23 @@ State должен быть:
 
 ## Frame/render scope
 
+### Recovery сохраняемого Effect state
+
+```text
+flat bytes → size/schema validation → migrate known schema
+          → allocate live state → initialize transient cache → publish
+          ↘ failure: clean partial allocation; retain primary error
+```
+
+RESETUP не предполагает существование прежнего живого объекта. Copy/duplicate
+не переносит mutex, decoder pointer или callback-local world. Legacy FLATTEN и
+GET_FLATTENED_SEQUENCE_DATA имеют разные ownership transitions; смотреть точный
+selector, а не общий метод «save». Unknown future schema не превращать в defaults
+без явной product policy. Parameter Reset и восстановление sequence — разные
+операции. Практическая [таблица хранилищ и migration](../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md#13-сохраняемое-состояние-и-arbitrary-data)
+согласована с source codec; render использует валидированный snapshot и не зависит
+от того, открывалась ли UI-панель.
+
 Classic render:
 
 ```text

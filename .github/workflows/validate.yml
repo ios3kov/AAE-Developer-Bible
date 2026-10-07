@@ -45,6 +45,10 @@ jobs:
       - name: Compile native protocol headers
         run: c++ -std=c++17 -Wall -Wextra -Werror scripts/test_protocol_headers.cpp -o /tmp/protocol-headers-test
       - run: /tmp/protocol-headers-test
+      - name: Portable versioned state codec (not AE persistence test)
+        run: |
+          c++ -std=c++17 -Wall -Wextra -Werror scripts/test_versioned_state.cpp -o /tmp/state-codec-test
+          /tmp/state-codec-test
       - run: python -m pip install -r requirements-docs.txt
       - run: python -m unittest discover -s 18-SDK-HEADER-TOOLS/tests -v
       - run: >-

@@ -99,7 +99,11 @@ HEAD: <sha>
 Следующий логичный блок: <название>
 ```
 
-After this report, **stop and wait for the user's next instruction before starting the next block**.
+Default: after this report, stop and wait for the user's next instruction before starting the next block.
+Exception authorized by the owner on **2026-10-07**: finish the remaining edition
+without intermediate approval pauses; retain logical blocks, validation and status
+reports. This does not authorize fabricated evidence, arbitrary licensing decisions
+or overwriting concurrent work.
 
 ---
 
@@ -447,6 +451,7 @@ choose one logical block
 → STOP
 ```
 
-Start the next block only after the user asks to continue or approves the next block.
+Start the next block after approval, or under the owner's continuous-completion
+instruction dated 2026-10-07. In continuous mode report each checked block and continue.
 
 This workflow is mandatory for continued development of AE Developer Bible.

@@ -1,5 +1,9 @@
 # Effect plug-ins — native capability map
 
+Практический маршрут state evolution: [выбор хранилища, arbitrary callbacks и migration](../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md#13-сохраняемое-состояние-и-arbitrary-data)
+→ [portable versioned codec](../16-WORKING-TEMPLATES/effect-state/README.md).
+Это сохраняемые пользовательские значения, не PICA service state или общий render cache.
+
 Baseline for source-backed statements: **After Effects SDK 25.6 build 61**. Later-SDK notes must stay version-gated.
 
 ## Host contract
