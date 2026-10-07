@@ -60,7 +60,7 @@ PF_Cmd_SMART_RENDER → PF_SmartRenderExtra
 
 ## 4. Индекс параметра и checkout ID
 
-В `checkout_layer` отдельно передаются `index` и `checkout_idL`. Первый указывает слой-параметр: 0 — основной вход, далее дополнительные параметры. Второй выбирает эффект; header требует неотрицательное уникальное значение. В `checkout_layer_pixels` затем передаётся именно этот ID. [S1:2537–2547,2574–2579]
+В `checkout_layer` отдельно передаются `index` и `checkout_idL`. Первый указывает слой-параметр: 0 — основной вход, далее дополнительные параметры. Второй — неотрицательный уникальный идентификатор checkout, выбранный вашим эффектом, **не идентификатор другого эффекта**. В `checkout_layer_pixels` затем передаётся именно этот ID. [S1:2537–2547,2574–2579]
 
 Например, для временного эффекта два запроса одного входного слоя в разные моменты — две зависимости с разными IDs. Нельзя считать, что ID всегда равен индексу слоя: SmartyPants использует равные значения для своего простого случая, но структура API разделяет эти роли.
 
@@ -154,3 +154,26 @@ checkouts. Math expectation фиксируется до измерения. Runt
 Для GPU header дополнительно требует `PF_RenderOutputFlag_GPU_RENDER_POSSIBLE` на pre-render этапе. Само наличие поля `what_gpu` или настройка GPU у проекта не доказывает исполнения GPU-ветки конкретного эффекта. [S1:2504–2507], [S2:1007]
 
 Для собственного SmartFX-продукта проверяют отдельно CPU-корректность, float, частичные области, ошибки/отмену, cache и конкуренцию. **Уровень этой главы — SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.** Описанные сценарии не подтверждают выполнение SmartFX Copy в AE и не создают обязательный host-QA этап для Библии. Результат проверки продукта должен указывать его source/artifact identity, AE build и покрытые сценарии.
+
+## 12. Что реализует сопровождающий исходник
+
+[`SmartFxMfr.cpp`](../20-REFERENCE-IMPLEMENTATIONS/Effect/SmartFX-MFR/SmartFxMfr.cpp)
+— отдельный SOURCE EXAMPLE: SmartFX Copy, а не реализация blur или temporal filter.
+Имя каталога сохранено для существующих ссылок; оно не означает включённый MFR.
+
+| Этап | Фактическое поведение исходника | Граница |
+|---|---|---|
+| GlobalSetup | Smart render + float awareness, deep color; threaded flag отсутствует | Ни GPU, ни MFR не заявлены |
+| PreRender | Input index 0, checkout ID 1, копия output request и входных result rectangles | Нет halo, соседних времён или собственного snapshot |
+| Render | Получение input/output, `WorldTransformSuite1()->copy` | Нет собственного пиксельного алгоритма |
+| Пустой world | NULL input/output отклоняется | Это отличается от transparent-black policy temporal walkthrough |
+| Обычный error path | После успешного input checkout вызывается ранний checkin; primary error сохраняется | Exception boundary не является RAII-владельцем раннего checkin |
+| Entry point | PF_Err и прочие исключения преобразуются в return code | Не доказывает корректность ROI/empty input/render в хосте |
+
+Для перехода к пространственному или временному эффекту сначала реализуйте
+зависимости из разделов 9–10, затем typed access и арифметику из
+[пиксельной главы](06-COLOR-PIXELS.md). Не изменяйте только flags у Copy и не
+приписывайте ему математическое поведение walkthrough. Auxiliary-данные идут
+через [собственный channel contract](08-AUXILIARY-CHANNELS.md), а не через cast
+скопированного RGBA world. Исторические compiler/link results сохраняют свои
+identities в [ledger](../VERIFICATION.md); здесь не добавляется новый runtime PASS.

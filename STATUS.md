@@ -241,10 +241,15 @@ Completed as one native-service/bridge/migration block:
 
 ## Current editorial TODO
 
-1. Start block 6: Effect state and arbitrary data.
-2. Resolve the owner-deferred license decision before block 16 edition freeze.
-3. Follow blocks 7–15 and update each affected row in the chapter tracker.
-4. Complete block 16: source/link/provenance sweep and edition freeze.
+1. Finish the individual cross-page reviews for the already implemented additions
+   in blocks 6–15. Use [the chapter tracker](CHAPTER-COMPLETION-TRACKER.md) as the
+   authoritative page-level queue; do not restart these blocks as unwritten work.
+2. Reconcile each source example with its canonical chapter and state the actual
+   implementation limits before closing the affected tracker row.
+3. Resolve the owner-deferred license decision before edition freeze; until then
+   [NOTICE](NOTICE.md) remains the explicit statement of unresolved reuse rights.
+4. Complete block 16: source/link/provenance sweep, regenerated outputs and a
+   revision-bound freeze report. Final completion is not yet claimed.
 
 ## Research tracks
 

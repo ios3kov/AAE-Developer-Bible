@@ -117,6 +117,22 @@ new color conversion, ROI math implementation or auxiliary runtime output.
 
 ## Validation boundary
 
+### Completion follow-up: SmartFX / pixels / auxiliary
+
+Read the complete SmartFX, pixel/color and auxiliary chapters together with the
+CPU/GPU equivalence recipe and actual SmartFX Copy/Minimal Gain sources. Corrected
+the ambiguous sentence that made checkout ID sound like an effect identifier.
+Added the source-scope table in the canonical SmartFX chapter: Copy has no halo,
+temporal dependencies, snapshot, GPU or MFR flag; NULL rejection differs from the
+walkthrough's selected empty-input policy. Ordinary cleanup and exception boundary
+remain distinct. Pixel chapter now directly documents Gain's clamp/cast truncation
+with a distinguishing input, not merely the optional rounding formula.
+
+This review reconciles these authored examples and explanations against the
+already recorded SDK source contracts. It does not establish new SDK, renderer,
+auxiliary source qualification or host evidence. Other tracker rows remain open
+until their related-page review is recorded.
+
 Portable codec and scripting safety checks do not emulate AE SDK callbacks.
 Strict generated docs/freshness validate publication consistency, not API semantics.
 Evidence ledger records performed checks; licenses remain owner-undecided.

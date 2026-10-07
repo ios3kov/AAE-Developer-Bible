@@ -1,5 +1,15 @@
 # Changelog
 
+## Completion reconciliation — 2026-10-07
+
+- Removed current-status instructions to restart already implemented blocks;
+  historical progress remains dated rather than rewritten as current completion.
+- Corrected checkout ID wording: chosen by the effect, not selecting an effect.
+- Added an explicit SmartFX Copy source-scope table and linked the spatial/temporal,
+  pixel and auxiliary contracts; MFR/GPU/runtime capabilities remain unclaimed.
+- Reconciled Minimal Gain integer truncation with the optional rounding policy.
+- No blanket closure of the remaining core tracker rows or new host result.
+
 ## Practical completion additions — 2026-10-07
 
 - Follow-up: bounded JSX import/disabled-queue source and portable safety regressions;

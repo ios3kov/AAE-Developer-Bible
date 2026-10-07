@@ -1,5 +1,25 @@
 # Verification purpose
 
+## Completion reconciliation — 2026-10-07
+
+Source parent: `8d78e067b11f9f219215f8f940c951f30a66d51c`; the follow-up changes
+are identified by the commit containing this record, not by that parent. Reviewed
+current status/plan/tracker and SmartFX/pixel/auxiliary explanations against the
+authored Copy/Gain sources. No new Adobe SDK compilation or AE execution.
+
+Local checks after these edits on macOS, using the existing documentation venv:
+
+- consistency unit tests: 10/10 PASS;
+- `scripts/check_docs_consistency.py`: PASS;
+- regeneration followed by `scripts/build_docs.py --check`: PASS;
+- `mkdocs build --strict`: PASS;
+- `git diff --check`: PASS.
+
+The unit tests deliberately print stale-output messages when exercising drift
+rejection; these are expected negative fixtures, not a failed current freeze.
+Existing dependencies were reused; no clean lock-file installation is claimed.
+Remote Validate for this follow-up is not established by these local results.
+
 ## Block 6 — 2026-10-07
 
 ### Subsequent practical additions

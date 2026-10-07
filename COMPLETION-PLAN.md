@@ -20,7 +20,16 @@
 
 Для каждого core chapter в coverage tracker отмечать отдельно: полнота объяснения, практический сценарий, provenance, согласованность примеров, links. Статусы: complete / needs expansion / needs reconciliation / intentionally limited. Последний статус требует ясного объяснения, а не служит способом скрыть недописанный материал.
 
-## Прогресс — 2026-10-02
+## Текущая очередь — 2026-10-07
+
+Блоки 1–5 завершены в описанной ниже редакционной/tooling области. Практические
+дополнения блоков 6–15 уже реализованы; их результаты и оставшиеся ограничения
+перечислены в [поглавном трекере](CHAPTER-COMPLETION-TRACKER.md). Следующая работа —
+сверить оставшиеся строки вместе со связанными главами, исходниками и источниками,
+а не повторно начать написание блока 6. Блок 16 и финальный freeze ещё не завершены.
+Лицензия остаётся решением владельца, явно отложенным в [NOTICE](NOTICE.md).
+
+## Исторический прогресс — 2026-10-02
 
 **Блок 1: выполнен; результаты проверок — в [ledger](VERIFICATION.md#block-1-editorial-readiness-and-evidence-2026-10-02).** Устранены active legacy gates, scoped исторический compiler result, согласован FSTR rerun status. [Поглавный трекер](CHAPTER-COMPLETION-TRACKER.md) охватывает 127 core pages. Блок 2 завершён отдельной итерацией 2026-10-04; блок 3 завершён 2026-10-04; следующий блок — **4: проверки и генерация документации**.
 
@@ -99,7 +108,7 @@
 
 ## 5. Источники и таблица версий
 
-**Выполнен 2026-10-04 в редакционной области; PR #2 слит в main на `8e95a2df24433bfe2f58a1bb42b50f30c9cdf9c8`.** [Таблица](BLOCK-5-SOURCES.md): 27 scoped claim/source records с отдельными SDK/host/panel/platform границами и двумя историческими documentation regeneration records. [Review](BLOCK-5-REVIEW-2026-10-04.md): fresh platform/roadmap checks, selected practical-depth comparison и ограничения. По решению владельца лицензия собственного текста/кода пока неопределённа; решить перед freeze (блок 16). Полный построчный review внешних коллекций и host/runtime не заявлены. Следующий блок 6 ещё не начат.
+**Выполнен 2026-10-04 в редакционной области; PR #2 слит в main на `8e95a2df24433bfe2f58a1bb42b50f30c9cdf9c8`.** [Таблица](BLOCK-5-SOURCES.md): 27 scoped claim/source records в том историческом снимке с отдельными SDK/host/panel/platform границами и двумя историческими documentation regeneration records. [Review](BLOCK-5-REVIEW-2026-10-04.md): fresh platform/roadmap checks, selected practical-depth comparison и ограничения. По решению владельца лицензия собственного текста/кода пока неопределённа; решить перед freeze (блок 16). Полный построчный review внешних коллекций и host/runtime не заявлены. На момент этого исторического закрытия блок 6 ещё не был начат; текущая очередь указана выше.
 
 **Файлы:** SOURCES, environment/version chapters, SDK records, platform source review, CEP/UXP transition, NOTICE.
 
@@ -252,7 +261,10 @@ Signing/installer walkthrough включает digest/timestamp/verify, Adobe pa
 
 Reverse-engineering atlas, новые real-project case studies, host-observed examples, дополнительные SDK generations и готовые sample project bundles полезны, но развиваются отдельными версиями. Полноценный AE UXP guide добавляется после появления доступного AE-specific contract, а не по roadmap других Adobe hosts.
 
-**Первый рекомендуемый шаг: блок 1.** Он устраняет двусмысленность цели и доказательств, после чего остальные блоки можно дописывать по одной понятной системе готовности.
+**Текущий рекомендуемый шаг: поглавная сверка дополнений блоков 6–15.** Блок 1
+уже установил общую систему готовности и доказательств. Не открывать его заново
+из-за исторического порядка плана; подтверждённые новые противоречия исправлять
+отдельно, сохраняя прежние evidence records.
 
 
 ## Дополнение из ElasticGridFX
