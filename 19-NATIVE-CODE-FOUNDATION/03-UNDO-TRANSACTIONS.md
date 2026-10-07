@@ -145,6 +145,28 @@ For a concrete product, useful runtime checks include:
 
 ## Product acceptance guidance
 
+### Resource cleanup is not compensation
+
+Disposing an EffectRef releases access to an effect; it does not remove the applied
+effect from a layer. Freeing a caller-owned footage handle before adoption differs
+from deleting a project item after adoption. A completed keyframe batch is also
+not undone by releasing the borrowed stream. The command layer must explicitly
+record which mutations occurred and decide whether safe compensation is possible.
+
+For a multi-step command, use a product-owned operation record such as:
+
+| Stage | Record | Failure response |
+|---|---|---|
+| Preflight | Fresh target, capabilities, intended values | Refuse before mutation |
+| Start undo | Start status and active scope | Refuse if grouping is required |
+| Mutation | Own-created objects and actual completed steps | Stop; do not report full success |
+| Compensation | Only actions whose reversal is safe and defined | Preserve primary and compensation errors |
+| End undo | Explicit end result if required | Report separately from domain success |
+
+This is an orchestration policy, not an existing transaction implementation in
+`UndoScope.h`. Background compute and confirmation UI stay outside the active
+undo scope; target resolution is repeated at the host-safe mutation boundary.
+
 A product should not claim reliable multi-step undo semantics until it has:
 
 - validated prerequisites;

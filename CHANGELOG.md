@@ -2,6 +2,10 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Owner chose to continue without a reuse license; NOTICE states the current
+  decision separately from the historical deferred-choice record.
+- Foundation guidance now traces the actual render receipt operation and
+  distinguishes ordinary cleanup, exception fallback and mutation compensation.
 - Removed current-status instructions to restart already implemented blocks;
   historical progress remains dated rather than rewritten as current completion.
 - Corrected checkout ID wording: chosen by the effect, not selecting an effect.

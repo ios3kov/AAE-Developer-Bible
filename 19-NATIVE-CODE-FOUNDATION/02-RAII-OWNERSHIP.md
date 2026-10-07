@@ -160,6 +160,36 @@ For a concrete product, additional runtime evidence may cover:
 
 These are product-evidence concerns, not conditions for Bible editorial completion.
 
+## Read the helpers with an actual operation
+
+The canonical authored [render recipe](../17-NATIVE-SUITE-COOKBOOK/code/RenderRecipes.cpp)
+composes the receipt owner with the callback guard:
+
+~~~text
+caller owns configured RenderOptions
+→ recipe acquires RenderSuite through SuiteHandler
+→ RenderAndCheckoutFrame returns receipt
+→ receipt owner borrows suite table
+→ GetReceiptWorld returns borrowed world
+→ consume completes while receipt is alive
+→ explicit CheckinFrame on the ordinary return path
+→ resource owner destroyed before SuiteHandler
+~~~
+
+The consumer must not retain the world or pointers into it. The recipe does not
+dispose caller-owned options, schedule asynchronous work or perform export/file
+verification. On the ordinary path it returns a checkin error only when there is
+no primary error. On exception unwind the owner performs fallback checkin and
+discards its status. Thus **both errors are not recorded by this helper**; a
+product needing that diagnostic must provide an explicit result/logging policy.
+
+In contrast, [the keyframe recipe](../17-NATIVE-SUITE-COOKBOOK/code/KeyframeRecipes.cpp)
+borrows its input stream and owns newly obtained StreamValue and batch resources.
+It cleans ordinary error paths but has no callback guard or scope owners for
+exception unwind. Do not infer that every cookbook recipe already composes this
+foundation layer. See [callback boundary](04-HOST-CALL-BOUNDARY.md) before calling
+it from an exported host callback.
+
 ## Verification boundary
 
 RAII proves deterministic local cleanup only when the ownership assumption and suite lifetime are correct.

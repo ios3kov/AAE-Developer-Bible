@@ -133,6 +133,21 @@ already recorded SDK source contracts. It does not establish new SDK, renderer,
 auxiliary source qualification or host evidence. Other tracker rows remain open
 until their related-page review is recorded.
 
+### Completion follow-up: foundation composition
+
+Read suite acquisition, RAII ownership, undo and callback boundary chapters with
+the actual RenderRecipes/KeyframeRecipes sources. Added the render operation's
+borrowed-options/world and owned-receipt lifetimes, ordinary primary-error policy
+and fallback-checkin diagnostic limit. Keyframe recipe's ordinary cleanup does
+not establish exception unwind safety. Undo guidance now explicitly separates
+EffectRef disposal and footage adoption from safe mutation compensation; the
+operation table is a recommended command-layer design, not shipped transaction
+code. No new SDK declaration or host result introduced.
+
+Owner decision during completion: keep the authored material without a reuse
+license for now. NOTICE preserves the earlier record and states the new decision;
+editorial readiness does not grant reuse rights.
+
 Portable codec and scripting safety checks do not emulate AE SDK callbacks.
 Strict generated docs/freshness validate publication consistency, not API semantics.
 Evidence ledger records performed checks; licenses remain owner-undecided.

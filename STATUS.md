@@ -246,8 +246,8 @@ Completed as one native-service/bridge/migration block:
    authoritative page-level queue; do not restart these blocks as unwritten work.
 2. Reconcile each source example with its canonical chapter and state the actual
    implementation limits before closing the affected tracker row.
-3. Resolve the owner-deferred license decision before edition freeze; until then
-   [NOTICE](NOTICE.md) remains the explicit statement of unresolved reuse rights.
+3. Retain the owner's 2026-10-07 decision to continue without a reuse license in
+   [NOTICE](NOTICE.md). Do not introduce MIT/CC terms or imply copying permission.
 4. Complete block 16: source/link/provenance sweep, regenerated outputs and a
    revision-bound freeze report. Final completion is not yet claimed.
 
