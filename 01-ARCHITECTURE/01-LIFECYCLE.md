@@ -19,6 +19,12 @@ AE loads/reads PiPL
 
 Не существует одного «Effect object lifetime». Есть несколько scopes.
 
+The arrows describe responsibility scopes, not a guaranteed linear callback trace.
+Reload/resetup, cancellation and cache reuse can skip the render you expected.
+In particular, a transferred SmartFX pre-render snapshot must be released through
+its delete callback even if no render follows; static destructors after shutdown
+must not call host APIs. Keep primary errors while performing permitted cleanup.
+
 ## Global scope
 
 Живёт на уровне загруженного effect module.

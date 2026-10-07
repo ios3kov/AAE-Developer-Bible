@@ -4,6 +4,12 @@ Updated: **2026-10-07**
 
 ## Continuous completion — 2026-10-07
 
+Remaining audit branches: five export-only branches reviewed with no chapter/source
+material to transfer. Native/source branch `31fba78` is retained pending full
+reconciliation. First selective transfer fixes CEP paths, documents SignTool warning
+handling and lifecycle boundaries, and adds dependency-preserving SDK workspace mode.
+[Decisions and remaining queue](AUDIT-BRANCH-RECONCILIATION-2026-10-07.md).
+
 Completion follow-up: current status/plan no longer instruct restarting implemented
 blocks. SmartFX Copy/Gain limitations are now directly documented in canonical
 chapters. Foundation overview, four chapters, headers, tests and related render/

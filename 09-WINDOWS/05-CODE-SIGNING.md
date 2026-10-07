@@ -33,6 +33,14 @@ signtool verify /pa /v MyPlugin.aex
 
 Verify the exact staged/shipping file after all mutations are complete.
 
+The [SignTool reference](https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool)
+defines exit codes 0 (success), 1 (failure) and 2 (warnings). A release runner must
+explicitly handle warnings, not accept every code other than 1. `/pa` selects
+Authenticode verification policy; `/all` verifies all signatures when applicable.
+Do not use signing `/a` blindly in release CI: select the intended certificate and
+verify the resulting signer identity. These are documented rules, not a new
+Windows execution result.
+
 ## Sign final binaries
 
 Correct order:

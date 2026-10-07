@@ -64,7 +64,7 @@ System:
 
 User:
 
-    %AppData%\Roaming\Adobe\CEP\extensions
+    %AppData%\Adobe\CEP\extensions
 
 CEP runtime/version and signing/debug-mode policy still apply. A directory existing does not prove the host accepts the package.
 

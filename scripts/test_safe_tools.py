@@ -201,6 +201,32 @@ class HostCycleSafetyTests(unittest.TestCase):
 
 
 class MaterializeSafetyTests(unittest.TestCase):
+    def test_workspace_preserves_dependencies_and_refuses_existing_output(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            examples = self.make_examples(root)
+            (examples / "Util").mkdir()
+            (examples / "Util/helper.cpp").write_text("dependency")
+            out = root / "workspace"
+            written = materialize_sdk_examples.materialize_workspace(
+                examples, out, ["native-panel"]
+            )
+            self.assertEqual(written, [(out / "Examples/AEGP/Panelator").resolve()])
+            self.assertEqual((written[0] / "../../Util/helper.cpp").read_text(), "dependency")
+            self.assertTrue((out / "workspace-index.json").is_file())
+            with self.assertRaises(ValueError):
+                materialize_sdk_examples.materialize_workspace(examples, out, ["native-panel"])
+            self.assertTrue((examples / "AEGP/Panelator/Panelator.cpp").is_file())
+
+    def test_workspace_rejects_overlap_before_copy(self):
+        with tempfile.TemporaryDirectory() as td:
+            examples = self.make_examples(Path(td))
+            with self.assertRaises(ValueError):
+                materialize_sdk_examples.materialize_workspace(
+                    examples, examples / "workspace", ["native-panel"]
+                )
+            self.assertFalse((examples / "workspace").exists())
+
     def make_examples(self, root: Path, source_name: str = "Panelator.cpp") -> Path:
         examples = root / "Examples"
         (examples / "Headers").mkdir(parents=True)

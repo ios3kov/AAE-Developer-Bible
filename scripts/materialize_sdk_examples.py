@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 import tempfile
 from pathlib import Path
@@ -117,15 +118,44 @@ def materialize(examples: Path, out: Path, names: list[str] | None = None) -> li
     return written
 
 
+def materialize_workspace(examples: Path, out: Path, names: list[str] | None = None) -> list[Path]:
+    """Preserve SDK-relative dependencies in a fresh, locally licensed workspace."""
+    examples = examples.resolve()
+    if out.is_symlink():
+        raise ValueError("Destination must not be a symlink")
+    out = out.resolve()
+    if out.exists() or _overlap(examples, out):
+        raise ValueError("Use a new workspace outside the source SDK tree")
+    if not examples.is_dir():
+        raise ValueError("Expected SDK Examples directory")
+    if not (examples / "Headers/AE_GeneralPlug.h").is_file():
+        raise ValueError("Expected SDK Examples directory with Headers/AE_GeneralPlug.h")
+    selected = list(dict.fromkeys(names or SAMPLES))
+    for name in selected:
+        rel, stem = SAMPLES[name]
+        _validate_sample(examples / rel, stem)
+    # Keep Headers/Util/Resources and sibling project dependencies at original paths.
+    _replace_tree_transactionally(examples, out / "Examples")
+    index = {name: "Examples/" + SAMPLES[name][0] for name in selected}
+    (out / "workspace-index.json").write_text(json.dumps({
+        "source": str(examples), "samples": index,
+        "verification": "copied only; no build or host result",
+    }, indent=2) + "\n")
+    return [out / index[name] for name in selected]
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("examples", type=Path)
     ap.add_argument("--out", type=Path, default=Path(".build/sdk-examples"))
     ap.add_argument("--only", choices=sorted(SAMPLES), action="append")
+    ap.add_argument("--workspace", action="store_true",
+                    help="Copy the whole Examples layout into a fresh output; --only selects index entries")
     args = ap.parse_args(argv)
 
     try:
-        written = materialize(args.examples, args.out, args.only)
+        copier = materialize_workspace if args.workspace else materialize
+        written = copier(args.examples, args.out, args.only)
     except ValueError as exc:
         ap.error(str(exc))
 

@@ -59,4 +59,16 @@ Those product-validation steps are described elsewhere in the Bible, but **the B
 
 `scripts/materialize_sdk_examples.py` can create local untracked sample workspaces as an optional developer utility.
 
+For an actual SDK project, preserve its relative dependencies:
+
+```sh
+python3 scripts/materialize_sdk_examples.py "/path/to/SDK/Examples" --workspace --out .build/sdk-workspace --only native-panel
+```
+
+Workspace mode copies the **whole locally licensed Examples tree** into a fresh
+output directory; `--only` selects entries in `workspace-index.json`, not files to
+copy. It refuses existing or SDK-overlapping output. Default mode still extracts
+individual source shells for inspection/adaptation; those isolated copies are not
+standalone build projects. Do not commit or redistribute the licensed workspace.
+
 Historical compiler/runtime evidence, where present, remains documented in [VERIFICATION.md](../VERIFICATION.md).

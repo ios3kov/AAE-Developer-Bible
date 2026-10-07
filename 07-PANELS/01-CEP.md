@@ -111,7 +111,10 @@ Windows system:
 
 Windows user:
 
-    %AppData%\Roaming\Adobe\CEP\extensions
+    %AppData%\Adobe\CEP\extensions
+
+`%AppData%` already resolves to the user's roaming AppData directory; do not append
+another `Roaming`. This is path guidance, not a Windows installation test.
 
 These are CEP extension locations, not native .plugin/.aex locations.
 
