@@ -307,6 +307,49 @@ Expensive encode/network/GPU processing happens after the product owns a copy.
 
 ## 22. Asynchronous protocol boundary
 
+### Source rereview and concrete safe route — 2026-10-07
+
+Re-read supplied25.6build61 `AE_Hook.h` in full and `GP/EMP/EMP.cpp`.
+Header declares completion with receipt/error, but contains no buffer-retention,
+completion-thread, cancellation or death-hook ordering contract. EMP remains no-op.
+Thus async consumer cannot be derived safely from this source alone; this is a
+specific missing vendor contract, not a demand to host-test every Bible example.
+
+A complete **synchronous-copy design** can still avoid this missing protocol:
+initialize this callback's output flags to NONE; validate positive signed dimensions
+and stride before converting to size_t; accept only supported format/depth/layout
+combinations; copy needed rows into owned staging; publish copied metadata; return
+without ASYNCHRONOUS and without invoking optional completion for later worker work.
+The worker uses only the product copy, so its completion is a product queue event,
+not AE_BlitCompleteFunc. Never retain receipt/view/pix-buffer pointers in that queue.
+
+[Portable row-copy reference](https://github.com/ios3kov/AAE-Developer-Bible/blob/main/19-NATIVE-CODE-FOUNDATION/code/monitor_frame_copy.hpp)
+demonstrates checked products/offsets, padded-source to packed-destination copying,
+byte budget and publish-only-on-success. It preserves channel bytes unchanged;
+no swizzle/color transform or enum inference. Its caller must establish readable
+source extent from a valid layout/host contract; inventing extent from an unchecked
+pointer cannot make it safe. Negative strides and unsupported layouts are rejected
+by the adapter policy, not claimed impossible in all hosts. Blank-frame null pointer
+is handled before calling this helper (explicit blank message), not a copy error.
+
+[Portable tests](../19-NATIVE-CODE-FOUNDATION/tests/test_monitor_frame_copy.cpp)
+cover padding, independent copied storage, truncation, budget, null, short rows,
+zero/unsupported layouts and overflow, plus8/16-byte pixels. Example command:
+
+```sh
+c++ -std=c++17 -Wall -Wextra -Werror \
+  19-NATIVE-CODE-FOUNDATION/tests/test_monitor_frame_copy.cpp \
+  -o /path/to/product-build/test_monitor_frame_copy
+/path/to/product-build/test_monitor_frame_copy
+```
+
+This reference allocates per successful copy; real monitoring should use a bounded
+preallocated pool and nonblocking saturation policy. Allocation exceptions must be
+caught by the host callback boundary. It is not an exported BlitHook plugin, queue
+implementation or performance/AE runtime proof. Death hook must stop/join all
+product workers before freeing state or unloading code; a timeout does not authorize
+detaching a worker into unloaded plugin code.
+
 The header exposes asynchronous flag + receipt + completion callback, but the supplied sample does not establish the complete pointer/receipt timing model.
 
 Bible therefore does not invent it.

@@ -2,6 +2,19 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### BlitHook copy operation and pinned scripting denominator
+
+Parent `6b2b163`. Original product-side copy helper, no Adobe ABI/header reproduction.
+C++17 -Wall/-Wextra/-Werror with AddressSanitizer/UBSan compile/run PASS. Cases:
+padded rows, copied lifetime, source truncation, byte budget, null/invalid layouts,
+overflow and8/16-byte pixels. Portable result, not AE callback/runtime PASS.
+Pinned scripting inventory extraction completed45 pages/629 member headings;
+UNASSESSED not inferred covered from literal mentions. Python extractor tests and
+standard scripts discovery, consistency/checker, generated freshness, strict MkDocs
+and whitespace checks PASS (scripts85/85, consistency11/11). First strict build
+found .hpp absent from staged docs; source link changed to repository download,
+then strict build rerun. No current SDK/host matrix claim.
+
 ### Scripting26.x delta and shared UXP workflow
 
 Parent `ec4c684`; containing commit identifies new source documentation. Pinned

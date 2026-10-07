@@ -2,6 +2,11 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Added original portable bounded row-copy reference for BlitHook synchronous
+  staging; async lifetime remains unsupported by supplied source.
+- Added pinned scripting DOM inventory (45 pages/629 member headings), source hashes
+  and explicit unassessed coverage; historical freeze matrix now marked as such.
+
 - Added scoped scripting26.x operations: typed guides, layer/stage pairs, mesh and
   variable-font axes. Separated scripting introduction versions from native/UXP.
 - Added shared UXP development/least-privilege/CCX/install workflow; documented

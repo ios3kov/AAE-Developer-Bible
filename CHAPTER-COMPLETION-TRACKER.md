@@ -4,6 +4,11 @@
 
 ## Final editorial result — 2026-10-07
 
+New block: BlitHook synchronous-copy reference and portable tests added; original
+async limitation confirmed by full25.6 header/sample reread. Scripting inventory
+now records45 pages/629 headings, without promoting token mentions to C. Active
+expanded member-level acceptance remains separate from historical chapter labels.
+
 Expanded third-block review: scripting26.x operational delta and shared UXP
 permissions/development/distribution workflow now documented. AE host setup ID and
 full member reconciliation stay in active currentness queue; historical C rows are

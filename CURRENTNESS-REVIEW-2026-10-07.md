@@ -64,6 +64,34 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ## Native26.5 public-contract reconciliation
 
+### Reproducible scripting inventory
+
+`scripts/audit_scripting_inventory.py` obtained all45 DOM pages at pinned scripting
+revision and extracted629 unique member headings within their pages. Report:
+`scripting-api-inventory-2026-10-07.json` (per-page SHA256, member names, literal
+mentions in scripting/templates and explicit UNASSESSED status). No upstream prose
+copied. Source tree truncation fails closed. This is a machine inventory, not629
+human-reviewed contracts; mentions are not practical coverage, overload signatures
+and expressions/matchnames are outside this extractor's scope. Reproduce:
+
+```sh
+.venv/bin/python scripts/audit_scripting_inventory.py \
+  --output scripting-api-inventory-2026-10-07.json
+```
+
+This supplies a concrete review denominator instead of assuming128 chapters cover
+the current API. Per-member/topic reconciliation remains OPEN and visible.
+
+### BlitHook limitation disposition — synchronous operation supplied
+
+Full local25.6 AE_Hook.h/EMP.cpp reread: no async lifetime/thread/cancel ordering
+contract found. Async remains blocked on vendor details rather than invented timing.
+Added concrete synchronous-copy callback/worker separation plus original portable
+row-copy helper/tests. Valid source extent is caller precondition; no SDK source
+redistributed or ABI shim invented. Native guide inventory and remaining API coverage
+are still independent OPEN tasks. This closes the lack of a concrete safe copy
+operation, not the undocumented async path.
+
 ### Third block: scripting delta and shared UXP workflow
 
 Scripting source pinned `7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`: changelog,

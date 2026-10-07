@@ -2,6 +2,12 @@
 
 Edition: **1.1 editorial freeze**, updated 2026-10-07.
 
+**Active expanded acceptance is unfinished:** [currentness review](CURRENTNESS-REVIEW-2026-10-07.md).
+The freeze matrix below is historical, not the current API completeness result.
+Current scripting inventory finds629 member headings across45 pinned DOM pages;
+member-level review is UNASSESSED until actually reconciled. AE UXP/shared workflow
+and scoped26.x native/scripting changes are additions after freeze, not a full-current PASS.
+
 This matrix describes **documentation coverage, reference material and evidence boundaries**. It is not a product QA scoreboard.
 
 [Поглавный трекер завершения](CHAPTER-COMPLETION-TRACKER.md) дополняет эту обзорную матрицу конкретными задачами для всех 127 core pages. Он не объявляет полную готовность направлений по одной обзорной оценке «strong/source reviewed».

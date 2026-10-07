@@ -1,0 +1,3461 @@
+{
+  "source_revision": "7137a990db4bd8dc9f5869b8ca431c7dfed52bdc",
+  "scope": "DOM member headings; excludes expressions/matchnames",
+  "warning": "Literal mentions do not establish practical or contract coverage. No auto-PASS.",
+  "source_pages": 45,
+  "members": 629,
+  "records": [
+    {
+      "source_path": "docs/general/application.md",
+      "source_sha256": "e52a01661517b25ef437bbb3596744ed138761789f2d85701cde34c306e2b405",
+      "members": [
+        {
+          "name": "app.activate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.activeViewer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.availableGPUAccelTypes",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.beginSuppressDialogs",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.beginUndoGroup",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md",
+            "06-SCRIPTING/README.md",
+            "16-WORKING-TEMPLATES/cep-panel-bridge/host/index.jsx",
+            "16-WORKING-TEMPLATES/jsx-tool/build-demo-rig.jsx",
+            "16-WORKING-TEMPLATES/jsx-tool/import-and-queue.jsx",
+            "16-WORKING-TEMPLATES/jsx-tool/rename-selected-layers.jsx"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.buildName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.buildNumber",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.cancelTask",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.disableRendering",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.effects",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.endSuppressDialogs",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.endUndoGroup",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md",
+            "06-SCRIPTING/README.md",
+            "16-WORKING-TEMPLATES/cep-panel-bridge/host/index.jsx",
+            "16-WORKING-TEMPLATES/jsx-tool/build-demo-rig.jsx",
+            "16-WORKING-TEMPLATES/jsx-tool/import-and-queue.jsx",
+            "16-WORKING-TEMPLATES/jsx-tool/rename-selected-layers.jsx"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.endWatchFolder",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.executeCommand",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.exitAfterLaunchAndEval",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.exitCode",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.findMenuCommandId",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.fonts",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.isRenderEngine",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.isWatchFolder",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.isoLanguage",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.memoryInUse",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.newProject",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.onError",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.open",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.openFast",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.parseSwatchFile",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.pauseWatchFolder",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.preferences",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.project",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md",
+            "06-SCRIPTING/README.md",
+            "16-WORKING-TEMPLATES/cep-panel-bridge/host/index.jsx",
+            "16-WORKING-TEMPLATES/jsx-tool/build-demo-rig.jsx",
+            "16-WORKING-TEMPLATES/jsx-tool/import-and-queue.jsx",
+            "16-WORKING-TEMPLATES/jsx-tool/rename-selected-layers.jsx"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.purge",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.quit",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.restart",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.saveProjectOnCrash",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.scheduleTask",
+          "literal_mentions": [
+            "06-SCRIPTING/02-SCRIPTUI.md"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.setMemoryUsageLimits",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.setMultiFrameRenderingConfig",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.setSavePreferencesOnQuit",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.settings",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.version",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "app.watchFolder",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/general/globals.md",
+      "source_sha256": "626265c43a51eb92c3f99043bc606fbf2c6606c677c8a775a72267a2b357351e",
+      "members": []
+    },
+    {
+      "source_path": "docs/general/project.md",
+      "source_sha256": "a9d93a56db945aef500e2061f3a22255e30cc06b18ddf10a3dde303a3a0041ff",
+      "members": [
+        {
+          "name": "Project.activeItem",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.autoFixExpressions",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.bitsPerChannel",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.close",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.closeTeamProject",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.compensateForSceneReferredProfiles",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.consolidateFootage",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.convertTeamProjectToProject",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.dirty",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.displayStartFrame",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.expressionEngine",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.feetFramesFilmType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.file",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.footageTimecodeDisplayStartType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.framesCountType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.framesUseFeetFrames",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.gpuAccelType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.importFile",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.importFileWithDialog",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.importPlaceholder",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.isAnyTeamProjectOpen",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.isLoggedInToTeamProject",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.isResolveCommandEnabled",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.isShareCommandEnabled",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.isSyncCommandEnabled",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.isTeamProjectEnabled",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.isTeamProjectOpen",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.item",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.itemByID",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.items",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.layerByID",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.linearBlending",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.linearizeWorkingSpace",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.listColorProfiles",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.listTeamProjects",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.newTeamProject",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.numItems",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.openTeamProject",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.reduceProject",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.removeUnusedFootage",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.renderQueue",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.replaceFont",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.resolveConflict",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.revision",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.rootFolder",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.save",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.saveWithDialog",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.selection",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.setDefaultImportFolder",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.shareTeamProject",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.showWindow",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.syncTeamProject",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.timeDisplayType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.toolType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.transparencyGridThumbnails",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.usedFonts",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.workingGamma",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.workingSpace",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Project.xmpPacket",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/general/system.md",
+      "source_sha256": "539aab80c11db13029defa8e86e85dde6b78852f1e19960c703f562bec5fdccd",
+      "members": [
+        {
+          "name": "System.callSystem",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "System.machineName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "System.osName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "System.osVersion",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "System.userName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/item/avitem.md",
+      "source_sha256": "09f0727ccb5357918b43e64d793edbffe730fa588f0cf52be70dc4f134d13b70",
+      "members": [
+        {
+          "name": "AVItem.duration",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.footageMissing",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.frameDuration",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.frameRate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.hasAudio",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.hasVideo",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.height",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.isMediaReplacementCompatible",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.name",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.pixelAspect",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.proxySource",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.setProxy",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.setProxyToNone",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.setProxyWithPlaceholder",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.setProxyWithSequence",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.setProxyWithSolid",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.time",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.useProxy",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.usedIn",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVItem.width",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/item/compitem.md",
+      "source_sha256": "292d6940b4c29f15d137765bb06251dd37eaf7299c789cba73da4beb55bf4f2f",
+      "members": [
+        {
+          "name": "CompItem.activeCamera",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.bgColor",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.counters",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.displayStartFrame",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.displayStartTime",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.draft3d",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.dropFrame",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.duplicate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.exportAsMotionGraphicsTemplate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.frameBlending",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.frameDuration",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.getMotionGraphicsTemplateControllerName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.hideShyLayers",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.layer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.layers",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.markerProperty",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.motionBlur",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.motionBlurAdaptiveSampleLimit",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.motionBlurSamplesPerFrame",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.motionGraphicsTemplateControllerCount",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.motionGraphicsTemplateName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.numLayers",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.openInEssentialGraphics",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.openInViewer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.preserveNestedFrameRate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.preserveNestedResolution",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.renderer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.renderers",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.resolutionFactor",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.selectedLayers",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.selectedProperties",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.setMotionGraphicsControllerName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.shutterAngle",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.shutterPhase",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.workAreaDuration",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CompItem.workAreaStart",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/item/folderitem.md",
+      "source_sha256": "c94f448b4cd7df86bb0ad364b723f615f86cab714639cfea90bc3c04e4df20e2",
+      "members": [
+        {
+          "name": "FolderItem.item",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FolderItem.items",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FolderItem.numItems",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/item/footageitem.md",
+      "source_sha256": "ce08462e56a04331ef14c0d543ec3fa6637c9f60075f8f8fdfcf4f0074ec6324",
+      "members": [
+        {
+          "name": "FootageItem.file",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FootageItem.mainSource",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FootageItem.openInViewer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FootageItem.replace",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FootageItem.replaceWithPlaceholder",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FootageItem.replaceWithSequence",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FootageItem.replaceWithSolid",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/item/item.md",
+      "source_sha256": "ac9e8ffcf7b537e6c4154e1171c5481d4a9f5ca81d8b4e69c0a05cb98934eaba",
+      "members": [
+        {
+          "name": "Item.addGuide",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.comment",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.dynamicLinkGUID",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.getGuideAsObject",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.guides",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.id",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.label",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.name",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.parentFolder",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.remove",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.removeGuide",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.selected",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.setGuide",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Item.typeName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/item/itemcollection.md",
+      "source_sha256": "9a06d8ba296208bcfb6a06299d5f80aac9bb7746cc3f4286867cfa79768a2905",
+      "members": [
+        {
+          "name": "ItemCollection.addComp",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ItemCollection.addFolder",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/layer/avlayer.md",
+      "source_sha256": "6f36967cb7f015b14873af52e33cce6cf1669698de3c76c207e6509641de2b1d",
+      "members": [
+        {
+          "name": "AVLayer.addToMotionGraphicsTemplate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.addToMotionGraphicsTemplateAs",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.adjustmentLayer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.audioActive",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.audioActiveAtTime",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.audioEnabled",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.blendingMode",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.calculateTransformFromPoints",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.canAddToMotionGraphicsTemplate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.canSetCollapseTransformation",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.canSetTimeRemapEnabled",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.collapseTransformation",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.compPointToSource",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.effectsActive",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.environmentLayer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.frameBlending",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.frameBlendingType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.guideLayer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.hasAudio",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.hasTrackMatte",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.height",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.isNameFromSource",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.isTrackMatte",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.motionBlur",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.openInViewer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.preserveTransparency",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.quality",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.removeTrackMatte",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.replaceSource",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.samplingQuality",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.setTrackMatte",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.source",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.sourcePointToComp",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.sourceRectAtTime",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.threeDLayer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.threeDPerChar",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.timeRemapEnabled",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.trackMatteLayer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.trackMatteType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "AVLayer.width",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/layer/cameralayer.md",
+      "source_sha256": "5aca9653d3ba588f9da2769a3771c44e1e604c49e93317b836fcffcf18e1be60",
+      "members": []
+    },
+    {
+      "source_path": "docs/layer/layer.md",
+      "source_sha256": "d5fbcc3985ed935d41dd257a9ccb873aea8991969789e66acb5cd2cd4cb09a39",
+      "members": [
+        {
+          "name": "Layer.activeAtTime",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.addGuide",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.applyPreset",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.autoOrient",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.comment",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.containingComp",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.copyToComp",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.doSceneEditDetection",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.duplicate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.getGuideAsObject",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.guides",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.hasVideo",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.id",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.inPoint",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.index",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.isNameSet",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.label",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.locked",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.marker",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.moveAfter",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.moveBefore",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.moveToBeginning",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.moveToEnd",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.nullLayer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.outPoint",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.parent",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.remove",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.removeGuide",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.selectedProperties",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.setGuide",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.setParentWithJump",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.shy",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.solo",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.startTime",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.stretch",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Layer.time",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/layer/layercollection.md",
+      "source_sha256": "b7f0462632d1a13f0ef4b02727b293d48b72c75ce1f0e6bd065be8d18b7ace66",
+      "members": [
+        {
+          "name": "LayerCollection.add",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "LayerCollection.addBoxText",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "LayerCollection.addCamera",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "LayerCollection.addLight",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "LayerCollection.addNull",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "LayerCollection.addParametricMesh",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "LayerCollection.addShape",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "LayerCollection.addSolid",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "LayerCollection.addText",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "LayerCollection.addVerticalBoxText",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "LayerCollection.addVerticalText",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "LayerCollection.byName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "LayerCollection.precompose",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/layer/lightlayer.md",
+      "source_sha256": "86a9dd47d2bca122ccb7727517a37758a5a5e12f58071dc07d19fb95f865331d",
+      "members": [
+        {
+          "name": "LightLayer.lightType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/layer/parametricmeshlayer.md",
+      "source_sha256": "0d7e33b2af164925da1c55967603028807c003e6d5815fca72f1c7e57b9219e7",
+      "members": [
+        {
+          "name": "ParametricMeshLayer.parametricBevelOptions",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ParametricMeshLayer.parametricMeshOptions",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ParametricMeshLayer.parametricMeshType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/layer/shapelayer.md",
+      "source_sha256": "be961766dafb8722e80edfe77fde0a80c90f0e49bf31b97ff4466c9bba310725",
+      "members": []
+    },
+    {
+      "source_path": "docs/layer/textlayer.md",
+      "source_sha256": "01d485dc5c594116facc278ec99eac0e260a03ec00873c1beb755eec0b1164c9",
+      "members": []
+    },
+    {
+      "source_path": "docs/layer/threedmodellayer.md",
+      "source_sha256": "c0b1653bc6f521eee71ffbf5851871476503b9171182e9f383910b612092c463",
+      "members": []
+    },
+    {
+      "source_path": "docs/other/collection.md",
+      "source_sha256": "a2856c8d8d15b80981783e9e7bed1fdc106878ff17c4fb0a0377f11bad031f30",
+      "members": []
+    },
+    {
+      "source_path": "docs/other/guideoptions.md",
+      "source_sha256": "a5beedfa99324aafacca93d3337d02b157152c68b4e3378c4dbff9b70172d1c0",
+      "members": [
+        {
+          "name": "GuideOptions.color",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "GuideOptions.orientation",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "GuideOptions.pinned",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "GuideOptions.position",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "GuideOptions.positionType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/other/importoptions.md",
+      "source_sha256": "5cfbbfc9728a02c952829d8c8c96b13a6fe252fa313e286c04453c3d75138678",
+      "members": [
+        {
+          "name": "ImportOptions.canImportAs",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ImportOptions.file",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ImportOptions.forceAlphabetical",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ImportOptions.importAs",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ImportOptions.isFileNameNumbered",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ImportOptions.rangeEnd",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ImportOptions.rangeStart",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ImportOptions.sequence",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/other/keyframeease.md",
+      "source_sha256": "ecb9822ce3f38bd98ac384b88605ccb0a7ee4eb19b7f95dc703466ee7e9a7f7d",
+      "members": [
+        {
+          "name": "KeyframeEase.influence",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "KeyframeEase.speed",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/other/markervalue.md",
+      "source_sha256": "bbabdd85400be48747aea323e839dfb643a00b723e03f29e60529c073606fea7",
+      "members": [
+        {
+          "name": "MarkerValue.chapter",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MarkerValue.comment",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MarkerValue.cuePointName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MarkerValue.duration",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MarkerValue.eventCuePoint",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MarkerValue.frameTarget",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MarkerValue.getParameters",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MarkerValue.label",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MarkerValue.protectedRegion",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MarkerValue.setParameters",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MarkerValue.url",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/other/preferences.md",
+      "source_sha256": "d576fe4f7884dbbf55fe12c30771f807aa6224810bbeeac35a647d58f964be83",
+      "members": [
+        {
+          "name": "Preferences.deletePref",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Preferences.getPrefAsBool",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Preferences.getPrefAsFloat",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Preferences.getPrefAsLong",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Preferences.getPrefAsString",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Preferences.havePref",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Preferences.reload",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Preferences.savePrefAsBool",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Preferences.savePrefAsFloat",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Preferences.savePrefAsLong",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Preferences.savePrefAsString",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Preferences.saveToDisk",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/other/settings.md",
+      "source_sha256": "b78175fe58bced1297d3ddda22a587147fc13d2fb1aaba3530fe6767aedf3ed8",
+      "members": [
+        {
+          "name": "Settings.getSetting",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Settings.haveSetting",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Settings.saveSetting",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/other/shape.md",
+      "source_sha256": "bea0bd961cb3585074ac693b4099d53aba16ef51064f8b9ab78c7f4ab0eb27f9",
+      "members": [
+        {
+          "name": "Shape.closed",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Shape.featherInterps",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Shape.featherRadii",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Shape.featherRelCornerAngles",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Shape.featherRelSegLocs",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Shape.featherSegLocs",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Shape.featherTensions",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Shape.featherTypes",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Shape.inTangents",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Shape.outTangents",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Shape.vertices",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/other/view.md",
+      "source_sha256": "3aa94c8505e1728af45f24b970aa049c3c6563ffb2e7044663acbfb844d6d475",
+      "members": [
+        {
+          "name": "View.active",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "View.options",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "View.setActive",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/other/viewer.md",
+      "source_sha256": "66e71cd5ba766a920f736345f1e3c85ac2a0ca937b4324ad492365638cf888df",
+      "members": [
+        {
+          "name": "Viewer.active",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Viewer.activeViewIndex",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Viewer.maximized",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Viewer.setActive",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Viewer.type",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Viewer.views",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/other/viewoptions.md",
+      "source_sha256": "259a233dee52d68eeb3c0bf984a75e3dc289956c977bef1c9fabfc3f591cfbc8",
+      "members": [
+        {
+          "name": "ViewOptions.channels",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ViewOptions.checkerboards",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ViewOptions.exposure",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ViewOptions.fastPreview",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ViewOptions.guidesLocked",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ViewOptions.guidesSnap",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ViewOptions.guidesVisibility",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ViewOptions.rulers",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ViewOptions.zoom",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/property/maskpropertygroup.md",
+      "source_sha256": "0fe426c439d222fd5affa94250760327b722924166fbe1c5653396f28a8d3a6a",
+      "members": [
+        {
+          "name": "MaskPropertyGroup.color",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MaskPropertyGroup.inverted",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MaskPropertyGroup.locked",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MaskPropertyGroup.maskFeatherFalloff",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MaskPropertyGroup.maskMode",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MaskPropertyGroup.maskMotionBlur",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "MaskPropertyGroup.rotoBezier",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/property/property.md",
+      "source_sha256": "a613a1fb4715d643ad85514d4200d1b527ae73271919e570a4bc57085284bf37",
+      "members": [
+        {
+          "name": "Property.LayerInputStageType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.addKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.addToMotionGraphicsTemplate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.addToMotionGraphicsTemplateAs",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.alternateSource",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.canAddToMotionGraphicsTemplate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.canSetAlternateSource",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.canSetExpression",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.canVaryOverTime",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.dimensionsSeparated",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.essentialPropertySource",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.expression",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.expressionEnabled",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.expressionError",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.getInputStageCycleSafeLimit",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.getSeparationFollower",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.hasMax",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.hasMin",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.inputLayerAndStage",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.isDropdownEffect",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.isInterpolationTypeValid",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.isSeparationFollower",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.isSeparationLeader",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.isSpatial",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.isTimeVarying",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keyInInterpolationType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keyInSpatialTangent",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keyInTemporalEase",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keyLabel",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keyOutInterpolationType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keyOutSpatialTangent",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keyOutTemporalEase",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keyRoving",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keySelected",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keySpatialAutoBezier",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keySpatialContinuous",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keyTemporalAutoBezier",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keyTemporalContinuous",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keyTime",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.keyValue",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.layerInputStage",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.maxValue",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.minValue",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.nearestKeyIndex",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.numKeys",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.propertyIndex",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.propertyParameters",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.propertyValueType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.removeKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.selectedKeys",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.separationDimension",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.separationLeader",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setAlternateSource",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setInputLayerAndStage",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setInterpolationTypeAtKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setLabelAtKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setLayerInputStage",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setPropertyParameters",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setRovingAtKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setSelectedAtKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setSpatialAutoBezierAtKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setSpatialContinuousAtKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setSpatialTangentsAtKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setTemporalAutoBezierAtKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setTemporalContinuousAtKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setTemporalEaseAtKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setValue",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setValueAtKey",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setValueAtTime",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.setValuesAtTimes",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.unitsText",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.value",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.valueAtTime",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "Property.valueText",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/property/propertybase.md",
+      "source_sha256": "5665696e50957001877556843c43bbbde0fc9d06a16a754d586592011406b4f1",
+      "members": [
+        {
+          "name": "PropertyBase.active",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.canSetEnabled",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.duplicate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.elided",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.enabled",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.isEffect",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.isMask",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.isModified",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.matchName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.moveTo",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.name",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.parentProperty",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.propertyDepth",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.propertyGroup",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.propertyIndex",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.propertyType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.remove",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyBase.selected",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/property/propertygroup.md",
+      "source_sha256": "ee6bae774d500506020a44670382552b7519fc06d5da13c75637573c1f697d7c",
+      "members": [
+        {
+          "name": "PropertyGroup.addProperty",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyGroup.addVariableFontAxis",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyGroup.canAddProperty",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyGroup.numProperties",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "PropertyGroup.property",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/renderqueue/omcollection.md",
+      "source_sha256": "b62f1f0dd645a4dab2a1aab3b9bec592e266089503b63711849c18f2445f7e87",
+      "members": [
+        {
+          "name": "OMCollection.add",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/renderqueue/outputmodule.md",
+      "source_sha256": "246e04e38e86508771ba6ee13db681d80b56ed7678644ec79b568e314f1df2e5",
+      "members": [
+        {
+          "name": "OutputModule.applyTemplate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "OutputModule.file",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "OutputModule.getSetting",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "OutputModule.getSettings",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "OutputModule.includeSourceXMP",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "OutputModule.name",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "OutputModule.postRenderAction",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "OutputModule.remove",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "OutputModule.saveAsTemplate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "OutputModule.setSetting",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "OutputModule.setSettings",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "OutputModule.templates",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/renderqueue/renderqueue.md",
+      "source_sha256": "1994ce059934945f9a09ea2131016b2843e933c35ebe3fbb248344a6cdcec719",
+      "members": [
+        {
+          "name": "RenderQueue.canQueueInAME",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueue.item",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueue.items",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueue.numItems",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueue.pauseRendering",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueue.queueInAME",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueue.queueNotify",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueue.render",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueue.rendering",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueue.showWindow",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueue.stopRendering",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/renderqueue/renderqueueitem.md",
+      "source_sha256": "4b1a8b5469e60b7d71f219b81e9f42071b5dcf5e2ebeeaf3c294fb9585ea55a8",
+      "members": [
+        {
+          "name": "RenderQueueItem.applyTemplate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.comp",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.duplicate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.elapsedSeconds",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.getSetting",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.getSettings",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.logType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.numOutputModules",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.onStatusChanged",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.outputModule",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.outputModules",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.queueItemNotify",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.remove",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.render",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.saveAsTemplate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.setSetting",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.setSettings",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.skipFrames",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.startTime",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.status",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.templates",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.timeSpanDuration",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "RenderQueueItem.timeSpanStart",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/renderqueue/rqitemcollection.md",
+      "source_sha256": "dc613acab4110acb9eca816f382ed8be0f92faa468a84b3d1a36ffdd5e9debf5",
+      "members": [
+        {
+          "name": "RQItemCollection.add",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/text/characterrange.md",
+      "source_sha256": "8cc50916f25aa9eacd9608cf4f980c3e56c9936b7a4bae7669ec0a59a91e5ab6",
+      "members": [
+        {
+          "name": "CharacterRange.characterEnd",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CharacterRange.characterStart",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CharacterRange.fillColor",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CharacterRange.isRangeValid",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CharacterRange.kerning",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CharacterRange.pasteFrom",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CharacterRange.strokeColor",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CharacterRange.strokeOverFill",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CharacterRange.text",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "CharacterRange.toString",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/text/composedlinerange.md",
+      "source_sha256": "6e1f7c2ad1b9c137567cfcac514cd42dd187b65d229b5d5b182e70b7d17ef50d",
+      "members": [
+        {
+          "name": "ComposedLineRange.characterEnd",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ComposedLineRange.characterRange",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ComposedLineRange.characterStart",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ComposedLineRange.isRangeValid",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ComposedLineRange.toString",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/text/fontobject.md",
+      "source_sha256": "aa2d061962ad78e27570864cc4cc0c0ec3245d309e25ad149e5c6de0cf8c5cb3",
+      "members": [
+        {
+          "name": "FontObject.designAxesData",
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.designVector",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.familyName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.familyPrefix",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.fontID",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.fullName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.hasDesignAxes",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.hasGlyphsFor",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.hasSameDict",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.isFromAdobeFonts",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.isSubstitute",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.location",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.nativeFamilyName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.nativeFullName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.nativeStyleName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.otherFontsWithSameDict",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.postScriptName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.postScriptNameForDesignVector",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.styleName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.technology",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.type",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.version",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontObject.writingScripts",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/text/fontsobject.md",
+      "source_sha256": "b1facdc6e7fcf181fc067d8c4100ae6da8352d08115e9d6975b667ba0c593322",
+      "members": [
+        {
+          "name": "FontsObject.allFonts",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.favoriteFontFamilyList",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.fontServerRevision",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.fontsDuplicateByPostScriptName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.fontsWithDefaultDesignAxes",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.freezeSyncSubstitutedFonts",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.getCTScriptForString",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.getDefaultFontForCTScript",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.getFontByID",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.getFontsByFamilyNameAndStyleName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.getFontsByPostScriptName",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.missingOrSubstitutedFonts",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.mruFontFamilyList",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.pollForAndPushNonSystemFontFoldersChanges",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.setDefaultFontForCTScript",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "FontsObject.substitutedFontReplacementMatchPolicy",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/text/paragraphrange.md",
+      "source_sha256": "45790933ae83236df117664b262ca06f682a87640902d3001fa9656a1aee52bc",
+      "members": [
+        {
+          "name": "ParagraphRange.characterEnd",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ParagraphRange.characterRange",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ParagraphRange.characterStart",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ParagraphRange.isRangeValid",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "ParagraphRange.toString",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    },
+    {
+      "source_path": "docs/text/textdocument.md",
+      "source_sha256": "bd2662f083fa19c7c466f1208e7ea68e2d3f260116555ab1987d60d56df55d8c",
+      "members": [
+        {
+          "name": "TextDocument.allCaps",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.applyFill",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.applyStroke",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.autoHyphenate",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.autoKernType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.autoLeading",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.baselineDirection",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.baselineLocs",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.baselineShift",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.boxAutoFitPolicy",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.boxFirstBaselineAlignment",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.boxFirstBaselineAlignmentMinimum",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.boxInsetSpacing",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.boxOverflow",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.boxText",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.boxTextPos",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.boxTextSize",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.boxVerticalAlignment",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.characterRange",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.composedLineCharacterIndexesAt",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.composedLineCount",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.composedLineRange",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.composerEngine",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.digitSet",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.direction",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.endIndent",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.everyLineComposer",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.fauxBold",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.fauxItalic",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.fillColor",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.firstLineIndent",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.font",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.fontBaselineOption",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.fontCapsOption",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.fontFamily",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.fontLocation",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.fontObject",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.fontSize",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.fontStyle",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.hangingRoman",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.horizontalScale",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.justification",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.kerning",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.leading",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.leadingType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.ligature",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.lineJoinType",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.lineOrientation",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.noBreak",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.paragraphCharacterIndexesAt",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.paragraphCount",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.paragraphRange",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.pointText",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.resetCharStyle",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.resetParagraphStyle",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.smallCaps",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.spaceAfter",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.spaceBefore",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.startIndent",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.strokeColor",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.strokeOverFill",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.strokeWidth",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.subscript",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.superscript",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.text",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.tracking",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.tsume",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
+          "name": "TextDocument.verticalScale",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        }
+      ]
+    }
+  ]
+}
