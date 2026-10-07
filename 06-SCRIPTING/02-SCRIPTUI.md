@@ -1,6 +1,8 @@
 # ScriptUI
 
-Практический command layer: [demo rig](../16-WORKING-TEMPLATES/jsx-tool/build-demo-rig.jsx).
+Практическая standalone operation: [demo rig](../16-WORKING-TEMPLATES/jsx-tool/build-demo-rig.jsx).
+Его IIFE ещё не reusable command layer: для UI вынести operation в отдельную
+function с plain input/result, оставив alert и dialogs в adapter. Рекомендация:
 UI вызывает reusable operation, а не копирует host mutations в каждый handler.
 Для long batch progress обновляется между bounded chunks; Cancel запрещает новые
 chunks, не обещает rollback. Каждая chunk повторно проверяет project/target и

@@ -2,6 +2,7 @@
 // ES3 host syntax. Creates a new comp; never deletes pre-existing items.
 (function () {
     if (!app.project) { alert("Open a disposable project first"); return; }
+    if (app.project.renderQueue.rendering) { alert("Render queue is busy"); return; }
     var comp = null, opened = false;
     try {
         app.beginUndoGroup("Bible: Create Demo Rig"); opened = true;
@@ -20,7 +21,9 @@
         opacity.setInterpolationTypeAtKey(1, KeyframeInterpolationType.LINEAR, KeyframeInterpolationType.LINEAR);
         opacity.setInterpolationTypeAtKey(2, KeyframeInterpolationType.LINEAR, KeyframeInterpolationType.LINEAR);
         // Script resolves matchNames; expression uses product-controlled names.
-        opacity.expression = 'thisComp.layer("Bible Control").effect("Bible Amount")(1)';
+        if (!opacity.canSetExpression) throw new Error("Expression unavailable");
+        // Add the control to animated value: keys remain observable, not overridden.
+        opacity.expression = 'Math.min(100, Math.max(0, value + thisComp.layer("Bible Control").effect("Bible Amount")(1)))';
         opacity.valueAtTime(0, false);
         if (!opacity.expressionEnabled || opacity.expressionError) throw new Error(opacity.expressionError || "Expression disabled");
         var marker = new MarkerValue("Bible start");

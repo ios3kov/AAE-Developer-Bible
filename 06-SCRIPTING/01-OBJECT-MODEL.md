@@ -14,6 +14,12 @@ project → create comp/layers → resolve matchNames → set keys/interpolation
 write TextDocument/Shape/MarkerValue → expression resolution → explicit cleanup.
 Host runtime не заявлен; syntax ES3 и guide objects не равны support matrix.
 
+Demo expression uses animated `value` plus slider with clamp, so keys are not
+silently overridden: slider50 yields expected opacity50 at t=0 and100 at t=1.
+`valueAtTime(0,false)` requests post-expression evaluation; expressionEnabled/error
+checks establish script-level resolving only, not a complete pixel correctness test.
+The script currently creates linear keys; it is not an ease/Bezier authoring example.
+
 Bulk rename: snapshot selected layer objects/old names перед изменением, validate
 все proposed names, открыть один Undo group, менять последовательно и сообщать
 changed count + failure. Имя не stable identity; не resolve заново по уже изменённому

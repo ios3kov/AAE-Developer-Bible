@@ -40,7 +40,14 @@ set interpolation or supply callback guard. Generic Ping is illustrative; reload
 stub now refuses instead of reporting fake success. Per-recipe review remains open
 for other AEGP recipes; this entry does not close the whole block11 tracker.
 
-## Validation boundary
+## Scripting demo semantic correction
+
+Read ScriptUI chapter, Object Model chapter and authored demo rig. Original
+slider-only opacity expression ignored the newly created keys. Now `value + slider`
+with clamp preserves their visible role; checks canSetExpression and busy queue.
+Expected opacity at t0/t1 is50/100 for slider50. Key interpolation remains LINEAR,
+not an ease authoring walkthrough. UI architecture recommendations are distinct
+from this standalone IIFE; the source is not a reusable command-layer implementation.
 
 ## Evidence record follow-up
 
@@ -66,8 +73,6 @@ Artie death-hook registration occur after module/renderer registration; neither
 proves rollback on later failure. Licensed workspace routes are not standalone
 implementations. No codec/scene/host runtime claimed.
 
-## SmartFX follow-up
-
 ## Platform workflow follow-up
 
 Read macOS/Windows GPU, packaging, CI and production-pipeline chapters together
@@ -84,6 +89,8 @@ package transitions. No installer, GPU, Windows or signing execution claimed. Th
 are scoped follow-up results; remaining platform rows require complete related-page
 and version-source reconciliation before full closure.
 
+## SmartFX follow-up
+
 Read SmartFX chapter, auxiliary chunk section and actual
 `20-REFERENCE-IMPLEMENTATIONS/Effect/SmartFX-MFR/SmartFxMfr.cpp` plus README.
 Source is pass-through: ID1, copy request/result extents, WorldTransform copy,
@@ -93,6 +100,8 @@ temporal empty-input-as-black policy and is now explicit. Catch-all is an ABI
 boundary, not an early-checkin RAII owner for callback exceptions. No native build
 rerun or host ROI/depth/empty-input success claimed. These distinctions are reviewed;
 full block7 pixel/channel cross-page acceptance is still separately pending.
+
+## Validation boundary
 
 Portable codec and scripting safety checks do not emulate AE SDK callbacks.
 Strict generated docs/freshness validate publication consistency, not API semantics.

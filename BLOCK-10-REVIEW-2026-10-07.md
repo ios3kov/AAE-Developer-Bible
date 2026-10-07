@@ -9,3 +9,8 @@ Source basis: existing scripting guide review; exact object/matchName routes fol
 AE scripting object model, not browser JS. Source/runtime boundary remains explicit.
 No AE execution or all-version support claim. Host correctness and each render
 output still require reader-product fixtures; expression resolution is not full QA.
+
+Follow-up source review: demo originally replaced keyed opacity with slider-only
+expression; now adds slider to animated value with clamp and checks canSetExpression.
+Expected t=0/1 values documented. Busy render queue refuses entry. No host result
+or keyframe-ease implementation inferred.

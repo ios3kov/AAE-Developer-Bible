@@ -4,6 +4,22 @@
 
 ### Subsequent practical additions
 
+### Published GitHub workflow observations — 2026-10-07
+
+Read public GitHub Actions API, not inferred from local checks:
+
+| Source head | Workflow | Observed result | Run |
+|---|---|---|---|
+| `657fff94de0357933bd1428ed0df41dfc41dc55c` | Validate | completed/success | [37603418884](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37603418884) |
+| `657fff94de0357933bd1428ed0df41dfc41dc55c` | Regenerate docs | completed/success | [37603418932](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37603418932) |
+| `c4785c5ea251795624214b2f98d2f9714b240324` | Validate | completed/success | [37604032798](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37604032798) |
+| `c4785c5ea251795624214b2f98d2f9714b240324` | Regenerate docs | completed/success | [37604032863](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37604032863) |
+| `1d1c5e9109eff2a02a109301d13d5bc98a8f18ff` | Validate | in_progress at observation; not yet accepted | [37604538465](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37604538465) |
+| `1d1c5e9109eff2a02a109301d13d5bc98a8f18ff` | Regenerate docs | completed/success | [37604538599](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37604538599) |
+
+These are documentation/portable workflow results only. Lack of local `gh` does
+not prevent read-only API verification. Later heads require their own observation.
+
 Evidence-plan follow-up adds downloadable ILLUSTRATIVE/NOT_RUN JSON and two portable
 structure/arithmetic tests. It does not copy historical compiler success into the
 hypothetical artifact or invent observations/raw logs. Four related evidence chapters

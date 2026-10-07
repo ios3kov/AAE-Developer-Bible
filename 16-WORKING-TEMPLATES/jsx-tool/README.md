@@ -4,6 +4,9 @@
 
 - [build-demo-rig.jsx](build-demo-rig.jsx): comp/null/text, slider, expression,
   keys/interpolation, mask/marker, own-comp-only compensation.
+  Opacity keys are 0→100; slider50 adds to animated `value` with 0…100 clamp.
+  Thus expected evaluated opacity at t=0 is50 and t=1 is100; disabling expression
+  restores keyed 0→100. This is a declared expectation, not an observed host result.
 - [import-and-queue.jsx](import-and-queue.jsx): один visual file, новая comp,
   disabled output queue, exact template и path readback; не запускает render.
 
