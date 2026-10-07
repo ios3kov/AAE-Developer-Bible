@@ -52,6 +52,22 @@
 
 ## Drop-in code
 
+“Drop-in” means graft into a licensed SDK sample project, not standalone build or
+complete commands. For scoped import/adopt/create/animate/queue and frame chains,
+use [the operation walkthrough](../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md) alongside
+the individual chapters. [Source guide](code/README.md) lists actual implemented
+fragments; masks, text/markers and footage have contract/design routes, not separate
+authored translation units. [Evidence](VERIFICATION.md) retains exact identity limits.
+
+| Task | Chapter route | Actual source |
+|---|---|---|
+| Project/root/item traversal | [Project/items](01-PROJECT-ITEMS.md) | [ProjectItemRecipes](code/ProjectItemRecipes.cpp) |
+| Fixed comp / bounded LayerIDs | [Compositions](02-COMPOSITIONS.md), [layers](03-LAYERS.md) | [CompLayerRecipes](code/CompLayerRecipes.cpp) |
+| Installed match / apply / static OneD | [Effects](04-EFFECTS.md), [streams](05-STREAMS-PROPERTIES.md) | [EffectStreamRecipes](code/EffectStreamRecipes.cpp) |
+| OneD CompTime batch | [Keyframes](06-KEYFRAMES.md) | [KeyframeRecipes](code/KeyframeRecipes.cpp) |
+| Borrowed options → receipt/world/checkin | [Frames](10-RENDER-FRAMES.md) | [RenderRecipes](code/RenderRecipes.cpp) |
+| Add/path/QUEUED/readback | [Queue](11-RENDER-QUEUE.md) | [RenderQueueRecipes](code/RenderQueueRecipes.cpp) |
+
 См. [`code/`](code/README.md):
 - common RAII patterns;
 - project/item traversal;

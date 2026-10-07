@@ -218,6 +218,14 @@ resolve fresh LayerH
 
 После vertex create/delete заново считывайте topology перед дальнейшими index-based edits.
 
+Bounded example: command creates its own mask, obtains outline value, then geometry
+write fails. Dispose value → outline stream → mask ref regardless of primary error;
+this releases acquisitions, **not the newly created project mask**. Decide explicitly
+whether to leave/report the partial mask or delete only that command's mask while
+still retaining the required MaskRef disposal. Existing-mask editing needs before
+geometry and separate compensation policy; Undo grouping does not supply it.
+This flow is authored guidance; no MaskRecipes.cpp implementation is shipped.
+
 ## 14. Anti-patterns
 
 Не делайте:

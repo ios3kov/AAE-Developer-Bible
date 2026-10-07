@@ -195,3 +195,20 @@ These thirteen rows close applicable editorial axes against recorded contracts a
 current examples. Removing empty verification headings improves section scope.
 No C++ implementation changed; no new compilation, AE execution, audio/UI/GPU
 result, MFR repair or performance result is inferred from this reconciliation.
+
+## Cookbook composition follow-up
+
+Read cookbook00–15 with all six recipe translation units and BibleAegpCommon.h,
+code guide and project/render automation. Eight rows closed in this block:
+automation, how-to, compositions, masks, text/markers, memory/Undo/persistence,
+lifetime/threading and recipe index (index scenario/source axes L). The remaining
+cookbook rows keep their prior status until recorded
+closure. Existing per-source reconciliation above remains valid.
+
+Found and corrected unconditional EndUndoGroup after failed Start in the how-to
+fragment. Balance-only UndoGroup does not expose Start/End errors; constructing it
+cannot serve as mutation authorization. Added fixed-comp source scope; bounded
+mask failure and existing-marker write flows; helper composition limits and actual
+code/evidence route table. Corrected the automation table's stale wording that
+read the historical TRUE defect as current. These are editorial/source comparisons,
+not new API signatures, compiler evidence, host mutation or exception-safety tests.

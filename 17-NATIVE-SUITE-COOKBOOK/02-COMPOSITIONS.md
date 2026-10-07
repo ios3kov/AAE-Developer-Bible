@@ -8,6 +8,13 @@
 
 ## Create a composition
 
+Companion [`CompLayerRecipes.cpp`](code/CompLayerRecipes.cpp) implements
+`Bible_CreateComp` with fixed 1920×1080, PAR1:1, duration10s, fps25:1. It validates
+only pica/name/output pointers; caller supplies folder legality, Unicode lifetime,
+project freshness and Undo/exception boundary. It neither configures arbitrary
+settings nor deletes its new project object after later command failure. The
+remaining creation/configuration routes here are design guidance, not its code.
+
 Conceptual call shape:
 
 ```cpp

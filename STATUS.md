@@ -16,6 +16,11 @@ auxiliary and cache receipts; shutdown generation is not cancellation or quiesce
 [Review](CHAPTER-RECONCILIATION-2026-10-07.md). This closes these editorial rows,
 not remaining platform/AEGP/scripting/final-freeze work; no new host evidence.
 
+Cookbook composition follow-up closes eight more rows, including automation and
+recipe index (applicable route axes). Corrected unconditional Undo end after failed
+start, exposed balance-only helper diagnostics and linked actual code versus design
+operations. Other cookbook/native integration rows remain in the tracker queue.
+
 Completion follow-up: current status/plan no longer instruct restarting implemented
 blocks. SmartFX Copy/Gain limitations are now directly documented in canonical
 chapters. Foundation overview, four chapters, headers, tests and related render/

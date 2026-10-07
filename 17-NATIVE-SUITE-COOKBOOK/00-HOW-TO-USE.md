@@ -29,11 +29,20 @@ Cookbook предполагает, что platform/PiPL plumbing уже взят
 AEGP_SuiteHandler suites(SPBasicSuiteP);
 
 ERR(suites.UtilitySuite6()->AEGP_StartUndoGroup("My Operation"));
-// mutating calls
-ERR2(suites.UtilitySuite6()->AEGP_EndUndoGroup());
+const bool undo_started = !err;
+if (undo_started) {
+    // mutating calls; preserve their primary error
+    ERR2(suites.UtilitySuite6()->AEGP_EndUndoGroup());
+}
 ```
 
 Для production-кода нужен guard, который вызывает `EndUndoGroup()` даже при раннем выходе.
+
+End вызывается только после successful Start. Companion `BibleAegpCommon.h`
+балансирует successful Start на ordinary scope exit, но не сообщает Start error
+вызывающему коду и отбрасывает End error. Поэтому сам факт создания этого guard
+не разрешает начинать mutation: command layer должен иметь наблюдаемый preflight/
+start-result путь. Это не rollback и не exception guard вокруг host calls.
 
 ## 3. Проверять ownership
 

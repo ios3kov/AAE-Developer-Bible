@@ -222,7 +222,7 @@ if (!err) {
 | Рецепт | Полезный фрагмент | Ограничение чтения |
 |---|---|---|
 | [ProjectItemRecipes](../17-NATIVE-SUITE-COOKBOOK/code/ProjectItemRecipes.cpp) | Получение проекта/корня; First/Next обход | Частичный счётчик при ошибке не является итогом; внешняя ABI-граница должна обрабатывать исключения suite acquisition |
-| [RenderQueueRecipes](../17-NATIVE-SUITE-COOKBOOK/code/RenderQueueRecipes.cpp) | Повторное получение refs после Add | TRUE/status ошибка; нет полного preflight/readback/rollback; предположение «новый элемент последний» требует контроля контекста |
+| [RenderQueueRecipes](../17-NATIVE-SUITE-COOKBOOK/code/RenderQueueRecipes.cpp) | Повторное получение refs после Add; исправленный named QUEUED + state readback | Историческая TRUE/status ошибка исправлена; нет полного preflight/path-readback/rollback; предположение «новый элемент последний» требует контроля контекста |
 | [RenderRecipes](../17-NATIVE-SUITE-COOKBOOK/code/RenderRecipes.cpp) | Receipt → consumer → checkin | Использует RenderSuite4; options передаются заимствованными; нет cancel callback, async-протокола или полной политики cleanup-ошибок |
 
 `Bible_WithRenderedWorld` на нормальном пути сохраняет checkin error, если основной ошибки не было. При исключении работает owner, чьи ограничения описаны в [главе памяти](../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md). Consumer не должен удерживать world после возврата. В новой главе рассмотрены и объявления RenderSuite5; это не молчаливое обновление реализации RenderSuite4 или разрешение кастовать версии.

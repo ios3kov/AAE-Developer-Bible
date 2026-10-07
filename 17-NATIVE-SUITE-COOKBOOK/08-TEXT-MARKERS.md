@@ -216,6 +216,15 @@ NewMarker
 
 Do not combine `DisposeMarker` and `DisposeStreamValue` for the same payload unless the exact ownership transition is documented.
 
+Bounded write example: update the comment on an existing marker key. Resolve fresh
+stream/time/index → acquire typed keyframe value → edit its marker payload → write
+that value to the key → dispose value and stream on success or error. If write fails,
+do not report the intended text as readback; reacquire to observe actual project
+state. If write succeeds but cleanup fails, report mutation completed with cleanup
+failure, not “nothing changed”. Source Text follows the same result distinction,
+but uses its own text-document payload and static/keyframe policy. These are
+recommended command flows, not standalone authored TextMarkerRecipes.cpp code.
+
 ## 15. Failure and invalidation cases
 
 Text:

@@ -401,6 +401,18 @@ because semantic lifetime differs.
 
 ## Product workflow
 
+Concrete composition with shipped snippets:
+[`Bible_ApplyEffect`](code/EffectStreamRecipes.cpp) disposes an EffectRef after apply,
+not the installed layer effect; failed disposal can follow successful mutation.
+[`Bible_AddOneDKeyframes`](code/KeyframeRecipes.cpp) closes its batch on ordinary
+errors, but not C++ unwind; command guard alone does not resume skipped cleanup.
+[`Bible_WithRenderedWorld`](code/RenderRecipes.cpp) has a receipt owner whose suite
+outlives it, but destructor checkin discards diagnostics. UndoGroup in
+[`BibleAegpCommon.h`](code/BibleAegpCommon.h) is balance-only and exposes neither
+Start nor End errors. These are source limits, not an implemented transaction layer.
+Before composing them, supply observable Undo start/end, primary/secondary errors
+and compensation only for the command's permitted project changes.
+
 1. Classify state.
 2. Define owner.
 3. Define cleanup pair.

@@ -4,6 +4,12 @@
 
 ### Render/cache/UI closure and audit publication
 
+Cookbook composition follow-up at parent `ef37a74`: read chapters00–15, six C++
+recipes/common header and automation companion; eight editorial rows closed with
+explicit code/design boundaries. Corrected how-to Undo balance after failed Start.
+No C++ source changed or compiled. Consistency11/11, checker, generated freshness,
+strict MkDocs and diff whitespace checks PASS for the containing changes.
+
 Source parent `20b0413cd2ac81844afdb4e644ceca40eee28833`; changes are identified by
 the commit containing this entry. Thirteen core rows reconciled as detailed in
 [chapter record](CHAPTER-RECONCILIATION-2026-10-07.md), with audio source-composition

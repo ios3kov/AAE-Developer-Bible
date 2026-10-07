@@ -372,6 +372,15 @@ Before using any new API:
 
 ## 28. Related chapters
 
+Concrete [render recipe](code/RenderRecipes.cpp): configured options borrowed from
+caller → SuiteHandler → receipt owner → borrowed consumer world → explicit checkin
+or destructor fallback → suite teardown. Neither options nor world are disposed by
+the helper. Actual owner reset discards cleanup errors; suite-before-owner lifetime
+is necessary but not a diagnostic guarantee. The
+[threading companion](../15-COMMUNICATION/08-THREADING-BOUNDARIES.md) carries the
+worker/host shutdown route: generation rejects stale publication, not pending work
+or retained-buffer lifetime. No async implementation is supplied by this sync recipe.
+
 - [Memory / Undo / Persistent Data](12-MEMORY-UNDO-PERSISTENCE.md)
 - [Memory/threading/errors](../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md)
 - [RAII ownership](../19-NATIVE-CODE-FOUNDATION/02-RAII-OWNERSHIP.md)
