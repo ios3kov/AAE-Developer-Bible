@@ -42,6 +42,12 @@ for other AEGP recipes; this entry does not close the whole block11 tracker.
 
 ## Scripting demo semantic correction
 
+Additional bounded operations: OneD temporal ease, new UTF-8 text output with
+close-error preservation/race caveat, and own-section settings readback. Pinned
+Property/Settings guide and live ExtendScript File open/write/close reviewed.
+Upstream temporal/spatial wording inconsistencies retained explicitly; settings
+reported byte limits not generalized to every host. No execution of new fragments.
+
 Read ScriptUI chapter, Object Model chapter and authored demo rig. Original
 slider-only opacity expression ignored the newly created keys. Now `value + slider`
 with clamp preserves their visible role; checks canSetExpression and busy queue.

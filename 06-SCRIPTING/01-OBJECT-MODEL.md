@@ -273,6 +273,73 @@ The command function should remain callable from ScriptUI, CEP, a JSX harness or
 
 ## Long operations
 
+### File/Folder и preferences: bounded сценарии
+
+**UTF-8 text export (SOURCE EXAMPLE / AE NOT_RUN).** Включённые scripting file
+permissions — prerequisite, не обещание helper. Dialog до mutation, новый filename,
+проверка parent Folder и возвращаемых I/O statuses. Здесь нет project edits и Undo:
+
+```jsx
+function writeNewUtf8(file, text) {
+    if (!file || file.exists || !file.parent.exists)
+        throw new Error("Choose a new file in an existing folder");
+    file.encoding = "UTF-8";
+    var opened = false, primary = null, closeProblem = null;
+    try {
+        if (!file.open("w")) throw new Error(file.error || "Open failed");
+        opened = true;
+        if (!file.write(text)) throw new Error(file.error || "Write failed");
+    } catch (e) { primary = e; }
+    finally {
+        if (opened) {
+            try { if (!file.close()) closeProblem = "Close failed: " + file.error; }
+            catch (c) { closeProblem = c.toString(); }
+        }
+    }
+    if (primary || closeProblem)
+        throw new Error((primary ? primary.toString() : "") + "\n" + (closeProblem || ""));
+    return file.fsName;
+}
+```
+
+Expected: Unicode text roundtrips through an independent UTF-8 reader, output
+path returned only after successful close. Failure can leave partial own file;
+do not report complete export. `exists` check is **not exclusive creation**: race
+can create a file before open("w"). Use a product-owned staging directory under
+controlled access; if collision-free publication against concurrent writers is
+required, use an external service with exclusive-create/atomic-publish semantics,
+not this helper. Never delete user files as automatic error cleanup.
+
+**Preferences.** A tool can save a short non-secret mode string under its own
+`app.settings` section; this does not mutate project and needs no Undo. Example:
+
+```jsx
+function saveMode(mode) {
+    if (mode !== "preview" && mode !== "final") throw new Error("Invalid mode");
+    app.settings.saveSetting("BibleDemo", "mode", mode);
+    if (app.settings.getSetting("BibleDemo", "mode") !== mode)
+        throw new Error("Preference readback mismatch");
+}
+function readMode() {
+    if (!app.settings.haveSetting("BibleDemo", "mode")) return "preview";
+    var value = app.settings.getSetting("BibleDemo", "mode");
+    return value === "final" ? "final" : "preview";
+}
+```
+
+Expected current preference readback, not proof of persistence across process exit.
+Test restart separately in target AE. Settings I/O can fail; caller reports the
+error instead of marking saved. Unknown values use declared safe default; no secret
+or binary blob, no attempt to override host's preference storage location.
+The guide documents values as strings, per-version preferences (not automatically
+migrated across AE installs), and a reported1999-byte failure limit in AE15.0.1;
+keep tiny preferences rather than interpreting that observation as a universal
+modern capacity guarantee.
+Exact
+File/Folder APIs follow [ExtendScript File reference](https://extendscript.docsforadobe.dev/file-system-access/file-object/)
+(open/write/close returns reviewed2026-10-07), not browser File APIs; Settings follows
+[pinned guide](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/settings.md).
+
 Host-side ExtendScript can block interactive work. Avoid one giant call that performs expensive file parsing, networking or computation and then mutates the project.
 
 Split work into:
