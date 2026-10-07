@@ -8,6 +8,34 @@ AEIO — native I/O module for media that After Effects imports and/or exports. 
 
 ## 1. Где AEIO находится в архитектуре
 
+## Exact IO sample reading walkthrough
+
+SDK 25.6 `Examples/AEGP/IO/IO.cpp`: читать module/function-block construction и
+registration, затем `My_InitInSpecFromFile` (70), `My_DisposeInSpec` (183),
+`My_FlattenOptions` (200), `My_InflateOptions` (255), `My_DrawSparseFrame` (325),
+`My_GetSound` (394). Export: `My_InitOutputSpec` (441), flat/dispose output options
+(500/538), `My_StartAdding` (651), `My_AddFrame` (735), `My_EndAdding` (760).
+Line anchors относятся только к приложенной поставке; искать также имена functions.
+
+Import route: validate untrusted header → create local options → attach to InSpec
+with exact ownership API → populate metadata → random frame request with actual
+time/region/world → bounded decode/cancel → dispose attached state. Сначала читать
+`PretendToReadFileHeader`: название буквально предупреждает, что sample не является
+полным parser/codec. Его stub callbacks не доказывают sound/format support.
+
+Export route: validate options/path → initialize own encoder → append frame by
+provided time/count policy → finalize or explicit incomplete/cancel result → release
+encoder/options. Flat options сериализуют schema, не file pointer. Failed init
+освобождает только successfully owned resources; ownership attachment не считать
+равным простому присваиванию pointer. Temporary-file + atomic publish — production
+recommendation, не автоматически показанная в IO guarantee.
+
+Callback names/shape и paired host APIs сверять с target `AE_IO.h` и current
+IOIn7/IOOut6. Sample старые generations не становятся current из-за наличия в SDK.
+Overview задаёт purpose, [registration chapter](../14-NATIVE-INTEGRATIONS/08-AEIO.md)
+разбирает контракт, reference guide объясняет licensed workspace; не три независимых
+implementation. No runtime import/export claimed.
+
 ```text
 AEGP EntryPointFunc
 → заполнить AEIO_ModuleInfo

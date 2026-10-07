@@ -1,5 +1,12 @@
 # Дополнительные каналы: глубина, ID, нормали и сырые данные (Auxiliary Channels)
 
+Связанный [численный ROI/temporal маршрут](03-SMARTFX.md) описывает RGBA dependency,
+но не гарантирует размеры channel chunk. Для auxiliary lookup получить actual
+datatype, dimension, width/height/stride и coordinate contract; лишь затем
+преобразовать coordinate и проверить доступную область. ID не интерполируется
+как RGB; missing depth не автоматически 0. Channel checkout/checkin — своя пара,
+не optional ранний release SmartFX pixels. Error/cancel не пропускает checkin.
+
 **Основа:** заголовки из присланного SDK 25.6 build 61. Это глава о публичном контракте данных, не новый collector и не протокол запуска эксперимента. [Идентичность SDK](../18-SDK-HEADER-TOOLS/05-SUPPLIED-SDK-25.6.md).
 
 Главное различие: RGBA изображения и auxiliary-данные источника — не одно и то же. Серое изображение может визуализировать глубину, но наличие серых пикселей само по себе не означает, что источник предоставляет канал `DPTH`. В SDK получение auxiliary-описаний и buffers оформлено отдельным `PF_ChannelSuite1`. [C1], [C2]

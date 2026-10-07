@@ -1,5 +1,12 @@
 # Recipe — profiling a slow effect
 
+Worked scoped [native/export/Preview report](../22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md)
+and [illustrative reader report](../13-TEMPLATES/examples/WORKED-EXAMPLE.md).
+Attribution build proves route, not ordinary timing. Record warmups/repeats/order,
+cache policy and complete decoded frame set before accepting host measurements.
+Native 12.06× and ordinary-export 1.35× describe different workloads, not contradictory
+measurements or transferable AE speed promises.
+
 ## Goal
 
 Find the actual bottleneck of a reproducible user operation, change one cause, then prove both performance improvement and unchanged correctness.

@@ -13,6 +13,12 @@ Blocks 7–10 additions now in progress: numeric ROI/temporal dependencies, cach
 receipt and GPU failure routes, bounded Drawbot/audio, scripting demo rig. These
 additions are not a claim that all tracker reconciliation/freeze tasks are closed.
 
+Blocks 11–15 practical additions implemented: AEGP operation chains, copied SDK
+Skeleton platform routes, exact IO/Artie maps, worked evidence pack and scoped
+ElasticGridFX case study. Chapter tracker remains the outstanding queue; license
+decision and full per-page reconciliation are not silently closed. Next: cross-page
+source/recipe review and final checks, not a new product QA requirement.
+
 ## Canonical editorial policy
 
 All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). The mandatory workflow is: finish one logical block → commit/validate → report status to the user → stop before the next block.

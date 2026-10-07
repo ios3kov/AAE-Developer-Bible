@@ -2,6 +2,14 @@
 
 ## Block 6 — 2026-10-07
 
+### Subsequent practical additions
+
+Blocks 11–15: strict MkDocs build and 10 consistency regression tests PASS locally.
+Primary ElasticGridFX JSON records fetched at immutable snapshot and reviewed in
+[case study](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md)
+with byte hashes. No project runtime independently repeated. Windows commands,
+signing/notarization and sample load are documented routes, not executed results.
+
 Scope: [review](BLOCK-6-REVIEW-2026-10-07.md), authored codec and SDK 25.6 header reading.
 Portable tests are not AE callback/persistence tests; runtime is not claimed.
 

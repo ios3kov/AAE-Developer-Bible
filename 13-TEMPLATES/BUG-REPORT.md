@@ -1,5 +1,9 @@
 # Bug report template
 
+Filled [illustrative failure](examples/WORKED-EXAMPLE.md) and
+[project-reported crash/retry](../22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md).
+Status, evidence origin and closure decision differ; non-reproduction is not a fix.
+
 ## Identity
 
 - Bug ID:

@@ -6,6 +6,57 @@ It does **not** mean the Bible examples are host-verified. A production pipeline
 
 ## Inputs
 
+## Конкретный учебный маршрут: SDK Skeleton
+
+Использовать локально лицензированный SDK 25.6 `Examples/Template/Skeleton/Mac/Skeleton.xcodeproj`.
+Скопировать **весь Examples tree** в новый workspace, чтобы relative Headers/Util
+и Rez dependencies сохранились. В Bible не публиковать vendor sources.
+
+```bash
+xcodebuild -list -project "$EXAMPLES/Template/Skeleton/Mac/Skeleton.xcodeproj"
+xcodebuild -project "$EXAMPLES/Template/Skeleton/Mac/Skeleton.xcodeproj" \
+  -scheme Skeleton -configuration Debug -destination 'generic/platform=macOS' \
+  -derivedDataPath "$WORK/DerivedData" build \
+  ARCHS='arm64 x86_64' ONLY_ACTIVE_ARCH=NO \
+  MACOSX_DEPLOYMENT_TARGET=12.0 CODE_SIGNING_ALLOWED=NO \
+  CONFIGURATION_BUILD_DIR="$WORK/Products"
+```
+
+`EXAMPLES` — copied tree, `WORK` — fresh development output. Target 12.0 — example
+build setting, не проверенный minimum OS. Проверить toolchain/sample availability;
+предупреждения старого SDK project не игнорировать. Sample compiler settings вроде
+`-fno-threadsafe-statics` требуют review перед использованием lazy shared state.
+Ожидаемый output — `Products/Skeleton.plugin`, не AE installation. Rez step должен
+создать resource в bundle; build output проверить, а не угадать его по suffix.
+
+```bash
+lipo -archs "$WORK/Products/Skeleton.plugin/Contents/MacOS/Skeleton"
+nm -gU "$WORK/Products/Skeleton.plugin/Contents/MacOS/Skeleton"
+otool -L "$WORK/Products/Skeleton.plugin/Contents/MacOS/Skeleton"
+plutil -p "$WORK/Products/Skeleton.plugin/Contents/Info.plist"
+```
+
+Ожидаемые **виды** результатов: requested slices; entry symbols для фактического
+sample; intended dependencies; consistent bundle version/identifier. Это не
+подставленные успешные outputs. Source, PiPL Name/match/code/flags/version и
+bundle identity изменить согласованно при graft Minimal Gain. Не устанавливать
+два renamed Skeleton bundles с одинаковым match name и считать их независимыми.
+
+Development: ad-hoc sign отдельный built bundle, не рабочий AE. Debug: launch/attach
+development host по [version-gated debugger policy](03-DEBUGGING.md), breakpoint
+на EffectMain, проверить cmd и фактически loaded image path/UUID. Если breakpoint
+не hit: discovery path → duplicate identity → architecture → signature/quarantine
+→ exports/PiPL → symbols; не начинать с изменения pixel math.
+
+Release shell: archive exact binary+dSYM (`dwarfdump --uuid` matching), sign nested
+code inside-out с выбранной Developer ID identity, package, notary submit/log,
+staple supported container, verify final artifact. Команды и security границы в
+[signing](05-SIGNING-NOTARIZATION.md). Notary success не доказывает AE load.
+Install staging ведёт owned-files manifest; update при закрытом AE сохраняет прежний
+artifact/metadata для rollback, не удаляет presets/чужие plug-ins. Повторная установка
+на developer Mac не clean-machine result. CI outputs связываются с source/hash,
+toolchain, SDK и UUID, не только названием release ZIP.
+
 Pin:
 
 - source commit;

@@ -8,6 +8,31 @@ Artisan — это не «GPU effect» и не callback, который полу
 
 ## 1. Когда Artisan вообще нужен
 
+## Exact Artie sample reading walkthrough
+
+SDK 25.6 `Examples/AEGP/Artie/Artie.cpp`: registration table → `Artie_GlobalSetup`
+(360)/GlobalSetdown (348) → SetupInstance (373)/SetdownInstance (388) →
+FlattenInstance (294) → FrameSetup (324)/FrameSetdown (308) → render paths.
+`AEGP_GetCompRenderTime` occurs at 434, layer-context iteration near 918–930,
+own render-world dispose near 899. Names are more robust than line numbers for
+another distribution. Sample uses CanvasSuite5/WorldSuite2 in these locations;
+current chapter contract is CanvasSuite8, не cast старых structs.
+
+Scene route: borrowed render context → query comp/time/ROI/layer contexts → copy
+permitted geometry/material/camera/light data into normalized own scene → renderer
+work → output by exact host contract → release own textures/worlds/receipts →
+frame teardown. Borrowed contexts не отправлять worker после завершения request.
+Unknown layer type/feature имеет explicit reject/delegate/fallback policy; не
+выдавать чёрный output как correctness support. Cache key включает scene/time/
+quality dependencies, не context pointer.
+
+Persistence хранит versioned instance settings, не live device/scene pointers.
+Partial init и cancellation проходят ту же таблицу owned resources; main/render
+thread permission определяется exact callback/suite, не C++ class lifetime.
+Artie shortcuts не становятся production ray tracer или complete scene-coverage
+guarantee. [Deep contract](../14-NATIVE-INTEGRATIONS/09-ARTISAN.md) и reference
+workspace остаются linked layers одной темы. Runtime renderer не заявлен.
+
 Рассматривайте Artisan, если продукт должен:
 
 - стать selectable renderer для 3D composition;

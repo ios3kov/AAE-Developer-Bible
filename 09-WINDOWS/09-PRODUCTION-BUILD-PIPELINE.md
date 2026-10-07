@@ -6,6 +6,58 @@ It is a process definition, not proof that the Bible examples already compile or
 
 ## Inputs
 
+## Конкретный учебный маршрут: Skeleton Win
+
+В SDK 25.6 начать с `Examples/Template/Skeleton/Win/Skeleton.sln` и
+`Skeleton.vcxproj`. Скопировать весь Examples tree в fresh local workspace.
+В Developer Command Prompt с matching installed toolset:
+
+```bat
+msbuild Skeleton.sln /m /t:Build /p:Configuration=Release /p:Platform=x64
+dumpbin /headers path\to\Skeleton.aex
+dumpbin /exports path\to\Skeleton.aex
+dumpbin /dependents path\to\Skeleton.aex
+```
+
+Configuration=Release — **выбор reader project**, сначала проверить реально
+доступные solution configurations, не предполагать, что старый sample имеет её.
+Working directory — copied `Template\Skeleton\Win`; `path\to` заменить actual
+build output. Header machine должен соответствовать target, exports — declared
+entry names, dependencies — shipping CRT/libs, не Debug-only локальные DLLs.
+
+Source chain: `SkeletonPiPL.r` → preprocessing с AE_OS_WIN/architecture macros
+→ SDK PiPL conversion custom step → generated `.rc` → Windows resource compiler
+`.res` → linker вместе с objects → `.aex`. Проверить actual vcxproj CustomBuild
+commands/output dependencies; имена временных files не являются универсальным
+SDK contract. C/C++ include paths Headers, Headers/SP и Util разрешаются относительно
+copied tree; resource include/preprocessor settings проверяются отдельно.
+
+Rename source registration и PiPL match/name/version/flags одновременно; code
+property соответствует exported EffectMain. CRT `/MD` versus `/MT` — explicit
+dependency/ABI policy, не повод передавать owned memory между разными allocators.
+ARM64 build — отдельные compatible libs/toolchain и PiPL code entry; VS17.4+
+guidance не доказывает native AE ARM64 host availability.
+
+Debug: attach правильный AfterFX process architecture, load matching PDB и проверить
+module path/symbol status; breakpoint EffectMain/AEGP entry. Failure order:
+discovery/duplicates → machine/imports → resources/exports → loader/security → cmd
+dispatch. Link success не доказывает DLL availability у клиента.
+
+Final signing пример для собственного artifact (cert/timestamp placeholders
+заменяются infrastructure policy; не выполнять с чужими signing credentials):
+
+```bat
+signtool sign /sha1 CERT_THUMBPRINT /fd SHA256 /tr HTTPS_TIMESTAMP_URL /td SHA256 MyPlugin.aex
+signtool verify /pa /v MyPlugin.aex
+```
+
+После signing не менять binary; installer подписать отдельно и verify отдельно.
+Сохранить PDB + exact signed binary + manifest. Installer owned-file plan сохраняет
+старый artifact для rollback, проверяет locked files при закрытом AE, не уничтожает
+third-party files/preferences. Official path discovery и scope брать из
+[install guidance](06-INSTALLATION-PACKAGING.md). Windows commands — DOCUMENTED
+walkthrough, execution на этой macOS-среде не заявлен.
+
 Pin:
 
 - source commit;

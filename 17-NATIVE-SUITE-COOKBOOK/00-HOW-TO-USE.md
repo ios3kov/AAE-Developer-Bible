@@ -1,5 +1,10 @@
 # Как пользоваться cookbook
 
+Сквозные [menu/mutation/frame routes](../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md)
+связывают отдельные recipes. Начать с user trigger/preflight, выбрать exact suite
+source, проследить own/borrow/adopt, mutation invalidation и cleanup до report.
+Здесь cookbook call shapes, там orchestration; не считать набор snippets единым plugin.
+
 ## 1. Начинать с официального sample
 
 Adobe прямо рекомендует не собирать native plug-in с пустого проекта:

@@ -233,4 +233,58 @@ if (!err) {
 
 Статус DONE у очереди — отдельное наблюдение. Для приёмки экспорта дополнительно нужны реальные файлы с проверенными форматом, количеством кадров, размером и содержимым. Ранее исследованный [случай 3D Channel Extract](../21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/3D-Channel/3D-Channel-Extract/EVIDENCE-AUDIT-2026-09-30.md) показывает, почему отчёт коллектора нельзя автоматически считать полной проверкой пикселей.
 
-Эта глава завершает редакционное объяснение рассмотренных контрактов. Она не закрывает native build, host execution, исправление отмеченного queue-рецепта или остальные gates [согласованного плана](../COMPLETION-CHECKLIST.md).
+Эта глава объясняет SDK/source pattern; native build и host execution не заявлены.
+Named-enum ошибка queue-рецепта уже исправлена; историческая находка выше сохранена.
+Редакционный план не требует host QA всех snippets.
+
+## 13. Три сквозных операции
+
+### Menu command: resolve → mutate → report
+
+Update-menu hook только оценивает availability; command hook заново получает
+active item и тип. Нельзя сохранить active LayerH из menu update и считать его
+целью клика позже. Command callback имеет catch-all ABI guard; suite lifetime
+охватывает cleanup всех owners. Read-only preflight строит plan с project/comp/ID,
+проверяет capability; Undo открывается лишь перед mutation. После ошибки report
+содержит completed actions и primary/cleanup errors, не «ничего не изменилось».
+MenuTool — shell этого пути, не произвольное worker разрешение на suites.
+
+### Import → adopt → create → animate → queue
+
+1. Current project/root через [ProjectItemRecipes](../17-NATIVE-SUITE-COOKBOOK/code/ProjectItemRecipes.cpp), без New/Open.
+2. FootageSuite создаёт caller-owned footage; при failed adoption dispose own
+   footage, после successful AddFootageToProject ownership передан project.
+3. Comp/Layer suites создают только planned objects. Track созданные IDs для
+   explicit compensation; borrowed project handles не «освобождаются» как refs.
+4. Получить stream, определить value type/separated dimensions и timebase.
+   Insert keys через согласованный batch lifecycle; EndAddKeyframes и DisposeStream
+   выполнить также при intermediate failure. Не использовать stale stream после
+   изменения indexed topology.
+5. Queue preflight требует STOPPED и fresh owned output path. Add/reacquire,
+   output settings/readback, named QUEUED/readback. Не запускать чужие queue items.
+6. Primary error сохраняется; rollback касается только own created objects и
+   заранее разрешённых обратимых actions. Undo не является DB transaction.
+
+Exact per-operation ownership/suite generations находятся в
+[cookbook](../17-NATIVE-SUITE-COOKBOOK/15-RECIPE-INDEX.md), а не в независимо
+переписанном псевдо-dispatcher. Это design chain, не единый compiled plugin.
+
+### Frame request: options → receipt → owned copy
+
+Синхронный user-requested route использует
+[Bible_WithRenderedWorld](../17-NATIVE-SUITE-COOKBOOK/code/RenderRecipes.cpp): caller
+владеет configured options, helper — receipt, consumer лишь borrowed world.
+Consumer validate type/size/rowbytes/region, копирует row-aware в own bytes для
+worker, затем helper checkin. Suite4 source сохраняется compatibility-shaped;
+current Suite5 contracts не подставляются cast-ом. Destructor cleanup не равен
+наблюдаемому success: normal path сохраняет checkin error отдельно от primary.
+
+Async route — separate request record: request ID + generation + target/time/options
+identity + refcon lifetime. Cancellation помечает obsolete и вызывает разрешённый
+Cancel; она не доказывает callback absence. Late callback освобождает acquired
+receipt, но не публикует stale pixels. Shutdown — отдельное правило, поскольку
+callback может не прийти. Не держать product mutex через host request/callback.
+
+Completion export требует expected frame set + successful decode каждого output,
+format/dimensions и source/artifact identity. Launcher exit0, queue DONE и наличие
+первого файла — три наблюдения, ни одно само не доказывает всю pixel sequence.

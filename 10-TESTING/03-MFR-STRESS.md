@@ -154,4 +154,12 @@ Release blocker:
 
 ## MFR claim rule
 
+### Bounded incident пример
+
+[Project-reported incident](../22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md):
+SIGABRT control, 19/60 outputs, launcher0; после six retries crash не повторён,
+cause UNKNOWN/fix NONE. Requested MFR не measured concurrency. Issue closure —
+решение пользователя, не исправление и не rewrite исходного FAIL. Record содержит
+build/loaded UUID и raw-report hash; public aggregate не открывает private fixture.
+
 Until the stress matrix passes, keep MFR disabled in the shipping capability declaration and use a separately identified test build for experiments.

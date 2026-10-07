@@ -1,5 +1,10 @@
 # Performance report template
 
+Filled [ILLUSTRATIVE/NOT_RUN pack](examples/WORKED-EXAMPLE.md); real-source
+[scoped metrics](../22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md).
+Separate preparation, actual-render core, ordinary export, Preview fill and playback;
+declare decoder/calibration/output precision/alpha/profile with pixel comparisons.
+
 ## Decision
 
 - Report ID:

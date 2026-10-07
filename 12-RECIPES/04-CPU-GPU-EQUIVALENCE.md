@@ -1,5 +1,13 @@
 # Recipe — CPU/GPU equivalence
 
+Concrete [GPU eligibility/failure route](../02-EFFECT-PLUGINS/05-GPU.md) and
+[exceptional-value policy](../02-EFFECT-PLUGINS/06-COLOR-PIXELS.md): same source,
+parameters/time/ROI, format and compiler policy; observe actual CPU/GPU selectors.
+Define finite abs/relative tolerances and NaN/Inf/signed-zero treatment **before** run.
+Unsupported GPU frame must take documented CPU route or explicit error, not silently
+return partial pixels. Compare fallback output separately; original-artifact and
+matched-toolchain controls are distinct records.
+
 ## Goal
 
 Prove that each claimed GPU backend implements the same effect semantics as the CPU reference within a predefined numerical tolerance.

@@ -176,7 +176,12 @@ actual device test
 ## Один backend: маршрут Metal sample
 
 Source-level walkthrough SDK 25.6 `Effect/SDK_Invert_ProcAmp`: открыть основной
-dispatcher, Metal source/resources и Mac project **вместе**. Device setup создаёт
+dispatcher, `SDK_Invert_ProcAmp_Kernel.cl`, GPUUtils и Mac project **вместе**.
+Mac CustomBuild preprocesses shared kernel с `GF_DEVICE_TARGET_METAL=1`, затем
+`GPUUtils/CreateCString.py` создаёт embedded `.metal.h`; это не отдельный checked-in
+`.metal` файл. Project содержит старый hardcoded clang3.5 include path и `python`;
+их доступность требует review, наличие проекта не доказывает modern Xcode build.
+Device setup создаёт
 effect pipeline state для предоставленного host device; pre-render объявляет
 eligibility данного запроса; GPU render проверяет GPU world format, передаёт pitch,
 dimensions и coefficients kernel; setdown уничтожает только effect-owned state.

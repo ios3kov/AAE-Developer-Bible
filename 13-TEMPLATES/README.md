@@ -1,5 +1,8 @@
 # Working templates
 
+[Заполненный учебный комплект](examples/WORKED-EXAMPLE.md): spec, compatibility,
+correctness, failure, performance и release с явными ILLUSTRATIVE/NOT_RUN labels.
+
 These templates are evidence forms, not decorative paperwork.
 
 Use them to make decisions reproducible across development, QA and release.

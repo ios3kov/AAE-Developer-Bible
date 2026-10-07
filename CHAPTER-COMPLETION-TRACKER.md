@@ -2,6 +2,29 @@
 
 Обновлено: **2026-10-04**. План: [16 логических блоков](COMPLETION-PLAN.md). Правила: [EDITORIAL-GUIDE](EDITORIAL-GUIDE.md); существующий source/evidence baseline — [coverage matrix](FINAL-COVERAGE-AUDIT.md).
 
+## Дополнения 2026-10-07 — reconciliation queue
+
+Ниже сохранены исходные задачи аудита; строки без C **не означают отсутствие уже
+добавленного текста**. До freeze каждому затронутому row требуется отдельный
+cross-page review. Добавления и результаты:
+
+- [№6](BLOCK-6-REVIEW-2026-10-07.md): lifecycle/arbitrary codec/migration реализованы,
+  C++ portable test PASS; SDK callback adapter намеренно не заявлен.
+- [№7](BLOCK-7-REVIEW-2026-10-07.md): spatial/temporal math и calibration; auxiliary
+  dimensions/checkin связаны с маршрутом, не равны RGBA ROI.
+- [№8](BLOCK-8-REVIEW-2026-10-07.md): cache/GPU routes +
+  [bounded incident](22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md).
+- [№9](BLOCK-9-REVIEW-2026-10-07.md): sample-backed draw и bounded audio/async UI.
+- [№10](BLOCK-10-REVIEW-2026-10-07.md): authored JSX rig + automation operation map.
+- [№11](BLOCK-11-REVIEW-2026-10-07.md): три AEGP chains; exact per-recipe review остаётся.
+- [№12/13](BLOCK-12-13-REVIEW-2026-10-07.md): concrete sample/build/sign/rollback routes;
+  per-platform version-sensitive rereview и individual links остаются.
+- [№14](BLOCK-14-REVIEW-2026-10-07.md): exact IO/Artie callbacks; no codec/renderer runtime.
+- [№15](BLOCK-15-REVIEW-2026-10-07.md): worked evidence pack + primary-record performance
+  scope; template/recipe linking и final wording sweep остаются.
+
+Общая сборка документации/регрессии не закрывают автоматически 127 technical rows.
+
 ## Block 5 source handoff — 2026-10-04
 
 [Claim/source boundaries](BLOCK-5-SOURCES.md) и [source review](BLOCK-5-REVIEW-2026-10-04.md) завершены в редакционной области: retained SDK records, fresh platform/roadmap review и selected practical-depth comparison. Это не закрывает все оси 127 core rows: содержательные expansion/reconciliation задачи блоков 6–15 остаются. Новые APIs/workflows получают отдельные scoped source records. Лицензия отложена владельцем до freeze; runtime не заявлен.

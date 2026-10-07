@@ -1,5 +1,9 @@
 # Практические кейсы — FSTR Line и AE Hot Loader
 
+Дополнение 2026-10-07: [ElasticGridFX performance/incident scope](ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md)
+с проверенными primary JSON identities. Native throughput, ordinary export,
+Preview intervals и bounded non-reproduction имеют отдельные области.
+
 Дата включения в Bible: **2026-09-30**.  
 Статус: **code-level reuse audit выполнен; проектные runtime results сохраняются только как scoped evidence. Дополнительный host QA не является условием готовности Bible.**
 

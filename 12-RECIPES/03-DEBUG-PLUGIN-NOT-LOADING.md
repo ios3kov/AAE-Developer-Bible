@@ -1,5 +1,10 @@
 # Recipe — plug-in does not load
 
+Concrete command/artifact branches: [macOS Skeleton inspection](../08-MACOS/09-PRODUCTION-BUILD-PIPELINE.md)
+and [Windows machine/exports/imports/PiPL](../09-WINDOWS/09-PRODUCTION-BUILD-PIPELINE.md).
+Check discovery/duplicates before pixel algorithm; loaded module path/UUID/PDB identity
+must match the artifact under test. Unknown loaded identity means unresolved diagnosis.
+
 ## Goal
 
 Reduce a load failure to one layer instead of changing code blindly.

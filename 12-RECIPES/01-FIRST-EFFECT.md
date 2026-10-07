@@ -2,6 +2,14 @@
 
 ## Goal
 
+Concrete source/artifact route: [Minimal Gain](../16-WORKING-TEMPLATES/effect-basic/README.md)
+→ [macOS Skeleton build](../08-MACOS/09-PRODUCTION-BUILD-PIPELINE.md) or
+[Windows resource/build chain](../09-WINDOWS/09-PRODUCTION-BUILD-PIPELINE.md)
+→ [illustrative specification](../13-TEMPLATES/examples/WORKED-EXAMPLE.md).
+8-bpc red=100,gain=2 expects red=200; alpha unchanged; 16-bpc white=32768.
+Source example does not claim float/GPU/MFR. The host gates below apply to a reader
+product, not to editorial completion of these instructions.
+
 Get one minimal native effect from clean source to a real After Effects host with the smallest possible number of moving parts.
 
 Adobe SDK guidance recommends starting from the supplied Skeleton sample rather than reconstructing the host-specific project and Windows PiPL build machinery from scratch.

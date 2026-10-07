@@ -378,6 +378,20 @@
       "evidence": "PROJECT-REPORTED",
       "limits": "No general API/performance guarantee; acceptance USER-REPORTED",
       "record": "22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-TRANSFER-PLAN-2026-10-02.md"
+    },
+    {
+      "id": "PROJECT-02",
+      "claim": "ElasticGridFX native/export/Preview metrics and bounded MFR incident",
+      "source": "https://github.com/ios3kov/ElasticGridFX/tree/9d0162de64d01ceb41f6a1374a73544729ed0ec2/docs",
+      "identity": "Documentation snapshot 9d0162de64d01ceb41f6a1374a73544729ed0ec2; five fetched JSON byte hashes in review",
+      "review_date": "2026-10-07",
+      "sdk": "Project-specific; no new Bible SDK build",
+      "host": "Reported AE 25.6x101 only; independently NOT RUN",
+      "panel": "Preview interval observations, not exact UI latency",
+      "platform": "Reported macOS 26.6.2 M1 Pro; no cross-platform inference",
+      "evidence": "PROJECT-REPORTED",
+      "limits": "Native versus export speed separated; raw private fixtures unavailable; MFR incomplete; six retries do not prove causal fix",
+      "record": "22-PROJECT-CASE-STUDIES/ELASTICGRIDFX-PERFORMANCE-SCOPE-2026-10-07.md"
     }
   ],
   "regenerations": [

@@ -1,5 +1,11 @@
 # Undo groups and transaction boundaries
 
+Практический [import/adopt/create/animate chain](../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md)
+открывает Undo только после preflight, ведёт список own-created objects и отдельно
+выбирает compensation. На failure созданной comp не удалять её source footage,
+если ownership уже передан project или объект использован другим action. RAII
+EndUndoGroup закрывает grouping, но не возвращает project в прежнее состояние.
+
 AEGP undo grouping gives the user one coherent undo operation for a set of host mutations.
 
 It is not a database transaction and does not automatically roll back a half-completed command after an error.
