@@ -2,6 +2,10 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Added fonts/text operational reconciliation: usage time domain, session identity,
+  duplicate-name selection, substitute/glyph policies, non-undoable replacement,
+  mixed-style range editing and stale composed-line/overflow diagnostics.
+
 - Added original portable bounded row-copy reference for BlitHook synchronous
   staging; async lifetime remains unsupported by supplied source.
 - Added pinned scripting DOM inventory (45 pages/629 member headings), source hashes

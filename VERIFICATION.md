@@ -2,6 +2,14 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Fonts/text selected scripting contracts
+
+Parent `7455e93`; selected pinned Project/FontsObject/FontObject/TextDocument/
+CharacterRange sections read and reconciled in object-model chapter. No font
+installation, project replacement or AE runtime executed. Block checks: checker,
+consistency11/11, generated freshness, strict MkDocs and whitespace. Full member
+inventory/current SDK/host requirements remain outside this bounded review.
+
 ### BlitHook copy operation and pinned scripting denominator
 
 Parent `6b2b163`. Original product-side copy helper, no Adobe ABI/header reproduction.

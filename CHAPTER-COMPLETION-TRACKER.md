@@ -4,6 +4,10 @@
 
 ## Final editorial result — 2026-10-07
 
+Fonts/text currentness block adds usage preflight, session font identity, substitution
+policy, non-undoable replacement, range invalidation and fresh composition workflow.
+Source/member boundaries recorded in currentness review; not whole629-member closure.
+
 New block: BlitHook synchronous-copy reference and portable tests added; original
 async limitation confirmed by full25.6 header/sample reread. Scripting inventory
 now records45 pages/629 headings, without promoting token mentions to C. Active

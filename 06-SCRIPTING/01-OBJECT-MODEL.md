@@ -66,6 +66,97 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Font preflight: identity, substitutes and project usage
+
+Reviewed2026-10-07 at scripting source `7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`:
+[FontsObject](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/text/fontsobject.md),
+[FontObject](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/text/fontobject.md),
+[Project](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/general/project.md).
+DOCUMENTED/source workflow, no host result claimed.
+
+Concrete read-only preflight: validate project and font API → record
+FontsObject.fontServerRevision → flatten FontsObject.allFonts family arrays for
+display → read FontsObject.missingOrSubstitutedFonts and Project.usedFonts → report
+source font identity and each usedAt.layerID/layerTimeD → recheck revision and mark
+stale if it changed. Do not mutate sync policy or activate fonts as a hidden side
+effect of a report. Resolve layers by Project.layerByID; skip/report deleted targets.
+
+Critical time-domain exception: **Source Text.valueAtTime expects layer time** in
+the usedFonts example, unlike other properties' comp-time usage. Preserve supplied
+layerTimeD; don't substitute comp.time or subtract startTime again blindly.
+
+FontObject.fontID is stable only within this application session, may change after
+restart. FontsObject.getFontByID can return undefined after removal. Persist font
+descriptors, not fontID as cross-launch identity; re-resolve and handle ambiguity.
+FontsObject.allFonts groups are not uniquely keyed by family name; duplicate
+PostScript names are allowed across technology/writing-script tuples. Never pick
+array[0] automatically for a release-critical replacement. Display technology,
+writing scripts, designVector and substitute status for user selection.
+
+FontsObject.fontServerRevision changes on installation/removal, substituted-project
+open/close, variable instances and English-name sort preference. Cache by this
+revision only within the session; a matching revision is not render/image proof.
+FontObject.designAxesData gives name/tag/min/max/default; designVector order follows
+axes, not alphabetical tag order. Both can be undefined for non-variable fonts.
+FontObject.hasSameDict tests variable-font dictionary identity, not equal appearance.
+FontObject.postScriptNameForDesignVector returns a name, not installed availability.
+FontObject.hasGlyphsFor (25.1+) answers whether **all** characters have glyphs;
+false doesn't identify which character, true doesn't prove shaping/layout correctness.
+
+### Project-wide font replacement is not Undo-safe
+
+Project.usedFonts / Project.replaceFont introduced24.5. Plan: fresh usage report →
+explicit from/to font choice and backup/save policy → re-resolve both font instances
+and project → user confirmation of non-undoable mutation → replaceFont → refresh
+usage and text/layout diagnostics. No automatic retry if an exception leaves unknown
+outcome. The return is boolean **at least one layer changed**, not a changed-count,
+complete glyph-success result or saved-project confirmation.
+
+Project.replaceFont preserves mixed-style ranges but is **not undoable**; wrapping
+it in beginUndoGroup cannot provide rollback. Optional noFontLocking=false allows
+glyph fallback; true can yield missing glyphs without a complete detection/report
+API. For substituted fromFont with identical target properties, documentation says
+fallback is suppressed and the option treated as true. A successful replacement
+does not establish final glyph coverage. Preflight sampled text with hasGlyphsFor
+where available and qualify relevant frames/layout separately.
+
+FontsObject.freezeSyncSubstitutedFonts (24.6) controls automatic Adobe Fonts sync;
+FontsObject.substitutedFontReplacementMatchPolicy selects POSTSCRIPT_NAME,
+CTFI_EQUAL or DISABLED replacement matching. These are application-environment
+policies, not per-layer edits. If a tool deliberately changes them, save old values,
+restore in finally, report restoration error separately and don't promise restoration
+undoes already completed font activation/replacement.
+
+### Text ranges: detached edit, explicit commit, fresh composition
+
+Source: [TextDocument](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/text/textdocument.md),
+[CharacterRange](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/text/characterrange.md).
+TextDocument.characterRange / paragraphRange / composedLineRange introduced24.3.
+Character indices start0; explicit end is exclusive, optional end selects one
+character; -1 follows current text end. Cannot span final carriage return. Paragraph
+and composed-line ranges use their respective indices, not character offsets.
+
+Concrete styling edit: resolve intended Source Text and time/key policy → obtain
+TextDocument value → validate start/end against that value → obtain characterRange
+→ edit chosen styling fields only → commit with setValue for static property or
+explicit key/time route → reacquire TextDocument → verify target styling and text.
+Do not overwrite animated Source Text through a generic static setter; do not treat
+first-character aggregate style as proof all mixed-style characters match.
+
+CharacterRange.isRangeValid must be checked after edits changing length.
+CharacterRange.pasteFrom (25.1) deletes target text then pastes source text/style;
+original range bounds stay fixed and a shorter paste can invalidate the target.
+Recreate accessors after structural text changes. Validation before paste is not
+permission to reuse the old accessor afterward.
+
+TextDocument.composedLineCount is a snapshot from initial composed state; editing
+the detached TextDocument does **not** recompose it. It may be zero for all-overset
+text. Commit and reacquire before using composedLineRange or reporting line layout.
+TextDocument.boxOverflow (24.6) reports some text didn't compose into the box;
+don't hide overflow by claiming successful text assignment proves full visibility.
+Absent versioned APIs require an explicit older-host path or unsupported report,
+not interpreting undefined as no missing fonts/no overflow.
+
 [Import/queue source](../16-WORKING-TEMPLATES/jsx-tool/import-and-queue.jsx): диалоги
 input/output диалоги до Undo → canImportAs → import → comp/layer → disabled queue item → exact template
 prompt внутри Undo → reacquire → output path readback. Не запускает render и не включает чужие

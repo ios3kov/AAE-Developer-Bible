@@ -66,6 +66,16 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### Fonts/text operational reconciliation — 2026-10-07
+
+Reviewed selected Project/FontsObject/FontObject/TextDocument/CharacterRange sections
+at pinned revision. Transferred identity/revision/substitute/glyph policies,
+non-undoable project replacement, layer-time usage exception and range/composition
+invalidation to scripting chapter. Review scope is the named members in these
+sections; not all45 pages/629 members. Machine report retains UNASSESSED because
+literal extraction isn't a semantic review ledger. This block closes previously
+missing operational guidance for those workflows; full text/member inventory stays OPEN.
+
 `scripts/audit_scripting_inventory.py` obtained all45 DOM pages at pinned scripting
 revision and extracted629 unique member headings within their pages. Report:
 `scripting-api-inventory-2026-10-07.json` (per-page SHA256, member names, literal
