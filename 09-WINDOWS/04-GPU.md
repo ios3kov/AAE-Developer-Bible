@@ -134,12 +134,17 @@ CPU ↔ backend сравнивается по заранее определён�
 ```text
 backend setup fails
 → cleanup partial resources
-→ mark backend unavailable
-→ CPU fallback if promised
+→ report eligibility/error under the exact callback contract
+→ CPU path only through a supported selection/retry route
 → actionable diagnostic
 ```
 
 Half-initialized global state оставлять нельзя.
+
+Это design policy, не гарантия автоматического host retry. Ошибка уже начатого GPU
+render не разрешает передать GPU worlds CPU iterator или вернуть success с partial
+output. Сверять eligibility versus execution failure с
+[канонической GPU policy](../02-EFFECT-PLUGINS/05-GPU.md).
 
 ## Deployment
 

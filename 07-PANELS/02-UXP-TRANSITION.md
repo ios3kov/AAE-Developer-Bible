@@ -137,4 +137,9 @@ The timeline is based on Adobe's 2026-09-24 announcement; AE-specific published 
 
 ## Source rereview — 2026-10-04
 
+Follow-up **2026-10-07**: official AE UXP landing reread; host-specific API links
+and beta documentation wording remain published. This does not establish installed
+beta/GA availability, member execution or cross-host API parity. Dated rollout dates
+below remain announcement provenance, not a new availability promise.
+
 [Adobe announcement](https://blog.developer.adobe.com/en/publish/2026/09/investing-in-the-future-of-creative-cloud-extensibility-uxp-comes-to-our-flagship-applications) and [AE UXP landing](https://developer.adobe.com/after-effects/uxp/) reread. The beta-by-November statement remains dated roadmap; published host-specific documentation and installed runtime availability are separate facts. No installed beta/GA or API execution is verified. [Claim/version boundaries](../BLOCK-5-SOURCES.md).

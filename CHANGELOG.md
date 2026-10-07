@@ -2,6 +2,10 @@
 
 ## Completion reconciliation — 2026-10-07
 
+- Closed Windows/compatibility editorial rows; separated public-guide catalogue
+  headings from exact target SDK contracts and retained dated host-support limits.
+- Clarified MSVC syntax-only report and GPU failure policy; no native/host PASS added.
+
 - Closed ten macOS platform rows editorially after related source/workflow review;
   linked Skeleton inspection, clarified symlink/header identity limits and GPU retry.
 - Added concrete Developer ID/PKG/notary log/staple commands with NOT_RUN scope;

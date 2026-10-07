@@ -2,6 +2,11 @@
 
 ## Start from an Adobe sample
 
+Exact copied-Examples/Skeleton solution, include/resource chain, MSBuild and
+final PE/export/import checks: [production walkthrough](09-PRODUCTION-BUILD-PIPELINE.md).
+Check available solution configurations/toolset before choosing Release/x64;
+the walkthrough gives expected observations, not recorded Windows build output.
+
 Do not reconstruct an After Effects effect project from an empty Visual Studio project unless you have a specific reason and understand every host-specific build step.
 
 The SDK guide explicitly recommends starting from Skeleton or the nearest sample because Windows effect projects contain PiPL resource-generation steps that are easy to lose.

@@ -73,7 +73,7 @@ cross-page review. Добавления и результаты:
 |---|---|---|---|---|---|---|
 | [Decision tree — что именно вы разрабатываете?](00-START-HERE/00-DECISION-TREE.md) | E | E | R | R | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
 | [Extension types](00-START-HERE/01-EXTENSION-TYPES.md) | R | E | R | R | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
-| [Environment matrix](00-START-HERE/02-ENVIRONMENT-MATRIX.md) | R | R | R | R | C | Разнести SDK, AE build, suite generation и OS/architecture; датировать ограничения. **№5** |
+| [Environment matrix](00-START-HERE/02-ENVIRONMENT-MATRIX.md) | C | C | C | C | C | Separate SDK/host/platform/policy/evidence fields; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 
 ## 01-ARCHITECTURE
 
@@ -81,10 +81,10 @@ cross-page review. Добавления и результаты:
 |---|---|---|---|---|---|---|
 | [Native plug-in lifecycle](01-ARCHITECTURE/01-LIFECYCLE.md) | C | C | C | C | C | Recovery/partial failure связан с versioned codec; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Память, время жизни ресурсов и ошибки](01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) | C | C | C | C | C | Receipt/error cleanup и incident limits согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [PiPL, регистрация и загрузка плагина](01-ARCHITECTURE/03-PIPL-AND-LOADING.md) | R | E | R | R | C | Связать PiPL/resource chain с конкретными macOS/Windows sample walkthroughs. **№13** |
-| [Version compatibility](01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md) | R | E | R | R | C | Добавить читаемую таблицу SDK/AE/suite/architecture и сценарий отказа при несовместимости. **№5** |
+| [PiPL, регистрация и загрузка плагина](01-ARCHITECTURE/03-PIPL-AND-LOADING.md) | C | C | C | C | C | Exact resource/registration versus both platform routes; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [Version compatibility](01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md) | C | C | C | C | C | Required/optional typed acquisition and separate identities; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 | [Performance architecture](01-ARCHITECTURE/05-PERFORMANCE-ARCHITECTURE.md) | C | C | C | C | C | Core/export/Preview и observed overlap разделены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [Build system strategy](01-ARCHITECTURE/06-BUILD-SYSTEM.md) | R | E | R | R | C | Связать общие правила с конкретными resource/export/build маршрутами обеих платформ. **№13** |
+| [Build system strategy](01-ARCHITECTURE/06-BUILD-SYSTEM.md) | C | C | C | C | C | Both sample/resource routes and artifact equivalence scope; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 | [Communication architecture](01-ARCHITECTURE/07-COMMUNICATION-ARCHITECTURE.md) | C | C | C | C | C | Envelopes, correlation и mutation ordering/idempotency согласованы. **№2 выполнен**. |
 
 ## 02-EFFECT-PLUGINS
@@ -136,7 +136,7 @@ cross-page review. Добавления и результаты:
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
 | [CEP development](07-PANELS/01-CEP.md) | C | C | C | C | C | Manifest/bootstrap walkthrough и controlled failure paths согласованы. **№2 выполнен**. |
-| [UXP transition for After Effects](07-PANELS/02-UXP-TRANSITION.md) | R | L | R | L | C | Перепроверить официальные даты; ограничить главу migration context без выдуманного API. **№5** |
+| [UXP transition for After Effects](07-PANELS/02-UXP-TRANSITION.md) | C | L | C | L | C | Dated roadmap/published docs, installed availability unknown; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 | [Panels: CEP now, UXP transition](07-PANELS/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
 
 ## 08-MACOS
@@ -158,16 +158,16 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [Windows — Visual Studio setup](09-WINDOWS/01-VISUAL-STUDIO-SETUP.md) | E | E | R | R | C | Дать exact sample/VS target/include/lib settings и resource chain до .aex. **№13** |
-| [Windows — x64 and ARM64](09-WINDOWS/02-X64-ARM64.md) | R | E | R | R | C | Разнести target architecture, toolchain и подтверждённую host support matrix. **№13** |
-| [Windows — debugging After Effects plug-ins](09-WINDOWS/03-DEBUGGING.md) | E | E | R | R | C | Добавить attach/breakpoint/exception/symbols walkthrough и диагностику load failure. **№13** |
-| [Windows — GPU development](09-WINDOWS/04-GPU.md) | R | E | R | R | C | Связать backend/device/fallback с конкретным Windows sample/configuration. **№13** |
-| [Windows — code signing](09-WINDOWS/05-CODE-SIGNING.md) | E | E | R | R | C | Дать SignTool/signature/timestamp verification пример для конкретного artifact. **№13** |
-| [Windows — installation and packaging](09-WINDOWS/06-INSTALLATION-PACKAGING.md) | E | E | R | R | C | Добавить owned-file install/upgrade/rollback маршрут с expected results. **№13** |
-| [Windows — CI pipeline](09-WINDOWS/07-CI.md) | R | E | R | R | C | Связать Windows build/symbol/package outputs с source identity и target matrix. **№13** |
-| [Windows — native SDK validation](09-WINDOWS/08-NATIVE-SDK-VALIDATION.md) | R | E | R | R | C | Согласовать MSVC report и portable lane; не приписывать stub PASS реальному SDK. **№4** |
-| [Windows — production build pipeline](09-WINDOWS/09-PRODUCTION-BUILD-PIPELINE.md) | E | E | R | R | C | Проследить source→PiPL/.r→.rc/.res→.aex→symbols→installer на одном примере. **№13** |
-| [Windows developer bible](09-WINDOWS/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
+| [Windows — Visual Studio setup](09-WINDOWS/01-VISUAL-STUDIO-SETUP.md) | C | C | C | C | C | Skeleton/configuration/resource route; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [Windows — x64 and ARM64](09-WINDOWS/02-X64-ARM64.md) | C | C | C | C | C | Machine/dependency/host distinct; dated vendor snapshot retained; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [Windows — debugging After Effects plug-ins](09-WINDOWS/03-DEBUGGING.md) | C | C | C | C | C | Modules/PDB/breakpoint/exception route, NOT_RUN; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [Windows — GPU development](09-WINDOWS/04-GPU.md) | C | C | C | C | C | Actual sample configuration limits and no assumed CPU retry; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [Windows — code signing](09-WINDOWS/05-CODE-SIGNING.md) | C | C | C | C | C | Certificate/digest/timestamp/result policy, NOT_RUN; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [Windows — installation and packaging](09-WINDOWS/06-INSTALLATION-PACKAGING.md) | C | C | C | C | C | Registry/view/owned-files/rollback design; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [Windows — CI pipeline](09-WINDOWS/07-CI.md) | C | C | C | C | C | Candidate/PDB/signing/package identity chain; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [Windows — native SDK validation](09-WINDOWS/08-NATIVE-SDK-VALIDATION.md) | C | C | C | C | C | Actual runner/driver versus fake compiler tests; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [Windows — production build pipeline](09-WINDOWS/09-PRODUCTION-BUILD-PIPELINE.md) | C | C | C | C | C | Source→resource→PE→symbols→installer route; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [Windows developer bible](09-WINDOWS/README.md) | C | L | C | L | C | Reconciled route index, not implementation; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 
 ## 10-TESTING
 
@@ -188,7 +188,7 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [Versioning and compatibility](11-DISTRIBUTION/01-VERSIONING-COMPATIBILITY.md) | R | E | R | R | C | Согласовать version table, disk IDs и source/artifact compatibility promises. **№5** |
+| [Versioning and compatibility](11-DISTRIBUTION/01-VERSIONING-COMPATIBILITY.md) | C | C | C | C | C | Disk IDs/schema/source/artifact support domains; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 | [Security and licensing architecture](11-DISTRIBUTION/02-SECURITY-LICENSING.md) | R | E | R | R | C | Зафиксировать license/provenance правила примеров и происхождение third-party SDK assets. **№5** |
 | [Release checklist](11-DISTRIBUTION/03-RELEASE-CHECKLIST.md) | R | E | R | R | C | Добавить filled documentation/product evidence пример и artifact-bound release gate. **№15** |
 | [Install locations cheat sheet](11-DISTRIBUTION/04-INSTALL-LOCATIONS.md) | R | E | R | R | C | Сверить официальные platform paths и связать их с owned-file installers. **№13** |
@@ -198,9 +198,9 @@ cross-page review. Добавления и результаты:
 
 | Глава | Т | С | И | П | Л | Оставшийся результат / блок |
 |---|---|---|---|---|---|---|
-| [Recipe — first native effect](12-RECIPES/01-FIRST-EFFECT.md) | E | E | R | R | C | Связать конкретный sample, build steps, expected gain и evidence boundaries. **№12** |
+| [Recipe — first native effect](12-RECIPES/01-FIRST-EFFECT.md) | C | C | C | C | C | Actual Gain plus both sample shells and bounded fixtures; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 | [Recipe — migrate an existing effect to MFR](12-RECIPES/02-MFR-MIGRATION.md) | C | C | C | C | C | Inventory/snapshot/cache/candidate/observed overlap route согласован; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
-| [Recipe — plug-in does not load](12-RECIPES/03-DEBUG-PLUGIN-NOT-LOADING.md) | R | E | R | R | C | Связать failure tree с resources/exports/architecture/logs обеих платформ. **№13** |
+| [Recipe — plug-in does not load](12-RECIPES/03-DEBUG-PLUGIN-NOT-LOADING.md) | C | C | C | C | C | Both artifact inspection routes and unresolved identity limits; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 | [Recipe — CPU/GPU equivalence](12-RECIPES/04-CPU-GPU-EQUIVALENCE.md) | C | C | C | C | C | Identity, numeric policy, actual route и fallback comparisons согласованы; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Recipe — panel + native core](12-RECIPES/05-HYBRID-PANEL-NATIVE.md) | C | C | C | C | C | Prefix schema, ordering и error outcomes согласованы. **№2 выполнен**. |
 | [Recipe — profiling a slow effect](12-RECIPES/06-PROFILING.md) | E | E | R | R | C | Добавить воспроизводимый profiling record с warmup/repeats/core-host-Preview scopes. **№15** |
@@ -231,9 +231,9 @@ cross-page review. Добавления и результаты:
 | [AEIO — registration and callback lifecycle](14-NATIVE-INTEGRATIONS/08-AEIO.md) | C | C | C | C | C | Overview/templates/reference ownership и source routes сверены; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [Artisan — registration, contexts and render contract](14-NATIVE-INTEGRATIONS/09-ARTISAN.md) | C | C | C | C | C | Typed registration/version и partial init сверены с Artie; [review](CHAPTER-RECONCILIATION-2026-10-07.md). |
 | [BlitHook — display-pipeline frame hook](14-NATIVE-INTEGRATIONS/10-BLITHOOK.md) | C | L | C | L | C | Synchronous owned-copy/IPC и quiescence; async protocol намеренно ограничен; [review](CHAPTER-RECONCILIATION-2026-10-07.md#remaining-aegpnative-integration-closure). |
-| [Legacy / historical native integration boundaries](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) | R | E | R | R | C | Сверить old/current suite table и разделить source migration от project compatibility. **№5** |
-| [AEGP suites catalog — After Effects 26.5 snapshot](14-NATIVE-INTEGRATIONS/12-AEGP-SUITES-CATALOG.md) | R | L | R | L | C | Согласовать catalogue с exact baseline; не превращать inventory в runtime coverage claim. **№5** |
-| [Public SDK docs errata / verification notes](14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md) | R | L | R | L | C | Связать errata с dated sources; сохранить superseded finding и later correction. **№5** |
+| [Legacy / historical native integration boundaries](14-NATIVE-INTEGRATIONS/11-LEGACY-NATIVE.md) | C | C | C | C | C | Old/current contracts versus project semantics; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [AEGP suites catalog — After Effects 26.5 snapshot](14-NATIVE-INTEGRATIONS/12-AEGP-SUITES-CATALOG.md) | C | L | C | L | C | Public-guide inventory, not exact 26.5 header/runtime audit; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
+| [Public SDK docs errata / verification notes](14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md) | C | L | C | L | C | Dated mismatches/corrections, no standalone implementation; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
 | [Native integrations — карта всего нативного SDK After Effects](14-NATIVE-INTEGRATIONS/README.md) | R | L | R | L | C | Навигация и маршрут проверены; **№3 выполнен**. Остальные редакционные оси остаются R/L; итоговая сверка — **№16**. |
 
 ## 15-COMMUNICATION

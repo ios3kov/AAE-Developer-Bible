@@ -32,6 +32,13 @@ A change in one domain does not automatically require the same kind of change in
 
 ## Effect project compatibility
 
+Concrete source boundary: [Minimal Gain](../16-WORKING-TEMPLATES/effect-basic/README.md)
+keeps Gain disk ID1; [parameter evolution](../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md)
+separates UI index, disk ID and arbitrary payload schema. A new payload field evolves
+schema without allocating a new parameter ID; a new parameter gets its own stable ID.
+[Versioned codec](../16-WORKING-TEMPLATES/effect-state/README.md) is portable wire logic,
+not a sequence/arbitrary callback adapter or evidence that old AE projects reopen.
+
 When an old AE project contains an effect instance, compatibility depends on stable interpretation of persisted state.
 
 Protect:

@@ -2,8 +2,6 @@
 
 A Windows plug-in installer must resolve Adobe's supported install paths, own only its files, handle upgrades deterministically and preserve signed payload integrity.
 
-## Common Adobe plug-in path
-
 ## Worked upgrade/rollback design (NOT_RUN)
 
 Example product-owned `BibleGain.aex` + matching private PDB archive (PDB is not
@@ -28,6 +26,8 @@ plug-in before replacement; locked-file failure is not permission to kill proces
 Expected evidence: registry value/view → chosen path → candidate/installed hashes
 → loaded module → smoke result; upgrade adds prior/restored hashes and recovery
 status. Execution is NOT_RUN; [worked pack](../13-TEMPLATES/examples/WORKED-EXAMPLE.md).
+
+## Common Adobe plug-in path
 
 The AE SDK installer guidance documents the common path through the registry:
 

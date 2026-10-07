@@ -1,10 +1,16 @@
 # AEGP suites catalog — After Effects 26.5 snapshot
 
-Это практическая карта native capabilities. Точный compile-time contract всегда проверять в headers того SDK, которым собирается plug-in.
+Это dated public-guide capability inventory, **не exact SDK26.5 header inventory**
+и не runtime coverage. Точный compile-time contract всегда проверять в headers
+того SDK, которым собирается plug-in. Таблица сохраняет guide headings: например,
+EffectSuite4/KeyframeSuite3 ниже не заменяют reviewed SDK25.6 EffectSuite5/KeyframeSuite5.
+Baseline/current-source distinctions: [function map](../17-NATIVE-SUITE-COOKBOOK/16-SUITE-FUNCTION-MAP.md)
+и [legacy review](11-LEGACY-NATIVE.md). Later Guide2/ItemView2/Comp13/Stream7 notes
+основаны на dated public documentation, не новой proprietary SDK26.5 сверке.
 
 > **Важно:** номер suite в заголовке публичного guide не всегда равен «самому новому struct version в любых bindings». Для AE 26.5 официально подтверждены как новые `GuideSuite2`, `ItemViewSuite2`, `CompSuite13`, `StreamSuite7`. Остальные version-sensitive номера проверяются в headers конкретного SDK. См. [`13-DOCS-ERRATA.md`](13-DOCS-ERRATA.md).
 
-| Suite | Current documented version | Что контролирует |
+| Suite | Public-guide heading / dated note | Что контролирует |
 |---|---:|---|
 | Memory | `AEGP_MemorySuite1` | host-managed memory handles |
 | Command | `AEGP_CommandSuite1` | menu commands |
@@ -66,4 +72,8 @@
 
 ## Suite acquisition rule
 
-Do not encode “suite version 7 exists everywhere” into product logic. Acquire the version you need and degrade gracefully on older hosts. Public SDK guide explicitly recommends trying an earlier suite version when a newer one is missing.
+Do not encode “suite version 7 exists everywhere” into product logic. Acquire with
+the exact suite-name/public-version macros. An older fallback needs its own typed
+table and explicit semantic limits; never cast a table. Required-suite absence
+fails before mutation. This index promises neither a standalone implementation nor
+availability of every listed capability in the SDK25.6 baseline or an installed host.

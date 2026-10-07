@@ -4,6 +4,13 @@ Updated: **2026-10-07**
 
 ## Continuous completion — 2026-10-07
 
+Windows/compatibility reconciliation complete: twenty-one rows C or explicit L.
+Corrected GPU retry assumption and catalogue guide-heading versus exact-header scope;
+linked driver/resource/source identity. Vendor requirements reread blocked by HTTP403;
+dated snapshot retained, no fresh host support/runtime claim.
+[Review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure).
+Next: testing/distribution/templates → remaining indexes and final freeze.
+
 macOS reconciliation complete: ten platform rows C or index-bounded L. Linked exact
 Skeleton routes; corrected assumed GPU CPU retry; added concrete identity/PKG/notary
 log/staple commands and source-driver identity limits. Dated debugger/install and

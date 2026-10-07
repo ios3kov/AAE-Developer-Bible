@@ -2,6 +2,16 @@
 
 ## Completion reconciliation — 2026-10-07
 
+### Windows and compatibility closure
+
+Parent `255c78c`; containing commit identifies edits. Twenty-one rows reconciled in
+[chapter record](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure).
+Windows ARM build/SignTool and UXP landing reread; Adobe requirements fetch HTTP403,
+older dated snapshot explicitly retained. No SDK26.5 header audit or Windows run.
+Local consistency11/11, checker, generated regeneration/freshness, strict MkDocs and
+diff whitespace PASS. Portable driver tests9/9 at parent macOS block remain scoped
+to unchanged driver; no MSVC/link/AE/sign/install/CI execution result inferred.
+
 ### macOS platform closure
 
 Parent `4693980b07566d6b4e411fd88b2dbe24ea8a052a`; containing commit identifies

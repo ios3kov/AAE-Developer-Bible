@@ -27,6 +27,13 @@ The parser is deliberately conservative; unsupported declarations are not silent
 
 ## What PASS does not mean
 
+Actual `run-windows.ps1` requires `cl.exe` in a matching VS developer environment,
+checks each external tool's `$LASTEXITCODE`, and runs `check_native.py` with
+`--compiler-style msvc --require-clean`. Driver uses `/Zs`, not link; report records
+source SHA/dirty, per-source hashes, SDK header manifest and commands/compiler identity.
+Portable fake-compiler tests validate report/error flow, not MSVC or Windows ABI.
+Header digest does not identify PiPLTool/resources/the entire SDK distribution.
+
 It does not prove:
 
 - PiPL/resource generation;

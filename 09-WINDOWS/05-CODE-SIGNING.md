@@ -27,6 +27,12 @@ Do not encode a private-key deployment strategy into the product repository.
 
 ## Verify
 
+Reread **2026-10-07**: Microsoft SignTool reference (page source commit
+`83dc978799b200d89bf9ea0475e1f404e275c4d8`). `/sha1` selects a certificate by
+thumbprint; it does not change `/fd SHA256` into a SHA-1 file signature.
+Concrete candidate/installer commands: [production route](09-PRODUCTION-BUILD-PIPELINE.md).
+Capture unsigned/signed hashes and verify intended signer as well as tool result.
+
 ~~~bat
 signtool verify /pa /v MyPlugin.aex
 ~~~

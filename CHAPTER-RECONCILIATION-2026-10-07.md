@@ -320,3 +320,27 @@ CPU retry. Owned-file update/rollback and artifact-bound CI remain recommended d
 not a shipped installer/release pipeline. No C++ source changed, SDK compiler/link,
 Universal/GPU/LLDB/signing/notary/install/AE execution performed. Windows and remaining
 compatibility rows remain open; first-effect/PiPL cross-platform closure awaits Windows.
+
+## Windows and compatibility closure
+
+Parent `255c78c`. Read all ten Windows pages, actual PowerShell runner, native driver
+and tests; environment/version/PiPL/build-system, first-effect/load-failure recipes,
+distribution versioning, UXP, legacy/catalogue/errata and retained PICA/legacy review.
+Twenty-one rows close editorially, with index/catalogue/UXP limits retained as L.
+Linked exact Skeleton resource/PE route and driver `/Zs` report scope. Fixed GPU
+failure design that implied automatic CPU retry. No native source changed.
+
+SignTool official page reread at source `83dc978799b200d89bf9ea0475e1f404e275c4d8`:
+certificate thumbprint is distinct from file digest; timestamp warnings and signer
+identity matter. ARM build guide reread; Adobe requirements fetch returned HTTP403.
+Retained dated 2026-10-04 vendor host-support snapshot, not a fresh support-matrix
+verification. AE UXP landing reread: published beta documentation is not installed
+availability/API execution. No new rollout/GA claim.
+
+Catalogue now labels guide headings rather than pretending to be an exact SDK26.5
+header inventory: Effect4/Keyframe3 headings do not replace reviewed baseline
+Effect5/Keyframe5. Later notes remain dated-public-doc scoped. Legacy initializer/
+generic-call differences retain exact prior review; source modernization is not
+project compatibility. Disk ID versus payload schema linked to actual Gain/codec.
+Both platform routes provide commands/expected observations, not Windows build,
+GPU, debugger, signing, installer or AE runtime evidence. Local checks in ledger.
