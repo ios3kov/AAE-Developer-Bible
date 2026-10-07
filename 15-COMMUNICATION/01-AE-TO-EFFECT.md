@@ -1,6 +1,6 @@
 # After Effects → Effect plug-in
 
-Сквозной [state/arbitrary walkthrough](../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md#13-сохраняемое-состояние-и-arbitrary-data)
+Сквозной [state/arbitrary walkthrough](../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md)
 связывает command dispatch, borrowed input, owned callback output и wire schema.
 Не читать arbitrary union до проверки команды/type ID; обычный render не передаёт
 плагину владение parameter value. Copy/flatten не является отправкой runtime cache

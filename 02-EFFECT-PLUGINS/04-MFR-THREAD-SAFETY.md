@@ -199,6 +199,40 @@ Header описывает multi-checkout pattern: сначала запроси�
 
 ## 12. Граница текущей готовности
 
+## Walkthrough: таблица resampling в Compute Cache
+
+Design example: cache value содержит immutable indices/weights для осевого
+mapping, но не input pixels. Key сериализует algorithm/schema version, source/output
+dimensions, mapping coefficients, kernel и boundary mode в canonical fields без
+padding. Time/content hash нужен только если **эта таблица** зависит от времени
+или изображения; не добавлять frame identity в чисто геометрическую таблицу.
+
+```text
+ClassRegister at allowed lifecycle → options/key
+→ ComputeIfNeededAndCheckout
+    pending without receipt → chosen retry/fallback policy
+    error without receipt → return primary error
+    success + receipt → GetReceiptComputeValue
+        success → use borrowed immutable table
+        error/cancel → no further reads
+    → CheckinComputeReceipt (also on error)
+→ return primary error; report checkin error separately
+ClassUnregister only after outstanding work is quiescent
+```
+
+Compute allocates candidate locally, validates bounds/overflow/memory budget and
+publishes only complete value. `approx_size_value` включает все arrays; delete callback
+освобождает только собственные arrays. Receipt хранится в request scope; cache
+value не delete-ится consumer. Нельзя unregister class, пока code/value используются;
+shutdown запрещает новую работу до teardown. Call-local intermediate Bicubic rows
+остаются request scratch, не mutable cache value. Exceptional mapping использует
+исходный fallback без изменения arithmetic.
+
+Recommendation для failure injection: fail до receipt, после receipt, после value,
+в compute allocation и при cancellation. Считать acquisitions/checkins и peak memory
+отдельно от output equality. Наличие mutex не исправляет неполный key; отсутствие
+MFR flag не делает iterate callback однопоточным.
+
 В этой итерации проверены **исходные декларации и комментарии** supplied SDK, а также смысл показанных в них схем. Не выполнены: MFR stress, измерение ускорения, проверка конкретного GPU, native-компиляция новой реализации или её загрузка в AE. Такие результаты не выводятся из успешной сборки документации.
 
 Глава продолжает [память и владение ресурсами](../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) и [SmartFX](03-SMARTFX.md). Её evidence — **SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED**. Матрица выше помогает проверить MFR-корректность собственного продукта; она не является обязательной host-QA программой Библии. Редакционные дополнения к главе отмечены в [поглавном трекере](../CHAPTER-COMPLETION-TRACKER.md). Исследование отдельного auxiliary-считывателя остаётся самостоятельной работой.

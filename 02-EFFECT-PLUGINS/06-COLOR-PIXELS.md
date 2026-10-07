@@ -197,6 +197,28 @@ Host-owned input/output не освобождаются как самостоя�
 
 ## Итоговая схема
 
+## Калибровка output и exceptional values
+
+Перед algorithm test проверить identity-control всей цепочки: source → effect
+world → output module → файл → независимый decoder. Ramp/impulse и разные
+R/G/B/alpha выявляют scale, offset и alpha representation. Записать actual decoder
+format, working/output profiles и transforms. 32-bpc project → RGBA16 unsigned
+export не проверяет сохранение native HDR/NaN; equality export относится только
+к этому export. `sampleImage` с area sampling также не exact raw pixel accessor.
+
+Для float заранее выбрать numeric или bitwise policy: +0/−0 могут быть numeric
+equal, но bytes различны; NaN требует class/payload policy; ±Inf — sign/class;
+finite values — explicit absolute/relative tolerance либо exact bytes в matching
+environment. Shortcut `x*1 → x` не доказывает exceptional-bit preservation.
+Fast-math/FMA/reassociation входят в identity сравнения.
+
+Original artifact comparison сохранять отдельно от unchanged-source rebuild
+matching toolchain. Control помогает локализовать delta, но не устанавливает
+причину различия старого artifact автоматически. Sampling связан со spatial/temporal
+walkthrough в [SmartFX](03-SMARTFX.md); IDs/depth не обрабатывать как RGB.
+
+## Итоговая схема обработки
+
 ```text
 Фактический world и формат
 → typed access + размеры/stride/origin

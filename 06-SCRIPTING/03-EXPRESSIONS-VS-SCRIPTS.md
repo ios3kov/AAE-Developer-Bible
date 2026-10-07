@@ -170,3 +170,22 @@ For script + expression products test:
 - performance on many instances.
 
 See [object model](01-OBJECT-MODEL.md).
+
+## Законченный rig route
+
+[ES3 demo rig](../16-WORKING-TEMPLATES/jsx-tool/build-demo-rig.jsx) создаёт новую
+640×360 comp, Null/Slider, text, linear opacity keys, marker и mask. Script
+обращается по matchNames; expression связывает opacity с product-controlled
+`Bible Control`/`Bible Amount`. Число в Slider 50 даёт expected opacity=50;
+expression overrides underlying keyed opacity, а keys остаются для demonstration.
+`valueAtTime(0,false)` + `expressionEnabled/expressionError` проверяют resolution,
+не все frames. Имена expression не становятся stable IDs: rename/missing control
+сломает rig; duplicate/migration требует policy владельца продукта.
+
+Expression literal фиксирован, не user string interpolation. Для динамического
+имени escape backslash, quote и linebreak в JS literal либо использовать validated
+layer-control strategy; не вставлять произвольный текст как executable expression.
+Source example не запускался в AE; host expression engine/support нужно проверять
+на целевой версии. В error path удаляется только вновь созданная comp; Undo не
+считается atomic rollback. User-edited expression не перезаписывается migration
+без явного согласия.

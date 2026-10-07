@@ -193,4 +193,27 @@ AUDIO_SETDOWN
 
 ## Verification boundary
 
+## Bounded stateless DSP walkthrough
+
+Concrete **DSP example**, not an AUDIO_RENDER dispatcher: gain=0.5, mono/stereo
+interleaved float32 buffer, finite inputs only, output same channels/rate/count.
+Validate format is PF_SIGNED_FLOAT, sample_size is **4 bytes**, count/channels and
+overflow before accessing memory. Define sample index separately from channel:
+`offset = frameIndex*channelCount + channelIndex`; at 48 kHz a 480-frame stereo
+block contains 960 scalar components and 3840 bytes. Layout must match the exact
+host audio-data contract, not merely this assumed DSP input representation.
+
+For each scalar `out[i]=0.5f*in[i]`; no history, clipping, resampling or hidden previous
+block. Silence remains zero; sine peak 0.8 becomes 0.4. Product chooses NaN/Inf
+reject/sanitize/propagate policy explicitly. Output allocation and host borrowed
+input are separate; layer-audio checkout is returned even when later processing
+fails. Do not dispose host SoundWorld data as a product allocation.
+
+Setup determines supported format/range from target declarations; render validates
+actual input and processes bounded requested samples; setdown releases only owned
+request state. Sample count is not seconds; start/duration use their specified
+scale. This arithmetic lesson does not establish host block ordering, AUDIO_IIR
+history, actual field wiring or sample-perfect automation. Those remain intentionally
+limited because no matching bundled AUDIO_RENDER implementation was found.
+
 Bible не заявляет собственный audio runtime result. Создание отдельного audio demo effect не является условием редакционной готовности главы.

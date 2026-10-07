@@ -129,6 +129,6 @@ Skeleton устанавливает `PF_OutFlag_DEEP_COLOR_AWARE` с комме�
 Minimal Gain сейчас не использует sequence или arbitrary data: Gain — обычный
 анимируемый slider, scratch `GainInfo` существует в render call. Добавлять persistence
 лишь ради наличия struct не нужно. Для составного состояния см.
-[arbitrary walkthrough](02-PARAMETERS-UI.md#13-сохраняемое-состояние-и-arbitrary-data).
+[arbitrary walkthrough](02-PARAMETERS-UI.md).
 
 Для чтения SDK эта глава даёт проверенную карту команд и структур: **SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED**. Если разработчик превращает Minimal Gain в свой плагин, сборка, согласование ресурсов/экспортов, загрузка и пиксельные проверки дают доказательства именно для его артефакта и целевой среды. Они не являются условием редакционной готовности главы. Переход к областям и float: [SmartFX](03-SMARTFX.md); к данным глубины, ID и нормалей: [дополнительные каналы](08-AUXILIARY-CHANNELS.md).

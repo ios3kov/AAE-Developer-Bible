@@ -9,6 +9,10 @@ Block 6 content implemented: arbitrary data/state migration, SDK ownership map,
 portable codec and Minimal Gain identity table. [Review](BLOCK-6-REVIEW-2026-10-07.md).
 Next: block 7 spatial/temporal SmartFX. No new AE runtime claim.
 
+Blocks 7–10 additions now in progress: numeric ROI/temporal dependencies, cache
+receipt and GPU failure routes, bounded Drawbot/audio, scripting demo rig. These
+additions are not a claim that all tracker reconciliation/freeze tasks are closed.
+
 ## Canonical editorial policy
 
 All writing/editing rules are now consolidated in [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md). The mandatory workflow is: finish one logical block → commit/validate → report status to the user → stop before the next block.

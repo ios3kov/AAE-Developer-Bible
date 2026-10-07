@@ -188,4 +188,32 @@ Interaction state может быть transient, но любое состоян�
 
 ## Verification boundary
 
+## Rectangle draw → hit → parameter → Undo
+
+Exact reading path SDK 25.6: `UI/Custom_ECW_UI/Custom_ECW_UIUI.cpp:95–209`.
+`PF_GetDrawingReference(contextH)` → `GetSupplier`/`GetSurface` (borrowed) →
+`NewPath`/`NewBrush` (owned) → `AddRect` → `FillPath` → `ReleaseObject` on each
+created object → release acquired suites. If brush creation fails after path,
+release path anyway; don't overwrite primary error with cleanup error. Mark
+handled only after successful draw. Sample rectangle uses current_frame and 0.5
+offset for its drawing model; это не универсальный Retina coordinate conversion.
+
+Interaction design example: hit-test этой rect в том же event coordinate space;
+DO_CLICK сохраняет initial parameter value и gesture generation; DRAG переводит
+current pointer в parameter units, ограничивает допустимый диапазон, изменяет
+сохраняемый parameter по разрешённому event contract и просит redraw. Render
+читает parameter snapshot, не transient drag variable. Escape/context close
+завершает gesture и исключает поздние replies; фактический Undo contract проверять
+отдельно, не считать redraw или successful hit его доказательством.
+
+Acceptance разделяет: событие доставлено; parameter readback изменился; final
+pixels соответствуют; Undo восстановил before; latency измерена independently.
+Viewer resolution label, Preview preset и already cached display — разные
+readbacks. Отсутствие latency timestamp не позволяет объявлять interaction faster.
+
+Async boundary: generation-tagged request → available image/placeholder DRAW →
+stale cancellation → no callback writes into closed view. Это conservative design,
+не полная implementation async-manager suite. Ни lifetime beyond documented receipt,
+ни host-tested cancellation здесь не обещаны.
+
 Bundled Custom_ECW_UI/CCU source reviewed. Bible не заявляет собственный UI runtime result; отдельная demo implementation/host QA не является completion requirement документации.

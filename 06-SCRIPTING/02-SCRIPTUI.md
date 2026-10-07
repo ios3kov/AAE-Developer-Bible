@@ -1,5 +1,12 @@
 # ScriptUI
 
+Практический command layer: [demo rig](../16-WORKING-TEMPLATES/jsx-tool/build-demo-rig.jsx).
+UI вызывает reusable operation, а не копирует host mutations в каждый handler.
+Для long batch progress обновляется между bounded chunks; Cancel запрещает новые
+chunks, не обещает rollback. Каждая chunk повторно проверяет project/target и
+generation; закрытая Panel не получает late update. Dockable Panel и floating
+Window имеют разные show/layout пути; scripted command не должен зависеть от них.
+
 ScriptUI is the ExtendScript UI toolkit used for dialogs, palettes and classic script panels. It remains useful when the product is mainly AE automation and does not require a modern web-style application shell.
 
 ## Use when

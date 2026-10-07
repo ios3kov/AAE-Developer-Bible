@@ -80,7 +80,7 @@ RESETUP не предполагает существование прежнег�
 GET_FLATTENED_SEQUENCE_DATA имеют разные ownership transitions; смотреть точный
 selector, а не общий метод «save». Unknown future schema не превращать в defaults
 без явной product policy. Parameter Reset и восстановление sequence — разные
-операции. Практическая [таблица хранилищ и migration](../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md#13-сохраняемое-состояние-и-arbitrary-data)
+операции. Практическая [таблица хранилищ и migration](../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md)
 согласована с source codec; render использует валидированный snapshot и не зависит
 от того, открывалась ли UI-панель.
 

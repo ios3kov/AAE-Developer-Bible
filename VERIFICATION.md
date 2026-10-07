@@ -7,6 +7,10 @@ Portable tests are not AE callback/persistence tests; runtime is not claimed.
 
 Local: strict C++17 codec compile/test PASS; generated docs and strict MkDocs PASS.
 
+Blocks 7–10: source-level walkthrough additions; Node syntax check of authored
+demo rig PASS (not ES3/AE execution). GitHub CLI unavailable locally; CI status
+not inferred. Active links are checked through actual generated HTML separately.
+
 This file is an **evidence ledger**, not the completion checklist for AE Developer Bible.
 
 It records what was actually reviewed, compiled, observed or not run so the text never overstates evidence. A missing host/compiler result means only that Bible must not claim that result. It does **not** create an obligation to build or run every example before the documentation can be complete.

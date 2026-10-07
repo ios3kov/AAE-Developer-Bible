@@ -4,7 +4,7 @@ Evidence: **SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED**. `VersionedState.h` is a
 portable codec, not an arbitrary callback dispatcher, SDK handle adapter or effect.
 It demonstrates bytes, validation, v1→v2 migration and publish-after-validation.
 
-Use with [state/arbitrary walkthrough](../../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md#13-сохраняемое-состояние-и-arbitrary-data).
+Use with [state/arbitrary walkthrough](../../02-EFFECT-PLUGINS/02-PARAMETERS-UI.md).
 The caller must validate state before encoding (amount ≤4000, mode ≤1); a decode
 failure leaves the previous output untouched. Unknown schema is reported separately
 from corruption. No runtime cache, refcon or native pointer enters persisted bytes.

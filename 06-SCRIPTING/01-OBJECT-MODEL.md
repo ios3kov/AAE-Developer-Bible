@@ -1,5 +1,38 @@
 # After Effects scripting object model
 
+## Сквозные automation операции
+
+Начать с [demo rig](../16-WORKING-TEMPLATES/jsx-tool/build-demo-rig.jsx): validated
+project → create comp/layers → resolve matchNames → set keys/interpolation →
+write TextDocument/Shape/MarkerValue → expression resolution → explicit cleanup.
+Host runtime не заявлен; syntax ES3 и guide objects не равны support matrix.
+
+Bulk rename: snapshot selected layer objects/old names перед изменением, validate
+все proposed names, открыть один Undo group, менять последовательно и сообщать
+changed count + failure. Имя не stable identity; не resolve заново по уже изменённому
+имени. Partial failure не скрывать return=0 после успешно переименованных слоёв.
+
+Import: выбрать существующий File, проверить `ImportOptions.canImportAs`, задать
+importAs/sequence явно, импортировать, настроить interpretation только для подходящего
+source, добавить Layer в validated comp. На failure удалять лишь созданные tool-owned
+items, если policy это допускает, не чужой project. Replace: validate target FootageItem
+и new media до `replace`; сохранить old path/interpretation для diagnostic, но не
+обещать восстановление missing media простым Undo. Structural changes в indexed
+groups инвалидируют property references: сохранить index и re-query после addProperty.
+
+Queue route: add validated comp → acquire outputModule(1) → проверить доступные
+template names → applyTemplate → вновь получить outputModule → установить новый
+owned output File → readback path/settings → queue status. Нельзя render в существующий
+неизвестный output или считать exit0 доказательством полного набора decoded frames.
+
+File/Folder: permissions на script filesystem/network не предполагать включёнными.
+Для UTF-8 text установить encoding до open, проверить return/status, close в finally;
+не переписывать существующий file без explicit policy. `app.settings` — preferences,
+не project persistence или secret vault. Scheduled chunks хранят generation/job ID,
+обрабатывают bounded batch и revalidate target; cancelTask прекращает будущие
+invocations, не откатывает уже совершённые изменения. Не держать Undo group
+открытым через произвольные scheduled callbacks.
+
 After Effects scripting exposes the host through an ExtendScript object graph. It is a high-level automation API for project structure, timeline state, properties, import and render queue. It is not the same API surface as Effect or AEGP suites.
 
 ## Mental map

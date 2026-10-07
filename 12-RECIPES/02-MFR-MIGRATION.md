@@ -1,5 +1,11 @@
 # Recipe — migrate an existing effect to MFR
 
+Законченный implementation route: [state inventory](../02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md)
+→ immutable snapshots → call-local scratch → [cache receipt walkthrough](../02-EFFECT-PLUGINS/04-MFR-THREAD-SAFETY.md)
+→ error/cancel cleanup → observed overlap + sequential/concurrent output comparison.
+Не включать mutable global sampling tables; reuse immutable indices/weights, но
+request rows не разделять. Pending-cache policy заранее выбрать, не spin-wait в UI.
+
 ## Goal
 
 Enable Multi-Frame Rendering only after the effect is actually safe under concurrent render selectors.

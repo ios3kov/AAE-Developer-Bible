@@ -173,4 +173,28 @@ actual device test
 
 ## Verification boundary
 
+## Один backend: маршрут Metal sample
+
+Source-level walkthrough SDK 25.6 `Effect/SDK_Invert_ProcAmp`: открыть основной
+dispatcher, Metal source/resources и Mac project **вместе**. Device setup создаёт
+effect pipeline state для предоставленного host device; pre-render объявляет
+eligibility данного запроса; GPU render проверяет GPU world format, передаёт pitch,
+dimensions и coefficients kernel; setdown уничтожает только effect-owned state.
+Host queue/device/context и borrowed worlds не dispose-ятся плагином.
+
+| Условие | Policy до GPU commitment | После начала GPU render |
+|---|---|---|
+| Backend не реализован | Не обещать GPU possible | Вернуть explicit error, не CPU-cast GPU pointer |
+| Frame feature не поддерживается | CPU route через корректную pre-render eligibility | Не выдать partial pixels как успех |
+| Allocation/pipeline failure | Удалить partial owned resources | Preserve error, cleanup; host retry не предполагать |
+| Format отличается от expected | Не угадывать layout | Reject по contract |
+| Cancel/device failure | Снять eligibility лишь для будущих requests | Завершить backend work по его правилам, не free in-flight buffers |
+
+CPU fallback — спроектированный маршрут host negotiation, не обещание, что AE
+повторит любой failed GPU render на CPU. Synchronization и buffer lifetime брать
+из конкретного backend sample/API; одинаковое имя queue не гарантирует завершение
+dispatch. Log actual selector/framework/device/format/route для attribution.
+Настройка проекта «GPU» и существование Metal kernel не доказывают его исполнение.
+Throughput считать с preparation/transfer/sync, не одним kernel timestamp.
+
 Текст сверён с SDK/source sample. Bible не заявляет собственный GPU runtime result; сборка demo binary не является условием редакционной готовности главы.

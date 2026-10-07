@@ -1,5 +1,20 @@
 # Performance architecture
 
+## Сквозной profiling contract
+
+Сначала установить actual render entry/plane route instrumented build, затем
+измерять unchanged baseline и candidate с одинаковыми source/toolchain/inputs.
+Instrumentation attribution и ordinary release timing — разные режимы.
+Pure native benchmark исключает host scheduling/output encoding; export timing
+включает их; Preview cache-fill и displayed playback — ещё две отдельные метрики.
+Нельзя переносить ускорение generic CPU renderer на реально вызываемый plane path.
+
+State inventory → immutable parameter snapshot → request-local scratch → complete
+cache key + receipt → actual route observation → output parity → repeated timings.
+Сначала correctness, затем speed. Для N simultaneous requests budget включает
+N×scratch; MFR requested не measured concurrency. Для этого нужны overlapping
+callback observations именно нужного effect, а не общий CPU graph.
+
 Performance is an architecture property before it is a compiler flag.
 
 The order matters: remove unnecessary work before trying to execute unnecessary work faster.

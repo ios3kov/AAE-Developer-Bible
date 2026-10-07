@@ -103,6 +103,54 @@ PF_Cmd_SMART_RENDER → PF_SmartRenderExtra
 
 ## 9. SmartFX, float, GPU и MFR — не один флаг
 
+## Spatial walkthrough: halo и origin
+
+Авторская math/policy схема поверх S1, не новый SDK sample. Rectangles half-open.
+Non-expanding blur: source `[0,640)×[0,360)`, requested output
+`[100,140)×[50,80)`, kernel support ±8 full-resolution pixels. Input request
+получается `[92,148)×[42,88)`; max output остаётся полным source bounds, не
+текущим ROI. Outside-source выбран transparent black. Для expanding blur/glow
+максимальная output geometry рассчитывается иначе — не переносить эту policy.
+
+PreRender объявляет enlarged dependency ID=1. Доступный `result_rect` учитывает
+upstream checkout и собственную boundary policy, а не только желаемый запрос.
+SmartRender получает actual world: layer pixel `(104,56)` при origin `(92,42)`
+имеет local `(12,14)`. Validate actual dimensions, origin и stride; запрошенная
+rect не гарантирует allocation такого размера. За boundary не читать память.
+
+При downsample 1/2 радиус 8 даёт support 4 в buffer units для этой выбранной
+математики; outward-round границы. Non-square pixels требуют отдельного X/Y
+пересчёта display-radius; PAR не меняет byte stride. Применять origin/downsample
+один раз. Warp требует inverse mapping; corner-only bounds недостаточны для
+нелинейной карты с внутренним экстремумом. Separable-axis reuse допустим только
+при проверенной eligibility, с fallback, сохраняющим прежний arithmetic.
+
+## Temporal walkthrough: один слой, три IDs
+
+Policy: `(previous + 2*current + next)/4` в согласованном premult representation.
+Пример t=1000, step=40, scale=1000: checkout IDs 1/2/3, каждый parameter index=0,
+what_time=960/1000,1000/1000,1040/1000 seconds соответственно. Time_step/time_scale
+сохраняются rational; проверить overflow и нулевой scale до вычисления соседей.
+Это выбранный sample interval, не обещание source frame interval при time-remap.
+
+PreRender объявляет все зависимости; SmartRender читает worlds по IDs, не по
+номеру layer parameter. Snapshot хранит weights/rational times, не borrowed
+pixels. Callback effect time не заменять composition time внешнего AEGP command.
+Stretch/remap/motion-blur mapping не придумывать по округлённому frame number.
+
+Boundary policy здесь: missing successful input → transparent black; weights не
+перенормируются. Checkout error отличается от empty input и останавливает operation.
+Ранний checkin pixels optional по S1, но пользоваться ими после checkin нельзя.
+Snapshot до передачи принадлежит effect, после передачи освобождается delete callback.
+Cancellation не оправдывает пропуск отдельно обязательного channel/parameter cleanup.
+
+Product fixtures: full-frame/ROI equality, odd size, negative origin, downsample/PAR,
+transparent edges, start/end times, remapped source, missing input и cancel между
+checkouts. Math expectation фиксируется до измерения. Runtime этих walkthroughs
+не заявлен.
+
+## Capabilities остаются независимыми
+
 В [S2] отдельно определены `PF_OutFlag2_SUPPORTS_SMART_RENDER`, `PF_OutFlag2_FLOAT_COLOR_AWARE`, `PF_OutFlag2_SUPPORTS_GPU_RENDER_F32` и `PF_OutFlag2_SUPPORTS_THREADED_RENDERING`. Объявление одной возможности не подтверждает остальные.
 
 Для GPU header дополнительно требует `PF_RenderOutputFlag_GPU_RENDER_POSSIBLE` на pre-render этапе. Само наличие поля `what_gpu` или настройка GPU у проекта не доказывает исполнения GPU-ветки конкретного эффекта. [S1:2504–2507], [S2:1007]
