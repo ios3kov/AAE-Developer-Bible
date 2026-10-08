@@ -1,0 +1,14 @@
+{
+  "source_revision": "7137a990db4bd8dc9f5869b8ca431c7dfed52bdc",
+  "evidence": "Full pinned zero-qualified-member-heading pages read; AE runtime NOT_RUN",
+  "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+  "reviews": [
+    {"source_path": "docs/general/globals.md", "source_sha256": "626265c43a51eb92c3f99043bc606fbf2c6606c677c8a775a72267a2b357351e", "operation": "Eight global methods: explicit fps/duration parsing, Info output, random and enum/validity gates"},
+    {"source_path": "docs/layer/cameralayer.md", "source_sha256": "5aca9653d3ba588f9da2769a3771c44e1e604c49e93317b836fcffcf18e1be60", "operation": "Typed camera group inspection and26.3 Advanced3D option boundaries"},
+    {"source_path": "docs/layer/shapelayer.md", "source_sha256": "be961766dafb8722e80edfe77fde0a80c90f0e49bf31b97ff4466c9bba310725", "operation": "Owned shape creation and inherited indexed-group mutation"},
+    {"source_path": "docs/layer/textlayer.md", "source_sha256": "01d485dc5c594116facc278ec99eac0e260a03ec00873c1beb755eec0b1164c9", "operation": "Text property groups, unused remap/tracker and retained matte source conflict"},
+    {"source_path": "docs/layer/threedmodellayer.md", "source_sha256": "c0b1653bc6f521eee71ffbf5851871476503b9171182e9f383910b612092c463", "operation": "Versioned model type inspection versus unsupported geometry/import contracts"},
+    {"source_path": "docs/other/collection.md", "source_sha256": "a2856c8d8d15b80981783e9e7bed1fdc106878ff17c4fb0a0377f11bad031f30", "operation": "One-based live collections, bounded mutation and output-module owner correction"},
+    {"source_path": "docs/sources/placeholdersource.md", "source_sha256": "ad0461c325214b5850c3c3e08ebe9d0f8b9ccadbc79e2419945dfa56e832322d", "operation": "Typed main/proxy placeholder source inspection and inherited interpretation"}
+  ]
+}

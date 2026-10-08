@@ -2,6 +2,16 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Scripting zero-heading source review
+
+Parent `e8f160a`;7 full pinned zero-member-heading pages read and hash checked;
+independent exhaustive ledger/test,648 qualified DOM heading denominator unchanged.
+No time parser/enum/random/collection/type/camera/model/matte/AE runtime performed;
+ExtendScript runtime/File/Folder and exact property match names remain separate.
+Results: scripts91/91, consistency11/11, checker/7 source hashes and whitespace
+PASS; generated freshness/strict MkDocs checked before publication. Intentional
+negative-fixture stale output doesn't imply real generated failure or runtime evidence.
+
 ### Pinned expression text/page-review closure
 
 Parent `21963ca`;4 full text pages read/hash checked, ledger32/32 pages/295 headings,

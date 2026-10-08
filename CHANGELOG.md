@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Reconciled all7 pinned scripting zero-qualified-heading pages: eight globals,
+  collection semantics and typed camera/text/shape/model/placeholder operations.
+  Independent hash ledger/regression; retained inheritance/matte/source-owner gaps.
+
 - Closed pinned expression page-review scope32/32 pages (295 headings): text
   style/range/paragraph and variable-font-axis operations, exact source hashes and
   exhaustive page-set regression. Retained chaining/None/kerning/Tsume gaps;

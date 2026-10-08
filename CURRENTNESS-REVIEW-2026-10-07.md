@@ -44,6 +44,12 @@ the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
 
+2026-10-08 scripting zero-heading closure:7/7 such inventory pages read/hash checked
+and independently reconciled, including8 unqualified globals, Collection table,
+Camera26.3 Advanced3D options and typed inheritance.648 DOM heading denominator
+unchanged. Text matte/camera inheritance/source-owner discrepancies retained; exact
+match names/ranges and runtime/File/Folder still separate. No host runtime PASS.
+
 2026-10-08 pinned expression page-review closure:32/32 pages,295/295 third-level
 headings reconciled by explicit full-page reviews; includes3 zero-heading pages,
 non-callable Text.Font menu and Chaining overview. Added uniform/range text styles,

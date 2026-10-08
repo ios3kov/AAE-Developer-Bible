@@ -6,6 +6,20 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 class ReviewLedgerTests(unittest.TestCase):
+    def test_zero_heading_pages_are_explicitly_reviewed(self):
+        inventory = json.loads((ROOT / 'scripting-api-inventory-2026-10-07.json').read_text())
+        ledger = json.loads((ROOT / 'scripting-zero-heading-reviewed-2026-10-08.json').read_text())
+        known = {r['source_path']: r for r in inventory['records'] if not r['members']}
+        paths = [r['source_path'] for r in ledger['reviews']]
+        self.assertEqual(len(paths), len(set(paths)))
+        self.assertEqual(set(paths), set(known))
+        self.assertEqual(ledger['source_revision'], inventory['source_revision'])
+        self.assertTrue((ROOT / ledger['coverage_page']).is_file())
+        for r in ledger['reviews']:
+            self.assertTrue(r['operation'])
+            self.assertEqual(r['source_sha256'], known[r['source_path']]['source_sha256'])
+        self.assertIn('runtime NOT_RUN', ledger['evidence'])
+
     def test_explicit_reviews_are_unique_and_pinned_to_inventory(self):
         inventory = json.loads((ROOT / 'scripting-api-inventory-2026-10-07.json').read_text())
         ledger = json.loads((ROOT / 'scripting-api-reviewed-2026-10-07.json').read_text())

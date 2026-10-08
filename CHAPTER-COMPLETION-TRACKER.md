@@ -4,6 +4,10 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 scripting7/7 zero-heading pages independently reviewed; globals/collections/
+typed inheritance operations supplied with exhaustive provenance test. DOM648 count
+unchanged; signature/match-name/runtime/File/Folder/current acceptance still OPEN.
+
 2026-10-08 pinned expressions:32/32 full-page reviews,295 headings including
 non-API headings and3 zero-heading pages; regression checks exhaustive page set.
 Text styles/variable axes supplied with source gaps. Not expression language/host

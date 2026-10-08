@@ -66,6 +66,76 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Zero-member-heading pages: globals and typed inheritance — review2026-10-08
+
+Full pinned globals/CameraLayer/ShapeLayer/TextLayer/ThreeDModelLayer/Collection/
+PlaceholderSource pages read at revision7137a990db4bd8dc9f5869b8ca431c7dfed52bdc.
+Their zero qualified-member-heading counts **do not mean no API**: globals has8
+unqualified methods, Collection table specifies length and1-based bracket access,
+CameraLayer lists26.3 Advanced3D options, other pages constrain inherited operations.
+Separate `scripting-zero-heading-reviewed-2026-10-08.json` records actual page review;
+648-heading DOM denominator stays unchanged, not silently expanded to runtime/File API.
+
+Concrete script time-entry route: prompt returns user String or cancel → validate
+intended project display-format/fps policy → currentFormatToTime(input,fps,true)
+for duration (false/default absolute with Project.displayStartFrame origin) → finite
+bounded seconds → existing typed time edit. Display result with
+timeToCurrentFormat(seconds,fps,true) under same project setting. These globals take
+**explicit fps** and isDuration as third argument, unlike expression time-conversion
+signatures; not fixed format parser, project-independent serialization or guaranteed
+subframe round-trip. Invalid text/error behavior not fully specified: catch/report,
+reject nonfinite/out-of-range results, don't assume zero means cancel.
+
+clearOutput/write/writeLn only small Info-panel feedback; write truncates long text,
+not persistent evidence or File logging. Generate summary then writeLn once; no
+sensitive paths/credentials in output.13.6+ generateRandomNumber returns pseudo-random
+[0..1], recommended source workaround for13.5 concurrency issue; no seed/reproducible
+sequence/cryptographic guarantee. For bounded offset choose scalar deliberately and
+preserve2D/3D/separated/keyed position semantics; source random-position example
+blindly writes2D unkeyed Position and isn't general safe layer-edit recipe.
+24.0+ getEnumAsString(enumValue) diagnostic String (signature line omits arg but table/
+example supplies it); use actual enum constant, not magic5220 as portable ABI ID.
+isValid(obj) verifies AE reference existence after structural edits, not semantic
+ownership/current index; moveTo can invalidate related mask references. Re-resolve
+owned path after mutation, check validity again before next access; don't apply this
+AE-object predicate to arbitrary JS arrays/File handles as universal runtime validator.
+
+Collection length and bracket indices1..length, unlike JS arrays0..length-1.
+Contents update with create/delete; bracket assignment/push isn't creation API.
+For removal iterate descending or snapshot owned targets and re-resolve: initial
+indices aren't persistent identities. Collection page OM wording says project-wide
+items, but operational owner is RenderQueueItem.outputModules; don't enumerate an
+invented app.project.outputModules. Use each concrete collection's reviewed factory/
+lookup methods and correct owner. length is immediate count, not recursive tree size.
+
+CameraLayer extends Layer, not AVLayer; addCamera returns owned camera then inspect
+actual property groups/available match names before editing.26.3 FocusAreaWidth and
+NearFarBlurMultiplier listed **Advanced3D only**; display property labels aren't exact
+match-name contracts or numeric ranges. Camera page lists Scale/Opacity unlike expression
+camera inheritance exclusions: don't cross-port lists or promise those groups exist
+on every target version. Preserve detected unsupported result rather than create
+invented camera options. Typed group inspection, not an expression cameraOption route.
+
+ShapeLayer addShape extends AVLayer; actual Contents/group mutation follows reviewed
+indexed-property rules and match names, no new constructor from this page. TextLayer
+addText adds Text/SourceText/PathOptions/MoreOptions/Animators groups; property labels
+in list aren't independently verified scripting lookup strings. Time Remap/Motion
+Trackers marked inapplicable; old text page additionally lists matte attributes unused,
+while AVLayer page documents modern track-matte operations broadly. Retain conflict,
+gate modern text matte behavior by actual target contract instead of silently declaring
+all text layers can never be mattes or every inherited feature always works.
+
+24.4+ ThreeDModelLayer instanceof branch after validating CompItem/layer bounds;
+type symbol itself needs version gate on older hosts. Inherits AVLayer per guide,
+listed Transform/Marker/Time Remap/Layer Styles/Audio doesn't prove glTF/OBJ import,
+material/mesh editing or renderer behavior. No additional model method invented.
+PlaceholderSource is FootageSource subtype on mainSource/proxySource, defines no
+extra members; inspect actual source type before inherited interpretation edits.
+Placeholder metadata isn't decoded media/file exists/proxy enabled; source replacement
+belongs to reviewed FootageItem/AVItem operations, not writable mainSource assignment.
+No globals/time/type/collection/camera/model/matte runtime performed. ExtendScript
+File/Folder and language/runtime remain outside this seven-page closure.
+
 ### Pinned DOM reconciliation closure and research-only import boundaries
 
 Full pinned [ImportOptions](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/importoptions.md)
