@@ -264,12 +264,106 @@ not ordinary layer marker universal flag; observation doesn't implement custom r
 or guarantee consumer behavior. Bounded Source Text diagnostics avoid eval/private
 metadata leakage and handle marker count first. No marker/Key/metadata runtime.
 
+### Global/layer/camera/light contexts — full review2026-10-08
+
+Full pinned general/general, general/global, layer/layer, layer/general, properties,
+sub-objects, threed and objects/camera/light pages read. Zero-heading navigation pages
+describe category/inheritance, not new undocumented methods. thisComp/thisLayer/
+thisProperty/thisProject are **containing evaluation** objects, time composition
+seconds; no app active-item/selection/UI mutation. Implicit thisLayer names convenient
+but explicit namespaces preferred in generated code to avoid local-name collision.
+colorDepth project bpc diagnostic, not transfer function or shader pixel format.
+comp/footage names need unique owned resolution policy established by installer.
+
+Concrete held random scalar expression: posterizeTime(1/framesToTime(12)); random(50,100).
+Finite positive update rate with explicit frames/fps policy; posterizeTime changes
+property evaluation cadence, not comp fps, output render rate or guaranteed single
+execution at each interval. Page lists numeric return but sample uses standalone
+cadence call followed by value: don't treat returned Number as output amplitude.
+No undocumented zero-rate "evaluate once forever" contract. Subframes/motion blur/
+engine contexts require qualification; random timeless policy still separate.
+
+Layer.enabled video switch, active includes in/out interval; audioActive audio switch/
+interval, hasAudio component, not PCM amplitude or silence. hasVideo description
+video but Type line says audio (copy error): preserve distinction, not duplicate
+hasAudio logic. width/height source dimensions, not transformed pixel bounds. index
+order changes with structural edits; name display metadata. hasParent gates parent
+access; position parent-space when parent exists, otherwise world, anchorPoint local,
+scale percentages, opacity percent, rotation z degrees for3D. audioLevels stereo
+[left,right] **decibels property values**, not media amplitude; use deliberate audio-
+analysis preparation rather than claiming reactive audio from these levels alone.
+
+inPoint/outPoint/startTime seconds: source warns reverse-time may invert in/out order;
+don't force increasing interval from normal-layer assumption when reporting/replaying
+reversed footage. timeRemap only enabled property seconds, not enable setter.
+Layer.source Comp/Footage defaults adjust to source time; sourceTime(t) obtains mapped
+numeric source time (description says source object despite Number return). No simple
+time-startTime replacement promised across stretch/remap/reverse. When reading another
+comp's animation choose explicit mapped sample time versus implicit source context,
+avoiding double application of source-time conversion.
+
+effect(name/index), mask(name/index) topmost duplicate-name/current1-based order, not
+persistent IDs. sourceRectAtTime(t,includeExtents) returns local {left,top,width,height};
+13.2+, paragraph extents15.1+. true gives paragraph **box**, not visible glyph alpha;
+shape bounds expanded. Copied smoothing-filter wording in t table is not an actual
+filter operation. Concrete background-box rig: text rect at intended time → derive
+four local corners/desired padding → map through transforms → return shape rectangle/
+position of compatible space. No post-effects/occlusion/motion-blur image bounds
+guaranteed; layer dimensions aren't interchangeable with rect.width/height.
+
+sampleImage(point,radius,postEffect,t) expects2D **layer-space pixel point**, [0,0]
+center upper-left pixel; radius half extents, default[0.5,0.5] one pixel. Returns
+alpha-weighted averaged RGBA, not raw channel histogram. Concrete color follower:
+source.sampleImage(localPoint,[2,1.5],true,time) → compatible4-component Color field;
+source point mapped from comp through qualified fromComp/fromCompToSurface route.
+postEffect true includes **direct** layer masks/effects, not all adjustment/precomp/
+final composition processing. Transparent/border/HDR cases need actual host/image
+qualification; page doesn't specify every weighting/edge rule. Bound samples/regions,
+avoid self-dependency cycles; "no longer disables multiprocessing" isn't a universal
+MFR thread-safety/performance guarantee for the entire rig or native plugin.
+
+3D material inspector: orientation3-vector degrees versus rotationX/Y/Z scalar,
+ambient/diffuse/metal/shininess/specular percentages and lightTransmission numeric.
+acceptsLights nominal Boolean Number; acceptsShadows/castsShadows preserve enum2
+"Only" instead of flattening truthy bool. These are renderer-sensitive observations,
+not setters to force renderer or proof identical Advanced3D/PBR material behavior.
+No universal inherited material access on Camera/Light: source excludes material,
+source/effect/mask/width/height/anchorPoint/scale/opacity/audioLevels/timeRemap for both.
+Typed rig generation must branch actual layer role before accessing those properties.
+
+Camera.active requires enabled/in-range **topmost** camera, unlike ordinary enabled
+layer active. Camera page syntax cameraOption (singular) is preserved as source-route
+ambiguity; verify actual pick-whip/API target before emitting it in production.
+aperture/focusDistance/zoom pixels, blurLevel and irisRoundness percentages, irisRotation
+degrees; depthOfField0/1. irisShape indices1..10 include divider2: don't assign it as
+real iris. highlightGain/Saturation, irisAspectRatio/DiffractionFringe ranges source
+1..100; highlightThreshold depends bpc (source8-bit0..100,16-bit0..32768,32-bit0..1).
+Don't normalize every option with one color/percent rule. pointOfInterest world per
+page, general position parent-relative: inspect target parent context explicitly.
+
+Concrete focus-distance expression route: owned validated camera/target → world
+positions → camera-space target depth for intended optical-axis focus, with explicit
+camera transform and parent policy → qualify DOF on/output. Euclidean distance from
+length(cameraPos,targetPos) is **not** necessarily optical-axis depth for off-axis
+target. Source scale compensation uses distance/zoom and raw positions: restrict to
+qualified simple unparented on-axis rig, guard zoom>0, don't advertise arbitrary
+perspective/parent/camera-roll equivalence.
+
+Light typed inspector: color4-vector, intensity/coneFeather/shadowDarkness percent,
+coneAngle degrees, shadowDiffusion pixels; castsShadows bool (unlike material "Only"
+enum). falloff dropdown numeric, falloffDistance/radius numeric with no full units/
+range enum map here; preserve current qualified values, don't fabricate choices.
+pointOfInterest world per page; lightOption singular syntax needs target qualification
+like cameraOption. Light type/renderer gates available options; these pages don't
+document environment-source mapping or current native lighting contracts. All source
+operations above not executed in AE; qualification gaps remain explicit.
+
 ### Independent expression inventory
 
 `expression-api-inventory-2026-10-08.json`:32 API-category pages/295 third-level headings
 including overloads. Page heading strings aren't unique global symbols or complete
-signature inventory. `expression-api-reviewed-2026-10-08.json` explicitly records19
-full-page operation reviews (136 headings), SHA256/source and coverage route;13 pages
+signature inventory. `expression-api-reviewed-2026-10-08.json` explicitly records28
+full-page operation reviews (213 headings), SHA256/source and coverage route;4 pages
 remain unreviewed. No literal mention or downloaded bytes give coverage PASS.
 
 Pinned expression-reference revision

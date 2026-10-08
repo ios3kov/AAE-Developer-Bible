@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 expressions global/layer/camera/light:28/32 pages (213/295 headings),
+4 text pages remain. Sampling/timing/typed options source gaps retained, not runtime.
+
 2026-10-08 expressions context/data/marker block:19/32 pages reviewed (136/295
 headings),13 remain; ambiguity/type/time/data safety supplied, no runtime PASS.
 

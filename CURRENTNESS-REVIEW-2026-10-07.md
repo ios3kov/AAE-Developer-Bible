@@ -44,6 +44,12 @@ the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
 
+2026-10-08 expression global/layer/camera/light block:9 full pages including2
+zero-heading navigation pages read/hash checked; ledger28/32 (213/295 headings),
+4 text pages remain. Context/cadence, transforms/audio/source-time/bounds/sampling,
+materials and camera/light policies supplied; source hasVideo/singular option routes,
+optical-depth and sample-stage limitations retained. No pixel/lighting/runtime PASS.
+
 2026-10-08 expression context/data/marker block:10 full pages read/hash checked,
 ledger19/32 pages (136/295 headings),13 remain. Comp/footage metadata and lookup,
 no-eval JSON/MGJSON, effects/menu/hierarchy, masks, keys and inert marker metadata

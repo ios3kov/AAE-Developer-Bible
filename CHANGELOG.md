@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Reviewed9 expression context/layer/camera/light pages, including navigation scope;
+  supplied cadence, source-time, direct pixel sampling and typed lighting policies.
+  Ledger28/32 pages,213/295 headings; source-route/units/default gaps retained.
+
 - Reviewed10 expression object pages: comp/project/effect/menu/hierarchy/mask,
   footage JSON/MGJSON, keys/markers. Ledger19/32 pages,136/295 headings; source
   discrepancies and missing sampling/default-camera contracts retained.

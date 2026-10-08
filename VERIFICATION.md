@@ -2,6 +2,15 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Expression global/layer/camera/light review
+
+Parent `e68fccd`;9 full pinned pages read/hash checked, ledger28/32 (213 headings).
+No posterize/sampleImage/source-time/material/camera/light/expression runtime executed.
+Source-design classification doesn't certify renderer/host/pixel/optical results.
+Results: scripts90/90, consistency11/11, checker/28 source hashes and whitespace
+PASS; generated freshness and strict MkDocs checked before publication. Negative
+consistency-fixture stale messages are intentional, not runtime or CI evidence.
+
 ### Expression context/data/marker source review
 
 Parent `f014eae`;10 full pinned pages read/hash matched, ledger19/32 pages with136
