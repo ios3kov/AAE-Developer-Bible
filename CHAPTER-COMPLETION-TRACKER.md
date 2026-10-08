@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 light/mesh/guide/ease source block fixes missed colon heading; inventory
+648, ledger476.12 reviewed members with version/type/options boundaries, not runtime.
+
 2026-10-08 full PropertyBase/PropertyGroup review reconciles remaining18 headings;
 named-root/indexed enumeration and invalidation operations supplied. Ledger464/647.
 

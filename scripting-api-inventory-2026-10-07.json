@@ -3,7 +3,7 @@
   "scope": "DOM member headings; excludes expressions/matchnames",
   "warning": "Literal mentions do not establish practical or contract coverage. No auto-PASS.",
   "source_pages": 49,
-  "members": 647,
+  "members": 648,
   "records": [
     {
       "source_path": "docs/general/application.md",
@@ -1194,7 +1194,9 @@
         },
         {
           "name": "AVLayer.environmentLayer",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -1601,6 +1603,11 @@
       "source_sha256": "86a9dd47d2bca122ccb7727517a37758a5a5e12f58071dc07d19fb95f865331d",
       "members": [
         {
+          "name": "LightLayer.lightSource",
+          "literal_mentions": [],
+          "review_status": "UNASSESSED"
+        },
+        {
           "name": "LightLayer.lightType",
           "literal_mentions": [],
           "review_status": "UNASSESSED"
@@ -1659,7 +1666,9 @@
         },
         {
           "name": "GuideOptions.orientation",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {

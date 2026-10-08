@@ -6,6 +6,26 @@
   "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
   "reviews": [
     {
+      "source_path": "docs/layer/lightlayer.md",
+      "operation": "Typed lights and version-gated same-comp 2D environment source linking",
+      "members": ["LightLayer.lightSource", "LightLayer.lightType"]
+    },
+    {
+      "source_path": "docs/layer/parametricmeshlayer.md",
+      "operation": "Typed mesh topology and shape-specific mesh/bevel fields; absent option construction/bounds contract retained",
+      "members": ["ParametricMeshLayer.parametricBevelOptions", "ParametricMeshLayer.parametricMeshOptions", "ParametricMeshLayer.parametricMeshType"]
+    },
+    {
+      "source_path": "docs/other/guideoptions.md",
+      "operation": "Explicit optional guide state, pixel/percentage bounds, edge pinning and partial update",
+      "members": ["GuideOptions.color", "GuideOptions.orientation", "GuideOptions.pinned", "GuideOptions.position", "GuideOptions.positionType"]
+    },
+    {
+      "source_path": "docs/other/keyframeease.md",
+      "operation": "Detached speed/influence authoring and explicit shaped temporal ease commit/readback",
+      "members": ["KeyframeEase.influence", "KeyframeEase.speed"]
+    },
+    {
       "source_path": "docs/property/propertybase.md",
       "operation": "Bounded tree inspection, UI versus evaluation gates and indexed-stack mutation/reacquisition; matchName/index reviewed separately",
       "members": ["PropertyBase.active", "PropertyBase.canSetEnabled", "PropertyBase.duplicate", "PropertyBase.elided", "PropertyBase.enabled", "PropertyBase.isEffect", "PropertyBase.isMask", "PropertyBase.isModified", "PropertyBase.moveTo", "PropertyBase.name", "PropertyBase.parentProperty", "PropertyBase.propertyDepth", "PropertyBase.propertyGroup", "PropertyBase.propertyType", "PropertyBase.remove", "PropertyBase.selected"]

@@ -66,6 +66,15 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### Light/mesh/value objects and heading correction — 2026-10-08
+
+Full LightLayer/ParametricMeshLayer/GuideOptions/KeyframeEase pages read, hashes match
+inventory. Extractor missed lightSource heading with trailing colon; fixed/tested,
+denominator now648 headings/49 pages.12 members transferred into actual operation
+guidance; ledger476/648,172 without documented reconciliation. MeshType versus
+ParametricMeshType and absent mesh-options constructor/bounds contracts retained;
+lightSource24.3 HDR/EXR versus25.2 any2D source separated. No geometry/light runtime.
+
 #### PropertyBase/PropertyGroup full-page reconciliation — 2026-10-08
 
 Full pages read, hashes match pinned inventory. Remaining18 headings transferred to

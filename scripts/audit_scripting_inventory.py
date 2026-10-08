@@ -14,7 +14,7 @@ DOM_FOLDERS = {"general", "item", "layer", "property", "text", "renderqueue", "o
 
 def members(text):
     # Preserve overloads as one member; headings are an inventory, not signature parsing.
-    return sorted(set(re.findall(r"^###\s+([A-Za-z][A-Za-z0-9_]*\.[A-Za-z][A-Za-z0-9_]*)(?:\(\))?\s*$",
+    return sorted(set(re.findall(r"^###\s+([A-Za-z][A-Za-z0-9_]*\.[A-Za-z][A-Za-z0-9_]*)(?:\(\))?:?\s*$",
                                  text, re.M)))
 
 

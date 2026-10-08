@@ -66,6 +66,64 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Typed value objects and current light/mesh options — review2026-10-08
+
+Full pinned [GuideOptions](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/guideoptions.md),
+[KeyframeEase](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/keyframeease.md),
+[LightLayer](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/layer/lightlayer.md) and
+[ParametricMeshLayer](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/layer/parametricmeshlayer.md)
+read. Source-design review; no light/mesh image or host execution.
+
+GuideOptions fields are optional; setGuide changes only supplied fields. orientation
+uses HORIZONTAL/VERTICAL, positionType PIXEL/PERCENTAGE; position finite, clamped
+±100000 pixels or **±300 percent**, not normalized0..1. color is RGB0..1;
+pinned means opposite edge (horizontal bottom, vertical right), not a generic locked
+flag. GuideOptions.orientation differs from guides-array orientationType spelling.
+Concrete center guide: new options → VERTICAL/PERCENTAGE/50/color/pinned explicit
+→ add on intended Item/Layer → returned index/full readback. No current typed constants
+before26.5; older pixel fallback must be offered as different lossy capability.
+
+KeyframeEase(speed,influence) uses influence0.1..100 and speed in property's own units,
+not a universal normalized curve factor. Build separate incoming/outgoing ease objects,
+apply correctly shaped arrays via setTemporalEaseAtKey, then keyIn/OutTemporalEase
+readback. Editing detached ease object's speed/influence alone isn't writing a key.
+Do not apply three ease entries to spatial Position just because value has3 components;
+the earlier temporal-shape rule is authoritative for that operation.
+
+Environment light command: validate LightLayer and actual renderer/capability →
+choose same-comp **2D** source layer → lightType=LightType.ENVIRONMENT → lightSource
+assignment → read back type/source and inspect representative image. lightSource
+introduced24.3 for HDR/EXR sources;25.2 expands to any2D video/still/precomp layer.
+3D source throws; don't convert user's source to2D silently. PARALLEL/SPOT/POINT/
+AMBIENT are other lightType values with different option relevance. LightSource
+is an actual layer link, not File path or AVLayer.environmentLayer legacy switch.
+API presence/readback doesn't verify renderer/environment lighting quality.
+
+Mesh edit command26.3+: validate actual ParametricMeshLayer → read parametricMeshType
+→ choose allowed shape and confirm topology-changing edit → set type → reacquire
+type-specific parametricMeshOptions / applicable parametricBevelOptions → change only
+supported intended fields → assign through documented getter/setter route → read back
+and qualify geometry/output. Collection constructor table says MeshType while mesh
+attribute documents **ParametricMeshType**: use actual published attribute enum and
+validate installed constructor contract, don't invent alias equivalence.
+
+| Shape | Mesh fields | Bevel fields |
+|---|---|---|
+| Cube | width,height,depth,smoothingAngle | radius,sides |
+| Sphere | radius,sides,sliceCaps,sliceStart,sliceEnd,smoothingAngle | Not documented |
+| Plane | width,length,cornerRadius,cornerSides | Not documented |
+| Torus | ringRadius,pipeRadius,ringSides,pipeSides,caps,sliceStart,sliceEnd,smoothingAngle | Not documented |
+| Cone | topRadius,bottomRadius,height,sides,topCap,bottomCap,sliceCaps,sliceStart,sliceEnd,smoothingAngle | topRadius,topSides,bottomRadius,bottomSides |
+| Cylinder | radius,height,sides,topCap,bottomCap,sliceCaps,sliceStart,sliceEnd,smoothingAngle | radius,sides |
+
+Torus public list names **caps**, unlike sphere/cone/cylinder sliceCaps. The page
+lists fields but not complete numeric bounds/units, defaults, object construction or
+partial-update semantics. Don't manufacture radius/range/sides declarations or assume
+GuideOptions-style patch behavior. Retain full readback snapshot for assignment;
+if safe option reconstruction isn't established for target build, disable that edit
+while retaining validated shape creation/type operation. Inherited property list isn't
+proof every AVLayer operation is meaningful for parametric geometry.
+
 ### Property tree inspection and structural mutation — review2026-10-08
 
 Full pinned [PropertyBase](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/propertybase.md)

@@ -11,7 +11,11 @@ class ScriptingInventoryTests(unittest.TestCase):
 
     def test_enum_namespace_preserved(self):
         self.assertEqual(members("### Property.LayerInputStageType\n"),
-                         ["Property.LayerInputStageType"])
+                          ["Property.LayerInputStageType"])
+
+    def test_trailing_colon_member_heading(self):
+        self.assertEqual(members("### LightLayer.lightSource:\n"),
+                         ["LightLayer.lightSource"])
 
 
 if __name__ == "__main__":

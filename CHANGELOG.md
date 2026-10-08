@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Fixed extractor omission of colon-suffixed LightLayer.lightSource; denominator648.
+  Reconciled light/mesh/GuideOptions/KeyframeEase full pages and12 members with concrete
+  version/typed-value workflows; ledger476/648, unresolved mesh contracts retained.
+
 - Reconciled remaining PropertyBase/PropertyGroup members: bounded inspector,
   named-root versus indexed enumeration, UI/evaluation gates and indexed-stack
   mutation/reacquisition.18 headings, ledger464/647; no runtime claim.

@@ -2,6 +2,15 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Light/mesh/guide/ease source review and extractor correction
+
+Parent `0fa336f`;4 full pinned pages read/hash matched. Added colon-heading regression
+fixture and regenerated inventory49/648;12 documented members added. No light/mesh/
+ease/guide host execution. Standard repository suites/checker/freshness/strict build/
+whitespace checks accompany block, not SDK/compiler/runtime evidence.
+Results: scripts87/87, consistency11/11, checker, inventory49/648, source hashes,
+generated freshness, strict MkDocs and whitespace PASS.
+
 ### PropertyBase/PropertyGroup full-page source review
 
 Parent `49c0e9b`; both full pinned pages read, hashes match inventory.18 additional
