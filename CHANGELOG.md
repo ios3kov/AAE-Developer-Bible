@@ -2,6 +2,9 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Reviewed5 official UXP font/ease/shape/marker pages: disambiguated picker and
+  fallback/revision, variable axes, typed topology/feathers and object parameter maps.
+
 - Reviewed6 official UXP settings/preferences/view/guide pages, added owned typed
   persistence and bounded live-preview operations with index/renderer/source gaps.
 

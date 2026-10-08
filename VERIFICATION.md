@@ -2,6 +2,15 @@
 
 ## Currentness continuation — 2026-10-08
 
+### UXP font and animation-value source review
+
+Parent `d4938ad`;5 full pinned pages read; ledger19/44 pages,229 repeated rows.
+No font/glyph/shaping/cloud/default/ease/path/marker/UXP runtime; constructors,
+target Property write-back and missing topology contracts not inferred.
+Results: scripts93/93, consistency11/11, docs checker and whitespace PASS;
+generated freshness/strict MkDocs checked before publication. Negative-fixture
+stale diagnostics intentional; no CI or host result inferred.
+
 ### UXP settings/preferences/views source review
 
 Parent `678b5d4`;6 full pinned pages read; ledger14/44 pages/164 repeated rows.

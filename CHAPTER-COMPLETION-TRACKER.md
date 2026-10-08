@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 UXP fonts/animation values:19/44 pages,229 repeated rows/headings;
+25 remain. Typed ownership/units/parameter-map operations separate from host PASS.
+
 2026-10-08 UXP preferences/settings/views:14/44 pages,164/1448 repeated rows;
 30 remain. Ownership/persistence/UI/render boundaries explicit, acceptance OPEN.
 

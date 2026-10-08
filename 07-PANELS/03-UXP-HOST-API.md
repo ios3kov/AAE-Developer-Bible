@@ -338,6 +338,80 @@ for GuideOptions from this page: use returned supported object, not invented cla
 Expected guide UI state not rendered artifact. No preference/disk/reload/view/guide/
 UXP host runtime executed; index/enum/renderer gaps remain unresolved contracts.
 
+### Font picker and typed animation values — full pinned review2026-10-08
+
+Full Font/Fonts/Shape/KeyframeEase/MarkerValue pages read; ledger19/44 pages,
+229/1448 repeated rows/headings,25 remain. No classes/constructors/export locations
+invented from matching ExtendScript names; obtain supported returned values and
+review target Property write-back contract separately.
+
+Concrete font picker: capture fontServerRevision → allFonts family arrays → exclude/
+flag substitutes deliberately → show nativeFamily/Style/FullName for non-Latin UI,
+keep internal postScriptName/technology/type/version/fontID for disambiguation →
+before apply recheck revision/getFontByID and validate requested glyph String.
+fontID stable **current session**, not persistent installed-font identity; unknown/
+removed ID gives undefined despite table Font return. Empty location valid, no
+guaranteed disk path or license to bundle font. familyName/fullName/styleName ASCII
+versus native Unicode fields; isFromAdobeFonts doesn't prove current entitlement.
+Duplicate PostScript/family+style lookup arrays may contain several; index0 primary
+for TextDocument.fontObject route but not user-intended face identity. Explicitly
+present substitution/duplicate policy, don't silently choose first for exact typography.
+
+findFirstFontByFamilyNameAndStyleNameWithFallback always returns {font,matched}:
+nonempty font isn't exact match. hasGlyphsFor returns support for **every character**,
+no failing-character list or shaping/ligature/visual equivalence guarantee.
+writingScripts/getCTScriptForString return script metadata/counts, empty String gives
+empty list; not complete glyph coverage or grapheme count. getDefaultFontForCTScript
+has **no guarantee even one mapped glyph exists**. Default change accepts non-variable
+Font, returns true changed/false already equal; null resets launch default, not previous
+custom mapping. Snapshot previous actual Font for intended restore and avoid concurrent
+global edits; favorite/mru family lists and sync-freeze/replacement policy are global
+UI/font behavior, not AEP-only project settings. otvLookupTable marked internal naming
+table, don't build required public font resolver on its undocumented stability.
+
+Variable fonts: hasDesignAxes first; designAxesData ordered {min,max,default,name,tag},
+designVector same-length ordered values; non-variable design fields undefined despite
+some primitive types. Validate finite values per axis bounds before
+postScriptNameForDesignVector(vector), read-only Font.designVector isn't setter.
+familyPrefix/designVectorIsDefault/otherFontsWithSameDict/hasSameDict distinguish
+dictionary/instances, not all same-name files; hasSameDict true only variable pair.
+Lookup-generated PS name alone isn't proof instantiated/installed/resolved design
+vector; actual lookup/TextDocument readback remains required. Folder poll returns true
+**scheduled asynchronous update**, not completed new-font availability. Refresh via
+revision/user-driven bounded UI, no aggressive polling or fabricated Promise await.
+freezeSyncSubstitutedFonts disables auto AdobeFonts sync attempt, not removes installed
+fonts or grants access. No download/install/cloud/runtime observations performed.
+
+KeyframeEase influence finite0.1..100, speed units depend property/key type; do not
+normalize spatial px/sec and scalar degrees/sec identically or assume zero valid
+influence. Value fields mutable, applying ease belongs Property per-dimensional arrays;
+no `new app.KeyframeEase` signature promised here. Snapshot matching typed easing
+through supported Property and re-read actual interpolation separately.
+
+Shape path edit design: valid returned Shape → preserve closed/vertices/inTangents/
+outTangents and feather metadata → validate finite2D pairs/equal tangent lengths →
+modify requested points → supported Property setter and readback. RotoBezier ignores
+stored tangent edits; closed connects endpoints but isn't duplicate final vertex.
+No expression createPath/points syntax in UXP Shape. Feather arrays one record per
+feather point with segment number **zero-based**, relative location0..1, tensions0..1,
+types0 outer/1 inner, interps0 non-Hold/1 Hold; inner radii negative, corner-angle
+relative **percentage** not world degrees. Topology insertion/removal can invalidate
+segments/feather mapping: preserve under compatible edit or explicit remap policy,
+don't blindly copy old feather indices to new topology. Page lacks complete topology/
+degenerate/empty-path/coordinate contract, no invented minimum vertex/ABI rule.
+
+MarkerValue comment/chapter/cuePointName/frameTarget/url String, eventCuePoint bool,
+duration seconds, label0..16 presets (not custom RGB), protectedRegion comp/nested-
+comp protected markers, not ordinary layer marker universal flag. Marker metadata
+stays inert/untrusted; validate bounds/types, no eval/open URL during rig evaluation.
+getParameters returns **object string-key/value map**, setParameters Object boolean:
+not ExtendScript flat alternating pair array or expression MarkerKey.parameters
+write operation. Copy owned bounded plain fields, reject unexpected inherited/schema
+keys and preserve unrelated user parameters intentionally. UI three-param limit not
+API limit, but impose product size bound. Changing detached value not proven host
+marker write until Property set/readback; duration bar isn't automatic playback/retime.
+No font/ease/path/marker/UXP host runtime or full animation contract PASS.
+
 ## Identity, selection и invalidation
 
 [Project](https://developer.adobe.com/after-effects/uxp/after-effects-api/project)

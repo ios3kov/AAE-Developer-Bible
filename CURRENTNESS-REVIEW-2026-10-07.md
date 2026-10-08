@@ -44,6 +44,11 @@ the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
 
+2026-10-08 official UXP font/animation-value block:5 full pages; ledger19/44,
+229/1448 repeated rows/headings,25 remain. Font picker/revision/fallback/variable axes,
+typed ease/path/feather and marker-object parameters documented. Global defaults,
+constructor/write-back/shaping/topology gaps retained; no typography/runtime PASS.
+
 2026-10-08 official UXP prefs/settings/views block:6 full pages, ledger14/44 pages,
 164/1448 repeated rows/headings,30 remain. Namespaced typed settings/preference
 ownership and explicit live preview/guide operations; activeViewIndex base/enum/
