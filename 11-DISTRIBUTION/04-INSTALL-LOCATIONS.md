@@ -84,6 +84,23 @@ Prefer common MediaCore only when the plug-in can safely be discovered by other 
 
 Use AE-specific placement when the product depends on After Effects-only suites/behavior and discovery by another host would be misleading or unsafe.
 
+**PPro/AME discovery — DOCUMENTED, review 2026-10-08.**
+[Pinned installation note](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/ppro/plug-in-installation.md)
+предупреждает: установка только в каталог Premiere Pro не обеспечивает рендер эффекта
+в отдельном процессе Adobe Media Encoder. Для заявленного общего маршрута нужен
+подходящий common payload, включая его зависимости. По
+[installer guide](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/intro/where-installers-should-put-plug-ins.md)
+PPro не обходит macOS aliases и Windows shortcuts. Символическая ссылка или alias
+не заменяют подтверждённое размещение; правила одного host не переносить на другой.
+
+**Разные preview assets.** Историческая
+[Premiere Elements page](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/ppro/premiere-elements.md)
+описывает иконку 60×45 PNG с именем `AE.<match-name>.png`. Это не новая схема
+PPro Beta27 preview: в [PiPL chapter](../01-ARCHITECTURE/03-PIPL-AND-LOADING.md)
+она привязана к имени binary. Не переносить размеры, filename key или destination
+между этими двумя host-контрактами; старый Elements path не объявляет поддержку
+современного выпуска Elements.
+
 ## Installer rules
 
 Native installer path guide reread 2026-10-07; CEP paths retain dated platform
@@ -104,4 +121,6 @@ Regardless of path:
 
 ## Verification boundary
 
-These paths follow current AE SDK/CEP guidance. Host discovery, permissions and installer behavior still require actual clean-machine tests.
+Пути — документированная схема размещения. Разработчик продукта подтверждает
+discovery, permissions и поведение своего installer для заявленной среды;
+эта глава не заявляет нового install/host результата Библии.

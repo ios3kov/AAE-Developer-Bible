@@ -10,6 +10,26 @@ Baseline/current-source distinctions: [function map](../17-NATIVE-SUITE-COOKBOOK
 
 > **Важно:** номер suite в заголовке публичного guide не всегда равен «самому новому struct version в любых bindings». Для AE 26.5 официально подтверждены как новые `GuideSuite2`, `ItemViewSuite2`, `CompSuite13`, `StreamSuite7`. Остальные version-sensitive номера проверяются в headers конкретного SDK. См. [`13-DOCS-ERRATA.md`](13-DOCS-ERRATA.md).
 
+### Полное чтение public guide не меняет SDK baseline
+
+**Public guide, 2026-10-08: DOCUMENTED / RUNTIME-NOT-CLAIMED.**
+
+Публичная страница suites на pin `6d9b285` содержит одновременно более новые
+`GuideSuite2`/`ItemViewSuite2`/`CompSuite13`/`StreamSuite7` и старые описания
+`EffectSuite4`/`KeyframeSuite3`/`RenderSuite4`. Это справочник со смешанными
+поколениями, поэтому номер в заголовке нельзя автоматически переносить в код.
+
+Сверка 2026-10-08 прочитала всю страницу: **4 141 исходная строка, 1 188 864 байта**.
+Карта содержит **88 заголовков и 596 именованных строк таблиц**, включая поля
+структур, повторяющиеся имена, removed/legacy entries и опечатки. Каждая запись
+связана с исходным диапазоном и тематической главой Bible. Это полнота чтения
+конкретной public page; число не является количеством функций современного SDK
+или количеством готовых C++ recipes. Ранее разобранные guides/views, mesh creation
+и layer-input stages сохраняют свои отдельные границы версий. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/aegp-suites.md)
+
+Полная [карта чтения страниц и разделов](../native-guide-reviewed-2026-10-08.json)
+связана с [точным inventory](../native-guide-inventory-2026-10-08.json).
+
 | Suite | Public-guide heading / dated note | Что контролирует |
 |---|---:|---|
 | Memory | `AEGP_MemorySuite1` | host-managed memory handles |

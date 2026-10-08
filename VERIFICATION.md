@@ -2,6 +2,35 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Full native public-guide reconciliation
+
+Parent `4bf9d4e079d46b2dfb6407d27613e057a27e69a8`. All89 pinned Markdown pages under
+`docs/` read in full:31 intro/PPro/provenance,38 effects/UI/SmartFX and20 AEGP/AEIO/
+Artisan/audio. Native pin `6d9b285d9755d1fbf8ead7680ba49de24f94b547`; exact tree
+`35566e8001d791aa6322602978df27ae5da4ceee`. Combined2 953 983 bytes/12 918 lines.
+[Review](NATIVE-PUBLIC-GUIDE-REVIEW-2026-10-08.md), inventory and ledger preserve exact
+source hashes, operation destinations, source conflicts and generation boundaries.
+The AEGP suites map contains88 headings/596 repeated named table rows, not596 current
+SDK functions or implemented recipes.
+
+New public-guide inventory regression checks complete page sets, raw-byte identity
+and coverage destinations. These validate the inventory bookkeeping; editorial
+reading establishes the operation mapping. The parameter0 guard is a documented
+C++ example correction, not a newly compiled native result. Public additions are
+DOCUMENTED / RUNTIME-NOT-CLAIMED; previous SDK25.6 results keep their exact scope.
+Local checks passed: public inventory4/4, consistency11/11, UXP inventory3/3,
+129-core checker, source-table freshness, strict MkDocs and whitespace. Independent
+review corrections and exact scope are recorded in the linked native review.
+
+### Published platform/files/host block: exact GitHub evidence
+
+Source commit `c3fea22b5e575687bf901b0bd9ed07a9336923de`:
+[Validate](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37830917952)
+and [Regenerate docs](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37830918047)
+completed successfully. Source files and generated-only follow-up
+`4bf9d4e079d46b2dfb6407d27613e057a27e69a8` matched local bytes. No separate run on the
+generated-only commit or real AE/SDK/IO result is inferred.
+
 ### Shared UXP platform, File/Folder, match names and host/platform review
 
 Parent `b5216fbd80ebb63aa48c2ee4b447eab3a9afc99c`. New platform chapter increases

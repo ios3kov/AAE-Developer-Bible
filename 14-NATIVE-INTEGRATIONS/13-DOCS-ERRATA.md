@@ -185,6 +185,52 @@ For these, current Apple/Microsoft/Adobe platform documentation may outrank old 
 
 Record review date.
 
+## Полный intro/PPro source review — 2026-10-08
+
+Закреплённый public guide `6d9b285d9755d1fbf8ead7680ba49de24f94b547` содержит
+одновременно новые и исторические указания. Это не новый exact SDK26.5 audit.
+
+| Источник | Граница применения в Библии |
+|---|---|
+| [Exceptions](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/intro/exceptions.md), строки 3–5 | Совет передать чужое exception обратно AE противоречит следующему запрету. Не превращать его в разрешение unwinding через callback; применяется [containment policy](../19-NATIVE-CODE-FOUNDATION/04-HOST-CALL-BOUNDARY.md) |
+| [Apple Silicon](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/intro/apple-silicon-support.md), строки 49–64 | Неполный пример `EffectMain` и `catch` не являются точным C++ declaration; форма берётся из SDK25.6 baseline |
+| [Symbol export](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/intro/symbol-export.md), строки 7–41 | Слово «entry» не основание удалить dispatcher или registration export. Их разные роли уже разобраны в [PiPL chapter](../01-ARCHITECTURE/03-PIPL-AND-LOADING.md) |
+| [SDK audience](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/intro/sdk-audience.md), строка 15 | Список старых проверенных IDE не задаёт современные требования всех target; Windows ARM64 guidance требует VS17.4+, а exact sample имеет собственный toolset |
+| [Other integration](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/intro/other-integration-possibilities.md), строки 11,37–39 | Исторические заявления о поставке ESTK, защите через JSXBIN и произвольном scripting через aerender не превращены в текущие tooling/security/CLI гарантии |
+
+Исторические разделы What's New читаются в границах своих версий: утверждения
+2021 года об Apple Silicon или 13.5 об async work-in-progress не отменяют более
+поздних контрактов. Номер guide release не переносит эти старые абзацы в настоящее.
+
+## Native effects public-guide review, 2026-10-08
+
+Полностью прочитаны 38 страниц effect-basics, effect-details, effect-ui-events и
+SmartFX в [snapshot 6d9b285](https://github.com/docsforadobe/after-effects-plugin-guide/tree/6d9b285d9755d1fbf8ead7680ba49de24f94b547).
+Это DOCUMENTED review; ранее проверенные SDK 25.6 declarations не заменены guide.
+
+| Расхождение | Классификация и решение |
+|---|---|
+| [PF_ParamDef](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-basics/PF_ParamDef.md#L22-L26) разрешает change flags в UPDATE_PARAMS_UI; selector/supervision pages запрещают value mutation | Несогласованная таблица. Сохранён запрет SDK 25.6; косметика через копию для `PF_UpdateParamUI` |
+| [PF_InData.shutter_angle](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-basics/PF_InData.md#L120-L128): 0…1 для оборота рядом с примером `==180` | Противоречивые единицы. Не выводить числовую shutter formula из этой страницы |
+| [PF_InData](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-basics/PF_InData.md#L244-L258) prose предлагает менять input origin, `PF_OutData` описывает output width/height/origin | Ошибочная ссылка на структуру; текущий header-first resize contract сохранён |
+| [Parameter-types page](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-basics/parameters.md#L88-L94) называет `path_id` индексом; PathQuery отдельно переводит index в unique ID | Не считать ID и index взаимозаменяемыми; bridge определяется точным API |
+| [Command tables](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-basics/command-selectors.md): `PF_Cmd_PARAM_SETUP`, `PF_Cmd_GPU_SMART_RENDER_GPU` | Опечатки не вводят новые selectors; действуют имена из текущих главы/headers |
+| [Integer slider](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-basics/parameters.md) помечен «No longer used», хотя supplied Skeleton его использует | Историческое обобщение. Сохраняемый тип и disk ID не меняются по одной строке guide |
+| [Заголовок «Change defaults? Change IDs»](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/changing-parameter-orders.md) | Не общая migration policy. Стабильные IDs, old-project value и Reset default рассматриваются раздельно |
+| [Compute Cache hash sample](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/compute-cache-api.md#L150-L186) использует `sizeof` pointer и не завершает return/error paths | Иллюстрация не готова к переносу в native callback; hash inputs и cleanup описаны отдельно |
+| [Sequence page](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/global-sequence-frame-data.md#L68-L101) разрешает менять contents при любом selector, затем вводит MFR const | Старую общую формулировку читать с более узким современным MFR contract |
+| [Drawbot release prose](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-ui-events/custom-ui-and-drawbot.md#L152-L160) дважды называет Supplier; старый sampling UI пишет state в render и keys в DRAW | Не подмена ownership из reviewed SDK и не современный MFR recipe |
+
+SmartFX legacy `func`, положительный/non-negative checkout ID и optional early
+pixel checkin уже разобраны выше; этот review не отменяет предыдущие исправления.
+Уточнение bounds также сохраняется: неизменность `max_result_rect` относится к
+выбору request, а не к любому времени/параметрам. Неиспользованный input допустим;
+«one-to-one» в guide не требует получать pixels каждого объявленного input.
+
+Сами главы теперь дают операции для path/segment ownership, keyframe checkout,
+dependency flags, sampling, gesture/Drawbot и MFR cache. Наличие page ledger не
+означает полной инвентаризации всех SDK declarations или нового host PASS.
+
 ## How to write an erratum
 
 Use a compact record:
@@ -233,3 +279,20 @@ When header, sample and guide disagree:
 - [Header-first rules](../18-SDK-HEADER-TOOLS/04-HEADER-FIRST-RULES.md)
 - [SDK diff policy](../18-SDK-HEADER-TOOLS/03-SDK-DIFF-POLICY.md)
 - [SDK contract audit tools](../18-SDK-HEADER-TOOLS/README.md)
+
+## AEGP / AEIO / Artisan / audio public-guide review, 2026-10-08: расхождения, которые нельзя копировать в код
+
+| Участок | Редакционное решение |
+|---|---|
+| Project getters используют TimeDisplay3 рядом с разделом TimeDisplay2; несколько setter rows печатают имена других функций | Сохранить generation и exact SDK declaration, не собирать ABI из соседних таблиц |
+| `GetLayerSourceItemID` описан как layer ID | Не заменять source-item identity на `GetLayerID` / `LayerIDVal` |
+| `GetRenderState`/`SetRenderState` напечатаны с Boolean | Сохранить уже проверенный SDK25.6 enum и исправление TRUE→QUEUED |
+| `ReportInfo` приписан ItemSuite; `GetLayerParentComp` — CompSuite | Навигация ведёт к Utility и Layer operations соответственно |
+| AUDIO_SETUP prose: startsampL/endsampL | PF_InData/PF_OutData страницы используют `start_sampL`/`dur_sampL`; не изобретать `endsampL` |
+| Artisan field-of-view: две несовместимые формулы | Из `tan(θ)=H/(2f)` алгебраически следует `f=H/(2tan(θ))`. Это исправление преобразования формулы, не подтверждение units/projection современного renderer |
+
+Источники: [suites](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/aegp-suites.md), [AEGP details](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/aegp-details.md),
+[effect bridge](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/cheating-effect-usage-of-aegp-suites.md), [audio range](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/audio/accessing-audio-data.md),
+[Artisan geometry](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/artisans/artisan-data-types.md). Для audio spelling дополнительно проверены
+`docs/effect-basics/PF_InData.md:169–175` и `PF_OutData.md:44` того же pin;
+provenance этих страниц включается в соседний native-effects ledger.

@@ -4,6 +4,11 @@
 
 ## Текущий результат после freeze
 
+**Native:**89/89 полных public-guide страниц согласованы с существующими главами.
+[Обзор и ledger](NATIVE-PUBLIC-GUIDE-REVIEW-2026-10-08.md) включают навигацию, history,
+AEGP/AEIO/Artisan/audio и cross-host материалы. Это не все headers современного SDK
+и не новая runtime evidence. Exact SDK25.6build61 сохраняется.
+
 Полное чтение44/44 pinned AE UXP host pages завершено; scope и сохранённые
 vendor-contract gaps описаны в [host chapter](07-PANELS/03-UXP-HOST-API.md).
 Отдельная [shared-platform глава](07-PANELS/04-UXP-PLATFORM.md) увеличивает

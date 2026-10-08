@@ -215,6 +215,28 @@ if (!err) {
 
 Рекомендация: вычисленный результат несёт снимок запроса — объект, время, options и timestamp. Перед публикацией нужно проверить, всё ли ещё относится к текущей задаче. При этом описанный механизм не удостоверяет правильность пикселей стороннего движка и не снимает необходимость алгоритмического сравнения.
 
+### Прочитать audio через AEGP
+
+**Public guide, 2026-10-08: DOCUMENTED / RUNTIME-NOT-CLAIMED.**
+
+`AEGP_RenderNewItemSoundData` возвращает `AEGP_SoundDataH`; при отсутствии audio
+он может быть NULL. SoundData Suite предоставляет format, sample count,
+lock/unlock samples и dispose. Это получение данных, не добавление render-queue
+item. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/aegp-suites.md#L3472-L3688)
+
+**Рекомендуемый порядок:** передать item и явные start/duration/format; проверить
+ошибку, затем наличие результата. Для полученного sound handle проверить формат
+и число samples, успешно lock-нуть данные, выполнить ограниченное чтение или
+копирование в собственный буфер, затем unlock и dispose. На частичной ошибке
+освобождать только успешно полученные ресурсы, сохраняя первичную ошибку отдельно
+от cleanup. Указатель на samples не переносить за пределы lock/lifetime.
+
+Для последующего анализа хранить копию вместе с rate, channels, encoding,
+sample count и временем запроса. Не связывать аудиокэш только с уже описанным
+video-only `HasItemChangedSinceTimestamp`. Этот путь отличается от
+`PF_CHECKOUT_LAYER_AUDIO` внутри effect: тип handle и paired cleanup выбираются
+по фактическому API, а не по слову «audio».
+
 ## 11. Что можно взять из существующих рецептов
 
 Исходники в этой итерации **не менялись**; новые native-примеры не создавались.
@@ -255,6 +277,12 @@ preflight or mutation; those steps above are extensions the reader must supply.
 Initializer resolves suites before registration, registers death first and retains
 global state after partial hook registration, disabling failed command. This is a
 source-level conservative pattern, not observed host failure recovery.
+
+Некоторые UI getters имеют побочный эффект: public guide указывает открытие
+композиции у `AEGP_GetShowLayerNameOrSourceName` и `AEGP_GetShowBlendModes`.
+Рекомендация: перечисление project data и чтение состояния Timeline UI оформлять
+как разные операции, чтобы фоновый inventory не открывал окна неожиданно.
+[Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/aegp-suites.md#L877-L891)
 
 ### Import → adopt → create → animate → queue
 

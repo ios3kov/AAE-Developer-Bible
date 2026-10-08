@@ -4,6 +4,12 @@ Updated: **2026-10-08**
 
 ## Active: current completeness and currency review
 
+**Native public guide завершён в своём source scope:89/89 страниц.**
+[Датированный обзор](NATIVE-PUBLIC-GUIDE-REVIEW-2026-10-08.md) и exact-byte ledger
+связывают полный текст с профильными главами. Дописаны lifecycle/dependencies/
+ownership, PPro, AEGP monitoring/audio/FIM, AEIO output/source и Artisan queries;
+противоречия guide сохранены в errata. Exact SDK26.5 archive/header gap остаётся.
+
 Добавлена [UXP platform глава](07-PANELS/04-UXP-PLATFORM.md):47 полных shared
 страниц и5 AE setup/site файлов, с отдельным ledger и сохранёнными source gaps.
 В scripting дописаны8 match-name страниц/757 повторяемых строк и8 runtime/File/
@@ -29,8 +35,8 @@ review. Exact26.5 archive/full header diff and full current API inventory still 
 Owner requested a stricter full/current Bible after edition1.1 freeze. Current
 API coverage is **not yet accepted**. [New criteria/source observations](CURRENTNESS-REVIEW-2026-10-07.md):
 current SDK header/archive acquisition remains OPEN. Следующие source-review задачи:
-полный native public-guide inventory/reconciliation, оставшиеся отдельные области
-ExtendScript runtime и финальная provenance sweep. AE-specific UXP setup/version map
+оставшиеся отдельные области ExtendScript runtime и финальная provenance sweep.
+Полный89-page native public-guide inventory/reconciliation закрыт в указанном scope. AE-specific UXP setup/version map
 не опубликованы в проверенных источниках. Полное чтение44 UXP host страниц и выбранных
 platform workflow источников не закрывает отсутствующие constructor/enum/type/async
 contracts и не является полным обзором всего UXP Hub.

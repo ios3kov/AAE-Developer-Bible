@@ -44,6 +44,17 @@ Effect может генерировать звук даже из silence.
 
 Нельзя включать эти flags «для совместимости»: они описывают реальную семантику host scheduling.
 
+### Анализ audio визуальным эффектом
+
+**Public guide, 2026-10-08: DOCUMENTED / RUNTIME-NOT-CLAIMED.**
+
+Для visual effect, который читает audio, но не изменяет его, guide выделяет
+`PF_OutFlag_I_USE_AUDIO`. Модификация audio относится к `AUDIO_EFFECT_TOO` или
+`AUDIO_EFFECT_ONLY`. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/audio/global-outflags.md)
+
+**Рекомендация:** выбирать flag по результату эффекта, а не по самому наличию
+checkout. Spectrum/level analysis и audio filter имеют разные output obligations.
+
 ## 3. PF_SoundWorld
 
 В 25.6 SoundWorld содержит:
@@ -88,6 +99,16 @@ Checkout запрашивает:
 
 Нельзя сохранять raw audio pointer за пределами его documented lifetime.
 
+### Requested samples не продлевают clip
+
+Checkout/range negotiation не является API продления clip. Для слышимого хвоста
+delay guide предлагает заранее продлить out point средствами host или time remap.
+[Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/audio/accessing-audio-data.md)
+
+**Рекомендация:** объяснить эту предпосылку пользователю эффекта. Запрос дополнительных
+samples для расчёта и изменение доступной длительности output решают разные задачи;
+не обещать tail за границей clip только из-за большего входного диапазона.
+
 ## 5. Random access важнее привычного streaming мышления
 
 After Effects — timeline host. Нельзя предполагать:
@@ -129,6 +150,16 @@ AUDIO_SETDOWN
 ```
 
 Точные поля надо брать из target SDK при реализации. Эта глава не заменяет compiler-checked sample.
+
+### Automation metadata и фактический audio format
+
+`PF_FSliderDef` содержит audio-specific phase/curve-tolerance поля;
+`PF_FSliderFlag_WANT_PHASE` запрашивает phase data. Это часть host automation,
+не самостоятельный DSP sample clock. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/audio/audio-specific-float-slider-variables.md)
+
+Sample rate и bit depth независимы, а выход после audio effect ещё может быть
+преобразован host. Поэтому формат входного SoundWorld не описывает автоматически
+финальный output file. [Источники](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/audio/audio-considerations.md), [структуры](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/audio/audio-data-structures.md)
 
 ## 7. Numerical policy
 
@@ -189,7 +220,7 @@ AUDIO_SETDOWN
 - sample-perfect behavior after seek;
 - MFR/audio relationship.
 
-Эти пункты требуют compiler/host fixture.
+Заявления о фактическом поведении продукта требуют отдельной compiler/host evidence; это не условие редакционной готовности главы.
 
 ## Bounded stateless DSP walkthrough
 

@@ -118,13 +118,18 @@ PF_Err SetNumericControlEnabled(PF_ParamUtilsSuite3* ui,
                                const PF_ParamDef& current,
                                bool enabled)
 {
-    if (!ui) return PF_Err_BAD_CALLBACK_PARAM;
+    if (!ui || index == 0) return PF_Err_BAD_CALLBACK_PARAM;
     PF_ParamDef display = current;
     if (enabled) display.ui_flags &= ~PF_PUI_DISABLED;
     else         display.ui_flags |=  PF_PUI_DISABLED;
     return ui->PF_UpdateParamUI(effect_ref, index, &display);
 }
 ```
+
+`PF_UpdateParamUI` нельзя вызывать для input-параметра 0. Остальные индексы также
+должны соответствовать текущему зарегистрированному параметру; helper не получает
+`num_params` и не проверяет весь диапазон за caller.
+[Public guide](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/parameter-supervision.md#L35-L46).
 
 Вызывать этот фрагмент следует из разрешённых USER_CHANGED_PARAM/UPDATE_PARAMS_UI, не из render. Простое копирование структуры здесь достаточно потому, что меняется скалярный флаг: это **не** deep-copy произвольных handles или строк. Не освобождайте данные, которыми владеет исходный параметр.
 
@@ -162,6 +167,19 @@ PF_Err SetNumericControlEnabled(PF_ParamUtilsSuite3* ui,
 Popup хранит value и количество вариантов, а строка списка использует `|`. В учебных образцах первый вариант обозначен 1 (`AE_Effect.h:1875–1891`; `Paramarama.cpp:139–143`). Разделяйте номер варианта и индекс параметра.
 
 Используйте `PF_DEF_NAME`, `PF_DEF_NAMEPTR`, `PF_DEF_NAMESPTR`, а не внутренние имена полей. Для pointer-полей SDK требует стабильные строки (`AE_Effect.h:1698–1711`). Указатель на временную строку, исчезающую после callback, не является стабильной строкой.
+
+**Локализация — DOCUMENTED/source boundary, review 2026-10-08.**
+[Pinned localization guide](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/intro/localization.md)
+различает Unicode API и legacy `char`-строки имён параметров, интерпретируемые
+с учётом языка приложения; язык запрашивается через `PF_AppGetLanguage`.
+Поэтому «весь native UI принимает UTF-8» не является общей нормой.
+Практический путь: определить язык → выбрать собственный resource string →
+подготовить encoding и bounded buffer для конкретного поля → сохранить требуемую
+lifetime → выполнить setup/UI update в разрешённой фазе. Проверять длину после
+преобразования в байты. Display text не меняет match name, disk IDs или enum meaning.
+Исторические инструкции страницы про `CP_OEMCP`, `GetApplicationTextEncoding` и
+переустановку AE не устанавливают современный универсальный platform recipe;
+точный string contract выбранного SDK имеет приоритет.
 
 ## 10. Где нужен Drawbot, а где стандартный UI
 
@@ -258,3 +276,66 @@ parameter flag. Это product design, не автоматическая гар�
 семантическом compare. Восстановление sequence state строит новый runtime объект
 из валидированной плоской модели, а не доверяет адресу из старого project. См.
 [memory/flatten lifecycle](../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md).
+
+## Public-guide операции — 2026-10-08
+
+**DOCUMENTED / RUNTIME-NOT-CLAIMED.**
+
+### Ключи, точность и arbitrary re-entry
+
+Для чтения ключей собственного параметра public guide предлагает отдельный маршрут:
+`PF_GetKeyframeCount` → проверить число ключей и выбрать допустимый index,
+либо `PF_FindKeyframeTime` → проверить `found` и использовать найденный index.
+После успешного разрешения index: `PF_CheckoutKeyframe` → использовать возвращённые value/time/scale →
+`PF_CheckinKeyframe`, включая ошибку после acquisition. Время keyframe не равно
+индексу ключа. `PF_IsIdenticalCheckout` сравнивает два момента, но между ними могут
+быть другие значения. Для cache за интервал нужен state/span contract; старые
+`PF_HasParamChanged` и `PF_HaveInputsChangedOverTimeSpan` не следует переносить в
+`PF_ParamUtilsSuite3` как действующие методы.
+[Parameter supervision](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/parameter-supervision.md#L48-L106).
+
+Как у color, у point и angle есть способы получить floating-point значение:
+`PF_PointParamSuite1` и `PF_AngleParamSuite1`. Они решают вопрос точности чтения;
+единицы, origin и масштаб остаются отдельными. Angle может содержать несколько
+оборотов, поэтому clamp к 0…360 требует самостоятельного алгоритмического решения.
+[Float access](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/parameters-floating-point-values.md),
+[parameter types](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-basics/parameters.md#L48-L62).
+
+Arbitrary callbacks должны выдерживать повторный вход: checkout вложенного слоя
+может снова вызвать тот же plug-in. NULL `src_arbH` в COPY означает создание default
+значения; это не разрешение читать NULL. При NULL `effect_ref` arbitrary checkout
+запрещён. Изменение arb из `DO_DIALOG` host игнорирует. Эти особенности дополняют
+таблицу ownership, но не меняют собственную версионированную wire schema.
+[Arbitrary data](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/arbitrary-data-parameters.md#L50-L86).
+
+### Прочитать native path и измерить сегмент
+
+`PF_Param_PATH` — ссылка на mask path, а не готовый массив вершин. Обновление может
+быть lazy, поэтому сначала checkout параметра на нужное время. При перечислении
+всех путей `PF_NumPaths` → `PF_PathInfo` переводит индекс enumeration в `PF_PathID`;
+не передавать эти два числа взаимозаменяемо. Затем `PF_CheckoutPath` получает outline,
+а `PF_CheckinPath` завершает доступ. Изменение маски через AEGP — другой маршрут,
+который не следует выполнять из render только потому, что suite доступна.
+[Path contract](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/working-with-paths.md).
+
+Операционная схема чтения, **не C++ declarations**:
+
+```text
+checkout parameter → актуальный path identity
+checkout path → open/closed, N segments, vertices
+  prepare segment length → length/evaluation/derivative
+  cleanup segment length, в том числе после ошибки evaluation
+checkin path как неизменённого, в том числе после ошибки чтения
+checkin parameter по правилам текущей фазы
+```
+
+`PF_PathPrepareSegLength`/`PF_PathCleanupSegLength` образуют отдельную пару; возврат
+outline не заменяет её. Сегменты имеют индексы `[0,N)`, вершины — `[0,N]`; у закрытого
+пути последняя повторяет первую. Vertex/tangents описаны в layer space. Частота
+100 в guide — выбор внутренних эффектов, не обязательная точность для любого пути.
+Имя, inversion и mask mode запрашиваются отдельно.
+
+Рекомендуемая собственная policy: до вычисления нормализованной длины обработать
+пустой/нулевой сегмент; копировать только нужную геометрию в snapshot, не сохранять
+borrowed outline или segment-preparation pointer после cleanup. Если читаются
+не только пути из path-параметров, объявить dependency на unreferenced masks.

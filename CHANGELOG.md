@@ -2,6 +2,13 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Completed all89 pinned native public-guide page reviews: full Effect/SmartFX/
+  Drawbot/MFR, intro/PPro, AEGP/AEIO/Artisan/audio coverage. Added practical ownership,
+  dependency, UI, import/monitor/audio and export/query boundaries to existing chapters.
+  Corrected parameter0 UI guard and documented source errors without reconstructing ABI.
+- Added exact-tree/blob/SHA256 public-guide inventory and exhaustive page-ledger
+  regression. Preserved SDK25.6build61 baseline and current26.5 archive gap.
+
 - Added separate UXP platform chapter covering lifecycle/UI, storage, network and
   distribution:47 full shared pages plus5 AE setup/site files, exact-byte ledger.
   Preserved missing AE manifest host ID/runtime map and upstream version conflicts.

@@ -31,7 +31,7 @@ full UXP/runtime/SDK26.5 audit or new installed AE observation inferred.
 | Layer | Retained exact baseline | Current published surface / gap |
 |---|---|---|
 | Native headers/samples | supplied SDK25.6build61 | 26.5 guide additions; actual archive/header/toolset diff OPEN |
-| Native guides | dated reviewed source | Selected Guide2, ItemView2, Comp13, Stream7 deltas reconciled; full pinned public-guide review in progress |
+| Native guides | dated reviewed source | All89 pinned public-guide pages read and reconciled; mixed suite generations and source gaps retained, not an exact SDK26.5 header inventory |
 | Effect metadata | reviewed PiPL baseline | Search_Keywords/Description/EXT3 and preview media are PProBeta27-only per current guide |
 | ExtendScript / expressions | retained lessons and dated evidence | Pinned DOM648 headings classified,32 expression pages and8 match-name pages reviewed;8 File/Folder/runtime pages added, broader runtime and source-contract gaps explicit |
 | AE UXP | official source pin7d1cd01 | 44/44 full host pages;47 selected Hub pages plus5 AE setup/site files reviewed. Constructor/enum/type/async and AE setup/runtime-map gaps retained |
@@ -43,6 +43,13 @@ layer-parameter render-stage sampling. Exact signatures/macros/layouts require
 the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
+
+**Native public-guide closure — 2026-10-08:** [обзор](NATIVE-PUBLIC-GUIDE-REVIEW-2026-10-08.md)
+фиксирует89/89 полностью прочитанных Markdown страниц,2 953 983 bytes/12 918 строк,
+exact tree/blob/SHA256 inventory и соответствие профильным главам. В частности,
+AEGP suites page прочитана полностью;88 headings/596 повторяемых именованных строк
+включают структуры, legacy и source typos, а не596 современных SDK функций.
+Public guide дополняет SDK25.6build61 и сохраняет текущий26.5 archive/header gap.
 
 **Platform/runtime дополнение — 2026-10-08:** новая
 [UXP platform глава](07-PANELS/04-UXP-PLATFORM.md) закрывает выбранные lifecycle/UI,
@@ -157,8 +164,10 @@ expression member inventory or runtime PASS.
 
 - [ ] Obtain lawful current SDK archive/version/build; record hash and full
   headers/utilities/sample/tool/resource diff against25.6. Do not distribute SDK.
-- [ ] Reconcile all published native families/members, including new26.5 APIs and
-  cross-host-only additions. Map topic → authoritative source → version → actual recipe.
+- [x] Read and reconcile all89 pinned native public-guide pages, including26.5
+  additions and cross-host-only topics. Map source → version boundary → practical
+  chapter; preserve malformed/legacy rows. Exact SDK symbol closure remains part
+  of the separate archive/header task above.
 - [x] Read all44 pinned published AE UXP host pages and reconcile practical operations;
   retain contradictory/incomplete contracts without inventing API parity.
 - [x] Review selected shared-platform setup/manifest/permissions/UI/file/network/

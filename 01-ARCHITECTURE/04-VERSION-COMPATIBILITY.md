@@ -194,6 +194,98 @@ Do not infer Premiere compatibility from:
 
 Check the exact host contract.
 
+### Premiere Pro: отдельный маршрут Effect API
+
+**DOCUMENTED / RUNTIME-NOT-CLAIMED, review 2026-10-08.** Полностью прочитаны девять
+[PPro-страниц закреплённого public guide](https://github.com/docsforadobe/after-effects-plugin-guide/tree/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/ppro).
+В них есть исторические ветки CS/CC. Описанная модель помогает проектировать adapter,
+но не устанавливает поддержку всех этих возможностей каждым новым PPro build.
+
+[Host identity](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/ppro/ppro.md)
+и [host IDs](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/intro/third-party-plug-in-hosts.md):
+`appl_id` равен `'PrMr'` и у Premiere Pro, и у Premiere Elements; `'FXTC'` обозначает
+AE. Поэтому `PrMr` недостаточно для различения двух продуктов. Для такой задачи
+guide указывает Premiere App Info Suite. Таблица Effect API major/minor содержит
+исторические значения: это не номер приложения и не одинаковая capability с AE.
+Проверять продукт, версию и требуемый контракт отдельно; сигнатуры Premiere-specific
+suites брать из соответствующих headers, которых этот review не подменяет.
+
+#### Request context и состояние
+
+[Basic differences](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/ppro/basic-host-differences.md)
+описывает следующие различия:
+
+| Вход или событие | Что учитывать |
+|---|---|
+| Time | Использовать отношение time values; не фиксировать исторический `time_scale` |
+| Playback / Paused render | Одно время может запрашиваться с разными resolution/bit depth; `quality` относится к monitor |
+| Native-format field render | `PF_Cmd_RENDER` приходит для поля; `height` — половина кадра, `rowbytes` удвоено относительно обычного кадра |
+| Scheduling | Возможны speculative, повторные и непоследовательные запросы; cached frame может не вызвать effect |
+| Instances | Разные экземпляры вызываются параллельно; описанная serialization одного instance исключает arbitrary callbacks |
+
+**Рекомендация adapter:** сначала нормализовать фактические format, stride, dimensions,
+field, time и quality, затем вызывать ядро. Cache key не должен состоять только из
+времени. Не хранить последний отрендеренный кадр как обязательный вход следующего.
+Suite acquisition failure обрабатывать до обращения к таблице; наличие AE utility
+не предполагать. Guide показывает отдельные callback/macro alternatives, например
+`PF_COPY` и `PF_FILL`; применимость к формату всё равно проверяется.
+
+В parameter UI PPro `PF_ParamFlag_START_COLLAPSED` не учитывается. Для перемещения
+time needle без ключей guide с CC2015 связывает доставку `PF_Cmd_UPDATE_PARAMS_UI`/
+`PF_Event_DRAW` с `PF_OutFlag_NON_PARAM_VARY`: интерфейс должен переживать пропуски
+redraw, а флаг соответствовать реальным зависимостям эффекта. Экспоненциальная шкала
+описана через `PF_ADD_FLOAT_EXPONENTIAL_SLIDER`; точную форму macro и доступность
+брать из выбранных headers, а не восстанавливать по примеру чисел в guide.
+
+[Multithreading note](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/ppro/multithreading.md)
+советует не включать `PF_OutFlag2_PPRO_DO_NOT_CLONE_SEQUENCE_DATA_FOR_RENDER` из-за
+проблем parameter UI. Этот флаг не является общей оптимизацией памяти и не заменяет
+спроектированное владение состоянием.
+
+#### Pixel formats, checkout и unsupported paths
+
+[Bigger differences](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/ppro/bigger-differences.md)
+описывает отдельную регистрацию поддерживаемых форматов и float-обработку через
+`PF_Cmd_RENDER`; перенос AE 16-bit/SmartFX пути этим разделом не обещан. Исходники
+**SDK Noise** служат ориентиром для PPro float/YUV adapter. Обычные 8-bit AE helpers
+нельзя применять к произвольному BGRA/YUV/float buffer.
+
+Для дополнительных checkout guide описывает opt-in на `PF_Cmd_GLOBAL_SETUP`, чтобы
+`PF_CHECKOUT_PARAM` возвращал формат render request; без него исторический путь
+возвращает ARGB8. Поэтому проверять и основной input, и checked-out input: один
+не устанавливает layout другого. Отдельно учитывать настройки глубины preview и
+export; успех одного маршрута не доказывает другой.
+
+[Unsupported features](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/ppro/unsupported-features.md)
+не обещает AEGP, AE audio, auxiliary/3D и ряд sampling/world utilities. В описанном
+PPro host `PF_OutFlag_I_USE_AUDIO` препятствует загрузке. Не рекламировать такой
+Effect как общий video-host payload только из-за расположения в MediaCore.
+Успешный discovery AEGP также не означает поддержку его callbacks: отсутствие
+обязательной AE suite должно завершать инициализацию ошибкой до регистрации работы.
+
+#### Кэш загрузки и presets
+
+[Plug-ins reloaded](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/ppro/plug-ins-reloaded.md)
+описывает сохранение части PiPL/`GLOBAL_SETUP` capabilities между запусками.
+Для диагностики изменённой регистрации: установить один идентифицированный binary
+→ перезапустить PPro с описанным guide Shift-reload → проверить фактически загруженный
+путь и полученные capabilities. Это отдельный механизм от frame cache и не hot reload.
+Guide также называет `PF_SetNoCacheOnLoad` для намеренного отказа от кэша; точную
+форму и применимость брать из Premiere headers, не конструировать callback по названию.
+
+Preset PPro создаётся из применённого эффекта с выбранными значениями/ключами через
+Save Preset, затем Export Preset. Его схема отдельна от AE presets. Описанная установка
+presets в plug-in directory делает их read-only; пользовательские presets остаются
+редактируемыми. Исторические Vista-пути не использовать как современный универсальный
+installer target. Custom ECW UI workaround на этой же странице предлагает отдельный
+data parameter и supervision: отображение не должно становиться единственным
+хранилищем значения.
+
+Для стороннего host применять тот же принцип capability adapter. Раздел
+[Other hosts](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/ppro/other-hosts.md)
+не даёт поддержки Adobe для сторонней реализации host; историческое отсутствие
+SmartFX у других hosts не превращается в бессрочную таблицу рынка.
+
 ## Compatibility matrix
 
 Product support statement should distinguish **supported** and **tested evidence**.

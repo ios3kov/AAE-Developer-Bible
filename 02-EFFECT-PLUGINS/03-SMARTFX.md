@@ -147,13 +147,66 @@ transparent edges, start/end times, remapped source, missing input и cancel м�
 checkouts. Math expectation фиксируется до измерения. Runtime этих walkthroughs
 не заявлен.
 
+### Дополнительные границы pre-render и времени
+
+**DOCUMENTED / RUNTIME-NOT-CLAIMED, review 2026-10-08.**
+[SmartFX guide](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/smartfx/smartfx.md)
+уточняет несколько операций, которые не видны в обычном Copy. В Smart selectors
+нет готового массива parameter values: не-layer значения получают checkout.
+Пустой request может запрашивать только `max_result_rect`; пустой `result_rect`
+может быть правильным результатом. Для предварительного определения размера input
+можно запросить metadata с пустой rect без последующего получения pixels.
+
+Для одного pre-render render бывает не более одного раза и может не состояться.
+Не ставить cleanup snapshot в зависимость от render. Объявленные inputs разрешено
+не использовать; однако `checkout_layer_pixels` для одного ID вызывается только
+один раз. Для второго получения того же слоя нужен другой заранее объявленный ID.
+Output получают после хотя бы одного input checkout, кроме эффекта без inputs.
+
+`result_rect` за пределами request требует `PF_RenderOutputFlag_RETURNS_EXTRA_PIXELS`.
+`max_result_rect` может зависеть от текущих параметров/времени, но не от выбранного
+ROI. Требование `preserve_rgb_of_zero_alpha` передаётся дальше входным checkouts;
+оно не тождественно capability `REVEALS_ZERO_ALPHA`.
+
+В [PF_InData](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-basics/PF_InData.md#L52-L114)
+`time_step` относится к source sample и может меняться, быть отрицательным или
+нулевым; `local_time_step` описывает другой, постоянный для слоя шаг. Не выводить
+source frame number делением без проверки нуля. Point values уже скорректированы
+host: checkout другого времени использует pre-effect origin **текущего** вызова.
+Кэшировать такие преобразованные координаты между временами без пересчёта нельзя.
+
+### Сделать временные и внешние зависимости видимыми
+
+| Зависимость результата | Что объявляет public guide |
+|---|---|
+| Параметры другого времени | `PF_OutFlag_WIDE_TIME_INPUT`; для SmartFX также `PF_OutFlag2_AUTOMATIC_WIDE_TIME_INPUT` |
+| Shutter sampling | `PF_OutFlag_I_USE_SHUTTER_ANGLE`; эффект сам выбирает/читает временные samples |
+| Camera / lights | `PF_OutFlag2_I_USE_3D_CAMERA` / `PF_OutFlag2_I_USE_3D_LIGHTS` |
+| Маски вне явно выбранных path parameters | `PF_OutFlag2_DEPENDS_ON_UNREFERENCED_MASKS` |
+| Изображение меняется при неподвижном source и параметрах | Проверить необходимость `PF_OutFlag_NON_PARAM_VARY` |
+
+[OutFlags](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-basics/PF_OutData.md),
+[motion blur](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/motion-blur.md).
+Automatic wide-time input отслеживает фактические checkouts; самодельный cache
+временных результатов всё равно требует проверки состояния на нужном интервале.
+Иначе скрытый cache может обойти построение зависимостей host. Этот механизм
+работает для SmartFX; legacy fallback остаётся wide-time input.
+
+[PFInterface camera/light bridge](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/accessing-camera-light-information.md)
+не означает разрешения любых AEGP mutations на render thread. Classic
+`PF_CHECKOUT_PARAM` и `params[0]` также не являются двумя названиями одной стадии
+изображения: guide отличает raw source checkout от результата предыдущих effects;
+SmartFX checkout основного input учитывает предшествующий стек. Не заменять один
+маршрут другим при чтении вторичного слоя.
+[Checkout semantics](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/interaction-callback-functions.md#L59-L150).
+
 ## 11. SmartFX, float, GPU и MFR — независимые capabilities
 
 В [S2] отдельно определены `PF_OutFlag2_SUPPORTS_SMART_RENDER`, `PF_OutFlag2_FLOAT_COLOR_AWARE`, `PF_OutFlag2_SUPPORTS_GPU_RENDER_F32` и `PF_OutFlag2_SUPPORTS_THREADED_RENDERING`. Объявление одной возможности не подтверждает остальные.
 
 Для GPU header дополнительно требует `PF_RenderOutputFlag_GPU_RENDER_POSSIBLE` на pre-render этапе. Само наличие поля `what_gpu` или настройка GPU у проекта не доказывает исполнения GPU-ветки конкретного эффекта. [S1:2504–2507], [S2:1007]
 
-Для собственного SmartFX-продукта проверяют отдельно CPU-корректность, float, частичные области, ошибки/отмену, cache и конкуренцию. **Уровень этой главы — SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED.** Описанные сценарии не подтверждают выполнение SmartFX Copy в AE и не создают обязательный host-QA этап для Библии. Результат проверки продукта должен указывать его source/artifact identity, AE build и покрытые сценарии.
+Для собственного SmartFX-продукта проверяют отдельно CPU-корректность, float, частичные области, ошибки/отмену, cache и конкуренцию. **Точная SDK25.6 база — SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED; public-guide дополнения от 2026-10-08 — DOCUMENTED / RUNTIME-NOT-CLAIMED.** Описанные сценарии не подтверждают выполнение SmartFX Copy в AE и не создают обязательный host-QA этап для Библии. Результат проверки продукта должен указывать его source/artifact identity, AE build и покрытые сценарии.
 
 ## 12. Что реализует сопровождающий исходник
 

@@ -214,6 +214,78 @@ stale cancellation → no callback writes into closed view. Это conservative 
 не полная implementation async-manager suite. Ни lifetime beyond documented receipt,
 ни host-tested cancellation здесь не обещаны.
 
+### Полный gesture и проверка context
+
+**DOCUMENTED / RUNTIME-NOT-CLAIMED, review 2026-10-08.**
+[Event contract](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-ui-events/effect-ui-events.md)
+требует неблокирующего click handler: для продолжения вернуть `send_drag=true`,
+а не ждать mouse-up внутри DO_CLICK. В DRAG `last_time` обозначает завершение.
+Transient gesture state принадлежит этому context/gesture и сбрасывается также
+при закрытии context. ACTIVATE/DEACTIVATE/CLOSE не дают разрешения читать click union.
+
+Перед drawing проверить `PF_EI_DONT_DRAW`, тип окна и актуальную область контрола.
+`PF_EO_HANDLED_EVENT` подтверждает обработку; `ALWAYS_UPDATE`/`NEVER_UPDATE`
+управляют composite updates во время gesture, а `UPDATE_NOW` — redraw после
+возврата события. Это разные обещания.
+[EventExtra](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-ui-events/PF_EventExtra.md).
+
+`continue_refcon` предназначен для click–drag state. Не переносить туда pointer
+через поле произвольной разрядности по старой таблице: layout берётся из headers.
+`when` — OS event time; он не заменяет layer render time. Keydown содержит
+unshifted key code и modifiers; это не готовая Unicode-строка пользовательского ввода.
+[EventUnion](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-ui-events/PF_EventUnion.md).
+
+Для hit-test сначала `frame_to_source`, затем при необходимости comp/layer
+conversion на нужное время. Если `get_comp2layer_xform` возвращает `exists=false`
+при нулевом scale, не применять выдуманную обратную матрицу: gesture недоступен
+для этой геометрии. `source_to_frame` выполняет обратный путь для отображения.
+Это операции текущего event context, не сохранённые навсегда matrices.
+UI-макросы предполагают локальное имя `extra`; менять headers ради другого имени
+не требуется.
+[UI callbacks](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-ui-events/ui-callbacks.md#L3-L40).
+
+### Drawbot: сохранить surface state и учесть возможности supplier
+
+[Drawbot guide](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-ui-events/custom-ui-and-drawbot.md)
+разрешает рисовать только в DRAW. Для clip/transform/interpolation/antialias changes
+сделать `PushStateStack` и затем `PopStateStack`, включая путь ошибки: release
+brush/path не восстанавливает surface state. `Flush` не является обязательным
+вызовом после каждой примитивной операции и может вызывать лишнюю перерисовку.
+
+Перед текстом проверить `SupportsText`; DrawString принимает UTF-16. Перед image
+creation проверить поддерживаемый ARGB/BGRA layout и явно выбрать straight/premul.
+Созданный image, как font/path/brush/pen, требует `ReleaseObject`. Страница не
+задаёт достаточный contract копирования исходного buffer: рекомендуем хранить
+собственные bytes до завершения использования image, пока exact API не подтверждает
+более короткий lifetime. Не выдавать borrowed world за новый владеющий image buffer.
+
+Overlay theme suite даёт согласованные foreground/shadow/stroke/vertex sizes.
+HiDPI пример с удвоенным bitmap — частный способ рисования, не доказательство,
+что zoom, hit-test и scale всех views всегда равны 2. У Drawbot arc углы в градусах,
+от 3 часов по часовой стрелке; это не единицы ANSI math.
+
+### Узкие host UI operations
+
+По [utility guide](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/useful-utility-functions.md):
+
+| Задача | Маршрут и ограничение |
+|---|---|
+| Название Options | `PF_SetOptionsButtonName` во время parameters setup |
+| UI colors/language/fonts | App/overlay suites, без hardcoded white/black и предположения о языке |
+| Color picker | Цвет рабочего пространства; `PF_Interrupt_CANCEL` означает отмену без нового значения |
+| Частичный redraw | `PF_InvalidateRect` из non-DRAW event; запрос выполняется после возврата, NULL rect означает весь pane |
+| Time label | AdvTime formatting с выбранным layer/comp контекстом; строка представления не служит cache key |
+| Project/window commands | Dirty, save, foreground, touch и rerender — разные операции; repaint не доказывает новую выдачу External Monitor frame |
+| Auxiliary channels | Отдельный lookup/checkout/checkin из [главы о каналах](08-AUXILIARY-CHANNELS.md), не доступ к UI bitmap |
+
+Legacy [color-sampling recipe](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-ui-events/tips-and-tricks.md#L35-L45)
+предлагает записать sequence state из render, отменить render и добавить ключи
+во время DRAW. Не переносить эту цепочку в современный MFR effect: она конфликтует
+с read-only render state и разделением drawing/mutation. Использовать согласованный
+request/result и разрешённую команду изменения параметров. Последняя виденная
+глубина world также не является текущим render format; UI display flags решают
+задачу отображения без такого предположения.
+
 ## Verification boundary
 
 Bundled Custom_ECW_UI/CCU source reviewed. Bible не заявляет собственный UI runtime result; отдельная demo implementation/host QA не является completion requirement документации.

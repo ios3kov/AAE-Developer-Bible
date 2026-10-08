@@ -96,6 +96,10 @@ Never:
 - move locked pointer to worker after unlock;
 - double-free handle.
 
+`AEGP_GetMemStats` учитывает выделения через Memory Suite; это не счётчик всех
+`PF_HandleSuite`, C++ или GPU ресурсов. Рекомендация: в отчёте утечек указывать,
+какое семейство аллокаций наблюдалось. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/aegp-suites.md#L115-L156)
+
 ## Copy before async work
 
 If worker needs returned string/data:
@@ -194,6 +198,22 @@ com.vendor.product/ui/lastPath
 ```
 
 Avoid collision with other components/products.
+
+### Чтение отсутствующего preference может записать default
+
+**Public guide, 2026-10-08: DOCUMENTED / RUNTIME-NOT-CLAIMED.**
+
+В public guide getters Persistent Data при отсутствующем ключе записывают и
+возвращают default; без default возможна запись пустого значения. Для проверки
+существования есть `AEGP_DoesKeyExist`. `A_FpLong` в этом хранилище описан с шестью
+знаками после запятой. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/aegp-suites.md#L3001-L3123)
+
+**Рекомендация:** разделить чтение настроек и их инициализацию. В режиме просмотра
+сначала проверить собственный namespace/key; отсутствующее значение представить
+как отсутствие, не создавая его случайным getter. Миграция отдельно проверяет
+схему и записывает новые значения только после успешного преобразования. Для
+величин, которым нужна более высокая точность, выбрать собственное явно
+версионированное представление; не обещать точный round trip через preference float.
 
 ## Persistent schema version
 

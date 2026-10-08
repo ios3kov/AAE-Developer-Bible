@@ -6,7 +6,7 @@
 
 Предыдущая версия главы смешивала baseline 25.6 с более поздним `CompSuite13`. Для supplied SDK 25.6 current declaration — `CompSuite12`. Это исправлено здесь.
 
-## 1. Два разных сценария
+## 1. Три разных сценария
 
 Сквозной [import/adopt/create/animate/queue route](../03-AEGP/02-PROJECT-RENDER-AUTOMATION.md)
 использует эту страницу как exact ownership contract. Здесь нет authored compiled
@@ -28,11 +28,28 @@ UTF-16 path + optional layered/sequence options
 → optional AddLayer(item, comp)
 ```
 
-### B. Новый file format / новый importer
+### B. Новый media decoder или encoder
 
-Это не `AEGP_NewFootage`. Нужен **AEIO/File Import** path. Footage Suite просит host импортировать уже поддерживаемый тип; она не реализует decoder.
+**Public guide, 2026-10-08: DOCUMENTED / RUNTIME-NOT-CLAIMED.**
 
-См. [AEIO](../04-AEIO/README.md) и [AEIO native integration](../14-NATIVE-INTEGRATIONS/08-AEIO.md).
+AEIO предоставляет AE pixels/audio собственного формата. MediaCore — другой
+importer API; именно для него guide описывает приоритет importers и попытку
+следующего обработчика. Установка AEIO сама по себе не обещает перехват уже
+обслуживаемого формата. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aeios/aeios.md)
+
+### C. Формат описывает проект или timeline
+
+Для файла, который нужно преобразовать в композиции и связанные items, public
+guide выделяет `AEGP_FIMSuite3`. Путь: зарегистрировать import flavor, его
+filetypes/extensions и callbacks; после импорта обозначить результат через
+`AEGP_SetImportedItem`. Это отдельный контракт от media AEIO. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/aegp-suites.md#L4115-L4141)
+
+**Рекомендация:** сначала определить результат импорта. Decoder выдаёт samples;
+project translator создаёт структуру проекта и использует уже поддерживаемое
+media. Во втором случае заранее разобрать файл в собственный план, а host objects
+создавать с проверкой актуального контекста, Undo и отчётом частично выполненных
+действий. Регистрация flavor не решает ownership созданных items и не реализует
+чтение нового media формата.
 
 ## 2. Ownership AEGP_FootageH меняется при adoption
 

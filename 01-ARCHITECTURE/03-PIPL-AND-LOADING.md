@@ -9,6 +9,12 @@ not currently After Effects. Search JSON is locale-keyed (include en_US), malfor
 JSON ignored; description is plain string with PiPL code-page caveat. Do not add
 these to an AE25.6 sample and promise AE Effects-panel discovery behavior.
 
+Для длинного keyword JSON guide отдельно указывает лимит `Rez`: 1023 байта на
+исходную строку. Разбивать JSON на соседние string literals, сохраняющие одну итоговую
+строку, и проверять JSON до C/resource escaping. Это ограничение authoring pipeline,
+не максимальная длина пользовательского поискового запроса. Поиск использует `en_US`
+и текущую locale; идентификатор эффекта не локализуется вместе с keywords.
+
 Preview assets are keyed by **binary file title**, not match name; all effects in
 one binary share preview. PProBeta paths: mac bundle `Contents/Resources/Preview`,
 Windows `Preview` next to `.aex`, `<binary-title>.jpg`/`.mp4`,640×360/H.264 video.
@@ -202,7 +208,10 @@ source revision → build configuration → produced artifact + hash
 
 Приватные эксперименты с поздней загрузкой из [проектных кейсов](../22-PROJECT-CASE-STUDIES/README.md) не заменяют эти требования. Registration callback, успешная поздняя загрузка нового модуля и безопасная замена уже загруженного кода — разные утверждения. Рассмотренные declarations не дают общего контракта hot reload.
 
-Далее: [инициализация AEGP, hooks и suites](../03-AEGP/01-HOOKS-SUITES.md). Точные исходники этой главы перечислены в [записи сверки](../18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md); непроведённые host-проверки остаются открытыми.
+Далее: [инициализация AEGP, hooks и suites](../03-AEGP/01-HOOKS-SUITES.md).
+Точные исходники SDK25.6 перечислены в [записи сверки](../18-SDK-HEADER-TOOLS/08-REGISTRATION-AEGP-SDK25.6.md).
+Их SDK-CONTRACT-REVIEWED уровень отделён от DOCUMENTED public-guide дополнений;
+редакционная готовность не зависит от нового запуска примера в host.
 
 
 ## Private loader boundary

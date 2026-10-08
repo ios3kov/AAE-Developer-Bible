@@ -81,6 +81,19 @@ AEGP EntryPointFunc
 
 Заявленный flag должен соответствовать реально реализованным callbacks. `HAS_AUX_DATA` без descriptor/draw/free path — не полноценная поддержка auxiliary channels.
 
+**Public guide, 2026-10-08: DOCUMENTED / RUNTIME-NOT-CLAIMED.**
+
+`CAN_ADD_FRAMES_NON_LINEAR` и `CANT_SOUND_INTERLEAVE` задают разные свойства
+output delivery; marker flags отдельно меняют место marker callbacks относительно
+frame/start callbacks. `NO_UI` нельзя совмещать с указанными host depth/start
+dialogs. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aeios/AEIO_ModuleInfo.md)
+
+**Рекомендация:** составлять callback policy по объявленному набору capabilities.
+Одного списка функций недостаточно для вывода об очередности audio/video/markers.
+Схема output lifecycle в §9 — обзор фаз, не обещание единственной последовательности
+всех optional callbacks. `Flush` и освобождение options не должны уничтожать данные,
+которые ещё нужны последующему разрешённому callback.
+
 ## 3. FunctionBlock4 frozen, но окружающие suites продолжают развиваться
 
 `AEIO_FunctionBlock4` в header помечен как revved to 4 in AE10 и frozen there. Он содержит **49 callback slots**: input lifecycle, sparse video/audio, output lifecycle, options, aux channels/files, metadata/user data, markers, verification и MIME.
@@ -400,6 +413,18 @@ If keeping file handles open:
 - honor CloseSourceFiles callback semantics where applicable;
 - do not rely on current working directory.
 
+### Collect Files: зависимости и переоткрытие source
+
+Для Collect Files guide связывает `AEIO_NumAuxFiles` и `AEIO_GetNthAuxFileSpec`
+с перечислением зависимостей. `AEIO_CloseSourceFiles(TRUE)` закрывает source,
+вариант с FALSE переоткрывает. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aeios/new-kids-on-the-function-block.md)
+
+**Рекомендация:** хранить список необходимых файлов отдельно от открытых readers.
+Закрытие reader не уничтожает сериализуемые настройки; повторное открытие заново
+проверяет путь и файл. После переноса не использовать descriptor или decoded cache,
+которые относятся к прежнему source. File dependencies и semantic auxiliary pixel
+channels остаются разными сущностями.
+
 ## 22. Importer selection and file verification
 
 `VerifyFileImportable` should be cheap, bounded and safe on untrusted input.
@@ -475,7 +500,23 @@ It is not universally possible for every container/filesystem, so document forma
 
 Never overwrite an existing destination before you know your overwrite/recovery semantics.
 
+При получении output path учитывается и `file_rsrvdPB`: guide выделяет файл,
+уже зарезервированный host, и предупреждает против его overwrite. Поэтому
+общую рекомендацию temp→rename нельзя автоматически применять к host reservation;
+способ публикации output должен соблюдать OutSpec-контракт. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aeios/new-kids-on-the-function-block.md)
+
 ## 26. AddFrame / frame order
+
+### Глубина входящего world и глубина экспортируемого файла
+
+`AEIO_GetDepths` описывает допустимые варианты экспорта, но guide прямо допускает
+получение `AddFrame`/`OutputFrame` world иной, более высокой глубины. Настройка
+выходного файла не определяет формат переданной памяти. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aeios/implementation-details.md)
+
+**Рекомендация:** выбрать decoder входящего world по фактическому типу/layout,
+после этого выполнить явное преобразование в формат encoder. Отдельно определить
+rounding, диапазон, alpha и color conversion. Подмена pixel pointer по выбранному
+пользователем export depth может ошибочно интерпретировать bytes ещё до кодирования.
 
 Do not assume frames always arrive in monotonically increasing order unless callback/format contract guarantees it.
 
@@ -658,7 +699,7 @@ If a concrete importer/exporter claims these capabilities, useful runtime cases 
 - repeated open/close without leaked state;
 - exporter finalization/recovery after failure.
 
-These cases establish product support evidence. Bible remains SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED unless a separate runtime record exists.
+These cases establish product support evidence. The exact SDK25.6 reading remains SDK-CONTRACT-REVIEWED; dated public-guide additions are DOCUMENTED. Both are RUNTIME-NOT-CLAIMED unless a separate runtime record exists.
 
 ## 37. Production workflow
 

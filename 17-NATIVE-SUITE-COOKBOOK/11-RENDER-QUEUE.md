@@ -235,6 +235,32 @@ Hybrid is acceptable when:
 - script errors structured;
 - native logic does not depend on localized UI strings.
 
+### Наблюдать render job через Render Queue Monitor
+
+**Public guide, 2026-10-08: DOCUMENTED / RUNTIME-NOT-CLAIMED.**
+
+`AEGP_RenderQueueMonitorSuite1` регистрирует listener с refcon и имеет отдельный
+`AEGP_DeregisterListener`. События несут job/item/frame IDs; окончание item
+сообщает отдельный finished status. Выходные UTF-16 handles информационных getters
+требуют `AEGP_FreeMemHandle`. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aegps/aegp-suites.md#L3813-L3911)
+
+**Рекомендуемый workflow:** создать собственный listener state; зарегистрировать
+callback table; в callback связать событие с текущими IDs, получить нужные поля,
+скопировать текст в собственную запись и освободить принадлежащие getter ресурсы.
+Передавать дальше уже скопированные записи, сохраняя callbacks короткими.
+
+Для журнала различать начало job, начало/обновление/окончание item и сообщения.
+`SUCCEEDED`, `ABORTED`, `ERRED` и `UNKNOWN` нельзя сливать в один флаг «готово».
+Идентификатор события не заменяет свежий `RQItemRefH`, а завершение job не отменяет
+политику частичных результатов отдельных items.
+
+При отключении инструмента прекратить приём новых действий, снять listener и
+завершить зависящие от него операции до уничтожения refcon. Страница не задаёт
+универсальную гарантию quiescence после deregistration. Также нельзя переносить
+правило освобождения **выходного** handle getter на входной `logbuf` callback без
+его отдельного контракта. Эти границы сохраняются явными; управление очередью
+не становится частью diagnostic callback.
+
 ## Product workflow
 
 1. Verify queue is editable.

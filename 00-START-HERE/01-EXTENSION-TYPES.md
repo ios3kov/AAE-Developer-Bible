@@ -107,6 +107,12 @@ Do not choose it only because «native must be faster». Browser-style panels ar
 
 Choose AEIO when product must participate in After Effects media input/output lifecycle.
 
+Для нового media importer сначала сравнить AEIO с Premiere Pro/MediaCore importer.
+[Pinned integration guide](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/intro/other-integration-possibilities.md)
+предпочитает второй путь для работы в нескольких Adobe hosts; AEIO оправдан, когда
+нужна его особая AE-интеграция. Это разные callback contracts, а не два способа
+упаковать один importer. Поддержку конкретных приложений определяет их версия.
+
 Typical responsibilities:
 
 - file recognition;
@@ -155,6 +161,11 @@ Do not use Artisan because an effect contains a 3D mesh or GPU code.
 ## BlitHook
 
 BlitHook is a display-pipeline observer/integration path.
+
+Для нового вывода на внешнее оборудование public guide рекомендует Mercury Transmit
+(с CC2014); BlitHook здесь сохраняется как отдельный legacy contract для поддержки
+такого кода. Сравнить эти маршруты до выбора EMP как основы нового продукта.
+Источник: [What Can I Do](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/intro/what-can-i-do.md).
 
 Good for external monitor/display consumer scenarios.
 

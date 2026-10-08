@@ -16,6 +16,11 @@ observation remains historical; it is no longer the current access status.
 
 **Pinned operation reviews — 2026-10-08:**
 
+- [Native public-guide ledger](native-guide-reviewed-2026-10-08.json) и
+  [inventory](native-guide-inventory-2026-10-08.json):все89 Markdown страниц под
+  `docs/` в `docsforadobe/after-effects-plugin-guide@6d9b285d9755d1fbf8ead7680ba49de24f94b547`.
+  Полный текст, точные blob/SHA256 и карта операций; это community-maintained guide
+  со смешанными SDK generations, не exact SDK26.5 archive. [Передача в главы](NATIVE-PUBLIC-GUIDE-REVIEW-2026-10-08.md).
 - [AE UXP host ledger](uxp-api-reviewed-2026-10-08.json):44 official pages at
   `AdobeDocs/uxp-after-effects@7d1cd01b4c69a9e02b77d48b3f919a6145a90841`.
 - [UXP platform ledger](uxp-platform-reviewed-2026-10-08.json):47 selected official

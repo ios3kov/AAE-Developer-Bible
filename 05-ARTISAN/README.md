@@ -201,6 +201,14 @@ Interactive path увеличивает scope:
 
 Не заявляйте interactive support только потому, что обычный Artisan render callback работает.
 
+**Public guide, 2026-10-08: DOCUMENTED / RUNTIME-NOT-CLAIMED.**
+
+Public guide различает standard Artisan, рендерящий 3D layers при участии AE
+в обработке 2D, и interactive Artisan, работающий со всеми layers для onscreen
+display. Final output interactive-варианта передаётся default Artisan. Это
+описанная граница двух integrations, не обещание единого renderer для preview
+и export. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/artisans/artisans.md)
+
 ## 14. Error/resource strategy
 
 Renderer state должен иметь чёткий ownership по слоям:
@@ -362,6 +370,20 @@ Answer only documented query types the renderer supports.
 
 Unsupported queries should use the appropriate unsupported/default behavior rather than fabricated transforms.
 
+### Transform time и view time — два входа query
+
+Guide связывает `AEGP_QueryXformGetTransformTime` с shutter-frame range,
+а `AEGP_QueryXformGetViewTime` — с `AEGP_GetLayerToWorldXformFromView`.
+`AEGP_GenerateRenderReceipt` создаёт receipt описанного состояния; сам по себе
+он не создаёт rendered pixels. [Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/artisans/artisan-data-types.md)
+
+**Рекомендация:** в записи scene request хранить transform time, view time и
+render quality отдельно. Преобразование координат должно явно указывать источник
+и назначение; transpose раскладки матрицы не заменяет её inversion. Не считать
+receipt подтверждением того, что собственный backend уже вычислил или сохранил
+кадр. Обновлять product cache только после завершения своей операции и проверок
+её актуальности.
+
 ## 28. Cancellation
 
 On cancellation:
@@ -450,7 +472,7 @@ If a concrete Artisan product claims these capabilities, useful runtime cases in
 - interactive/final parity if claimed;
 - performance/memory profiling.
 
-These establish product support evidence. Bible remains SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED unless a separate runtime record exists.
+These establish product support evidence. The exact SDK25.6 reading remains SDK-CONTRACT-REVIEWED; dated public-guide additions are DOCUMENTED. Both are RUNTIME-NOT-CLAIMED unless a separate runtime record exists.
 
 ## 34. Production workflow
 

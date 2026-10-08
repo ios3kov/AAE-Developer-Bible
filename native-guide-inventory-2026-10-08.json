@@ -1,0 +1,634 @@
+{
+  "repository": "docsforadobe/after-effects-plugin-guide",
+  "source_revision": "6d9b285d9755d1fbf8ead7680ba49de24f94b547",
+  "tree_sha": "35566e8001d791aa6322602978df27ae5da4ceee",
+  "tree_url": "https://api.github.com/repos/docsforadobe/after-effects-plugin-guide/git/trees/35566e8001d791aa6322602978df27ae5da4ceee?recursive=1",
+  "tree_truncated": false,
+  "scope": "All Markdown blobs under docs/. Page inventory, not all SDK/runtime symbols, signatures, versions, semantic or host coverage.",
+  "source_pages": 89,
+  "records": [
+    {
+      "source_path": "docs/_global/readme.md",
+      "git_blob_sha": "9c35a4429ce36f3245f81cf648b80f8379153d1d",
+      "source_sha256": "0824891efae56a1666dfbb53188d6ca19de74e3f102d4d592d65a4e54b15a790",
+      "bytes": 715,
+      "lines": 11
+    },
+    {
+      "source_path": "docs/aegps/aegp-details.md",
+      "git_blob_sha": "7542aff0396152e992edcbdad1af30d649674ab4",
+      "source_sha256": "13f0b6b428f4e6e8341acc2ec332d5d9481d8aeae8c5bf7d07ee5f3b42dfa06d",
+      "bytes": 2251,
+      "lines": 39
+    },
+    {
+      "source_path": "docs/aegps/aegp-suites.md",
+      "git_blob_sha": "434b7b5d702d83fe080b1b353124a3c70d8f2899",
+      "source_sha256": "c27d64011443b983b379d1c6c2279d29fc35fb0a50bd6eed5436cf0f872be0c7",
+      "bytes": 1188864,
+      "lines": 4141
+    },
+    {
+      "source_path": "docs/aegps/aegps.md",
+      "git_blob_sha": "f473e45052fdf3119ada7f09b303e95c75db9b30",
+      "source_sha256": "9c27296feb4447b3e2a627f92789b94d8ad2bb26457a124114de383c3ed1e14a",
+      "bytes": 991,
+      "lines": 15
+    },
+    {
+      "source_path": "docs/aegps/cheating-effect-usage-of-aegp-suites.md",
+      "git_blob_sha": "0b1794b1f1402b64846ff826b34690d93ac525d9",
+      "source_sha256": "3fb4e949b3ae5aaffa2606f5b183b3521f55bb069709329cf788931c3d0f70de",
+      "bytes": 1916,
+      "lines": 17
+    },
+    {
+      "source_path": "docs/aegps/data-types.md",
+      "git_blob_sha": "39e8feb66089f386fa2ff230b324779b236cabd8",
+      "source_sha256": "39e6a5e027a70926be73ef949db4177155450a9fbe2233f7f77d80fed70b88c3",
+      "bytes": 27080,
+      "lines": 123
+    },
+    {
+      "source_path": "docs/aegps/implementation.md",
+      "git_blob_sha": "bdf4807ea9ee24a767f6c6d2c7213394780ec15e",
+      "source_sha256": "91264a70a1b5be3e22e20381fde920b33c931a6c9efed7698e3c0d131aba9b32",
+      "bytes": 4649,
+      "lines": 76
+    },
+    {
+      "source_path": "docs/aegps/overview.md",
+      "git_blob_sha": "f857bf05dc4a1e89d5a0c2f72de8964923b516ca",
+      "source_sha256": "a0cea3e1c37a401043e10e1b35b88ba8cc289400bcfe5ec09360732a05f3df3b",
+      "bytes": 1505,
+      "lines": 29
+    },
+    {
+      "source_path": "docs/aeios/AEIO_ModuleInfo.md",
+      "git_blob_sha": "aa31dc55c25aab0bff63d40f358c84879f87e2fa",
+      "source_sha256": "39dd010aa0b24c778a244b44959cd4d6cfd610108fc1e2c65f5f393bd3f7d16d",
+      "bytes": 25442,
+      "lines": 149
+    },
+    {
+      "source_path": "docs/aeios/aeios.md",
+      "git_blob_sha": "afb4aaca34eedfed7a1d9953278c141461dd546f",
+      "source_sha256": "0d9592d61a0e071469f1575542705e4d00142cbd30ffeb5ce39423c709a15fe8",
+      "bytes": 4740,
+      "lines": 59
+    },
+    {
+      "source_path": "docs/aeios/calling-sequence.md",
+      "git_blob_sha": "90c75f5f46638479fbd2c4d1eb517fc28f768962",
+      "source_sha256": "ee5bff44955c36040ed578113d1b284eac56d2a1ad362b1b33765994902602b6",
+      "bytes": 4843,
+      "lines": 33
+    },
+    {
+      "source_path": "docs/aeios/implementation-details.md",
+      "git_blob_sha": "df0e9152f8c46eb6676d2a72ce4657b007ee31c4",
+      "source_sha256": "0f06bc861f40d00a3be0f4ed3be6b77f23c7e6f65a9c8f7247a1613ad40ec17c",
+      "bytes": 1139,
+      "lines": 21
+    },
+    {
+      "source_path": "docs/aeios/new-kids-on-the-function-block.md",
+      "git_blob_sha": "44ad60a1689fea2366bd0c07f9360d029e2f9393",
+      "source_sha256": "35c22789d15263eeceb9dfd2fc2c35ef02b451298a97c6969ef687cd97603ba8",
+      "bytes": 256369,
+      "lines": 607
+    },
+    {
+      "source_path": "docs/artisans/artisan-data-types.md",
+      "git_blob_sha": "56c7dd9bbe50d042413268dec0d7d1b39e46cd0b",
+      "source_sha256": "3c0b44570a2c44af930755028fefe6224569c2ddc9dc50245ccafeb6f03197e4",
+      "bytes": 170901,
+      "lines": 653
+    },
+    {
+      "source_path": "docs/artisans/artisans.md",
+      "git_blob_sha": "1db1d1871bf960f5b087780f20202370a8365480",
+      "source_sha256": "8c5ad9bafb4576d8224b46f15f0619ddc0e3af31086fc90533248df5b173be0e",
+      "bytes": 1261,
+      "lines": 14
+    },
+    {
+      "source_path": "docs/audio/accessing-audio-data.md",
+      "git_blob_sha": "925e2a63d64c7f1d597a9ca5e79883fbfc87ad7f",
+      "source_sha256": "141411045997f2d3fc69ab92887d549acca4ccb7579a119f0aa4d0ab26af47a4",
+      "bytes": 1088,
+      "lines": 21
+    },
+    {
+      "source_path": "docs/audio/audio-considerations.md",
+      "git_blob_sha": "ab1e6929f77b3bb7cfb5eaad20526deb1ab5951a",
+      "source_sha256": "4ca078d5c7fea5faa01ca0d167cc786f93d4755cfec545e13b2ea4b02f349f7d",
+      "bytes": 649,
+      "lines": 11
+    },
+    {
+      "source_path": "docs/audio/audio-data-structures.md",
+      "git_blob_sha": "957cd61f8c11ca6df7ae58aeb4fdd913b1a50b17",
+      "source_sha256": "b866a67b3f694a451fa0f4f19879121f2e10ed4659325ca3db08d08a71b08e8f",
+      "bytes": 2467,
+      "lines": 23
+    },
+    {
+      "source_path": "docs/audio/audio-specific-float-slider-variables.md",
+      "git_blob_sha": "5693b4ecc62f0b2c896715d0fe5f69ae6555f2a9",
+      "source_sha256": "ecc7ba7886fdb371c06247b796b5b29beb76c23513c5abe364fdb1cebc20c2e4",
+      "bytes": 764,
+      "lines": 31
+    },
+    {
+      "source_path": "docs/audio/audio.md",
+      "git_blob_sha": "75b6e86ae4a52e8431a5ff65ff57470885b0b0a0",
+      "source_sha256": "9a6a34d50d72aed3056e6c7c2b53a24347a3ab1db84d919e0f42aba7f59208a9",
+      "bytes": 524,
+      "lines": 11
+    },
+    {
+      "source_path": "docs/audio/global-outflags.md",
+      "git_blob_sha": "e55f9049662246d5f9674a379a01e4d6a94f40c1",
+      "source_sha256": "17373f05018dc8f50028166e86566ef859730ce404e1c9a1a40288afe7c470c1",
+      "bytes": 429,
+      "lines": 7
+    },
+    {
+      "source_path": "docs/effect-basics/PF_EffectWorld.md",
+      "git_blob_sha": "167b6b8728a8a7ac6cc97cf0b849e17e17a6b423",
+      "source_sha256": "ff35866106f8a218da794620329c3e958aff60718532697f3dd96af5f6ea5a23",
+      "bytes": 17535,
+      "lines": 148
+    },
+    {
+      "source_path": "docs/effect-basics/PF_InData.md",
+      "git_blob_sha": "8437c9e645325549306ba88483e196ee72c2c841",
+      "source_sha256": "54b55b845f012dd30eb9ea6e1f8018710e0e73732c75d14062c9a209a2a37587",
+      "bytes": 53633,
+      "lines": 258
+    },
+    {
+      "source_path": "docs/effect-basics/PF_OutData.md",
+      "git_blob_sha": "e526283122a465d9cfd079d3ee5d1fdb7e618ded",
+      "source_sha256": "c54fb69b5c2db1e5b289ecd3205814d1ce51536ae10790e9fffcd7b4ac14fba3",
+      "bytes": 143738,
+      "lines": 383
+    },
+    {
+      "source_path": "docs/effect-basics/PF_ParamDef.md",
+      "git_blob_sha": "7c5ac5bc30ab8d7ad749c576d9eebfb4bc1d8e43",
+      "source_sha256": "6204640bf7397e289db5142a9e9436a5d1cb7360b32184e0bc6168b84dbd3f7c",
+      "bytes": 41705,
+      "lines": 171
+    },
+    {
+      "source_path": "docs/effect-basics/command-selectors.md",
+      "git_blob_sha": "cb2f461d39b6382c3d9e02c3dd0818fb929fd553",
+      "source_sha256": "0724202830f65f50b20085536430394177e115bac6f426077cccd481d473ea04",
+      "bytes": 128706,
+      "lines": 295
+    },
+    {
+      "source_path": "docs/effect-basics/effect-basics.md",
+      "git_blob_sha": "5f89b714d4a92be6d721f502f527e6033dabb31c",
+      "source_sha256": "77c1784520c73e5528c8f41daad4549251d5f29c617385b8adf87203d8c2b7c0",
+      "bytes": 275,
+      "lines": 7
+    },
+    {
+      "source_path": "docs/effect-basics/entry-point.md",
+      "git_blob_sha": "50eccc28ae3fb5afef603dcbdf37fc90abef454b",
+      "source_sha256": "4fcf2758da6710d2d00bd15aa0fd9262ace76aff04bf0e753dd2bcca8e94c6f3",
+      "bytes": 7135,
+      "lines": 53
+    },
+    {
+      "source_path": "docs/effect-basics/errors.md",
+      "git_blob_sha": "7ca74da49e9cfbfad02ef1151fc028a3ea90f3cf",
+      "source_sha256": "f765e3467dc03b1a20207c8c8d15e6f52e2d539a915fdf960671e867aa96084a",
+      "bytes": 6516,
+      "lines": 73
+    },
+    {
+      "source_path": "docs/effect-basics/parameters.md",
+      "git_blob_sha": "b661978324f012e0c62638d7bbc2c813bf717c0c",
+      "source_sha256": "cadbf7341aa7df4b16671a0be7cda1a3146390f72e5bb4195add5ca8b74ca491",
+      "bytes": 37799,
+      "lines": 125
+    },
+    {
+      "source_path": "docs/effect-details/accessing-camera-light-information.md",
+      "git_blob_sha": "97ba1d356d75d49e0f460963c3559b2b6c93ab07",
+      "source_sha256": "22f29219aa65a83b698718ec9d596bd40908a44684ff43db11724625632f4ed9",
+      "bytes": 357,
+      "lines": 5
+    },
+    {
+      "source_path": "docs/effect-details/accessing-function-suites.md",
+      "git_blob_sha": "f73c0bf6d05cb9a5b69ccb7455f49f9e24239ae5",
+      "source_sha256": "f16eebcc83297c83bbc685b87aec76d1914f7511454764601e61511869847a78",
+      "bytes": 2429,
+      "lines": 44
+    },
+    {
+      "source_path": "docs/effect-details/arbitrary-data-parameters.md",
+      "git_blob_sha": "168cbcaf98fa5cd32adb0d4a6a5dd14cdc115a85",
+      "source_sha256": "d2f848882fcb0d58f3ab8554f946b88d7e2865a2faff19f9c751e0e822da2c6e",
+      "bytes": 16203,
+      "lines": 86
+    },
+    {
+      "source_path": "docs/effect-details/changing-parameter-orders.md",
+      "git_blob_sha": "5188be0a2ff3564adb7b17d8aacf11b26c7d5cf1",
+      "source_sha256": "e799d71065e36cd7b6d5124295b3a201f058f2b512ab98b3733e4de41ba07422",
+      "bytes": 2801,
+      "lines": 23
+    },
+    {
+      "source_path": "docs/effect-details/color-space-conversion.md",
+      "git_blob_sha": "53abe7b5fb8dcdb276de44cfcdf6eacd99181b50",
+      "source_sha256": "782d27babf4d8cccc4ff1f35ba76c834d0a38663dfefd239f9b33da368a2a37d",
+      "bytes": 4120,
+      "lines": 32
+    },
+    {
+      "source_path": "docs/effect-details/compute-cache-api.md",
+      "git_blob_sha": "6e63e5a14f735abe34af9e10698d3bc937cf2580",
+      "source_sha256": "a0f865c40c2f0e2f8d0045a7ec9a58e41d48d970905fd494b2c78c1d491959ec",
+      "bytes": 54571,
+      "lines": 306
+    },
+    {
+      "source_path": "docs/effect-details/effect-details.md",
+      "git_blob_sha": "fabd69f05de5c4880afa55330223e6c89f5e392a",
+      "source_sha256": "2ff13bdef451bf30783533a9ebb5d17ef5536f3cf36facdcf2bdf84dbad76723",
+      "bytes": 1482,
+      "lines": 15
+    },
+    {
+      "source_path": "docs/effect-details/effect-preview-media.md",
+      "git_blob_sha": "69465f02f807e6589bda8f212d61ce7563a3b8b6",
+      "source_sha256": "6e7b6f8bb1f35153f2bb7d33294799f762c208f85fafae8b4057ceb0b4fa6655",
+      "bytes": 1940,
+      "lines": 49
+    },
+    {
+      "source_path": "docs/effect-details/global-sequence-frame-data.md",
+      "git_blob_sha": "e4706a9986b3dbaed06bea032900fd79eb57abe6",
+      "source_sha256": "2563d2ec74c8f7d51a6c3b97b44a5acae77255a0020130d58dbaf40592c59c84",
+      "bytes": 7384,
+      "lines": 127
+    },
+    {
+      "source_path": "docs/effect-details/graphics-utility-suites.md",
+      "git_blob_sha": "d9e719cfd0d48230fe5637a4e39a80d7907328a1",
+      "source_sha256": "fb9ba4ce7f04a8f511d7c95b519ab88175b4a3b99c743042374e6b81427288c7",
+      "bytes": 61769,
+      "lines": 254
+    },
+    {
+      "source_path": "docs/effect-details/image-buffer-management-functions.md",
+      "git_blob_sha": "cb80839f9e9dc488fe7f0a77116e263e1bf4358f",
+      "source_sha256": "1e862af3965a2bf8ed788e027f8ff3b3a00087de52271575db611d6590c15ebb",
+      "bytes": 5791,
+      "lines": 29
+    },
+    {
+      "source_path": "docs/effect-details/interaction-callback-functions.md",
+      "git_blob_sha": "5984de89cf956b01ad8535bc73fc2bbb3e80f5e8",
+      "source_sha256": "063cd565293f303de45870b446921a0af58299d19da58b983ebdf3e04a80bf15",
+      "bytes": 46835,
+      "lines": 204
+    },
+    {
+      "source_path": "docs/effect-details/iteration-suites.md",
+      "git_blob_sha": "4129fdae9144020be88a2401cd71682a664d9ac3",
+      "source_sha256": "59b7a454b876b02781bd1cd7138b2d951d534f4e9b5270b6df705a33ce925648",
+      "bytes": 22397,
+      "lines": 59
+    },
+    {
+      "source_path": "docs/effect-details/memory-allocation.md",
+      "git_blob_sha": "eef7f5b7d9ed75458d3ade1e3148bf2875ea585e",
+      "source_sha256": "1df5c3982742f5cff9fda3dc04b3cdf608bb385a25a10e7e2e4726c8a26901e5",
+      "bytes": 5250,
+      "lines": 39
+    },
+    {
+      "source_path": "docs/effect-details/motion-blur.md",
+      "git_blob_sha": "41fae18bf2302de7bba0480aff3c4fed0b9dbdc6",
+      "source_sha256": "0bf6f066376d70f55f9d236633cb22e6bed9381e7a29c0f6e1cbf30f2076fae8",
+      "bytes": 806,
+      "lines": 11
+    },
+    {
+      "source_path": "docs/effect-details/multi-frame-rendering-in-ae.md",
+      "git_blob_sha": "e065ebdb452d4f157773876ce5c62a11e04db4e2",
+      "source_sha256": "c3bba96e81c2453645c65bca631244f29f1bdf992d2eafe1095035bd78feb803",
+      "bytes": 27674,
+      "lines": 427
+    },
+    {
+      "source_path": "docs/effect-details/parameter-supervision.md",
+      "git_blob_sha": "39a8013a0eeed66c1fbc21c7476cf35acb279abe",
+      "source_sha256": "ac93a247925a40d99078cf0b9be636ef1f84cea4ed20d99b457627eb73008727",
+      "bytes": 31608,
+      "lines": 106
+    },
+    {
+      "source_path": "docs/effect-details/parameters-floating-point-values.md",
+      "git_blob_sha": "035bf70f14e432e7cfca448c7615fbafcc2e570e",
+      "source_sha256": "6c494c68bb85f831f3b6fa1fc83b0714fad9572826c9cfbfb9a4a2b02928a86b",
+      "bytes": 5196,
+      "lines": 47
+    },
+    {
+      "source_path": "docs/effect-details/pixel-aspect-ratio.md",
+      "git_blob_sha": "5a60b15dec78a08c03be434b7fe5d6197f4eb5bf",
+      "source_sha256": "ea4492dc9d95bcf3237cd530cf87b8ae73577fc3f3649da4a6f69691cc00b09f",
+      "bytes": 5508,
+      "lines": 52
+    },
+    {
+      "source_path": "docs/effect-details/tips-tricks.md",
+      "git_blob_sha": "3c7dcab8c8e8f84fb673155734ae2d8b5cd4b3f1",
+      "source_sha256": "5c0030c58a4615c01c62b10c8a515073dd58a1e621727cd5580b4f5a065b8d15",
+      "bytes": 11709,
+      "lines": 185
+    },
+    {
+      "source_path": "docs/effect-details/useful-utility-functions.md",
+      "git_blob_sha": "20323d818960049d77fc9f99903ff934369b2078",
+      "source_sha256": "0b89818d9a333e936508c3bd85dda99bb3d3ce4ba23adfb7a7c014879f39dec2",
+      "bytes": 80262,
+      "lines": 309
+    },
+    {
+      "source_path": "docs/effect-details/working-with-paths.md",
+      "git_blob_sha": "2e7f30afed1b65ffd8c91fc518fdc23bc8258314",
+      "source_sha256": "f752e93c621efbd4ab697747d71af56b27b94adccf6c6795bbafb7e5593bc583",
+      "bytes": 33830,
+      "lines": 130
+    },
+    {
+      "source_path": "docs/effect-ui-events/PF_EventExtra.md",
+      "git_blob_sha": "eb1b59bfee53e5c9712fc4ab6c7d41e87f7af952",
+      "source_sha256": "b9025b4abc8261729336ab66d9a2204987ba4acb18c89d3a7b9fbfd7ea820c47",
+      "bytes": 12927,
+      "lines": 86
+    },
+    {
+      "source_path": "docs/effect-ui-events/PF_EventUnion.md",
+      "git_blob_sha": "3e2aa8a56c2f848c21e5f4d9c0904485692ded30",
+      "source_sha256": "301286288be683ee10123e1b7f50338049b0870065d648467666eec7e1704347",
+      "bytes": 20636,
+      "lines": 161
+    },
+    {
+      "source_path": "docs/effect-ui-events/custom-ui-and-drawbot.md",
+      "git_blob_sha": "b65ce1f79fa8ab19c5e23108df050b0c0964cd52",
+      "source_sha256": "a3764ee6b1f67eebc7d09c7e9f1e80b648814af74cddbe87073baf3131281187",
+      "bytes": 90582,
+      "lines": 353
+    },
+    {
+      "source_path": "docs/effect-ui-events/effect-ui-events.md",
+      "git_blob_sha": "6531620c32d7b24723e7c5a8c2f26c00846d57af",
+      "source_sha256": "d043d2720be80ca67746aa7f9404e52785d445de6502333fcadcca2449d40141",
+      "bytes": 9115,
+      "lines": 68
+    },
+    {
+      "source_path": "docs/effect-ui-events/tips-and-tricks.md",
+      "git_blob_sha": "45104654844d2898a246be0ea48f3da02d9ec2d9",
+      "source_sha256": "c1bfe2793e065bcbd52f2cfe6ed0ddccee1ed0eea8f44c6f7b71f26a0c9d2d3c",
+      "bytes": 2229,
+      "lines": 45
+    },
+    {
+      "source_path": "docs/effect-ui-events/ui-callbacks.md",
+      "git_blob_sha": "d2a228cff118f2b6d5af472b3db04330d8d8ddb8",
+      "source_sha256": "27bb14faf74ae8e539ff0ccd41a3c8861001063790d132fb2bccabb06f2be38b",
+      "bytes": 15822,
+      "lines": 60
+    },
+    {
+      "source_path": "docs/history.md",
+      "git_blob_sha": "e0ee791c003bf11073016bc4cd301290d615c01e",
+      "source_sha256": "eae1e3eb6a903497719cf995826f011d04b499c1edd93c1eca9b76d149318225",
+      "bytes": 13025,
+      "lines": 41
+    },
+    {
+      "source_path": "docs/index.md",
+      "git_blob_sha": "059dd27f9920f8e9afaf9f02a6fb6db779168a47",
+      "source_sha256": "850118720e928e7346cee140392713d66419ee3155480141d2feadc8fe7f72fe",
+      "bytes": 5537,
+      "lines": 84
+    },
+    {
+      "source_path": "docs/intro/apple-silicon-support.md",
+      "git_blob_sha": "74ef94c03ce9c7a1e8036f657de58be41c67d3b1",
+      "source_sha256": "80b7fcb6805cc41247e6436df03c1f0e653fc7a2b6bb3f5ac79bef4fa2c1b78f",
+      "bytes": 2974,
+      "lines": 65
+    },
+    {
+      "source_path": "docs/intro/compatibility-across-multiple-versions.md",
+      "git_blob_sha": "2549ea80e84b65ab75b75f41faf6e92c2a3a83dd",
+      "source_sha256": "55d72e045cdfaf8770c5bf354465f322045e4835e91eb848d991d2216fb29904",
+      "bytes": 6738,
+      "lines": 52
+    },
+    {
+      "source_path": "docs/intro/debugging-ae-macos.md",
+      "git_blob_sha": "dba8d8869fce670f6756e8aa0af1451d2ccb5e80",
+      "source_sha256": "fdbda80d8d130d345f8307632b76c84f5a266ae1eb6c9fca22d3b0a76295ae21",
+      "bytes": 3261,
+      "lines": 76
+    },
+    {
+      "source_path": "docs/intro/debugging-plug-ins.md",
+      "git_blob_sha": "cf561736762d2b9296c963b46cf3ff2f0d97db72",
+      "source_sha256": "8830465a0517ff0dbfe96c4526e298aa67d0301503dae6df965fab1f5c4ba9f5",
+      "bytes": 2914,
+      "lines": 46
+    },
+    {
+      "source_path": "docs/intro/exceptions.md",
+      "git_blob_sha": "b6e194945d58144852eb58919cd0dcabcc2f5b89",
+      "source_sha256": "79cd7ab5cc5c98e728156ebecd36dec1bbcc32f5f367412960b1c7fe62b5a89f",
+      "bytes": 485,
+      "lines": 7
+    },
+    {
+      "source_path": "docs/intro/gpu-build-instructions.md",
+      "git_blob_sha": "42e7f9ba7e2676bce3f952b0391f87a704b5f579",
+      "source_sha256": "70a498b381dd39247347afca083eff8970fb36dafd50fd67030eb21f6a4d0c85",
+      "bytes": 4546,
+      "lines": 76
+    },
+    {
+      "source_path": "docs/intro/how-to-start-creating-plug-ins.md",
+      "git_blob_sha": "36475d59cf1288c46d5916b58cccb9a91a0d07e8",
+      "source_sha256": "abfd47fd4967bd1c24cd696dac51564246e8628187161f005e1be448237ba98d",
+      "bytes": 2847,
+      "lines": 49
+    },
+    {
+      "source_path": "docs/intro/localization.md",
+      "git_blob_sha": "0eb9d072b32032c9cf31924d5a88cf7d33cbf712",
+      "source_sha256": "7378d420971db7544fcbfc058493224b89a12c2c4c20a7641ad7803222e5a6cc",
+      "bytes": 1225,
+      "lines": 18
+    },
+    {
+      "source_path": "docs/intro/next-steps.md",
+      "git_blob_sha": "3207707beea1bae197dd4ff755b2c977888c5e30",
+      "source_sha256": "4e6cc814f8c7c595d5e54c61c28fd45ef03372e64020b17cfb8db637dce1ec58",
+      "bytes": 220,
+      "lines": 5
+    },
+    {
+      "source_path": "docs/intro/other-integration-possibilities.md",
+      "git_blob_sha": "27531c0c66432053f6da8da5774b23f08be6e0bf",
+      "source_sha256": "329adf4b70dc5e130b3c5ae264564b0fd9f77776e3192974c62016c963525e6d",
+      "bytes": 4006,
+      "lines": 53
+    },
+    {
+      "source_path": "docs/intro/pipl-resources.md",
+      "git_blob_sha": "83fb418eef7752010d12cc056aa407eda6042441",
+      "source_sha256": "222a11d7c2e52598a197c9d6a950fcfe4a216e33a1f91c1e2fa8a637fa0533f8",
+      "bytes": 16667,
+      "lines": 106
+    },
+    {
+      "source_path": "docs/intro/sample-projects.md",
+      "git_blob_sha": "38303bdc435131f91379b6d9c6e23b505c1fc1bf",
+      "source_sha256": "17b74a886377349cbd423cb90dbb545152a633f7056bafc6c4be5ef40510a6d5",
+      "bytes": 32495,
+      "lines": 164
+    },
+    {
+      "source_path": "docs/intro/sdk-audience.md",
+      "git_blob_sha": "edfb9a73636b857e7fd430c80d8f66159d250a70",
+      "source_sha256": "bfa0c6d557affa173a822956b1941b3b6da976605423400d20ead847f78591f0",
+      "bytes": 1111,
+      "lines": 15
+    },
+    {
+      "source_path": "docs/intro/symbol-export.md",
+      "git_blob_sha": "789a74a03843ad26355a3775f3c13ebef1d31a43",
+      "source_sha256": "f65fc9c1cd81e958c21d440119fd44f8ace70c5cde3981ee9dca8b346188dd87",
+      "bytes": 3562,
+      "lines": 77
+    },
+    {
+      "source_path": "docs/intro/third-party-plug-in-hosts.md",
+      "git_blob_sha": "4b51f67006e1dea59b4c0331fc4ac6fded4785c5",
+      "source_sha256": "fca52ac081bb3c837d9a8799155d88ade8e5272f3cccc37b9d51ba300ce5bf3b",
+      "bytes": 505,
+      "lines": 7
+    },
+    {
+      "source_path": "docs/intro/what-can-i-do.md",
+      "git_blob_sha": "8f3c6f95fd1304e136e9a814754caeb962081374",
+      "source_sha256": "df8bda8441bd153f35cbacf623caa474e6f38805f56392a6b37b986b5e1d2ec3",
+      "bytes": 6327,
+      "lines": 59
+    },
+    {
+      "source_path": "docs/intro/whats-new.md",
+      "git_blob_sha": "c6eb435aec7aeaf4a16208c2b751080b33097005",
+      "source_sha256": "936152d27e867ea72c43ee3f67ee2bdd07ea2e012bf9622db236692a1c3ec9a3",
+      "bytes": 33420,
+      "lines": 452
+    },
+    {
+      "source_path": "docs/intro/where-installers-should-put-plug-ins.md",
+      "git_blob_sha": "0c04b0c89c42a0f1415c6a534fca48bd6a30e7e5",
+      "source_sha256": "6be0026b38b3c75e7d50390e2d228f6b4137efd3df8a08efe6ef71631035dff4",
+      "bytes": 1948,
+      "lines": 25
+    },
+    {
+      "source_path": "docs/intro/windows-on-arm-support.md",
+      "git_blob_sha": "9ad6dd00e23948a4aac7741aac4862a1f5069935",
+      "source_sha256": "470a20433f8087f57f1220f4cb9c679b7a03bbe72b6fcaa5b6aa03694c9c1742",
+      "bytes": 1853,
+      "lines": 37
+    },
+    {
+      "source_path": "docs/ppro/basic-host-differences.md",
+      "git_blob_sha": "081cecb6c0022a37ce590aa944a21f3c495d9d60",
+      "source_sha256": "5cc4294e3919214955cfd0d686d6cc47db8f09124c59179c0d7ff6b32aca68ad",
+      "bytes": 6861,
+      "lines": 90
+    },
+    {
+      "source_path": "docs/ppro/bigger-differences.md",
+      "git_blob_sha": "e441e60bec88fb7a6e5810a187884764b466893d",
+      "source_sha256": "96d9a267de14bc82d669643d950e8c1cfa6ffb81050c95a1cfc3ba8b8c72e1bd",
+      "bytes": 2896,
+      "lines": 29
+    },
+    {
+      "source_path": "docs/ppro/multithreading.md",
+      "git_blob_sha": "923b9b054a8353cdd2bf96af847cf1803dc043a4",
+      "source_sha256": "5731b43d9c0e967937648d9651f794f93e0c9cb8944855fe2e66350706c89535",
+      "bytes": 198,
+      "lines": 3
+    },
+    {
+      "source_path": "docs/ppro/other-hosts.md",
+      "git_blob_sha": "b39b57ea53cd22575c71b8b5be5ca790a4ba2edf",
+      "source_sha256": "0c28cd1b582cc951589188e9b39cb1e3aa6e20acb6d41b7603e0e70a7b5da392",
+      "bytes": 849,
+      "lines": 16
+    },
+    {
+      "source_path": "docs/ppro/plug-in-installation.md",
+      "git_blob_sha": "d3397647b7f8c44dc1e985b9bd61e124dc7a995c",
+      "source_sha256": "621bcaebed1eda698b1ddb365ea340610fd0dc585627d3c5d606aa3c7e968f80",
+      "bytes": 509,
+      "lines": 7
+    },
+    {
+      "source_path": "docs/ppro/plug-ins-reloaded.md",
+      "git_blob_sha": "03d0b6cd976ab8449ac96acfc0e1e7d504782111",
+      "source_sha256": "5b5c8cf01db1788bed8e2c4b8077c6ac53f228b0f721f61f68ad4330c9c2aca7",
+      "bytes": 2666,
+      "lines": 36
+    },
+    {
+      "source_path": "docs/ppro/ppro.md",
+      "git_blob_sha": "da2ac67e6c1266918ddb62608c2f7f8bc71efc63",
+      "source_sha256": "0aa241afb6dfd2812bbfaa079bfdcbdc81250edcb8f06116055d9545b57c317e",
+      "bytes": 2194,
+      "lines": 25
+    },
+    {
+      "source_path": "docs/ppro/premiere-elements.md",
+      "git_blob_sha": "d48f407e65db7588c700a5ea5c7f53c8d7046069",
+      "source_sha256": "d4c4c50790cb0fece312b6bef63a0b5b40196c9b4d541f00a638c27ea80fe25a",
+      "bytes": 632,
+      "lines": 9
+    },
+    {
+      "source_path": "docs/ppro/unsupported-features.md",
+      "git_blob_sha": "2d89c87c93f6aeade8480dd8b71dd52575299d08",
+      "source_sha256": "b47d972a8dfaeacbaf54509fdcebd0fb186f482c074f9fc63c9ff0348581e965",
+      "bytes": 1177,
+      "lines": 25
+    },
+    {
+      "source_path": "docs/smartfx/smartfx.md",
+      "git_blob_sha": "eb09304f340ff9ee5332d99f747f8881804b727a",
+      "source_sha256": "8e4979d553a3a1e214571bb728ea29e86949b1ed45f3ccb0fbfdce24dcb6c59a",
+      "bytes": 73473,
+      "lines": 248
+    }
+  ]
+}

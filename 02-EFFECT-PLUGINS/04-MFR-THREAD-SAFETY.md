@@ -174,7 +174,11 @@ Header описывает multi-checkout pattern: сначала запроси�
 | Временное mutable sequence state | Только по документированному отдельному механизму | Потеря копии не меняет алгоритмический результат |
 | Сторонняя библиотека | Проверенная модель её собственного контекста | Нет общего небезопасного singleton или скрытой записи |
 
-Не удерживать собственный блокирующий mutex через host callback или checkout — наша консервативная архитектурная рекомендация. Она не заменяет проверку конкретного callback. В SDK есть явный пример риска: layer checkout из `UPDATE_PARAMS_UI` возвращает чёрные pixels для предотвращения render-запроса и возможного deadlock (`Headers/AE_Effect.h:2661–2667`).
+Для MFR [public guide прямо запрещает](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/multi-frame-rendering-in-ae.md#L105-L116)
+удерживать blocking mutex/gate при вызове host, включая suites и checkout.
+Это DOCUMENTED-ограничение данного MFR-контекста; оно не выводится из одного лишь
+наличия `const` или RAII. Общая осторожная рекомендация для остальных API-семей
+остаётся в главе о памяти. В SDK есть явный пример риска: layer checkout из `UPDATE_PARAMS_UI` возвращает чёрные pixels для предотвращения render-запроса и возможного deadlock (`Headers/AE_Effect.h:2661–2667`).
 
 Обновление UI и вычисление изображения следует разделять; готовое значение для UI можно читать по подходящему контракту, но UI callback не становится render thread только потому, что там вызвана suite-функция.
 
@@ -231,6 +235,26 @@ Recommendation для failure injection: fail до receipt, после receipt, 
 отдельно от output equality. Наличие mutex не исправляет неполный key; отсутствие
 MFR flag не делает iterate callback однопоточным.
 
-В этой итерации проверены **исходные декларации и комментарии** supplied SDK, а также смысл показанных в них схем. Не выполнены: MFR stress, измерение ускорения, проверка конкретного GPU, native-компиляция новой реализации или её загрузка в AE. Такие результаты не выводятся из успешной сборки документации.
+### Cache может исчезнуть; thread-local не равен request-local
 
-Глава продолжает [память и владение ресурсами](../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) и [SmartFX](03-SMARTFX.md). Её evidence — **SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED**. Матрица выше помогает проверить MFR-корректность собственного продукта; она не является обязательной host-QA программой Библии. Редакционные дополнения к главе отмечены в [поглавном трекере](../CHAPTER-COMPLETION-TRACKER.md). Исследование отдельного auxiliary-считывателя остаётся самостоятельной работой.
+**DOCUMENTED / RUNTIME-NOT-CLAIMED, review 2026-10-08.**
+Compute Cache не сохраняется в project и может быть вытеснен из-за памяти.
+Корректный эффект способен снова выполнить compute при следующем запросе;
+доступность cache не должна определять пользовательский результат.
+[Persistence](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/compute-cache-api.md#L255-L269).
+Options должны содержать все входы, нужные и generate_key, и compute. Хешировать
+каноническое содержимое, а не адрес: `sizeof(const char*)` из guide sample не
+является длиной строки. Сам sample имеет незавершённый return/error path и не
+служит готовым callback.
+
+`thread_local` разделяет потоки, но не экземпляры эффекта и не повторный вход
+на одном потоке. Это вывод для архитектуры: хранить frame-specific scratch в
+request scope. По MFR guide запись в `global_data` во время render запрещена;
+`UPDATE_PARAMS_UI` также не является местом изменения sequence render state.
+Сканер static/global symbols полезен как inventory, но отсутствие находок не
+доказывает корректности сторонней библиотеки или cache key.
+[MFR guidance](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/multi-frame-rendering-in-ae.md#L105-L202).
+
+Исходная сверка проверяла **декларации и комментарии SDK25.6 build61**. Дополнения от 2026-10-08 основаны на отдельно указанном public guide и не являются новым exact-header review. MFR stress, измерение ускорения, проверка конкретного GPU, native-компиляция новой реализации и её загрузка в AE здесь не заявлены. Такие результаты не выводятся из успешной сборки документации.
+
+Глава продолжает [память и владение ресурсами](../01-ARCHITECTURE/02-MEMORY-THREADING-ERRORS.md) и [SmartFX](03-SMARTFX.md). Evidence точной базы — **SDK-CONTRACT-REVIEWED**, public-guide дополнений — **DOCUMENTED**; оба слоя **RUNTIME-NOT-CLAIMED**. Матрица выше помогает проверить MFR-корректность собственного продукта; она не является обязательной host-QA программой Библии. Редакционные дополнения к главе отмечены в [поглавном трекере](../CHAPTER-COMPLETION-TRACKER.md). Исследование отдельного auxiliary-считывателя остаётся самостоятельной работой.

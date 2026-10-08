@@ -71,6 +71,20 @@ DirectX path может включать shader source, generated shader binary,
 
 Generated assets должны входить в release package и находиться через controlled path.
 
+**Конкретные assets из public guide — review 2026-10-08.**
+[Pinned GPU build instructions](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/intro/gpu-build-instructions.md)
+называют создаваемый рядом с binary каталог `DirectXAssets`: его содержимое требуется
+host во время работы и входит в устанавливаемый payload. Не проверять только `.aex`.
+Guide связывает DirectX eligibility с `PF_OutFlag2_SUPPORTS_DIRECTX_RENDERING` и PiPL;
+отсутствие флага и ошибка уже начатого GPU render — разные ситуации, общей гарантии
+автоматического retry нет.
+
+Указанное там соответствие CUDA12.8 относится к **AE25.4**. Его нельзя объявлять
+toolchain для SDK25.6 или каждого будущего host. Фиксировать версии Boost, DXC,
+CUDA и используемые project variables по конкретному build, сохраняя generated
+assets в manifest. Рассмотренные public instructions не подтверждают ARM64 CUDA
+support и не отменяют отмеченный выше x64 compiler path в sample.
+
 ## Capability declarations
 
 Effect flags/PiPL должны соответствовать реально поддерживаемому backend path. Нельзя объявить DirectX support и не иметь рабочего resource/shader path.

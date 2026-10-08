@@ -223,6 +223,64 @@ matching toolchain. Control помогает локализовать delta, н�
 причину различия старого artifact автоматически. Sampling связан со spatial/temporal
 walkthrough в [SmartFX](03-SMARTFX.md); IDs/depth не обрабатывать как RGB.
 
+### Выбрать utility по операции и ограничениям
+
+**DOCUMENTED / RUNTIME-NOT-CLAIMED, review 2026-10-08.**
+Публичные [graphics suites](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/graphics-utility-suites.md)
+дают готовые операции, но их математические границы различаются:
+
+| Операция | Существенный контракт |
+|---|---|
+| `copy/copy_hq`, composite/transfer/transform | Согласовать rect, origin, transfer mode; массив transform matrices имеет собственный motion-blur смысл |
+| `blend` | Источники одинакового размера; alpha-weighted blend |
+| `convolve` | Source и destination должны различаться; `USE_LONG` — реализованный kernel format, `REPLICATE_BORDERS` и `ALPHA_WEIGHT_CONVOLVE` помечены неработающими |
+| FillMatte | Выбирать вариант глубины; NULL color означает прозрачный чёрный, NULL rect — весь world |
+| `subpixel_sample` | `(0,0)` — центр первого пикселя; high-quality alpha-weighted interpolation, low-quality nearest-neighbor |
+| `area_sample` | Радиусы не меньше 1 и меньше 128; outside — zero alpha; не произвольный большой blur |
+| Batch sampling | `begin_sampling` → подходящая sampling function → `end_sampling`, также после ошибки |
+| ANSI math | Углы в радианах; наличие callback не отменяет проверки математического domain |
+
+Source-pointer или sampling function не переживают владельца suite/world
+автоматически. Подмена собственной фильтрации такой utility требует проверки
+эквивалентности выбранных alpha, border и quality rules; одинаковое название
+«bilinear» этого не доказывает.
+
+Для собственного scratch-world [WorldSuite](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/image-buffer-management-functions.md)
+разделяет создание, запрос формата и dispose. Рекомендация: до публикации результата
+инициализировать всю требуемую область, даже если алгоритм записывает лишь её часть.
+Вход/выход не считать заранее очищенными; исторический Gaussian Blur sample
+показывает явный fill перед copy.
+[Clean slate](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/tips-tricks.md#L80-L95).
+
+### Геометрия и параллельная iteration
+
+[EffectWorld guide](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-basics/PF_EffectWorld.md#L53-L100)
+не гарантирует 16-byte alignment: SIMD должен учитывать реальный адрес/stride.
+Для основного слоя PAR берут из `PF_InData.pixel_aspect_ratio`, для checked-out
+слоёв — из их world. В `SMART_RENDER_GPU` NULL `data` описан как нормальная форма
+GPU world; такой world нельзя принять за пустой CPU input и разыменовать.
+
+Для геометрического эффекта полезна [модель full-resolution square coordinates](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/pixel-aspect-ratio.md#L23-L36):
+после согласования origin перевести buffer X через PAR и обратный downsample X,
+Y — через обратный downsample Y; вычислить геометрию; вернуть её обратным
+преобразованием. Проверить нулевые denominators/factors. Slider-distance измеряется
+отдельно от уже преобразованного point control; не применять масштаб дважды.
+Offset 0.5 для sampling нужен при переходе между corner и center conventions,
+а не как универсальная поправка ко всем точкам и transform matrices.
+
+[Iterate suites](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/iteration-suites.md)
+не гарантируют порядок пикселей. NULL source позволяет заполнять destination;
+`iterate_origin_non_clip_src` даёт zero pixels вне пересечения. Pixel iterate уже
+проверяет progress/abort: не вызывать их повторно из каждого pixel callback.
+В `iterate_generic` такие host calls разрешены только thread index 0. Исторический
+предел 32 iterate threads снят в SDK октября 2021; массив scratch на 32 потока не
+является переносимым контрактом.
+
+[RGB↔HLS/YIQ callbacks](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/color-space-conversion.md)
+не заменяют ICC/working-space conversion. У HLS/YIQ собственные fixed-point
+диапазоны; старый `Luminance` возвращает масштаб 0…25500, Hue — 0…255.
+Эти числа нельзя без нормализации принять за float RGB/HDR или градусы.
+
 ## Итоговая схема обработки
 
 ```text

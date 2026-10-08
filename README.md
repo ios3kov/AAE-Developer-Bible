@@ -12,7 +12,12 @@ The historical127-page closure does not certify the full current API surface.
 [Current review and open criteria](CURRENTNESS-REVIEW-2026-10-07.md).
 [Freeze record and reproduction](EDITION-FREEZE-2026-10-07.md).
 
-Последнее дополнение: отдельная [глава UXP platform](07-PANELS/04-UXP-PLATFORM.md)
+Полностью прочитан и согласован [native public guide](NATIVE-PUBLIC-GUIDE-REVIEW-2026-10-08.md):
+**89/89 страниц** на закреплённой revision, с практическими дополнениями Effect,
+AEGP, AEIO, Artisan, audio и Premiere Pro. Exact SDK остаётся25.6 build61;
+публичный guide не заменяет отсутствующие headers26.5.
+
+Предыдущее дополнение: отдельная [глава UXP platform](07-PANELS/04-UXP-PLATFORM.md)
 описывает lifecycle, UI, файлы, сеть и доставку по47 shared-platform страницам и5
 AE setup/site файлам. [Scripting](06-SCRIPTING/01-OBJECT-MODEL.md) дополнен точными
 match names и File/Folder с примерами ограниченного чтения и экспорта. Обновлены

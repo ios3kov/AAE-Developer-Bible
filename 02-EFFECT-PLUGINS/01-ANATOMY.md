@@ -132,3 +132,45 @@ Minimal Gain сейчас не использует sequence или arbitrary da
 [arbitrary walkthrough](02-PARAMETERS-UI.md).
 
 Для чтения SDK эта глава даёт проверенную карту команд и структур: **SDK-CONTRACT-REVIEWED / RUNTIME-NOT-CLAIMED**. Если разработчик превращает Minimal Gain в свой плагин, сборка, согласование ресурсов/экспортов, загрузка и пиксельные проверки дают доказательства именно для его артефакта и целевой среды. Они не являются условием редакционной готовности главы. Переход к областям и float: [SmartFX](03-SMARTFX.md); к данным глубины, ID и нормалей: [дополнительные каналы](08-AUXILIARY-CHANNELS.md).
+
+### Дополнительные команды: зависимости, диалог и ошибки
+
+**DOCUMENTED / RUNTIME-NOT-CLAIMED, review 2026-10-08.**
+В [public guide, review 2026-10-08](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-basics/command-selectors.md#L179-L228)
+описаны ещё три полезных контракта. `QUERY_DYNAMIC_FLAGS` может прийти в произвольный
+момент: получить нужные **не-layer** параметры через checkout, быстро вычислить
+разрешённые динамические flags, закончить checkout. Возможность, которую эффект
+собирается переключать, сначала объявляется в global setup; сам механизм также
+должен быть включён в PiPL. Это описание зависимостей для host, не UI refresh.
+
+`GET_EXTERNAL_DEPENDENCIES` различает все зависимости и только отсутствующие.
+Ответ — выделенный string handle с местом для завершающего NUL либо NULL, если
+сообщать нечего. Перечисление файлов/шрифтов не означает их копирования в проект
+и не заменяет корректную cache dependency. `COMPLETELY_GENERAL` передаёт payload
+от AEGP: его формат должен быть согласован обоими компонентами, а не угадан по `void*`.
+
+`DO_DIALOG` позволяет показать options UI, но не является обычным setter параметров.
+Не использовать его как замену supervised-команде с определённым временем и Undo.
+Даже global setdown не является уведомлением о выгрузке binary из памяти.
+
+Длительная обработка обязана передать ненулевой результат `PF_ABORT`/`PF_PROGRESS`
+host после cleanup. В частности, подавление `PF_Interrupt_CANCEL` способно оставить
+незавершённый кадр в cache. Собственную диагностику передавать через `return_msg`
+и `PF_OutFlag_DISPLAY_ERROR_MESSAGE`; callback-error, уже сообщённый host, не
+требует второго модального окна. Отсутствие окна в preview/без UI не означает успеха.
+[Error contract](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-basics/errors.md#L34-L59).
+
+При [acquisition suite](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/accessing-function-suites.md)
+отдельно выбрать обязательную и optional capability: `AEFX_SuiteScoper` с запрещённым
+отсутствием может бросить `A_Err_MISSING_SUITE`; optional-вариант требует проверки NULL.
+Fallback на старую suite означает отдельный поддержанный contract, не cast таблицы.
+Наличие suite не разрешает её вызов из любого потока.
+
+При изменении render-алгоритма обновлять версию **эффекта**: guide включает её
+в идентичность дискового cache. Ручная очистка cache разработчиком не заменяет
+правильную версию обновления у пользователя.
+[Cache/version](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/tips-tricks.md#L109-L119).
+
+**Граница другого host:** [Effect Preview Media](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/effect-details/effect-preview-media.md)
+в этом snapshot относится только к Premiere Pro Beta 27.0. JPEG/MP4 из `Preview`
+не объявлены функцией AE; наличие этой страницы не меняет AE packaging baseline.

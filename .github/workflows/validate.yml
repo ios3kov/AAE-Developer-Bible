@@ -71,6 +71,8 @@ jobs:
           python scripts/check_docs_consistency.py
       - name: Pinned UXP inventory and full-page review consistency
         run: python -m unittest discover -s scripts -p 'test_uxp_inventory.py' -v
+      - name: Pinned public-guide bytes and full-page review consistency
+        run: python -m unittest discover -s scripts -p 'test_public_guide_inventory.py' -v
       - name: Reviewed source table consistency (not runtime certification)
         run: |
           python -m unittest discover -s tests/sources -v

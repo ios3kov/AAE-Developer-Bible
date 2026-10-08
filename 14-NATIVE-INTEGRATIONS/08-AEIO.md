@@ -264,6 +264,30 @@ That refcon must outlive every callback that uses it and be invalidated before p
 
 Do not point refcon at stack/local initialization storage.
 
+### Public callback reference: сохранённые границы
+
+**Public guide, 2026-10-08: DOCUMENTED / RUNTIME-NOT-CLAIMED.**
+
+Полностью прочитанный public guide описывает 48 строк callback table, тогда как
+проверенный SDK 25.6 содержит 49 slots. Его helper sections — `IOInSuite5` и
+`IOOutSuite4`; Bible сохраняет точные `IOInSuite7`/`IOOutSuite6` и PB-based
+declarations supplied SDK. Краткий список bare-bones input пропускает
+`GetActiveExtent`, хотя таблица помечает его обязательным с допустимым default.
+Поэтому default-return thunk и отсутствие callback нельзя считать одним случаем.
+[Источник](https://github.com/docsforadobe/after-effects-plugin-guide/blob/6d9b285d9755d1fbf8ead7680ba49de24f94b547/docs/aeios/new-kids-on-the-function-block.md)
+
+Та же страница уточняет: `GetInSpecInfo` может получить folder без options;
+`GetOutSpecOutputModule` может отказать для ещё не подтверждённой OutSpec copy
+в диалоге; очистка native start time отличается от установки нуля.
+
+**Рекомендация:** запрос UI-описания не должен автоматически запускать decoder
+или объявлять отсутствие options повреждением файла. В output dialog менять
+собственную редактируемую конфигурацию, а не предполагать уже существующую связь
+с финальным queue item. Нулевое значение и отсутствие metadata представлять разными
+состояниями. Публичные опечатки `SetInSpecOptionsHandle` в output dialog и
+`USE_DEFAULT_CALLBACK` не использовать как объявления API; точные имена берутся
+из указанного SDK baseline.
+
 ## 18. Verification boundary
 
 Source review can prove callback names, signatures and documented ownership. It cannot prove:
