@@ -4,6 +4,10 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 pinned scripting DOM heading partition complete:642 documented +6 explicit
+research exclusions /648, with regression guard. Expanded full/current acceptance OPEN;
+expressions/native/UXP and retained source-contract gaps aren't closed by this count.
+
 2026-10-08 full TextDocument review adds63 remaining members; scoped styles and box
 layout operations supplied with source gaps retained. Ledger642/648, not full acceptance.
 

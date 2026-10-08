@@ -66,6 +66,30 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Pinned DOM reconciliation closure and research-only import boundaries
+
+Full pinned [ImportOptions](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/importoptions.md)
+read2026-10-08. file/importAs/canImportAs/sequence/forceAlphabetical supported-source
+operations are covered below. rangeStart/rangeEnd/isFileNameNumbered explicitly
+research-only, not documented baseline contracts. Range interaction descriptions
+include exceptions/reset and example count ambiguity; don't promise reliable clipping
+or infer numbered-file detection from String examples when table takes File.
+
+Baseline sequence import: validate actual trusted file list and expected sequence
+policy independently → choose explicit sequence/ordering/importAs → import → inspect
+actual source duration/frame rate/missing media → report imported frame inventory
+and gaps. Filename has digits doesn't prove sequence membership, continuity or range.
+For bounded deliveries use verified source preparation or explicit layer/render-time
+range; don't silently rely on research import clipping or delete original media.
+
+Ledger now partitions all648 pinned DOM headings into642 DOCUMENTED members and
+6 explicit research exclusions: app.openFast, Project.dirty, CompItem.counters and
+these three ImportOptions members. Regression checks partition/disjointness/source
+membership, not semantic completeness or installed-host behavior. Coverage excludes
+overload/signature completeness, zero-heading pages, expressions/matchnames and
+ExtendScript runtime/File/Folder contracts outside this inventory. Source gaps in
+documented recipes remain gaps; no blanket "all API works" or full Bible acceptance.
+
 ### TextDocument styling and box layout — full review2026-10-08
 
 Full pinned [TextDocument](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/text/textdocument.md)

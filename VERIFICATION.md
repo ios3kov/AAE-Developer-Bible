@@ -2,6 +2,15 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Pinned DOM classification closure
+
+Parent `5dacbed`; full ImportOptions source read/hash checked. Ledger partitions648
+headings as642 documented/6 research exclusions, with exhaustive/disjoint regression.
+No import clipping/sequence/host execution. Classification isn't full API signature,
+expression/native/UXP or whole-Bible semantic acceptance.
+Results: scripts88/88, consistency11/11, checker/hash/inventory49/648, generated
+freshness, strict MkDocs and whitespace PASS. No CI or host runtime PASS inferred.
+
 ### Full TextDocument source review
 
 Parent `9c97d64`; full pinned page read/hash checked,63 remaining headings recorded.

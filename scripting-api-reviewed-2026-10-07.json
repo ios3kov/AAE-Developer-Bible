@@ -4,6 +4,14 @@
   "evidence": "DOCUMENTED / operation-design review; AE runtime NOT_RUN",
   "scope": "Explicitly named members only; not signatures/overloads of every object",
   "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+  "exclusions": [
+    {"source_path": "docs/general/application.md", "member": "app.openFast", "reason": "Pinned source explicitly research-only; not supported baseline project open"},
+    {"source_path": "docs/general/project.md", "member": "Project.dirty", "reason": "Pinned source explicitly research-only; save protection must not depend on it"},
+    {"source_path": "docs/item/compitem.md", "member": "CompItem.counters", "reason": "Pinned source explicitly undocumented/research-only and no practical supported operation"},
+    {"source_path": "docs/other/importoptions.md", "member": "ImportOptions.rangeStart", "reason": "Pinned source research-only; sequence clipping contract not accepted"},
+    {"source_path": "docs/other/importoptions.md", "member": "ImportOptions.rangeEnd", "reason": "Pinned source research-only; sequence clipping contract not accepted"},
+    {"source_path": "docs/other/importoptions.md", "member": "ImportOptions.isFileNameNumbered", "reason": "Pinned source research-only; filename digit presence not reliable sequence validation"}
+  ],
   "reviews": [
     {
       "source_path": "docs/text/textdocument.md",

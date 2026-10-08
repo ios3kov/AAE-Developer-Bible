@@ -67,6 +67,12 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 ### Reproducible scripting inventory
 
 #### Text range full-page reconciliation — 2026-10-08
+Final ImportOptions full-page read/hash match confirms remaining3 members are research.
+Pinned DOM partition complete:642 documented +6 explicit research exclusions =648.
+No unclassified headings remain; test checks disjoint/exhaustive source membership.
+This scoped closure does not close expressions/matchnames, zero-heading pages,
+runtime/File/Folder, signature/overload gaps, native/UXP or full/current acceptance.
+
 Full TextDocument page subsequently read/hash matched:63 remaining headings mapped
 to scoped styling, irreversible composer migration, box fitting and fresh composition
 diagnostics. Leading setter/autoLeading prose, scale units and empty-line mapping

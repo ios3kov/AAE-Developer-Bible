@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Closed pinned scripting DOM heading classification:642 documented plus6 explicit
+  research-only exclusions out of648. Added exhaustive/disjoint ledger regression;
+  ImportOptions research clipping/numbering kept outside supported baseline.
+
 - Completed TextDocument full-page review: mixed-style scope, font/paragraph policies,
   composer migration, box fitting and fresh layout diagnostics.63 remaining members,
   ledger642/648; source leading/units/empty-line gaps retained, no text runtime claim.

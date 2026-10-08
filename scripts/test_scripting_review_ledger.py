@@ -22,6 +22,19 @@ class ReviewLedgerTests(unittest.TestCase):
         self.assertTrue(set(reviewed) <= known, set(reviewed) - known)
         self.assertIn('runtime NOT_RUN', ledger['evidence'])
 
+    def test_inventory_is_partitioned_without_promoting_research(self):
+        inventory = json.loads((ROOT / 'scripting-api-inventory-2026-10-07.json').read_text())
+        ledger = json.loads((ROOT / 'scripting-api-reviewed-2026-10-07.json').read_text())
+        known = {(r['source_path'], m['name']) for r in inventory['records']
+                 for m in r['members']}
+        documented = {(r['source_path'], m) for r in ledger['reviews'] for m in r['members']}
+        exclusions = ledger['exclusions']
+        excluded = {(r['source_path'], r['member']) for r in exclusions}
+        self.assertEqual(len(excluded), len(exclusions))
+        self.assertTrue(all(r['reason'] for r in exclusions))
+        self.assertFalse(documented & excluded)
+        self.assertEqual(documented | excluded, known)
+
 
 if __name__ == '__main__':
     unittest.main()
