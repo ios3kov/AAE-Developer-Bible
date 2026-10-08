@@ -66,6 +66,15 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### Text range full-page reconciliation — 2026-10-08
+
+Full CharacterRange/ParagraphRange/ComposedLineRange pages read/hash matched.
+Remaining18 headings mapped to mixed-style edit, insertion/replacement, detached
+validity, paragraph/line conversion and fresh composition workflows. Undefined
+mixed values, color/kerning side effects and independent derived accessors documented.
+Ledger520/648;128 without documented reconciliation, not128 proven absent operations.
+No text/layout/runtime performed; full TextDocument/Property remains next.
+
 #### Font ecosystem full-page reconciliation — 2026-10-08
 
 Full FontObject/FontsObject pages read/hash checked. Remaining26 headings reconciled

@@ -3152,7 +3152,9 @@
         },
         {
           "name": "CharacterRange.fillColor",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {

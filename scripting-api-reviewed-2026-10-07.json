@@ -6,6 +6,21 @@
   "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
   "reviews": [
     {
+      "source_path": "docs/text/characterrange.md",
+      "operation": "Mixed-style bounded accessor edits, structural text insertion/replacement, color/kerning/render-order side effects and safe diagnostics",
+      "members": ["CharacterRange.characterEnd", "CharacterRange.characterStart", "CharacterRange.fillColor", "CharacterRange.kerning", "CharacterRange.strokeColor", "CharacterRange.strokeOverFill", "CharacterRange.text", "CharacterRange.toString"]
+    },
+    {
+      "source_path": "docs/text/paragraphrange.md",
+      "operation": "Paragraph-to-character accessor conversion, detached range validity and recreation/diagnostics",
+      "members": ["ParagraphRange.characterEnd", "ParagraphRange.characterStart", "ParagraphRange.isRangeValid", "ParagraphRange.characterRange", "ParagraphRange.toString"]
+    },
+    {
+      "source_path": "docs/text/composedlinerange.md",
+      "operation": "Fresh composition snapshot styling, independent character accessors and validity versus recomposition",
+      "members": ["ComposedLineRange.characterEnd", "ComposedLineRange.characterStart", "ComposedLineRange.isRangeValid", "ComposedLineRange.characterRange", "ComposedLineRange.toString"]
+    },
+    {
       "source_path": "docs/text/fontobject.md",
       "operation": "Soft font lifetime, descriptor disambiguation and variable dictionary discovery; prior identity/glyph members covered separately",
       "members": ["FontObject.familyName", "FontObject.familyPrefix", "FontObject.fullName", "FontObject.hasDesignAxes", "FontObject.isFromAdobeFonts", "FontObject.location", "FontObject.nativeFamilyName", "FontObject.nativeFullName", "FontObject.nativeStyleName", "FontObject.otherFontsWithSameDict", "FontObject.postScriptName", "FontObject.styleName", "FontObject.technology", "FontObject.type", "FontObject.version", "FontObject.writingScripts"]

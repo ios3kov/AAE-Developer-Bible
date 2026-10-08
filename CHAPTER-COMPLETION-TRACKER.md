@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 text-range full pages reconcile remaining18 members; mixed-value editing,
+independent accessors and recomposition boundaries supplied. Ledger520/648.
+
 2026-10-08 full font ecosystem review reconciles remaining26 members with picker,
 soft lifetime, defaults and async update operation guidance. Ledger502/648.
 

@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Completed text-range source reconciliation: mixed styles, insertion/replacement,
+  color/kerning side effects, paragraph/line accessors and validity versus fresh
+  composition.18 remaining headings, ledger520/648; no text runtime claim.
+
 - Completed FontObject/FontsObject full-page reconciliation: soft lifetime, descriptor
   disambiguation, variable-instance lookup side effects, script/default mappings and
   asynchronous font updates.26 remaining members, ledger502/648; no font runtime.

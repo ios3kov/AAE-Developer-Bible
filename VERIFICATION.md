@@ -2,6 +2,14 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Character/paragraph/composed-line source review
+
+Parent `1b962fa`;3 full pinned pages read/hash checked.18 remaining headings recorded;
+no text edits/layout/host execution. Standard repository validation, inventory,
+generated freshness, strict MkDocs and whitespace checks accompany source designs.
+Results: scripts87/87, consistency11/11, checker, inventory49/648, generated
+freshness, strict MkDocs and whitespace PASS; no text/image/runtime/CI inferred.
+
 ### Font ecosystem full-page operation review
 
 Parent `c74f54b`;2 pinned pages fully read and hashes match inventory.26 remaining

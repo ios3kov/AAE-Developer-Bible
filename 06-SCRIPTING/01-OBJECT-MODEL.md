@@ -66,6 +66,59 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Character/paragraph/composed-line accessors — full review2026-10-08
+
+Full pinned [CharacterRange](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/text/characterrange.md),
+[ParagraphRange](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/text/paragraphrange.md) and
+[ComposedLineRange](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/text/composedlinerange.md)
+read. Accessors introduced24.3, pasteFrom25.1. They refer to the specific detached
+TextDocument instance, not live layer text. Every edit still needs explicit commit
+with static/key/time policy and fresh readback; no text host runtime performed.
+
+Concrete mixed-style report/edit: get intended TextDocument → create bounded
+characterRange(start,end) → check isRangeValid → read requested attributes, recording
+undefined as **mixed/indeterminate**, not0/false/default → edit only requested styles
+→ recreate ranges after length change → commit → reacquire and verify actual text/
+style/layout. characterStart/end read-only, end exclusive; reading bounds can throw
+when invalid. Zero span is insertion point. text read on zero span empty; assigning
+text replaces range, empty deletes, equal start/end inserts. Fixed range bounds
+don't automatically grow/shrink to match replacement. isRangeValid can later become
+true after text grows, but that isn't stable semantic ownership of the original text.
+
+CharacterRange.fillColor/strokeColor setting enables applyFill/applyStroke across
+range. Values are RGB floats with possible HDR overbright values, not universally
+clamped0..1; mixed reads undefined. Unlike TextDocument, range color reads don't
+throw merely because fill/stroke disabled. kerning reads manual amount only, undefined
+for metric/optical/mixed auto kern or mixed manual values; assignment selects manual
+NO_AUTO_KERN, not a computed optical kerning readback. strokeOverFill is per-character
+order and may be overridden by whole-layer All Strokes/All Fills First. Attribute
+readback alone doesn't establish final rendering order.
+
+Paragraph styling command: paragraphRange(selectedStart,selectedEnd) → validate →
+read characterStart/end → obtain characterRange() once for bounded style edits →
+commit/readback. Paragraph range can have equal character bounds only for empty final
+paragraph. Derived CharacterRange is **independent** of future parent-range limits,
+not a live wrapper; reconstruct after structural edits. CharacterRange excludes
+boxText/boxTextPos/boxTextSize/pointText/lineOrientation/baselineLocs/paragraphCount
+and nested characterRange/paragraphRange/paragraphCharacterIndexesAt APIs; don't
+blindly copy whole TextDocument settings object into it.
+
+Composed-line styling command: freshly composed TextDocument → composedLineRange
+→ isRangeValid → characterRange() → requested styling → commit → **reacquire new
+TextDocument and line ranges**. ComposedLineRange always has some length; its layout
+snapshot remains unchanged during detached text edits, even deleting all text.
+isRangeValid verifies bounds, not freshly recomposed layout. Composed lines aren't
+paragraphs; don't map paragraph index to wrapped-line index. Derived CharacterRange
+is independent and can become invalid. For all-overset/zero-line case report no
+composed range rather than indexing0 or claiming text visible.
+
+Each accessor's toString returns creation parameters, not range text, identity or
+serialized style. It is safe even when range invalid: use for diagnostics without
+reading throwing bounds, but don't eval it to reconstruct user data. Preserve
+source/target validity and recreate after pasteFrom as covered below; paste copies
+text/style, not guaranteed recomposition. These workflows supply range operations,
+not full inherited TextDocument field/overload coverage.
+
 ### Full font ecosystem review —2026-10-08
 
 Full pinned FontObject/FontsObject pages reread (source links in font preflight below).
