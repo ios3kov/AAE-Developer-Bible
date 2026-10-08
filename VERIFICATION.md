@@ -2,6 +2,14 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Expression context/data/marker source review
+
+Parent `f014eae`;10 full pinned pages read/hash matched, ledger19/32 pages with136
+headings. No footage/JSON/MGJSON/mask/marker/menu/expression/host runtime executed.
+Repository checks below are separate from complete API semantics and host delivery.
+Results: scripts90/90, consistency11/11, checker/19 source hashes, generated
+freshness, strict MkDocs and whitespace PASS; no CI/runtime result inferred.
+
 ### Expression interpolation/vector/color/angle review
 
 Parent `68541b5`;4 full pinned pages read/hash checked, explicit ledger9/32 pages

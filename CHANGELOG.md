@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Reviewed10 expression object pages: comp/project/effect/menu/hierarchy/mask,
+  footage JSON/MGJSON, keys/markers. Ledger19/32 pages,136/295 headings; source
+  discrepancies and missing sampling/default-camera contracts retained.
+
 - Reviewed4 expression math/color pages: bounded interpolation, safe vector/angle
   operations and normalized RGBA/HSLA/hex workflows. Ledger9/32 pages,75/295 headings.
 

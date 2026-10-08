@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 expressions context/data/marker block:19/32 pages reviewed (136/295
+headings),13 remain; ambiguity/type/time/data safety supplied, no runtime PASS.
+
 2026-10-08 expressions math/color:9/32 full pages reviewed (75/295 headings),23 remain;
 typed remap/vector/color operations added, no installed-host result inferred.
 

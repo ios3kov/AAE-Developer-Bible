@@ -44,6 +44,12 @@ the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
 
+2026-10-08 expression context/data/marker block:10 full pages read/hash checked,
+ledger19/32 pages (136/295 headings),13 remain. Comp/footage metadata and lookup,
+no-eval JSON/MGJSON, effects/menu/hierarchy, masks, keys and inert marker metadata
+operations supplied. [1][0] scalar/path example error, dated mask limitation and
+comp-marker numeric-name/index distinction retained. No host/data decode/render PASS.
+
 2026-10-08 expression math/color block:4 full pages read/hash checked; ledger9/32
 pages (75/295 headings),23 pages remain. Bounded remap, vector shape/zero-length,
 world orientation and normalized color/hex policies supplied. Malformed rgbToHsl
