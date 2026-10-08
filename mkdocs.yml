@@ -80,6 +80,7 @@ nav:
       - "After Effects scripting object model": 06-SCRIPTING/01-OBJECT-MODEL.md
       - "ScriptUI": 06-SCRIPTING/02-SCRIPTUI.md
       - "Expressions vs scripts": 06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md
+      - "ExtendScript runtime, data and debugging": 06-SCRIPTING/04-EXTENDSCRIPT-RUNTIME.md
       - "ExtendScript scripting": 06-SCRIPTING/README.md
   - 07-PANELS:
       - "CEP development": 07-PANELS/01-CEP.md

@@ -193,6 +193,121 @@ Runtime JavaScript object не является надёжным persistent stor
 - deliberate serialized metadata;
 - external product state, если он не обязан ехать вместе с project.
 
+<a id="bridgetalk"></a>
+
+## BridgeTalk: другая message-enabled application
+
+**DOCUMENTED / RUNTIME-NOT-CLAIMED.** BridgeTalk относится к ExtendScript
+interapplication messaging. Обычно `body` содержит код для DOM target приложения;
+по умолчанию принимающий `BridgeTalk.onReceive` вычисляет его. Это иной route,
+чем CEP `CSInterface.evalScript()` или native `AEGP_ExecuteScript()`.
+[Messaging overview](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/interapplication-communication/communications-overview.md),
+[API scope](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/interapplication-communication/messaging-framework-api-reference.md).
+
+### Выбрать target и сохранить его identity
+
+**DOCUMENTED.** `BridgeTalk.getTargets(null, null)` перечисляет известные
+message-enabled installations с version/locale; `getSpecifier(appName, version,
+locale)` возвращает подходящий полный specifier либо `null`. При version `0` или
+без version ищется наиболее новая версия. Major-only выбор может выбрать её
+старший minor. `isRunning()` сообщает running state; `getStatus()` также различает
+занятость, обработку очереди и недоступность. Modal UI target может означать BUSY.
+[BridgeTalk class](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/interapplication-communication/bridgetalk-class.md).
+
+Generic `"aftereffects"` не фиксирует installation: разрешение зависит от
+версии/locale/окружения. Application specifier и namespace вызова вроде
+`photoshop.open(...)` имеют разные правила. Instance suffix применяется только
+к приложениям, которые поддерживают несколько instances; из него не следует
+адресация произвольного AE PID.
+[Specifiers](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/interapplication-communication/application-and-namespace-specifiers.md).
+
+Практический маршрут: проверить наличие BridgeTalk в данном engine, перечислить
+реально найденные targets, выбрать разрешённый продуктом полный specifier и
+сохранить его вместе с request. Не собирать marketing-version strings по памяти.
+При нескольких установках показать выбор или применить явно записанную policy.
+Перед mutation полезен короткий read-only handshake: фактическая identity,
+версия собственного dispatcher, capabilities и context token проекта.
+
+~~~jsx
+// SOURCE EXAMPLE: только построение read-only probe; отправитель добавляет handlers.
+function makeIdentityProbe(fullSpecifier) {
+    var message = new BridgeTalk();
+    message.target = fullSpecifier;
+    message.body = "BridgeTalk.appSpecifier;";
+    message.timeout = 15; // seconds, пример policy срока входной очереди
+    return message;
+}
+~~~
+
+Default receive handler нужен для этой формы body. Custom dispatcher может
+определить собственный формат. Полученный specifier — данные ответа для проверки,
+а не разрешение автоматически запускать следующую destructive command.
+
+### Отправка, callbacks и два разных timeout
+
+**DOCUMENTED.** Перед `send()` настроить target/body/callbacks и сохранить сам
+message в объекте, который переживёт ответ; иначе GC может лишить отправителя
+callback. Результат транспорта — строка, даже когда target возвращает другое
+значение. Старые `toSource()`/`eval()` examples не являются обязательным форматом
+product protocol. Передавать plain serialized values, проверять схему; availability
+JSON implementation рассмотрена в runtime и CEP главах.
+[Message workflow](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/interapplication-communication/communicating-through-messages.md).
+
+| Сигнал / настройка | Документированный смысл |
+|---|---|
+| `send()` / `send(0)` | Асинхронная отправка; `true` означает возможность немедленной отправки, не completion |
+| `send()` вернул `false` | Отправка невозможна **либо** сообщение осталось в очереди; при автозапуске target это предусмотренный результат |
+| `message.timeout = seconds` | Срок ожидания извлечения из входной очереди; истёкшее до обработки сообщение отбрасывается, возможен `onTimeout` |
+| `send(seconds)` с положительным значением | Синхронно ждать результат до этого срока; это другой параметр |
+| `onReceived` | Receipt acknowledgement, не результат command |
+| `onResult` | Может быть intermediate либо final result: `sendResult()` допускает несколько ответов |
+| `onError` | `body` содержит сообщение; `headers["Error-Code"]` — код ошибки |
+
+[Message contract](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/interapplication-communication/bridgetalk-message-object.md).
+Callbacks опциональны и не обещаны всеми message-enabled hosts. Положительный
+deadline синхронного `send` не объявлен механизмом отмены выполняемой target
+операции.
+
+Практический registry хранит request ID, полный target, phase, message и UI sink.
+Создать запись **до** `send`; false-return оставить как `queuedOrUnavailable`,
+receipt перевести в `received`. Протокол с progress должен явно различать
+`progress` и `done`: первый `onResult` не освобождает запись. Final result/error
+сохраняет plain outcome, после чего transport callback owner можно освободить.
+Общий UI deadline даёт `outcomeUnknown`; скрытие панели отключает sink и не
+доказывает остановку target. Без idempotency/deduplication не повторять mutation
+автоматически. Ограничить число pending requests; зависшую запись не держать
+бесконечно без политики abandonment и последующей сверки outcome.
+
+Такой route не создаёт поток для вызовов AE DOM. Обработка зависит от message
+loop target. `BridgeTalk.pump()` обрабатывает входящие/исходящие сообщения;
+не превращать его в tight polling и учитывать возможность callback во время
+явного pump. Полноценная отмена требует собственного cooperative protocol.
+
+Коды messaging layer различают script/runtime и transport проблемы, но сами по
+себе не сообщают число уже выполненных edits. Логировать code отдельно от body;
+product envelope должен сообщать `changed`/partial outcome. В справочнике
+отрицательные error codes помечены как unrecoverable; универсальный retry по
+любой ошибке этому контракту не соответствует.
+[Error codes](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/interapplication-communication/messaging-error-codes.md).
+
+### Cross-DOM wrappers и historical scope
+
+Cross-DOM даёт небольшой набор startup-script wrappers; точный набор зависит от
+приложения. У `executeScript`, `open` и `print` нет result, подтверждающего
+завершение команды. Неверсионированный namespace выбирает старшую установленную
+версию; он не является алиасом текущего AE context.
+[Cross-DOM](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/interapplication-communication/cross-dom-functions.md).
+Для управляемого automation workflow предпочтительнее явный target и собственный
+response contract. Не заменять global `BridgeTalk.onReceive` из небольшой
+утилиты: такой handler меняет приём unsolicited messages всего приложения и
+требует отдельного ownership/restore решения.
+
+Source review: все 9 interapplication pages JavaScript Tools Guide mirror на
+`ac6839049e17f4652d301e7d28f8f0d3d5fbb66a`. Таблицы CS4/CS5 и старые startup paths
+оставлены historical evidence. Review не объявляет modern AE/Photoshop/Premiere
+support matrix, гарантии каждого callback, единый Undo между приложениями или
+сохранение engine после завершения произвольного script invocation.
+
 ## 12. Acceptance checklist
 
 Проверить:

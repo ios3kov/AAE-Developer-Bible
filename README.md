@@ -2,15 +2,21 @@
 
 **Практическая библия по разработке инструментов, скриптов, панелей и нативных plug-in'ов для Adobe After Effects.**
 
-Edition: **1.1 — editorial freeze, 2026-10-07**
+Edition: **1.1 — historical freeze, 2026-10-07; source-completion supplement, 2026-10-08**
 
 Native research baseline: **2026-10-01 / SDK25.6 build61**; selected source rereviews through **2026-10-08**.
 
 **Canonical writing/editing rules:** [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md)  
-Status: **edition1.1 frozen; expanded completeness/currentness review IN PROGRESS**.
-The historical127-page closure does not certify the full current API surface.
-[Current review and open criteria](CURRENTNESS-REVIEW-2026-10-07.md).
+Status: **редакционное дополнение по доступным опубликованным источникам завершено**.
+[Итоговое покрытие и границы](SOURCE-COMPLETION-2026-10-08.md). Exact SDK26.5 и
+неопубликованные vendor contracts остаются внешними зависимостями; полного current
+SDK/API acceptance это дополнение не заявляет. [Открытые критерии](CURRENTNESS-REVIEW-2026-10-07.md).
 [Freeze record and reproduction](EDITION-FREEZE-2026-10-07.md).
+
+Последнее дополнение: [ExtendScript runtime, данные и отладка](06-SCRIPTING/04-EXTENDSCRIPT-RUNTIME.md),
+подробный [ScriptUI](06-SCRIPTING/02-SCRIPTUI.md) и [BridgeTalk](15-COMMUNICATION/05-SCRIPT-TO-AE.md#bridgetalk).
+Прочитаны все **73/73 страницы** закреплённого runtime guide; добавлены работа с
+XML/XMP, библиотеками, единицами, ограниченным Socket-протоколом и debugger.
 
 Полностью прочитан и согласован [native public guide](NATIVE-PUBLIC-GUIDE-REVIEW-2026-10-08.md):
 **89/89 страниц** на закреплённой revision, с практическими дополнениями Effect,
@@ -24,7 +30,7 @@ match names и File/Folder с примерами ограниченного чт
 [официальные требования host/platform](HOST-PLATFORM-REVIEW-2026-10-08.md).
 Ранее согласованы **44/44 опубликованные AE UXP host страницы**; отсутствующие
 конструкторы/типы, AE setup и runtime-version mapping остаются явными границами.
-Текущий core inventory —129 страниц; source review не означает выполнение в AE.
+Текущий core inventory —130 страниц; source review не означает выполнение в AE.
 
 ## Цель
 
@@ -68,7 +74,7 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 
 План edition1.1 [завершён](COMPLETION-PLAN.md), но по новому требованию владельца
 полнота/актуальность текущего SDK/API проверяется отдельно. [Tracker](CHAPTER-COMPLETION-TRACKER.md)
-сохраняет историческое закрытие127 pages C/L и текущую очередь129 страниц;
+сохраняет историческое закрытие127 pages C/L и текущий состав130 страниц;
 это не исчерпывающий current API inventory. Новая работа не
 заменяется обязательной host-QA всех examples.
 
@@ -194,6 +200,6 @@ Block 4 is complete in the editorial/tooling scope: exact-head PR regeneration a
 - **Frozen/generated validation:** run `python scripts/build_docs.py --check` before regenerating anything. A stale MASTER or MANIFEST fails. Validate automatically chooses this lane for generated-only push commits; workflow_dispatch can explicitly select it.
 - **Identity:** the MASTER header records a relocatable source-content SHA-256, excluding MASTER/MANIFEST. It is not a Git revision. CI reports checkout SHA, triggering SHA and PR head SHA separately. Bot commits retain a `Source-Git-SHA` trailer and report the resulting generated commit SHA.
 
-Consistency tests check the actual request/success/error JSON examples in four CEP documents, the complete 129-row core inventory against nested menu/NAVIGATION, and three registered current evidence boundaries. They detect regressions and explicit unsupported CURRENT-COMPILE/RUNTIME/HOST claims; they do not certify every prose claim or execute AE. Source-driven CEP and documentation-file VM tests remain separate; their doubles do not establish real host or filesystem behavior.
+Consistency tests check the actual request/success/error JSON examples in four CEP documents, the complete 130-row core inventory against nested menu/NAVIGATION, and three registered current evidence boundaries. They detect regressions and explicit unsupported CURRENT-COMPILE/RUNTIME/HOST claims; they do not certify every prose claim or execute AE. Source-driven CEP and documentation-file VM tests remain separate; their doubles do not establish real host or filesystem behavior.
 
 PR regeneration checks out the exact PR head with read-only repository permission. It validates, regenerates and uploads a bundle/provenance packet containing the bot-authored generated commit (or an explicit no-change result). Publishing that commit is separate: verify its parent equals the still-current PR source SHA, its changed paths are only MASTER/MANIFEST, and generated --check passes, then fast-forward the PR branch. No write token is passed to PR code; failures are not swallowed. The main-only regeneration workflow remains separate.

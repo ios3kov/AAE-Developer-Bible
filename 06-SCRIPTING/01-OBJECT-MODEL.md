@@ -1991,6 +1991,8 @@ UI event
 
 ## Long operations
 
+<a id="extendscript-files-runtime"></a>
+
 ### ExtendScript runtime, File/Folder и preferences
 
 **ExtendScript runtime и File/Folder — DOCUMENTED / SOURCE EXAMPLE /
@@ -2000,7 +2002,8 @@ RUNTIME-NOT-CLAIMED, review 2026-10-08.** Прочитаны целиком во
 правками сообщества; оно не устанавливает поддержку каждого поведения в современной
 версии AE. Ниже документированные контракты отделены от собственных сценариев.
 В AE примеры не запускались. [Source ledger](../extendscript-runtime-reviewed-2026-10-08.json)
-фиксирует8 полных страниц/2790 строк и их SHA256. Переносимые проверки
+сохраняет эту группу8 полных страниц/2790 строк внутри общего73-page review
+и её SHA256. Переносимые проверки
 [фактических примеров](../scripts/test_document_file_examples.js) используют doubles;
 они проверяют контроль ошибок, а не реальный filesystem/runtime.
 
@@ -2261,10 +2264,12 @@ durability после потери питания или синхронизац�
 результаты: отчёт указывает отдельно путь sidecar, состояние сохранения проекта и
 частичный failure. Undo проекта не возвращает прежние байты внешнего файла.
 
-**Граница покрытия.** Закрыт source review выбранных File/Folder, encoding, `$`,
-preprocessor и runtime-overview страниц. Полное поведение ScriptUI, BridgeTalk,
-Socket, ExternalObject, E4X, reflection/localization и отладчика остаётся отдельными
-runtime-областями; этот блок не объявляет завершённым весь ExtendScript runtime.
+**Граница покрытия.** Этот File/Folder блок сохраняет собственную группу8 страниц:
+encoding, `$`, preprocessor и runtime overview. Остальные source pages теперь
+разобраны в [ScriptUI](02-SCRIPTUI.md), [BridgeTalk](../15-COMMUNICATION/05-SCRIPT-TO-AE.md#bridgetalk)
+и [runtime/data/debugger](04-EXTENDSCRIPT-RUNTIME.md). Совокупное чтение73 страниц
+не устанавливает полную матрицу возможностей современного AE и не заменяет
+неполные или противоречивые контракты источника.
 
 **Preferences.** A tool can save a short non-secret mode string under its own
 `app.settings` section; this does not mutate project and needs no Undo. Example:

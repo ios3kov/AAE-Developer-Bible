@@ -46,6 +46,7 @@ permissions, files/storage/network и packaging с отдельной грани
 **Читать**
 1. [After Effects scripting object model](06-SCRIPTING/01-OBJECT-MODEL.md).
 2. [ExtendScript → After Effects](15-COMMUNICATION/05-SCRIPT-TO-AE.md).
+   Runtime, XML/XMP, внешние библиотеки и отладка — [отдельная глава](06-SCRIPTING/04-EXTENDSCRIPT-RUNTIME.md).
 3. Выбрать интерфейс:
    - без панели — самостоятельный JSX;
    - интерфейс на ExtendScript — [ScriptUI](06-SCRIPTING/02-SCRIPTUI.md);
@@ -162,6 +163,7 @@ permissions, files/storage/network и packaging с отдельной грани
 - [After Effects scripting object model](06-SCRIPTING/01-OBJECT-MODEL.md)
 - [ScriptUI](06-SCRIPTING/02-SCRIPTUI.md)
 - [Expressions vs scripts](06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md)
+- [ExtendScript runtime, data and debugging](06-SCRIPTING/04-EXTENDSCRIPT-RUNTIME.md)
 - [ExtendScript scripting](06-SCRIPTING/README.md)
 
 ## 07-PANELS

@@ -12849,7 +12849,7 @@
       "destination_section": "Full intro/PPro source review —2026-10-08",
       "operation": "Resolve internally contradictory exception prose through existing callback containment policy without propagating arbitrary C++ exceptions",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 7,
       "reviewed_on": "2026-10-08",
       "coverage_page": "14-NATIVE-INTEGRATIONS/13-DOCS-ERRATA.md"
@@ -12864,7 +12864,7 @@
       "destination_section": "DirectX backend",
       "operation": "Explicit DirectXAssets deployment and version-qualified CUDA dependency example; no inferred ARM64 CUDA support or runtime retry",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 76,
       "reviewed_on": "2026-10-08",
       "coverage_page": "09-WINDOWS/04-GPU.md"
@@ -12894,7 +12894,7 @@
       "destination_section": "9. Point, popup и строки",
       "operation": "Language-aware parameter strings, API-specific encoding, bounded byte buffers and stable identity; historical conversion/platform instructions qualified",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 18,
       "reviewed_on": "2026-10-08",
       "coverage_page": "02-EFFECT-PLUGINS/02-PARAMETERS-UI.md"
@@ -12924,7 +12924,7 @@
       "destination_section": "AEIO / BlitHook",
       "operation": "Premiere importer and Mercury Transmit selection boundary; historical ESTK/JSXBIN/aerender generalizations retained as explicit source gaps",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 53,
       "reviewed_on": "2026-10-08",
       "coverage_page": "00-START-HERE/01-EXTENSION-TYPES.md"
@@ -12939,7 +12939,7 @@
       "destination_section": "Current cross-host metadata boundary / registration-resource separation",
       "operation": "Existing exact25.6 PiPL pipeline and Beta27-only metadata retained; add Rez1023-byte source-line handling without inventing26.5 declarations",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 106,
       "reviewed_on": "2026-10-08",
       "coverage_page": "01-ARCHITECTURE/03-PIPL-AND-LOADING.md"
@@ -12999,7 +12999,7 @@
       "destination_section": "Premiere Pro: отдельный маршрут Effect API",
       "operation": "FXTC/PrMr identity, capability checks and no inferred current third-party host matrix",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 7,
       "reviewed_on": "2026-10-08",
       "coverage_page": "01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md"
@@ -13014,7 +13014,7 @@
       "destination_section": "Effect /AEGP /AEIO /Artisan /BlitHook",
       "operation": "Existing integration ownership taxonomy sufficient; add explicit Mercury Transmit alternative for new monitor-output products",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 59,
       "reviewed_on": "2026-10-08",
       "coverage_page": "00-START-HERE/01-EXTENSION-TYPES.md"
@@ -13044,7 +13044,7 @@
       "destination_section": "Common vs AE-specific policy",
       "operation": "Add cross-host alias/shortcut discovery limit; preserve registry/per-user/common/AE-specific placement and owned-file policy",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 25,
       "reviewed_on": "2026-10-08",
       "coverage_page": "11-DISTRIBUTION/04-INSTALL-LOCATIONS.md"
@@ -13074,7 +13074,7 @@
       "destination_section": "Request context и состояние",
       "operation": "Time ratios, monitor quality, speculative/multiple requests, native-format fields/stride, concurrency and unavailable suites",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 90,
       "reviewed_on": "2026-10-08",
       "coverage_page": "01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md"
@@ -13089,7 +13089,7 @@
       "destination_section": "Pixel formats, checkout и unsupported paths",
       "operation": "Legacy PPro float through RENDER, native formats, explicit checkout-format opt-in and preview/export depth distinction",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 29,
       "reviewed_on": "2026-10-08",
       "coverage_page": "01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md"
@@ -13104,7 +13104,7 @@
       "destination_section": "Request context и состояние",
       "operation": "Documented warning against PPRO_DO_NOT_CLONE_SEQUENCE_DATA_FOR_RENDER and distinct ownership design",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 3,
       "reviewed_on": "2026-10-08",
       "coverage_page": "01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md"
@@ -13119,7 +13119,7 @@
       "destination_section": "Premiere Pro: отдельный маршрут Effect API",
       "operation": "No Adobe support guarantee for third-party host implementations or permanent market-wide SmartFX absence",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 16,
       "reviewed_on": "2026-10-08",
       "coverage_page": "01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md"
@@ -13134,7 +13134,7 @@
       "destination_section": "Common vs AE-specific policy",
       "operation": "Premiere-only placement does not deploy the effect for the separate Media Encoder application",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 7,
       "reviewed_on": "2026-10-08",
       "coverage_page": "11-DISTRIBUTION/04-INSTALL-LOCATIONS.md"
@@ -13149,7 +13149,7 @@
       "destination_section": "Кэш загрузки и presets",
       "operation": "Capability cache versus frame cache, Shift reload, header-owned no-cache opt-in, distinct presets and supervised custom UI data parameter",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 36,
       "reviewed_on": "2026-10-08",
       "coverage_page": "01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md"
@@ -13164,7 +13164,7 @@
       "destination_section": "Premiere Pro: отдельный маршрут Effect API",
       "operation": "PrMr shared by PPro/Elements, historical API versions not product versions, exact Premiere-specific suite contracts required",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 25,
       "reviewed_on": "2026-10-08",
       "coverage_page": "01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md"
@@ -13179,7 +13179,7 @@
       "destination_section": "Разные preview assets",
       "operation": "Historical Elements icon size/match-name key distinguished from current-guide PProBeta27 binary-title preview scheme",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 9,
       "reviewed_on": "2026-10-08",
       "coverage_page": "11-DISTRIBUTION/04-INSTALL-LOCATIONS.md"
@@ -13194,7 +13194,7 @@
       "destination_section": "Pixel formats, checkout и unsupported paths",
       "operation": "AE-only suites/audio/aux/SmartFX support boundaries and early failure when a discovered module lacks required host facilities",
       "full_page_reviewed": true,
-      "decision": "draft_addition",
+      "decision": "documented_addition",
       "lines": 25,
       "reviewed_on": "2026-10-08",
       "coverage_page": "01-ARCHITECTURE/04-VERSION-COMPATIBILITY.md"

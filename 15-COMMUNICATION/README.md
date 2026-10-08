@@ -48,8 +48,17 @@
 | native needs scripting-only capability | AEGP Utility ExecuteScript |
 | UI controls heavy native compute | small control protocol; heavy data stays native/helper |
 | cross-process helper | explicit versioned IPC |
+| ExtendScript to another message-enabled Adobe application | BridgeTalk with explicit target and response contract |
 
 Ни один bridge не должен превращаться в скрытую render dependency.
+
+## ExtendScript между приложениями
+
+**ExtendScript ↔ другая message-enabled application** —
+[BridgeTalk: target identity, callback lifecycle и timeout](05-SCRIPT-TO-AE.md#bridgetalk).
+BridgeTalk перечисляет и адресует поддерживающие messaging приложения; одно
+наличие ExtendScript не подтверждает все interapplication capabilities.
+[Source scope](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/interapplication-communication/index.md).
 
 ## Control plane vs data plane
 

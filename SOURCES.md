@@ -31,11 +31,14 @@ observation remains historical; it is no longer the current access status.
   tables,757 repeated rows at scripting guide revision
   `7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`. Type identities are not installed-effect
   availability or complete parameter/value contracts.
-- [ExtendScript runtime ledger](extendscript-runtime-reviewed-2026-10-08.json):8
-  full File/Folder/encoding/runtime pages,2790 lines at JavaScript Tools Guide
-  `ac6839049e17f4652d301e7d28f8f0d3d5fbb66a`. This is a community-maintained mirror
-  of Adobe material, not a current Adobe host support declaration. Broader runtime
-  subsystems remain separate. The vendor scripts-permission page has its own date.
+- [ExtendScript runtime ledger](extendscript-runtime-reviewed-2026-10-08.json) and
+  [inventory](extendscript-runtime-inventory-2026-10-08.json):all73 Markdown guide
+  pages,18 027 lines at `ac6839049e17f4652d301e7d28f8f0d3d5fbb66a`;8 File/base-runtime,
+  31 ScriptUI/BridgeTalk and34 other runtime/data/tooling pages. Community-maintained
+  Adobe material with historical/unsupported scope, not a current host support matrix.
+  Separate Adobe TreeView sample and ESTK Readme are pinned at CEP `ab5e4e3…`; the
+  official debugger README and scripts-permission page keep their own review dates.
+  These supplemental sources do not increase73. [Chapter transfer and checks](EXTENDSCRIPT-RUNTIME-REVIEW-2026-10-08.md).
 
 [Claim/source/version table](BLOCK-5-SOURCES.md) separates SDK, host, panel and platform boundaries. [Block 5 review](BLOCK-5-REVIEW-2026-10-04.md) records practical-depth comparison, fresh checks and remaining uncertainty.
 

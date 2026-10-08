@@ -2,6 +2,38 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Full ExtendScript runtime and final source continuation
+
+Parent `065df27eb0687cc71843d9d71fc2ff599a4b9392`. Full73-page JavaScript Tools Guide
+reading at `ac6839049e17f4652d301e7d28f8f0d3d5fbb66a`:1 045 098 raw bytes/18 027
+lines, exact tree `edb30d633a85608f310fd3bb9a3023d42cd21766`. The previous8 pages,
+31 ScriptUI/BridgeTalk and34 other runtime pages are disjoint; source hashes/blob
+identities and destinations match the complete inventory. Two immutable Adobe
+supplements and two dated vendor pages remain outside73. New chapter brings core
+to130; native ledger decision labels now describe integrated additions.
+
+Independent review corrected byte/character framing, XMP OPEN_FOR_UPDATE, debugger
+launch script scope and the source typo $.localization versus canonical $.localize.
+[Runtime review](EXTENDSCRIPT-RUNTIME-REVIEW-2026-10-08.md) records details;
+[source-completion record](SOURCE-COMPLETION-2026-10-08.md) records retained external
+gaps. Runtime/host/library/network execution is not claimed by the new examples.
+
+Final local results:13 inventory tests (including5 public-guide),3 scripting-ledger,
+11 consistency and16 source-extracted file-example cases PASS.130-core checker,
+source-table freshness, strict MkDocs (5.21 seconds after explicit anchor fixes),
+strict JSON config and whitespace PASS. Python3.12.14 / Node24.19.0. Generated
+outputs are rebuilt and checked after recording these results. New source-commit
+GitHub results are verified after publication and are not predeclared here.
+
+### Published native block: exact GitHub evidence
+
+Source commit `0b76c7315ec1bc25e93e2e4fdd1b36917dc74bee`:
+[Validate](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37833680918)
+and [Regenerate docs](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37833680870)
+completed successfully. All35 source files and2 generated files matched remote
+main `065df27eb0687cc71843d9d71fc2ff599a4b9392`. No separate generated-commit run or
+AE/SDK execution inferred.
+
 ### Full native public-guide reconciliation
 
 Parent `4bf9d4e079d46b2dfb6407d27613e057a27e69a8`. All89 pinned Markdown pages under

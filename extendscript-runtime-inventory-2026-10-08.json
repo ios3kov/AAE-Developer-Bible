@@ -1,0 +1,522 @@
+{
+  "repository": "docsforadobe/javascript-tools-guide",
+  "source_revision": "ac6839049e17f4652d301e7d28f8f0d3d5fbb66a",
+  "tree_sha": "edb30d633a85608f310fd3bb9a3023d42cd21766",
+  "tree_url": "https://api.github.com/repos/docsforadobe/javascript-tools-guide/git/trees/edb30d633a85608f310fd3bb9a3023d42cd21766?recursive=1",
+  "tree_truncated": false,
+  "scope": "All Markdown blobs under docs/. Page inventory, not all SDK/runtime symbols, signatures, versions, semantic or host coverage.",
+  "source_pages": 73,
+  "records": [
+    {
+      "source_path": "docs/_global/readme.md",
+      "git_blob_sha": "9c35a4429ce36f3245f81cf648b80f8379153d1d",
+      "source_sha256": "0824891efae56a1666dfbb53188d6ca19de74e3f102d4d592d65a4e54b15a790",
+      "bytes": 715,
+      "lines": 11
+    },
+    {
+      "source_path": "docs/extendscript-toolkit/code-profiling-for-optimization.md",
+      "git_blob_sha": "5951c2296235458b753fe03279fe5f96636b7ef7",
+      "source_sha256": "9b08d2c83f4a90ff60abac819ff8ecdc6091c7c8f752d4eb1b128ab1eceaf140",
+      "bytes": 2509,
+      "lines": 72
+    },
+    {
+      "source_path": "docs/extendscript-toolkit/configuring-the-toolkit-window.md",
+      "git_blob_sha": "9159845071093f9746dca0ac07eeebb38597904b",
+      "source_sha256": "b290f03f943d676d795f472152ae10895d091dd23b13a8c3d267d0337b7977e6",
+      "bytes": 6873,
+      "lines": 78
+    },
+    {
+      "source_path": "docs/extendscript-toolkit/debugging-in-the-toolkit.md",
+      "git_blob_sha": "a1ac8c178ff40ba53c5058e311da3c7593c18ef8",
+      "source_sha256": "414832272b486740e4fa84b258484287207b801d644e5efa5852ec47ebfa7b64",
+      "bytes": 27041,
+      "lines": 199
+    },
+    {
+      "source_path": "docs/extendscript-toolkit/index.md",
+      "git_blob_sha": "1890148148fe424f49a2efeb58359e2ce81bc146",
+      "source_sha256": "089efa5bfb8999d698cf14e11f0bdd8b30e06ce9076289f88d9030026642227e",
+      "bytes": 1323,
+      "lines": 20
+    },
+    {
+      "source_path": "docs/extendscript-toolkit/inspecting-object-models.md",
+      "git_blob_sha": "511bc636cb0796aa12126992ad4a227138499a8f",
+      "source_sha256": "77d4f76c89ecfb8db9310fa9bdb9001af9e030630ce5061b746eacda04d5c7ad",
+      "bytes": 2475,
+      "lines": 25
+    },
+    {
+      "source_path": "docs/extendscript-toolkit/selecting-scripts.md",
+      "git_blob_sha": "8d31557d43cdbf38869774ce114fb91466ff91aa",
+      "source_sha256": "9c4f14ab5d8a9d82840c165b6ca18aefc274b1cc49a6ce0a70168d132951af90",
+      "bytes": 3334,
+      "lines": 37
+    },
+    {
+      "source_path": "docs/extendscript-toolkit/the-script-editor.md",
+      "git_blob_sha": "0953831b18f883ccf6b91ebf13cbd736fb394bb3",
+      "source_sha256": "a152a9a38bc2b510cb0a483a530a90d5220c440914b93200018b17a4ea4cd9e5",
+      "bytes": 16448,
+      "lines": 217
+    },
+    {
+      "source_path": "docs/extendscript-tools-features/dollar-object.md",
+      "git_blob_sha": "75a47568433afd465667ae1a2d665d1a4aa025b8",
+      "source_sha256": "4558c9f1609fe523176de987bd5e52ad9caa8923cba2c6df39e47bc17a6e5563",
+      "bytes": 11585,
+      "lines": 552
+    },
+    {
+      "source_path": "docs/extendscript-tools-features/extendscript-reflection-interface.md",
+      "git_blob_sha": "c43997f0624e3068daefca2d2153d10feb68cf13",
+      "source_sha256": "c917f290b8f7572241a66ae63c4666db60831b9ea655a27b3b70d9de04a12d5a",
+      "bytes": 6428,
+      "lines": 322
+    },
+    {
+      "source_path": "docs/extendscript-tools-features/index.md",
+      "git_blob_sha": "c4f19dc952b7996bdc57832488a5d8fb9591539d",
+      "source_sha256": "c0b33ab54335b5396ee766a629bb6aaca230893efc74976dfcce1da0b38e511d",
+      "bytes": 1412,
+      "lines": 14
+    },
+    {
+      "source_path": "docs/extendscript-tools-features/localizing-extendscript-strings.md",
+      "git_blob_sha": "07d8a2550cc4762c849cb0e8632e50900e61a8a9",
+      "source_sha256": "8029b2b7e675cd939ac20bd4721719032a043b81178d1851da6aa68d7daf6a90",
+      "bytes": 11802,
+      "lines": 164
+    },
+    {
+      "source_path": "docs/extendscript-tools-features/operator-overloading.md",
+      "git_blob_sha": "48b73447635e398d4cb951a69f178c1d3bc2a66b",
+      "source_sha256": "e9d52044bd7c5281509faa1fdf20792ee1f89d224183e93d74f27b2469bc8247",
+      "bytes": 2187,
+      "lines": 58
+    },
+    {
+      "source_path": "docs/extendscript-tools-features/preprocessor-directives.md",
+      "git_blob_sha": "074abf24e4449aa9ce287d8fe2ce6b6ee279c7b4",
+      "source_sha256": "2e209cbc3aa56f930922edde778f2697bd66df9d1136cccf662dd8154dddfd63",
+      "bytes": 4584,
+      "lines": 98
+    },
+    {
+      "source_path": "docs/extendscript-tools-features/specifying-measurement-values.md",
+      "git_blob_sha": "9a0f1f7d7d394dfca1276235e83ed93adf4b4fb4",
+      "source_sha256": "ea1630b0d1f8a9967941c57057441a832afa21a327f8ac832491490669241f5b",
+      "bytes": 9512,
+      "lines": 258
+    },
+    {
+      "source_path": "docs/extendscript-tools-features/user-notification-dialogs.md",
+      "git_blob_sha": "3f61c085c3aad279c5b6a54fc4124d9b973b720b",
+      "source_sha256": "c44307e445ac52ff02213fa3be668ea28fa7649ff14aad2a5bc561889661b906",
+      "bytes": 6680,
+      "lines": 114
+    },
+    {
+      "source_path": "docs/external-communication/index.md",
+      "git_blob_sha": "0cae07d83407fb190abb957c08aa2749c40b5816",
+      "source_sha256": "f9d81abe2c1aea0628858923363db3e7995be1dd2dfd12ff917a2bd6d589b2cf",
+      "bytes": 373,
+      "lines": 11
+    },
+    {
+      "source_path": "docs/external-communication/socket-object-reference.md",
+      "git_blob_sha": "9975e3dc4eaa8e0b59790d90449a89135892834a",
+      "source_sha256": "00070b147d123ece5163941d2d2c65d05061e1702d4ad693e65bfe5576d1c6f5",
+      "bytes": 6866,
+      "lines": 265
+    },
+    {
+      "source_path": "docs/external-communication/socket-object.md",
+      "git_blob_sha": "091a3efcd67194324b7458651e74e13b197253d2",
+      "source_sha256": "ac31fd504e4b29b2d099cd92173be7781a9e6e515f242fe95f4ee195e1e1452d",
+      "bytes": 6630,
+      "lines": 139
+    },
+    {
+      "source_path": "docs/file-system-access/file-access-error-messages.md",
+      "git_blob_sha": "43eb1c1f5f9efedf88a3959bfb3c8e4e77e85bc3",
+      "source_sha256": "e8a787b9155c9d8b6e31dde1cb3429b937b98a64a0a0511e4968a101e6c51821",
+      "bytes": 2298,
+      "lines": 25
+    },
+    {
+      "source_path": "docs/file-system-access/file-and-folder-supported-encoding-names.md",
+      "git_blob_sha": "f4bfad903c01a5c75efee4a3241eccb67f42d734",
+      "source_sha256": "3f18e1a5699f530b0501f5ddc3451a349b45068c5ed519c5b8188f723930672f",
+      "bytes": 5236,
+      "lines": 119
+    },
+    {
+      "source_path": "docs/file-system-access/file-object.md",
+      "git_blob_sha": "e7bf64470018a4f034255dd8012d0be656287f5d",
+      "source_sha256": "d0447bc13f93f32582b64c6eb54336d6c28639aac553dbd0d33d212be02da977",
+      "bytes": 41050,
+      "lines": 1036
+    },
+    {
+      "source_path": "docs/file-system-access/folder-object.md",
+      "git_blob_sha": "ed7dd2d433af874e780b9dc4f4c23cb83f8e6816",
+      "source_sha256": "918131cb26fd5cfba6c8257d59bf7a7d6ee91f0c82189c165473faaa29d96f1f",
+      "bytes": 22853,
+      "lines": 713
+    },
+    {
+      "source_path": "docs/file-system-access/index.md",
+      "git_blob_sha": "f04f58ae34a909ae59a859e4249ec2e1f983c2d2",
+      "source_sha256": "d36ed5d38beeacf6a98bb3d81150f5cb2054877cdb7c2aeeccf6d14175d268aa",
+      "bytes": 684,
+      "lines": 6
+    },
+    {
+      "source_path": "docs/file-system-access/using-file-and-folder-objects.md",
+      "git_blob_sha": "d40d645559ed557e459855fa046ca9e83e89ba6e",
+      "source_sha256": "8138799e8e4db6a2ded9bc2dfa485c4bd7cc30e8fe3fda8b77c701f8480c84f4",
+      "bytes": 13436,
+      "lines": 164
+    },
+    {
+      "source_path": "docs/index.md",
+      "git_blob_sha": "f5e6ab47e4e35c351792a8efb4ab131b6a771e9f",
+      "source_sha256": "ff20d59a494b31e4afa8d08e406da4502c0953bc9cd270b54dbd1a54da991bb1",
+      "bytes": 1658,
+      "lines": 11
+    },
+    {
+      "source_path": "docs/integrating-external-libraries/defining-entry-points-for-direct-access.md",
+      "git_blob_sha": "baeadb653921db2e4402d8cc2c314b5a2412043a",
+      "source_sha256": "0a51ea6eba4b9057dda1924bb02652292b53541544f8fb0df4aa04bb71e2864c",
+      "bytes": 6327,
+      "lines": 158
+    },
+    {
+      "source_path": "docs/integrating-external-libraries/defining-entry-points-for-indirect-access.md",
+      "git_blob_sha": "b987d1967c4069182ea770fa942702a507c755af",
+      "source_sha256": "49726beb4bae3b5cb1245a61079e16a914d1554731f28e520e390420b366941b",
+      "bytes": 38279,
+      "lines": 705
+    },
+    {
+      "source_path": "docs/integrating-external-libraries/externalobject-object.md",
+      "git_blob_sha": "43b27a1bfdb3f94ce9ed8f560b16d6ac965025c6",
+      "source_sha256": "7572efc65b51486d2f2a478a32af9fa07117c592d42c5013a22d40bcdce0216c",
+      "bytes": 6175,
+      "lines": 136
+    },
+    {
+      "source_path": "docs/integrating-external-libraries/index.md",
+      "git_blob_sha": "ba5a38bcfc6ae25c793b5ec96f01f2f26907b6b7",
+      "source_sha256": "2be976498c139a6c8e20bdc65facb4cacd6a7018e9afed9be72f6d4f5d96bbc4",
+      "bytes": 1235,
+      "lines": 17
+    },
+    {
+      "source_path": "docs/integrating-external-libraries/loading-and-using-shared-libraries.md",
+      "git_blob_sha": "d7da09e6d11ddc5e5ba411bc423cbbfdb7ffe668",
+      "source_sha256": "370b47b2c7d54d30b14f768db361ddbeb757fab52643fcfbceae303b86156e4f",
+      "bytes": 2264,
+      "lines": 45
+    },
+    {
+      "source_path": "docs/integrating-xml/index.md",
+      "git_blob_sha": "993c205b23566febdf086598962304866db11a1b",
+      "source_sha256": "1c08dfba150ebcffbf1462f17df5d61c88dbf8765625a388f8e7a78580a6d61a",
+      "bytes": 426,
+      "lines": 3
+    },
+    {
+      "source_path": "docs/integrating-xml/the-xml-object.md",
+      "git_blob_sha": "acc89d57f9d2234f0f4e10d9450e84da391716e6",
+      "source_sha256": "2fb9b7a68de4b4ec199569b146464ebad0ae81330852295f594bde97800f01e7",
+      "bytes": 16732,
+      "lines": 469
+    },
+    {
+      "source_path": "docs/integrating-xml/xml-object-reference.md",
+      "git_blob_sha": "52e95d5e1830951c007a09e8098830f5df8ba2bb",
+      "source_sha256": "22507f0d9ee2b00ffc77f8f71481070f3c895e93e6a0b126f192d3b550d8e6b7",
+      "bytes": 32073,
+      "lines": 929
+    },
+    {
+      "source_path": "docs/interapplication-communication/application-and-namespace-specifiers.md",
+      "git_blob_sha": "231698dd2e88a6035ddfaf13345b8e7aeb87e670",
+      "source_sha256": "570132069102ec62d7b1c71fbf24bfd65537ca9eda438843ad10e569ca22b538",
+      "bytes": 13872,
+      "lines": 100
+    },
+    {
+      "source_path": "docs/interapplication-communication/bridgetalk-class.md",
+      "git_blob_sha": "610c8117f1ae9006769cc26fcdb5a60b1ef965c7",
+      "source_sha256": "4b2cfd8e19c5d39a413d9c347b3234e5436a29cdc88ea51a2d6d03796ed9ccf9",
+      "bytes": 22675,
+      "lines": 451
+    },
+    {
+      "source_path": "docs/interapplication-communication/bridgetalk-message-object.md",
+      "git_blob_sha": "cc219ad1f71d47a58e3443c9f8da10b503b87bdb",
+      "source_sha256": "33a83b4d93dea2d194d61e2dbad86e60b170af489b60d424efc0f39aeabb64bc",
+      "bytes": 10758,
+      "lines": 270
+    },
+    {
+      "source_path": "docs/interapplication-communication/communicating-through-messages.md",
+      "git_blob_sha": "bfed3cf5e720b12e666ef78c095753335808e30d",
+      "source_sha256": "b01077aa77b4bd0f7f513559b7a703fcb8b6687913783a9dc670da7c9e6fe81c",
+      "bytes": 26875,
+      "lines": 430
+    },
+    {
+      "source_path": "docs/interapplication-communication/communications-overview.md",
+      "git_blob_sha": "66cea814f8848d50f94407c3acee4bd5e9aaaea7",
+      "source_sha256": "cc162181151a78047632466d14e7e802fb4c5f1e675c0c4c20f9b8d54e8457b2",
+      "bytes": 3380,
+      "lines": 35
+    },
+    {
+      "source_path": "docs/interapplication-communication/cross-dom-functions.md",
+      "git_blob_sha": "1486003ce59e80b2a3a51c08f646d2f8b2ea410e",
+      "source_sha256": "df9e46b52bf7c91d25ee975129dbcd0edd5d6ebef139e74443c6c97c25a1f50c",
+      "bytes": 9733,
+      "lines": 186
+    },
+    {
+      "source_path": "docs/interapplication-communication/index.md",
+      "git_blob_sha": "5317cb1db0b8f4a187814a4c55b20f3132e4387a",
+      "source_sha256": "3588d0fa2ca35fbfca691fb22a79204b237cb815be237582b0946b606529fdd7",
+      "bytes": 530,
+      "lines": 5
+    },
+    {
+      "source_path": "docs/interapplication-communication/messaging-error-codes.md",
+      "git_blob_sha": "540dc68bd17048a909034fab49931c5424bc17c9",
+      "source_sha256": "cbdcb22c671aba220ac47b7a096f94c1ce510f2e27318b2b6bb1f7f07807d52f",
+      "bytes": 1398,
+      "lines": 30
+    },
+    {
+      "source_path": "docs/interapplication-communication/messaging-framework-api-reference.md",
+      "git_blob_sha": "15e2aca3e4b424541bf365c51b03fcbb5e1150d7",
+      "source_sha256": "16a8ff1fa9f969c0676557ce2301c99ce4673c7b3340e3c7ef3f09a7096b86fc",
+      "bytes": 3416,
+      "lines": 20
+    },
+    {
+      "source_path": "docs/introduction/extendscript-overview.md",
+      "git_blob_sha": "dd75fce64906854a42d4aa8ba41b46ce1fe09439",
+      "source_sha256": "315385f4f4cf9dd5f56b5fb3f9a33d6e7883ad6c79d030a23e8ff70729b7d6fa",
+      "bytes": 6907,
+      "lines": 83
+    },
+    {
+      "source_path": "docs/introduction/scripting-for-specific-applications.md",
+      "git_blob_sha": "f46e8459338a4f818c97429a295828ad8c67be24",
+      "source_sha256": "b692f1da24891572a4b8da019fea26cc17a5de4fc4a9555126be4b7145a034ba",
+      "bytes": 2482,
+      "lines": 34
+    },
+    {
+      "source_path": "docs/scripting-xmp/accessing-the-xmp-scripting-api.md",
+      "git_blob_sha": "0651cb5ddae47b07f3742f2185d83da0dbe082fe",
+      "source_sha256": "23b56831372d0e727bb56feeb52eeb27a08015e0bf81a97081a9d3371269432d",
+      "bytes": 10495,
+      "lines": 207
+    },
+    {
+      "source_path": "docs/scripting-xmp/index.md",
+      "git_blob_sha": "38f8f2549a9cae37ff9383d1dd87907af527bd4f",
+      "source_sha256": "d862b26b811e536b4cd915d90763023127c4e126d4dd710f5bafa4792593e5ab",
+      "bytes": 1261,
+      "lines": 10
+    },
+    {
+      "source_path": "docs/scripting-xmp/xmpscript-object-reference.md",
+      "git_blob_sha": "5f431f3db2adbd7036857b0bdb1783d1304ea5dc",
+      "source_sha256": "9be1d6638f9a3a21add2fc8792f8e13bf64235d9eb1ad370610bb4b2aa596b4b",
+      "bytes": 163729,
+      "lines": 1934
+    },
+    {
+      "source_path": "docs/user-interface-tools/automatic-layout.md",
+      "git_blob_sha": "6d020f09522e70163bca0da462e5f930433914c4",
+      "source_sha256": "bbf2106af3963b664f0723fb31b59f561cb350bc6369349734706c5af957e467",
+      "bytes": 30755,
+      "lines": 453
+    },
+    {
+      "source_path": "docs/user-interface-tools/code-examples-for-scriptui.md",
+      "git_blob_sha": "6d1c7bda44ac311fb1f055a1a8b268f3ea6c78ff",
+      "source_sha256": "405eab91932d719679930753f700de236764519b47d0554655f12927a9c46bb1",
+      "bytes": 8379,
+      "lines": 21
+    },
+    {
+      "source_path": "docs/user-interface-tools/common-properties.md",
+      "git_blob_sha": "0e6a2a07b9a1f7cb123c54a512625b6a91553db8",
+      "source_sha256": "dc1e8c4edbcbd4d4f2fb985463973122f6a9f5d1a06061cafa9381a1fc8f14ba",
+      "bytes": 50627,
+      "lines": 58
+    },
+    {
+      "source_path": "docs/user-interface-tools/communicating-with-the-flash-application.md",
+      "git_blob_sha": "2cd1fbc9857480b820a2fc07a424a553a82e3ccb",
+      "source_sha256": "0735733c5706def641c702c6cf467c611da167ff0236032b502ab9b692174931",
+      "bytes": 5014,
+      "lines": 74
+    },
+    {
+      "source_path": "docs/user-interface-tools/control-objects.md",
+      "git_blob_sha": "bdd72f51e34b0d80c1f4ef47162e557cbce57a7c",
+      "source_sha256": "a117b26cedd4114d23604d9f907fa625c83120aca6d189e4f224ff2af679f3ab",
+      "bytes": 128549,
+      "lines": 2168
+    },
+    {
+      "source_path": "docs/user-interface-tools/defining-behavior-with-event-callbacks-and-listeners.md",
+      "git_blob_sha": "2ba540c76c015502257be8af67a353a22e8528f5",
+      "source_sha256": "ef39b978017c70c218316bbb824aebe200318e5793a0d1b8b64924bd0ea67c8b",
+      "bytes": 14767,
+      "lines": 185
+    },
+    {
+      "source_path": "docs/user-interface-tools/drawing-objects.md",
+      "git_blob_sha": "d407de4e7963a85067d715277e7ce45223ed83ce",
+      "source_sha256": "982a01600a9b87670c45cc441ba0fb4505322fad5dd1c8d59a2724d67ab8505b",
+      "bytes": 4652,
+      "lines": 35
+    },
+    {
+      "source_path": "docs/user-interface-tools/environment.md",
+      "git_blob_sha": "c7b375ffa0fa3ee8afe1a8beb32ef261598bdcf8",
+      "source_sha256": "449dc1c792efb5856b67e7d0de94f56e99d5cb9cce561ed2a7ca2399ba4a19c4",
+      "bytes": 3057,
+      "lines": 114
+    },
+    {
+      "source_path": "docs/user-interface-tools/event-handling.md",
+      "git_blob_sha": "39b230004d1c72c6e818210ce0fd0694594d645a",
+      "source_sha256": "43f254fa82721c9381649a7fd083431ee446a169afc9b34789320cf2a4098199",
+      "bytes": 19482,
+      "lines": 683
+    },
+    {
+      "source_path": "docs/user-interface-tools/graphic-customization-objects.md",
+      "git_blob_sha": "651047d59c319936015fee48ab17eaf54716948d",
+      "source_sha256": "c6dbfd746725b435ba3144c05e4dbf9778b4b46f68bc29166e1c5083660e42a8",
+      "bytes": 45292,
+      "lines": 695
+    },
+    {
+      "source_path": "docs/user-interface-tools/index.md",
+      "git_blob_sha": "16f5d6439a059e59b53c70951a1b999cdda2f2af",
+      "source_sha256": "e8ce7cbad3c1bd19e0522036f4add80c444d69ab30a6af37c2189e77e9ff72fa",
+      "bytes": 796,
+      "lines": 6
+    },
+    {
+      "source_path": "docs/user-interface-tools/layoutmanager-object.md",
+      "git_blob_sha": "93bce0103ff83d0c3af5c0d772307168d38f311a",
+      "source_sha256": "bb13b6385586964c7a7e877f351f28618157bd05ba4f6d64550fbda639aabf9b",
+      "bytes": 2326,
+      "lines": 55
+    },
+    {
+      "source_path": "docs/user-interface-tools/localization-in-scriptui-objects.md",
+      "git_blob_sha": "03b189f00a1307911726bc1d90d06f00112cfde1",
+      "source_sha256": "89de76a0799e79208f4ae91db45f0287ebab27d560053092a0e40988fc9cfca1",
+      "bytes": 3088,
+      "lines": 63
+    },
+    {
+      "source_path": "docs/user-interface-tools/managing-control-titles.md",
+      "git_blob_sha": "df6beb50544bc9d6d029bda04647dfcdf72c29a0",
+      "source_sha256": "b74dc22bf3046ee3488356e3886540ff39775ddd06659d514dc259f30406a7a2",
+      "bytes": 11224,
+      "lines": 147
+    },
+    {
+      "source_path": "docs/user-interface-tools/resource-specifications.md",
+      "git_blob_sha": "d0f108687463c7fd1eb5cb6dd9b3b1d2c88162a4",
+      "source_sha256": "23478af3aa83286ecb26fedf7d06fadf65451cd8f864e8002e090feec9f83082",
+      "bytes": 4700,
+      "lines": 83
+    },
+    {
+      "source_path": "docs/user-interface-tools/scriptui-class.md",
+      "git_blob_sha": "424e4fd58cb3ee7064664033ef7eb78b57b4bced",
+      "source_sha256": "adf31c2fae2f15b4ea0f8d61099835bd7a1fb61ae4cd4d6fdb23202406925298",
+      "bytes": 7662,
+      "lines": 260
+    },
+    {
+      "source_path": "docs/user-interface-tools/scriptui-object-reference.md",
+      "git_blob_sha": "7c41362e5c05c8c034a10c6d7b62f097fde531d6",
+      "source_sha256": "7b28ce31d70747cf4bb76c5f1dc94c4a116b44bb666b7fdb6ef4f23c0c3b5c72",
+      "bytes": 825,
+      "lines": 14
+    },
+    {
+      "source_path": "docs/user-interface-tools/scriptui-programming-model.md",
+      "git_blob_sha": "e2973362e74553f69299e899d2661134985f69b5",
+      "source_sha256": "75cb6d77d25211cc943ff1711a7203fe2f37957f6c7f73bed655eb2e0df5e708",
+      "bytes": 12888,
+      "lines": 162
+    },
+    {
+      "source_path": "docs/user-interface-tools/size-and-location-objects.md",
+      "git_blob_sha": "13fe3666c05cf6985960f68ec392cd57c3800473",
+      "source_sha256": "816e4445d03d9800bb56f44a820b90ba259a7e92a438281c60b1ae841b625ae7",
+      "bytes": 3820,
+      "lines": 72
+    },
+    {
+      "source_path": "docs/user-interface-tools/types-of-controls.md",
+      "git_blob_sha": "0af4b8a3adec036fd32951fd37e3fd6c99c4a761",
+      "source_sha256": "1737b31fcac96bd891f32ec403e0bc62c31428d085e59587cfb6bed4f0f24aff",
+      "bytes": 26187,
+      "lines": 395
+    },
+    {
+      "source_path": "docs/user-interface-tools/window-class.md",
+      "git_blob_sha": "92934ece0116a425129fba6e99d9ff7ee3109ba2",
+      "source_sha256": "8d02788dedc312eb1dae1d4802d5ace5e945a5a2470d93d49ffef92ac98e8fce",
+      "bytes": 6446,
+      "lines": 140
+    },
+    {
+      "source_path": "docs/user-interface-tools/window-object.md",
+      "git_blob_sha": "b79b8a383f97839a67cf7b3bf077e9f282fd0655",
+      "source_sha256": "9db2ed78f48f6e555417b56f2602664e20fce7c6cf3683db608d116be3848b42",
+      "bytes": 48801,
+      "lines": 968
+    },
+    {
+      "source_path": "docs/vscode-debugger/getting-started-with-vscode-debugger.md",
+      "git_blob_sha": "b47e53ab8528dbc74dbff900297dc254ac8f267b",
+      "source_sha256": "085b8929e6c5bea224546e7019d3ce5dcfa16f282ec5c0abb3483b4818acea0f",
+      "bytes": 3207,
+      "lines": 90
+    },
+    {
+      "source_path": "docs/vscode-debugger/index.md",
+      "git_blob_sha": "61d7280bd5be822d157f55f3d8cb434e99714a0c",
+      "source_sha256": "4d79280203cbc4882a5df274dfaf9ad23eb93430c62d8669b483ec0e3acdb745",
+      "bytes": 1306,
+      "lines": 19
+    },
+    {
+      "source_path": "docs/vscode-debugger/vscode-extension-features.md",
+      "git_blob_sha": "546c9e05bb97fe9244b9edd84bc01426d60879aa",
+      "source_sha256": "a2a1db51c60fa9b5cb10ec9056d82a78bf80c20ebf51a4e01167284a29a36580",
+      "bytes": 4234,
+      "lines": 82
+    }
+  ]
+}

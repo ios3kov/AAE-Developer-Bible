@@ -2,45 +2,32 @@
 
 Updated: **2026-10-08**
 
-## Active: current completeness and currency review
+## Доступная source-сверка завершена
 
-**Native public guide завершён в своём source scope:89/89 страниц.**
-[Датированный обзор](NATIVE-PUBLIC-GUIDE-REVIEW-2026-10-08.md) и exact-byte ledger
-связывают полный текст с профильными главами. Дописаны lifecycle/dependencies/
-ownership, PPro, AEGP monitoring/audio/FIM, AEIO output/source и Artisan queries;
-противоречия guide сохранены в errata. Exact SDK26.5 archive/header gap остаётся.
+[Итоговое дополнение](SOURCE-COMPLETION-2026-10-08.md) завершает доступную
+редакционную очередь. **Текущий core inventory —130 страниц.** Это состояние книги
+по названным источникам, не заявление исчерпывающей приёмки текущего SDK/API.
 
-Добавлена [UXP platform глава](07-PANELS/04-UXP-PLATFORM.md):47 полных shared
-страниц и5 AE setup/site файлов, с отдельным ledger и сохранёнными source gaps.
-В scripting дописаны8 match-name страниц/757 повторяемых строк и8 runtime/File/
-Folder страниц. Три авторских файловых примера проверяются16 переносимыми cases
-из фактического текста главы; это проверки control flow с doubles, не AE или I/O.
-Официальные release/requirements/Advanced3D/known-issues страницы прочитаны,
-прежний HTTP403 больше не является текущим access gap. Core inventory теперь129.
+- Native public guide:89/89 полных страниц; Effect/AEGP/AEIO/Artisan/audio/PPro
+  дополнены, source conflicts и смешанные suite generations сохранены.
+- ExtendScript runtime:73/73 страницы; File/Folder, ScriptUI, BridgeTalk,
+  Socket/ExternalObject/XML/XMP и debugger получили практические маршруты.
+- Scripting DOM:648 заголовков классифицированы (642 documented +6 research
+  exclusions); все32 expression и8 match-name source pages пересмотрены.
+- AE UXP:44/44 host страницы; shared-platform workflows —47 Hub страниц и5
+  AE setup/site файлов. Это выбранные операции, не весь UXP Hub.
+- Host/platform:официальные release/requirements/Advanced3D/known-issues страницы
+  прочитаны; прежний HTTP403 access gap закрыт с сохранением дат источников.
 
-Завершён полный обзор **44/44 pinned AE UXP host pages**: 1448 повторяемых строк
-свойств/заголовков, не уникальных API. Последние19 страниц добавили lifecycle,
-настройки проекта/MOGRT, создание и редактирование слоёв, Property/key/mask,
-text ranges/tagged ranges, камеры/свет/mesh/model. Исправлено утверждение об отсутствии
-получения DeferredCall результата: layer docs упоминают `.wait()`, но полный
-async/error contract не задан. [Глава](07-PANELS/03-UXP-HOST-API.md) и
-[ledger](uxp-api-reviewed-2026-10-08.json) согласованы; UXP runtime NOT_RUN.
+Точные inventories, SHA256/Git blobs и maps связаны с профильными главами.
+Source/portable/CI evidence сохраняют разные границы. Новые host, XML/XMP, network,
+внешние библиотеки и native examples в AE не запускались.
 
-Native26.5 selected public contracts reconciled against available local25.6 tree:
-guide unit-loss/percentage fallback, ItemView26.0+ versus grouped26.5 notes,
-Comp13 mesh command, Stream7 layer/stage/cycle-safe lifetime and PProBeta-only
-metadata/preview boundaries. Pinned source/hash and transfer record in currentness
-review. Exact26.5 archive/full header diff and full current API inventory still OPEN.
-
-Owner requested a stricter full/current Bible after edition1.1 freeze. Current
-API coverage is **not yet accepted**. [New criteria/source observations](CURRENTNESS-REVIEW-2026-10-07.md):
-current SDK header/archive acquisition remains OPEN. Следующие source-review задачи:
-оставшиеся отдельные области ExtendScript runtime и финальная provenance sweep.
-Полный89-page native public-guide inventory/reconciliation закрыт в указанном scope. AE-specific UXP setup/version map
-не опубликованы в проверенных источниках. Полное чтение44 UXP host страниц и выбранных
-platform workflow источников не закрывает отсутствующие constructor/enum/type/async
-contracts и не является полным обзором всего UXP Hub.
-Historical closure below applies to the old plan, not this expanded acceptance.
+**Внешние зависимости:** exact SDK26.5 archive/build/headers/toolset diff ещё не
+получен; native contract baseline остаётся SDK25.6build61. AE UXP setup/runtime map
+и недостающие constructor/enum/type/async contracts не опубликованы в проверенных
+источниках. Эти пункты остаются в [currentness review](CURRENTNESS-REVIEW-2026-10-07.md)
+и не закрываются количеством страниц или сборкой документации.
 
 ## Historical edition freeze — 2026-10-07
 
@@ -257,7 +244,7 @@ Historical filenames containing “Gate 4” are retained for stable links/histo
 - Scripting/ScriptUI/CEP communication architecture.
 - macOS/Windows build, debugging, signing and packaging guidance.
 - Test/evidence/release methodology.
-- Historical CEP field-name reconciliation; remaining envelope/error-path defects are scheduled in block 2.
+- Historical CEP field-name reconciliation: at that snapshot, envelope/error-path follow-up was assigned to block 2; the current result is recorded above.
 - Render-queue enum correction.
 - 3D Channel Extract historical classification correction.
 - FSTR Line / AE Hot Loader reuse audit.

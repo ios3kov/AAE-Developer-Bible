@@ -4,6 +4,11 @@
 
 ## Текущий результат после freeze
 
+**Runtime:**73/73 полных guide страниц закрыты; [runtime/data/debugger](06-SCRIPTING/04-EXTENDSCRIPT-RUNTIME.md),
+ScriptUI и BridgeTalk дописаны. Текущий core inventory —130 страниц.
+[Итог доступной source-сверки](SOURCE-COMPLETION-2026-10-08.md) сохраняет отдельные
+внешние SDK/vendor gaps и исторические127/128/129-page результаты.
+
 **Native:**89/89 полных public-guide страниц согласованы с существующими главами.
 [Обзор и ledger](NATIVE-PUBLIC-GUIDE-REVIEW-2026-10-08.md) включают навигацию, history,
 AEGP/AEIO/Artisan/audio и cross-host материалы. Это не все headers современного SDK
@@ -12,7 +17,7 @@ AEGP/AEIO/Artisan/audio и cross-host материалы. Это не все hea
 Полное чтение44/44 pinned AE UXP host pages завершено; scope и сохранённые
 vendor-contract gaps описаны в [host chapter](07-PANELS/03-UXP-HOST-API.md).
 Отдельная [shared-platform глава](07-PANELS/04-UXP-PLATFORM.md) увеличивает
-текущий core inventory до129 страниц. Её ledger содержит47 полных shared-platform
+core inventory до129 страниц в предыдущем блоке. Её ledger содержит47 полных shared-platform
 страниц и5 AE setup/site файлов. File/Folder/runtime supplement опирается на8 полных
 страниц/2790 строк;16 переносимых checks используют фактические code fences и doubles.
 Source coverage не присваивает runtime PASS.
@@ -20,7 +25,8 @@ Source coverage не присваивает runtime PASS.
 Дополнены scripting match-name routes по8/8 pinned страницам и757 табличным
 строкам. [Host/platform rereview](HOST-PLATFORM-REVIEW-2026-10-08.md) закрывает
 прежний HTTP403 gap, сохраняя различия host/SDK/renderer и даты источников.
-Текущие оставшиеся задачи — в [currentness review](CURRENTNESS-REVIEW-2026-10-07.md).
+Внешние зависимости — в [currentness review](CURRENTNESS-REVIEW-2026-10-07.md);
+очередь доступной source-сверки завершена.
 
 ## История предыдущих редакционных блоков
 
@@ -171,7 +177,7 @@ cross-page review. Добавления и результаты:
 
 ## Что здесь учитывается
 
-Это рабочая очередь для **129 core pages**: Markdown непосредственно в разделах 00–15, 17 и 19, включая их обзорные README. Исторический freeze охватывал127 страниц. Dated source reviews, verification ledgers, вложенные source/reference guides и исследовательские приложения учитываются отдельно ниже. Каждый core page включён ровно один раз.
+Это рабочая очередь для **130 core pages**: Markdown непосредственно в разделах 00–15, 17 и 19, включая их обзорные README. Исторический freeze охватывал127 страниц. Dated source reviews, verification ledgers, вложенные source/reference guides и исследовательские приложения учитываются отдельно ниже. Каждый core page включён ровно один раз.
 
 Строки задают конкретный оставшийся результат по аудиту и плану. Это не новая полная техническая сертификация каждой главы и не отмена прежних source reviews. `R` может обозначать запланированную сверку, а не уже обнаруженную ошибку. Сам факт наличия текста, большого объёма или зелёной CI не закрывает строку.
 
@@ -269,6 +275,7 @@ cross-page review. Добавления и результаты:
 | [After Effects scripting object model](06-SCRIPTING/01-OBJECT-MODEL.md) | C | C | C | C | C | Actual rename/import/rig versus replace design; target/partial/source limits; [review](CHAPTER-RECONCILIATION-2026-10-07.md#scripting-completion-reconciliation). |
 | [ScriptUI](06-SCRIPTING/02-SCRIPTUI.md) | C | C | C | C | C | Plain-result synchronous command, dock/layout and separate deferred cancel design; [review](CHAPTER-RECONCILIATION-2026-10-07.md#scripting-completion-reconciliation). |
 | [Expressions vs scripts](06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md) | C | C | C | C | C | Rig matchNames versus fixed expression names, readback/escaping/engine limits; [review](CHAPTER-RECONCILIATION-2026-10-07.md#scripting-completion-reconciliation). |
+| [Runtime, данные и отладка](06-SCRIPTING/04-EXTENDSCRIPT-RUNTIME.md) | C | C | C | C | C | UnitValue, Socket framing, ExternalObject ownership, XML/XMP и debugger; full73-page source map, original examples and explicit source gaps. [Review](EXTENDSCRIPT-RUNTIME-REVIEW-2026-10-08.md). |
 | [ExtendScript scripting](06-SCRIPTING/README.md) | C | L | C | L | C | Reconciled route index, not standalone implementation; [review](CHAPTER-RECONCILIATION-2026-10-07.md#scripting-completion-reconciliation). |
 
 ## 07-PANELS

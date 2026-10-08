@@ -2,6 +2,14 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Completed all73 JavaScript Tools Guide pages: new runtime/data/debugger chapter,
+  ScriptUI lifecycle/layout/model/tree/drawing and BridgeTalk target/message/outcome
+  recipes. Added original UnitValue/XMP/probe/config examples, exact-byte ledger
+  and full runtime-page regression; reconciled Socket byte framing, XMP update mode,
+  debugger launch versus attach and canonical $.localize.
+- Closed available-source editorial continuation at130 core pages. Preserved exact
+  SDK25.6 baseline, current26.5 archive/vendor contract gaps and historical evidence.
+
 - Completed all89 pinned native public-guide page reviews: full Effect/SmartFX/
   Drawbot/MFR, intro/PPro, AEGP/AEIO/Artisan/audio coverage. Added practical ownership,
   dependency, UI, import/monitor/audio and export/query boundaries to existing chapters.

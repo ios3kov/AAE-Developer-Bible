@@ -33,7 +33,7 @@ full UXP/runtime/SDK26.5 audit or new installed AE observation inferred.
 | Native headers/samples | supplied SDK25.6build61 | 26.5 guide additions; actual archive/header/toolset diff OPEN |
 | Native guides | dated reviewed source | All89 pinned public-guide pages read and reconciled; mixed suite generations and source gaps retained, not an exact SDK26.5 header inventory |
 | Effect metadata | reviewed PiPL baseline | Search_Keywords/Description/EXT3 and preview media are PProBeta27-only per current guide |
-| ExtendScript / expressions | retained lessons and dated evidence | Pinned DOM648 headings classified,32 expression pages and8 match-name pages reviewed;8 File/Folder/runtime pages added, broader runtime and source-contract gaps explicit |
+| ExtendScript / expressions | retained lessons and dated evidence | Pinned DOM648 headings classified,32 expression and8 match-name pages reviewed; all73 runtime guide pages read, with historical/unsupported/source-contract boundaries |
 | AE UXP | official source pin7d1cd01 | 44/44 full host pages;47 selected Hub pages plus5 AE setup/site files reviewed. Constructor/enum/type/async and AE setup/runtime-map gaps retained |
 | Host/OS support | historical matrix retained | Four official pages read2026-10-08; dated release26.5/requirements and known issues transferred, previous HTTP403 access gap closed |
 
@@ -42,7 +42,16 @@ Native guide lists `AEGP_CreateParametricMeshLayerInComp` in CompSuite13 and
 layer-parameter render-stage sampling. Exact signatures/macros/layouts require
 the current SDK, not guessed declarations copied from overview prose.
 
-## Обязательная очередь новой актуальной редакции
+## Результат доступной source-сверки и внешние зависимости
+
+**Доступная редакционная очередь завершена — 2026-10-08.**
+[Итог](SOURCE-COMPLETION-2026-10-08.md) фиксирует130 core страниц и точные source
+знаменатели. [Runtime review](EXTENDSCRIPT-RUNTIME-REVIEW-2026-10-08.md) закрыл
+73/73 страниц:8 File/base runtime,31 ScriptUI/BridgeTalk и34 остальных областей.
+Добавлены Socket framing, ExternalObject ownership, XML/XMP и официальный debugger
+route; общая карта сохраняет history и source conflicts. Exact SDK26.5 archive/
+header review и недостающие AE UXP vendor contracts остаются открытыми.
+Эти внешние пробелы не названы прошедшей полной current API приёмкой.
 
 **Native public-guide closure — 2026-10-08:** [обзор](NATIVE-PUBLIC-GUIDE-REVIEW-2026-10-08.md)
 фиксирует89/89 полностью прочитанных Markdown страниц,2 953 983 bytes/12 918 строк,
@@ -63,14 +72,15 @@ AE host ID, minimum UDT или UXP↔AE mapping. Эти данные не при
 2790 строк, с исходными hashes. Добавлены собственные bounded binary reader,
 new-file UTF-8 export и UXP JSON export;16 source-extracted portable cases проверяют
 отмену, пределы, частичный outcome и cleanup, без настоящего I/O или AE.
-ScriptUI/BridgeTalk/Socket/ExternalObject/E4X и остальные runtime references не
-объявляются полностью пересмотренными из-за чтения этих8 страниц.
+Этот ранний8-page блок сам по себе не покрывал ScriptUI/BridgeTalk/Socket/
+ExternalObject/E4X; отдельная последующая73-page сверка выше закрыла чтение
+остальных страниц, сохранив их собственные contracts и historical limits.
 
 [Host/platform review](HOST-PLATFORM-REVIEW-2026-10-08.md) закрывает доступ к текущим
 официальным release notes и requirements, добавляет Advanced3D/known-issues scope.
 Сохранённые даты различаются; более старый renderer minimum не понижает текущий
 host minimum. Exact SDK25.6build61 baseline и отсутствие нового26.5 archive
-не изменились. Текущий core inventory129 не заменяет source API inventory.
+не изменились. Тогдашний core inventory129 и текущий130 не заменяют source API inventory.
 
 **Актуальный UXP результат — 2026-10-08:** полное чтение44/44 pinned страниц
 завершено; 1448/1448 повторяемых property rows/method headings охвачены page review.
@@ -173,13 +183,17 @@ expression member inventory or runtime PASS.
 - [x] Review selected shared-platform setup/manifest/permissions/UI/file/network/
   storage/lifecycle/packaging workflows; explicitly preserve unpublished AE-specific
   setup/runtime mapping. This is scoped operation coverage, not all UXP Hub APIs.
-- [ ] Review current scripting/expression object/member changes and missing operation
-  recipes; distinguish ExtendScript, expression JS and UXP rather than porting by name.
+- [x] Reconcile pinned scripting648 headings (642 documented +6 research exclusions),
+  all32 expression and8 match-name pages, plus all73 runtime guide pages; preserve
+  language differences, source gaps and exact operation scope.
 - [x] Read current host/platform requirements/release notes from a verifiable official
   route; close the previous access gap and retain separate dates/runtime limits.
-- [ ] Audit source/recipe completeness against current API inventory, not just the
-  historical127 core menu entries. Overview L does not excuse a missing promised operation.
-- [ ] Final source/date/link/provenance sweep, tests/generated outputs and new freeze.
+- [x] Audit documented operations against the pinned source inventories and review
+  ledgers, beyond the historical127 core entries. The available source scope and
+  missing vendor/SDK contracts are explicit; this does not close unavailable headers.
+- [x] Complete final source/date/link/provenance reconciliation and the dated
+  source-completion supplement, with repository tests/generated outputs. Retain the
+  exact SDK archive task and unpublished vendor contracts as external gaps.
 
 First result: [AE UXP host operations](07-PANELS/03-UXP-HOST-API.md) now documents
 actual published entry/version/identity/Undo/creation/readback boundaries. It closes

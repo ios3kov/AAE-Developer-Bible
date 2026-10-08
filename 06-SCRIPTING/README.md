@@ -228,6 +228,8 @@ native SDK baseline.
 - [Object model](01-OBJECT-MODEL.md)
 - [ScriptUI](02-SCRIPTUI.md)
 - [Expressions vs scripts](03-EXPRESSIONS-VS-SCRIPTS.md)
+- [Runtime, данные и отладка](04-EXTENDSCRIPT-RUNTIME.md)
+- [BridgeTalk: взаимодействие между приложениями](../15-COMMUNICATION/05-SCRIPT-TO-AE.md#bridgetalk)
 - [Script → AE communication](../15-COMMUNICATION/05-SCRIPT-TO-AE.md)
 - [CEP → ExtendScript](../15-COMMUNICATION/06-CEP-TO-EXTENDSCRIPT.md)
 - [Panels](../07-PANELS/README.md)
