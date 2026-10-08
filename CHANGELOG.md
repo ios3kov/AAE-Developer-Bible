@@ -2,6 +2,9 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Reviewed6 official UXP settings/preferences/view/guide pages, added owned typed
+  persistence and bounded live-preview operations with index/renderer/source gaps.
+
 - Reviewed official UXP queue/item/collections: owned prepare-only operation,
   synchronous/asynchronous launch, status/error/AME and callback lifecycle boundaries.
 

@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 UXP preferences/settings/views:14/44 pages,164/1448 repeated rows;
+30 remain. Ownership/persistence/UI/render boundaries explicit, acceptance OPEN.
+
 2026-10-08 UXP queue block:8/44 pinned pages (124/1448 repeated rows/headings),36
 remain; prepare/launch lifecycle separated from output evidence and unresolved callbacks.
 

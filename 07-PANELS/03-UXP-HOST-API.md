@@ -279,6 +279,65 @@ installed/reachable/licensed. queueInAME(false) queues, true also starts process
 boolean enqueue isn't AME terminal render or exported file PASS. No queue/AME/output/
 callback/runtime observations executed in this source review.
 
+### Preferences/settings and live views — full pinned review2026-10-08
+
+Six full pages Preferences/Settings/Viewer/View/ViewOptions/GuideOptions read at
+official pin; ledger14/44 pages,164/1448 repeated rows/headings,30 pages remain.
+Host-side preference stores differ from shared UXP plugin storage and AEP project.
+
+Concrete plugin-only small UI setting: app.settings.haveSetting(ownedSection,key)
+→ getSetting String or explicit default → bounded schema/version/enum validation
+→ on deliberate user change saveSetting(ownedSection,key,String) boolean → readback.
+No arbitrary eval of stored text, password/token/private project snapshots, or assumed
+inter-plugin privacy. prefType optional file selector; specify intended host-provided
+enum when needed, not hardcode integer. Settings has **no deletion method documented**;
+no invented removeSetting or automatic Preferences-key deletion for another namespace.
+No copied ExtendScript byte limit/default-section-prefix guarantee at this pin.
+Persisted true/readback doesn't prove survive restart or portable across AE versions.
+
+Preferences typed access: havePref before getPrefAsBool/Float/Long/String; validate
+finite number, integer for Long and intended bounds/type. Explicit owned section/key/
+prefType; default machine-specific file is not project preference. savePrefAsBool/
+Float/Long/String and deletePref return boolean: snapshot **existence and typed value**
+before changing, restore value if existed or delete only newly created owned key.
+Missing isn't false/zero/default. Never change hidden security/GPU/cache prefs by
+guessing key names or treat preference change as Undo-able project mutation.
+saveToDisk/reload affect host preference-file state globally; source wording says
+restart otherwise needed, not a guarantee every host subsystem immediately reacts
+to reload. Obtain consent for global flush/reload and avoid overwriting concurrent
+user changes on restore; unknown outcome/error remains reported, not blind retry.
+
+Viewer active/focus and maximized are UI state, type numeric viewer role; views Array/
+numViews, activeViewIndex **index base unspecified in this UXP page**. Don't port
+ExtendScript1-based viewer index or general JS0-based assumption into setter wrapper.
+Retain object from deliberate supported openInViewer operation where possible, refresh
+after project/view close/reload and verify type. setActive boolean changes focus; not
+activeComp selection authority or render camera. View.options read-only reference to
+mutable ViewOptions, View.setActive boolean and stopPlayback boolean UI operations,
+not render-queue stop. No playback start or automatic camera selection API invented.
+
+Concrete qualified view command: use caller-resolved live View from validated viewer
+→ snapshot options.zoom/checkerboards/rulers/guidesVisibility/guidesLocked/guidesSnap
+→ set intended zoom1.0 (100%) and requested UI flags → readback → report changed
+view; restore only with explicit user policy and if same valid view still owned.
+zoom range0.01..16 normalized, not percent100; exposure changes display not exported
+pixel truth. channels numeric enum requires actual enum contract, not guessed RGBA
+IDs. fastPreview access throws in Layer/Footage viewer; draft prose specifically
+ray-traced and Classic3D error, not modern Advanced3D capability matrix. Retain dated
+renderer wording rather than claim universal draft support. No screenshot/color/
+render equality inferred from UI options or checkerboard visibility.
+
+GuideOptions color exactly3 finite0..1 RGB; orientation horizontal/vertical, position
+PIXEL/PERCENTAGE with finite constraints (host clamps ±100000px/±300%). Validate
+product bounds before setter instead of rely silent clamp. pinned anchors opposite
+edge (bottom/right), not frozen position/locked guide; guidesLocked view option
+different scope. Read getGuideAsObject before partial update and preserve other
+fields/units; positional overload moves pixel position while object form interprets
+positionType, opposite index argument order remains. No constructor/export signature
+for GuideOptions from this page: use returned supported object, not invented class.
+Expected guide UI state not rendered artifact. No preference/disk/reload/view/guide/
+UXP host runtime executed; index/enum/renderer gaps remain unresolved contracts.
+
 ## Identity, selection и invalidation
 
 [Project](https://developer.adobe.com/after-effects/uxp/after-effects-api/project)

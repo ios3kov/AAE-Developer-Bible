@@ -2,6 +2,15 @@
 
 ## Currentness continuation — 2026-10-08
 
+### UXP settings/preferences/views source review
+
+Parent `678b5d4`;6 full pinned pages read; ledger14/44 pages/164 repeated rows.
+No persistence/restart/preference/global flush/reload/view/guide/image/UXP runtime.
+Unspecified view index/enum/constructor and renderer contracts not synthesized.
+Results: scripts93/93, consistency11/11, docs checker and whitespace PASS;
+generated freshness/strict MkDocs checked before publication. Negative-fixture
+stale messages intentional, no host/CI evidence inferred.
+
 ### UXP render queue source review
 
 Parent `7c0f54c`;4 full official pinned queue/collection pages read; ledger8/44

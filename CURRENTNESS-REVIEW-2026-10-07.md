@@ -44,6 +44,11 @@ the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
 
+2026-10-08 official UXP prefs/settings/views block:6 full pages, ledger14/44 pages,
+164/1448 repeated rows/headings,30 remain. Namespaced typed settings/preference
+ownership and explicit live preview/guide operations; activeViewIndex base/enum/
+constructor/global persistence/renderer gaps retained, no runtime or image PASS.
+
 2026-10-08 official UXP queue block:4 full pages reviewed; ledger8/44 pages,
 124/1448 repeated rows/headings,36 pages remain. Prepare-only owned queue command,
 render versus renderAsync return contracts, global queue consent, status/lastError/
