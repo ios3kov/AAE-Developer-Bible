@@ -1,5 +1,12 @@
 # Changelog
 
+## Currentness continuation — 2026-10-08
+
+- Reconciled full scripting Application/Project pages: protected document switch/save,
+  Undo/error/task scope, settings domains, import/maintenance, Team Projects conflicts,
+  Watch Folder and next-render controls.96 documented members, ledger357/647;
+  research openFast/dirty and historical memory allocation limits not promoted.
+
 ## Completion reconciliation — 2026-10-07
 
 - Reconciled full Item/CompItem sources into identity/organization/guides, composition

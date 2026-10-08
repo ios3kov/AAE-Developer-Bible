@@ -4,6 +4,10 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 Application/Project full-page review adds96 documented members and
+lifecycle/settings/tasks/maintenance/Team Projects workflows. Ledger357/647;
+research exceptions and source contract gaps preserved, full acceptance still OPEN.
+
 Item/CompItem block adds49 documented headings: identity, deletion/guides, scoped
 composition presets and MOGRT save/export boundaries; ledger261/647. Research counter
 excluded and unspecified controller index base retained as implementation gap.

@@ -1,10 +1,20 @@
 {
   "source_revision": "7137a990db4bd8dc9f5869b8ca431c7dfed52bdc",
-  "review_date": "2026-10-07",
+  "review_date": "2026-10-08",
   "evidence": "DOCUMENTED / operation-design review; AE runtime NOT_RUN",
   "scope": "Explicitly named members only; not signatures/overloads of every object",
   "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
   "reviews": [
+    {
+      "source_path": "docs/general/application.md",
+      "operation": "Document lifecycle, bounded Undo/error/task scope, diagnostics, render policy and explicit Watch Folder; research openFast excluded",
+      "members": ["app.activate", "app.activeViewer", "app.availableGPUAccelTypes", "app.beginSuppressDialogs", "app.beginUndoGroup", "app.buildName", "app.buildNumber", "app.cancelTask", "app.disableRendering", "app.effects", "app.endSuppressDialogs", "app.endUndoGroup", "app.endWatchFolder", "app.executeCommand", "app.exitAfterLaunchAndEval", "app.exitCode", "app.findMenuCommandId", "app.fonts", "app.isRenderEngine", "app.isWatchFolder", "app.isoLanguage", "app.memoryInUse", "app.newProject", "app.onError", "app.open", "app.parseSwatchFile", "app.pauseWatchFolder", "app.preferences", "app.project", "app.purge", "app.quit", "app.restart", "app.saveProjectOnCrash", "app.scheduleTask", "app.setMemoryUsageLimits", "app.setMultiFrameRenderingConfig", "app.setSavePreferencesOnQuit", "app.settings", "app.version", "app.watchFolder"]
+    },
+    {
+      "source_path": "docs/general/project.md",
+      "operation": "Save/open protection, settings domains, inventory/import/maintenance and consent-based Team Projects collaboration; research dirty excluded; fonts covered separately",
+      "members": ["Project.activeItem", "Project.autoFixExpressions", "Project.bitsPerChannel", "Project.close", "Project.closeTeamProject", "Project.compensateForSceneReferredProfiles", "Project.consolidateFootage", "Project.convertTeamProjectToProject", "Project.displayStartFrame", "Project.expressionEngine", "Project.feetFramesFilmType", "Project.file", "Project.footageTimecodeDisplayStartType", "Project.framesCountType", "Project.framesUseFeetFrames", "Project.gpuAccelType", "Project.importFile", "Project.importFileWithDialog", "Project.importPlaceholder", "Project.isAnyTeamProjectOpen", "Project.isLoggedInToTeamProject", "Project.isResolveCommandEnabled", "Project.isShareCommandEnabled", "Project.isSyncCommandEnabled", "Project.isTeamProjectEnabled", "Project.isTeamProjectOpen", "Project.item", "Project.itemByID", "Project.items", "Project.layerByID", "Project.linearBlending", "Project.linearizeWorkingSpace", "Project.listColorProfiles", "Project.listTeamProjects", "Project.newTeamProject", "Project.numItems", "Project.openTeamProject", "Project.reduceProject", "Project.removeUnusedFootage", "Project.renderQueue", "Project.resolveConflict", "Project.revision", "Project.rootFolder", "Project.save", "Project.saveWithDialog", "Project.selection", "Project.setDefaultImportFolder", "Project.shareTeamProject", "Project.showWindow", "Project.syncTeamProject", "Project.timeDisplayType", "Project.toolType", "Project.transparencyGridThumbnails", "Project.workingGamma", "Project.workingSpace", "Project.xmpPacket"]
+    },
     {
       "source_path": "docs/item/item.md",
       "operation": "Project-scoped identity, owned organization/deletion and versioned guide model edits",

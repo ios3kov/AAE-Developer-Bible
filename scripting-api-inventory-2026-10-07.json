@@ -11,7 +11,9 @@
       "members": [
         {
           "name": "app.activate",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -65,7 +67,9 @@
         },
         {
           "name": "app.effects",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -102,7 +106,9 @@
         },
         {
           "name": "app.exitCode",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -112,7 +118,9 @@
         },
         {
           "name": "app.fonts",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -137,7 +145,9 @@
         },
         {
           "name": "app.newProject",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -149,12 +159,16 @@
         },
         {
           "name": "app.open",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
           "name": "app.openFast",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -191,7 +205,9 @@
         },
         {
           "name": "app.quit",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -258,7 +274,9 @@
       "members": [
         {
           "name": "Project.activeItem",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -273,7 +291,9 @@
         },
         {
           "name": "Project.close",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -298,12 +318,16 @@
         },
         {
           "name": "Project.dirty",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
           "name": "Project.displayStartFrame",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -318,7 +342,9 @@
         },
         {
           "name": "Project.file",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -395,7 +421,9 @@
         },
         {
           "name": "Project.item",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -405,7 +433,9 @@
         },
         {
           "name": "Project.items",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -479,7 +509,9 @@
         },
         {
           "name": "Project.revision",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -489,7 +521,9 @@
         },
         {
           "name": "Project.save",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -499,7 +533,9 @@
         },
         {
           "name": "Project.selection",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {

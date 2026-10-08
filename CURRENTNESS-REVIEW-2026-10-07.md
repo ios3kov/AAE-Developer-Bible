@@ -66,6 +66,17 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### Application/Project reconciliation — 2026-10-08
+
+Full pinned Application/Project pages read; downloaded SHA256 checked against
+inventory.96 additional documented headings transferred to lifecycle/save/settings,
+bounded scheduled jobs, external-script outcomes, destructive maintenance, explicit
+Team Projects collaboration and Watch Folder operation guidance. Research openFast/
+dirty excluded. Source type/enum/example conflicts and missing prior-policy getters
+retained explicitly; historical memory-limit prose not promoted to modern RAM model.
+Ledger357/647,290 headings without documented-member reconciliation (includes research
+exceptions). No AE/save/cloud/watch/render runtime or release matrix observed.
+
 #### Item/CompItem reconciliation
 
 Full Item/CompItem pages read at pinned revision; downloaded bytes match inventory
