@@ -2,6 +2,9 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Reviewed4 expression math/color pages: bounded interpolation, safe vector/angle
+  operations and normalized RGBA/HSLA/hex workflows. Ledger9/32 pages,75/295 headings.
+
 - Added reproducible pinned expression inventory and explicit full-page review ledger;
   property animation/marker trigger/loop/sampling and typed path/arc-follow operations.
   5/32 pages reviewed (52/295 headings), no automatic or runtime PASS.

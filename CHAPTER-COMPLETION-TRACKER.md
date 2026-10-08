@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 expressions math/color:9/32 full pages reviewed (75/295 headings),23 remain;
+typed remap/vector/color operations added, no installed-host result inferred.
+
 2026-10-08 expression inventory32 pages/295 headings;5 full-page operation reviews
 (52 headings) pinned/hash checked,27 pages remain. Property/path workflows supplied;
 expanded acceptance OPEN, source ambiguities retained without runtime claims.

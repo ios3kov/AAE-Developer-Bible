@@ -2,6 +2,14 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Expression interpolation/vector/color/angle review
+
+Parent `68541b5`;4 full pinned pages read/hash checked, explicit ledger9/32 pages
+(75/295 headings). No math/color/orientation/image/AE runtime executed. Repository
+checks are source/design integrity only, not complete API or color-management PASS.
+Results: scripts90/90, consistency11/11, checker/9 source hashes, generated
+freshness, strict MkDocs and whitespace PASS. No CI/host runtime inferred.
+
 ### Expression inventory and property/path review
 
 Parent `ab8eb69`; full Property/Path Property pages read;5 reviewed-page hashes checked

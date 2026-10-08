@@ -44,6 +44,11 @@ the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
 
+2026-10-08 expression math/color block:4 full pages read/hash checked; ledger9/32
+pages (75/295 headings),23 pages remain. Bounded remap, vector shape/zero-length,
+world orientation and normalized color/hex policies supplied. Malformed rgbToHsl
+and mismatched clamp example preserved as source discrepancies; no runtime PASS.
+
 2026-10-08 expression property/path block: independent inventory32 pages/295 headings
 (overloads retained),5 explicitly full-page reviews/52 headings,27 pages unreviewed.
 Added marker trigger/count/pre-first gates, versioned next/previousKey, qualified
