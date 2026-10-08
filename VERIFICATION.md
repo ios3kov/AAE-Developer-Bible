@@ -2,6 +2,15 @@
 
 ## Currentness continuation — 2026-10-08
 
+### UXP render queue source review
+
+Parent `7c0f54c`;4 full official pinned queue/collection pages read; ledger8/44
+pages,124 repeated rows/headings. No render/callback/AME/decode/host executed;
+callback payload/order/unsubscribe/reentrancy contract gaps retained.
+Results: scripts93/93, consistency11/11, docs checker and whitespace PASS;
+generated freshness and strict MkDocs checked before publication. No CI/host result
+inferred; negative-fixture stale diagnostics intentional.
+
 ### Official pinned UXP inventory and media/output review
 
 Parent `a9f9598`; published HTML source link verified, official repository revision

@@ -217,6 +217,68 @@ Prepared settings/true return/output path isn't successful render: completion st
 decoded files/time/frame coverage and requested color/audio settings require actual
 render evidence. No media import/relink/proxy/output/UXP host execution in this review.
 
+### Render queue preparation and lifecycle — full pinned review2026-10-08
+
+RenderQueue/RenderQueueItem/RQItemCollection/OMCollection full pages at official pin
+read; ledger now8/44 pages,124/1448 rows/headings,36 pages remain. All reviewed
+members27.0. Queue contains **all** user items: render() isn't scoped to newly added
+item, so don't trigger unattended queue-wide side effects as part of import/setup.
+
+Concrete prepare-only command, from validated current CompItem and idle queue:
+queue.items.add(comp) → keep returned owned item, not stale index → choose available
+Render Settings template/applyTemplate boolean → explicitly set valid timeSpanStart/
+timeSpanDuration seconds and skipFrames0 → configure owned outputModule(1) under
+previous section → verify settings/path/time → set item.render=false until user
+separately approves queue launch. Setting render false unqueues item, true queues;
+status itself read-only. Validation occurs before mutation; failure can leave created
+item, report it, don't silently delete existing user queue entries or retry add.
+New output modules via item.outputModules.add(), refresh length and1-based
+getByIndex, never append array or confuse project collection. Last module removal
+throws. remove RenderQueueItem removes queue entry, not composition/file; changing
+comp requires explicit delete/new item, not assignment to read-only comp.
+
+Render item inspector covers comp/comment/logType/numOutputModules/outputModules/
+queueItemNotify/skipFrames/startTime/status/templates/timeSpan/render. startTime
+table Number versus description day/time or null isn't documented JS Date schema:
+preserve raw diagnostic, no invented epoch conversion. elapsedSeconds render cost,
+not frame coverage. skipFrames0..99 changes frame sampling (1 every other frame),
+not output duration. Notification flags at item/queue level external user policy,
+not output success. getSettings(format) selects STRING/NUMBER and SETTABLE subset;
+setSetting signature String contradicts prose string-or-number: prefer declared String
+or explicit setSettings object and qualify target. setSettings boolean isn't atomic
+all-fields rollback; read actual affected values. saveAsTemplate persistent local
+change separate from project-only edits. duplicate DONE becomes QUEUED: immediately
+review/unqueue owned duplicate to prevent accidental extra render.
+
+Launch policy: user sees **every queued item**, requested frame ranges, outputs,
+overwrite/missing-media concerns before explicit approval. queue.rendering true means
+in-progress **or paused**, not terminal failure. render(skipCheck=false) synchronous
+void until complete; no boolean-success gate. renderAsync(skipCheck=false) boolean
+launch result, **not Promise/completed file evidence**. Default false retains missing-
+source check; true intentional degraded missing-footage render, not recovery repair.
+pauseRendering(true/false) and stopRendering boolean commands don't instantly prove
+all files finalized or interrupted output cleaned. showWindow boolean only UI action.
+
+RenderQueueItem.onStatus/onComplete/onReorder are callback registration methods,
+not ExtendScript string onstatus field. Varargs callback contract doesn't describe
+payload, order, exactly-once, thread, unsubscribe/removal, or plugin-reload lifetime.
+Don't invent event listener return disposer or null-unregister. Before shipping
+interactive observer, resolve these gaps. With qualified registration, use generation
+gate and re-read actual item status; stale UI suppression never cancels host render.
+Blocking render doc suggests pause/stop from status/app.onError callback, but absence
+of full reentrancy contract means no arbitrary project mutation during callbacks.
+No mandatory all-example host testing added; missing delivery contract remains visible.
+
+Terminal status must inspect actual enum (DONE/ERR_STOPPED/USER_STOPPED versus
+QUEUED/UNQUEUED/NEEDS_OUTPUT/RENDERING/WILL_CONTINUE), then validate decoded output
+files/requested coverage. onComplete invocation alone not DONE guarantee. lastError
+session-only most recent failed render, can be stale relative requested operation;
+empty string isn't positive success evidence. Record before/after context without
+clearing undocumented field. canQueueInAME means queued AE items exist, not AME
+installed/reachable/licensed. queueInAME(false) queues, true also starts processing;
+boolean enqueue isn't AME terminal render or exported file PASS. No queue/AME/output/
+callback/runtime observations executed in this source review.
+
 ## Identity, selection и invalidation
 
 [Project](https://developer.adobe.com/after-effects/uxp/after-effects-api/project)

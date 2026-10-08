@@ -44,6 +44,11 @@ the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
 
+2026-10-08 official UXP queue block:4 full pages reviewed; ledger8/44 pages,
+124/1448 repeated rows/headings,36 pages remain. Prepare-only owned queue command,
+render versus renderAsync return contracts, global queue consent, status/lastError/
+AME and callback lifecycle gaps documented. No render/AME/output/runtime PASS.
+
 2026-10-08 official AE UXP source pinned at7d1cd01b4c69a9e02b77d48b3f919a6145a90841
 (AdobeDocs/uxp-after-effects, linked from published HTML). Inventory44 pages (43
 objects + index)/1448 repeated property rows and method headings, not unique symbols.

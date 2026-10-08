@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 UXP queue block:8/44 pinned pages (124/1448 repeated rows/headings),36
+remain; prepare/launch lifecycle separated from output evidence and unresolved callbacks.
+
 2026-10-08 official UXP inventory44 pages/1448 repeated rows/headings;4 pinned
 full reviews/79 rows,40 pages remain. Import/media/output operations supplied;
 published27.0 versus availability and source-contract gaps retained, acceptance OPEN.

@@ -2,6 +2,9 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Reviewed official UXP queue/item/collections: owned prepare-only operation,
+  synchronous/asynchronous launch, status/error/AME and callback lifecycle boundaries.
+
 - Added official pinned AE UXP inventory and explicit review ledger; reviewed
   ImportOptions/FileSource/FootageItem/OutputModule operations, language-specific
   sequence contracts and retained constructor/type/access discrepancies.
