@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 Layer/LayerCollection full-page review adds49 documented members:
+creation/parenting/timing/structural edits/presets/detection/guides; ledger406/647.
+
 2026-10-08 Application/Project full-page review adds96 documented members and
 lifecycle/settings/tasks/maintenance/Team Projects workflows. Ledger357/647;
 research exceptions and source contract gaps preserved, full acceptance still OPEN.

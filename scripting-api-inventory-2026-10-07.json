@@ -1395,7 +1395,9 @@
         },
         {
           "name": "Layer.id",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -1510,7 +1512,9 @@
         },
         {
           "name": "Layer.time",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         }
       ]
@@ -2615,7 +2619,9 @@
         },
         {
           "name": "PropertyBase.propertyIndex",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {

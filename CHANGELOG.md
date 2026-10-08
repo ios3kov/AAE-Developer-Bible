@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Reconciled Layer/LayerCollection construction and structural workflows: source
+  ownership, timing, parenting, copy/reorder/precompose, selection-sensitive presets,
+  scene detection and layer-view guides.49 members, ledger406/647; no runtime claim.
+
 - Reconciled full scripting Application/Project pages: protected document switch/save,
   Undo/error/task scope, settings domains, import/maintenance, Team Projects conflicts,
   Watch Folder and next-render controls.96 documented members, ledger357/647;

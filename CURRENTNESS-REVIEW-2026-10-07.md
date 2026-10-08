@@ -66,6 +66,15 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### Layer/LayerCollection reconciliation — 2026-10-08
+
+Full pinned pages read, SHA256 matches inventory.49 documented members transferred
+to typed creation, source ownership, timing/parenting/reordering, copy/duplicate,
+precompose/preset/detection and layer-view guide recipes. Dated copy/Undo crash warning
+retained without inventing a current-host result. Ledger406/647;241 headings remain
+without explicit documented reconciliation. No layer creation/copy/precompose/runtime
+performed; coordinate conversion/AVLayer contracts remain separate next review.
+
 #### Application/Project reconciliation — 2026-10-08
 
 Full pinned Application/Project pages read; downloaded SHA256 checked against

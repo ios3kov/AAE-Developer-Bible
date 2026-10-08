@@ -2,6 +2,15 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Layer/LayerCollection structural operation source review
+
+Parent `e599563`;2 pinned pages fully read and source hashes match inventory.
+49 members added. No copy/Undo, preset, detection, parenting/precompose or AE runtime
+executed. Standard scripts/consistency/checker, regenerated inventory/freshness,
+strict MkDocs and whitespace validation accompany this source-design block.
+Results: scripts86/86, consistency11/11, checker, inventory49/647, generated
+freshness, strict MkDocs and whitespace PASS. No compiler/host PASS inferred.
+
 ### Application/Project lifecycle and collaboration source review
 
 Parent `6e2158e`; both pinned pages read in full; source SHA256 matches inventory.

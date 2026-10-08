@@ -66,6 +66,98 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Layer construction and structural edits — review2026-10-08
+
+Full pinned [Layer](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/layer/layer.md)
+and [LayerCollection](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/layer/layercollection.md)
+pages read. DOCUMENTED/source workflows, not executed layer operations.
+
+Concrete creation: validate CompItem/current project and requested type → begin Undo
+→ create via typed collection method → retain returned layer plus newly created
+project sources → set explicit timing/transform/content → read back → report created
+identities and partial outcome. add(item,duration) duration applies only to still
+footage, not movie/sequence/audio, and creation honors user start-time preferences.
+Never infer startTime/inPoint/outPoint solely from constructor arguments.
+
+| Constructor | Required practical distinction |
+|---|---|
+| addSolid | Creates SolidSource + project FootageItem + AVLayer. RGB0..1, width/height4..30000, PAR0.01..100. Layer removal doesn't promise source cleanup; remove only owned unreferenced source |
+| addNull | Returns AVLayer representing null, with optional still duration; nullLayer observation isn't proof tool ownership |
+| addShape | Empty ShapeLayer, not automatically a visible shape/fill/stroke; explicitly add vector groups/content and reacquire indexed properties |
+| addText/addBoxText | Horizontal point/paragraph text; String or TextDocument for point source, finite positive box dimensions under product policy; explicitly style/commit/preflight fonts |
+| addVerticalText/addVerticalBoxText |24.2+, initial VERTICAL_RIGHT_TO_LEFT orientation; not interchangeable with rotating horizontal text |
+| addCamera/addLight | Name and2D centerPoint; camera Point of Interest z initially0. Establish actual transform/type/options deliberately, not assume centerPoint is full3D position |
+| addParametricMesh |26.3+, validated MeshType; use mesh recipe above and qualify renderer separately |
+
+Layer.id (22.0+) survives save/reopen but is reassigned on project import. Store project
+context and containingComp identity; index1..numLayers changes on structural edits,
+PropertyBase.propertyIndex on Layer is undefined. byName returns first/topmost match
+or null; never use duplicate display names as stable identity. isNameSet distinguishes
+explicit name from source-derived (always true without source); it isn't an ownership
+marker. comment/label0..16 are metadata, not behavior/custom RGB. locked is user edit
+intent: don't silently unlock targets. selectedProperties can contain groups as well
+as leaf values. marker may be null; use marker commit recipe after checking.
+
+Timing plan: snapshot startTime/inPoint/outPoint/stretch → validate finite requested
+seconds/range and reverse-time policy → apply deliberate timing edits → read all fields
+again. start/in/out ranges are±10800 seconds, stretch percentage±9900; near-zero
+positive/negative magnitudes clamp to±1 per source. Reject zero stretch as product
+policy rather than invent useful zero-rate behavior. Layer.time is read-only current
+**composition** time; not source time. Time remap must be handled separately. shy
+affects Timeline display; solo affects evaluation with other solo layers. hasVideo
+means eyeball switch exists, not rendered pixels. activeAtTime checks enabled/solo/
+in-out gates, not masks/opacity/occlusion/image visibility. autoOrient chooses enum
+policy: per-character camera facing requires per-character3D text; don't impose it
+on every layer type. Verify requested rendering behavior independently.
+
+Parent command: same-comp child/parent → reject self/ancestor cycle under product
+policy → snapshot transforms and parent → choose **preserve apparent pose** via
+parent assignment (compensating transform values), or **preserve local numeric values**
+via setParentWithJump (possible visible jump) → read back parent/transforms and inspect
+relevant times. setParentWithJump() without argument removes parent. Neither simple
+description proves every animated pose across time is preserved; don't silently
+reparent an animated rig claiming exact all-frame equivalence.
+
+Reorder command: resolve owned layer and same-comp anchor by identity → moveBefore/
+moveAfter or moveToBeginning/moveToEnd → reread indices/order and dependent matte/
+expression relationships. Returns nothing, not success boolean. remove deletes layer,
+not its project source; re-resolve remaining indices. duplicate returns new Layer
+without changing UI selection; track returned identity, don't infer selection moved.
+copyToComp returns nothing and prepends copy at destination.layer(1), shifting all
+old indices. Capture destination state and validate resulting first layer; don't
+reuse old target indices or blindly retry. Source retains dated13.6 parent-crash fix
+and13.7 effect-copy Undo crash warning; neither current-host safety nor current-host
+crash was tested here. Offer qualified-build copy path, not universal Undo-safe promise.
+
+Precompose command: fresh intended same-comp layer identities → resolve unique current
+indices immediately before call → confirm moveAllAttributes and resulting structure
+→ precompose(indices,name,flag) → record returned CompItem/new parent-comp structure
+→ inspect timings/parenting/mattes/expressions/dependencies → report. false is allowed
+only for one layer; default true moves attributes into new comp. Operation moves
+original layers and creates new comp/instance; not a recursive project-media copy.
+An exception can leave structural change; no index-based blind rollback/retry.
+
+applyPreset(File) applies to **currently selected layers of receiver's comp**, not
+necessarily receiver; no selection creates a new solid. Concrete safe command:
+choose trusted existing .ffx → snapshot selection → explicitly select intended bounded
+targets and deselect others → apply once → inspect changes/new effects/keyframes
+→ restore selection in finally only for still-existing layers → report separately.
+Do not apply once per selected receiver (would reapply to whole selection repeatedly).
+Preset isn't read-only data or safe to apply without mutation consent.
+
+doSceneEditDetection (22.3+) rejects non-video/time-remapped video. Choose NONE for
+detection-only array of **composition-time** seconds; MARKERS/SPLIT/SPLIT_PRECOMP
+mutate respective structures. Snapshot ownership/timing, confirm mode, inspect output
+array and new objects; detected cuts aren't ground-truth correctness or frame-delivery
+evidence. Relist after splits/precomps instead of continuing stale layer indices.
+
+Layer guides use same model contract as Item guides, but in **layer view**: guides
+array0-based, addGuide returns index, removal shifts higher indices, positional
+setGuide(position,index) reverses object overload setGuide(index,options). Full-state
+getGuideAsObject and units/color/pinning require26.5; preserve enum version boundary
+and finite pixel clamp±100000. These methods don't set comp guide visibility or
+render an overlay. Use guide recipe above on the intended layer, not its source Item.
+
 ### Application/project lifecycle: protect the current document
 
 Reviewed2026-10-08, full pinned
