@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 expressions continuation pins independent source and reviews3 full pages:
+coordinates/time/random operation recipes; expression inventory remains OPEN.
+
 2026-10-08 pinned scripting DOM heading partition complete:642 documented +6 explicit
 research exclusions /648, with regression guard. Expanded full/current acceptance OPEN;
 expressions/native/UXP and retained source-contract gaps aren't closed by this count.

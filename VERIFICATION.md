@@ -2,6 +2,15 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Expression coordinates/time/random source review
+
+Parent `337216e`;3 full expression pages read at independent pinned revision
+`a5c5c5066d0395239d524510ace060963f5c0d33`. No expression/coordinate/time/random AE
+execution; example numeric outcomes declared expectations only. Repository checks
+below validate source/doc integrity, not complete expression coverage or render PASS.
+Results: scripts88/88, consistency11/11, docs checker, generated freshness, strict
+MkDocs and whitespace PASS. Negative-fixture stale diagnostics intentional.
+
 ### Pinned DOM classification closure
 
 Parent `5dacbed`; full ImportOptions source read/hash checked. Ledger partitions648

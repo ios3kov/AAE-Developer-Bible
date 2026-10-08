@@ -44,6 +44,13 @@ the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
 
+2026-10-08 expression continuation: pinned reference revision
+`a5c5c5066d0395239d524510ace060963f5c0d33`; full transforms/time/random pages read.
+Practical3D parent-space follow, point/vector/surface distinctions, time offset/
+rounding and random lifetime policies added to expressions chapter. Source example
+toWorldVec/toWorld discrepancy retained. This is3-page scoped review, not complete
+expression member inventory or runtime PASS.
+
 - [ ] Obtain lawful current SDK archive/version/build; record hash and full
   headers/utilities/sample/tool/resource diff against25.6. Do not distribute SDK.
 - [ ] Reconcile all published native families/members, including new26.5 APIs and

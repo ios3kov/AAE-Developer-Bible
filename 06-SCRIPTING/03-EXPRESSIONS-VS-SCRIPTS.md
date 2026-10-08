@@ -4,6 +4,102 @@ Scripts and expressions both use JavaScript-like syntax, but they occupy differe
 
 ## Core distinction
 
+## Practical expression contracts — reviewed2026-10-08
+
+Pinned expression-reference revision
+[`a5c5c5066d0395239d524510ace060963f5c0d33`](https://github.com/docsforadobe/after-effects-expression-reference/tree/a5c5c5066d0395239d524510ace060963f5c0d33).
+Full [layer-space transforms](https://github.com/docsforadobe/after-effects-expression-reference/blob/a5c5c5066d0395239d524510ace060963f5c0d33/docs/layer/layer-space-transforms.md),
+[time conversion](https://github.com/docsforadobe/after-effects-expression-reference/blob/a5c5c5066d0395239d524510ace060963f5c0d33/docs/general/time-conversion.md),
+[random numbers](https://github.com/docsforadobe/after-effects-expression-reference/blob/a5c5c5066d0395239d524510ace060963f5c0d33/docs/general/random-numbers.md)
+read; source designs only, no AE expression evaluation observed. The separate
+scripting648-heading partition does not count these expression members.
+
+### Coordinates: position, direction and projected surface aren't interchangeable
+
+Expression toComp/fromComp and toWorld/fromWorld transform **points**; corresponding
+Vec methods transform **directions**. All take optional sample time defaulting to
+time. Comp/world coincide for2D, but3D comp space camera-relative versus camera-
+independent world. Don't feed parent-space position directly into a purported world
+conversion. Concrete3D target-follow expression on follower Position:
+
+~~~javascript
+var target = thisComp.layer("Bible Target");
+var p = target.toWorld(target.anchorPoint, time);
+hasParent ? parent.fromWorld(p, time) : p;
+~~~
+
+Product-controlled name must resolve; qualify follower3D status, parent transform,
+random seeks/animation and missing-target policy. This uses target's anchor, not its
+parent-space position. Expression returns value for this property, not mutating rig.
+For layer-space points through two layers use destination.fromWorld(source.toWorld(p,t),t)
+with same time; different comp contexts aren't automatically compatible world origins.
+Direction conversion uses toWorldVec/fromWorldVec (or comp equivalents), no translation;
+zero vector/nonuniform scale need explicit normalization policy. Source toWorldVec
+example mistakenly calls toWorld on point difference; use method contract, not that
+example. Don't promise perspective toCompVec acts like screen-space point difference
+at every depth without qualification.
+
+fromCompToSurface projects onto3D layer's zero-z plane via active camera and returns
+2D layer point: useful for effect point controls. It isn't arbitrary geometry ray
+intersection, a2D-layer helper, or identical to fromComp. Degenerate camera/plane
+cases aren't detailed in page: expose errors/unsupported input rather than invented
+fallback intersection. These expression methods are not AVLayer scripting's current-
+time/first-character sourcePointToComp or compPointToSource; no API by-name porting.
+
+### Frame conversion and timecode: display offsets and rounding
+
+framesToTime(frames,fps) accepts fractional frames and returns seconds; timeToFrames
+returns integer with policy: absolute rounds toward negative infinity, duration
+away from zero. Defaults use time+thisComp.displayStartTime and comp fps, so a bake/
+sampling tool must pass intended time explicitly rather than accidentally include
+display offset. At24fps, declared expectations: timeToFrames(-0.01,24,false)=-1;
+timeToFrames(0.01,24,true)=1; framesToTime(0.5,24)=1/48. These aren't executed assertions
+or proof exact floating-point boundary parity. Quantization means conversions aren't
+universal inverses for fractional inputs.
+
+Concrete Source Text time label:
+
+~~~javascript
+timeToCurrentFormat(time + thisComp.displayStartTime,
+                    1 / thisComp.frameDuration, false, thisComp.ntscDropFrame);
+~~~
+
+For elapsed duration pass elapsed seconds and true, not display start. Return String
+is display, not authoritative timebase/EDL interchange. timeToTimecode defaults base30,
+not automatic comp fps; timeToNTSCTimecode separate NTSC/drop-frame formatting.
+timeToFeetAndFrames explicit fps/framesPerFoot (default16) for film display, not media
+frame rate detection. Drop-frame skips numbering, not source frames or retime; explicit
+ntscDropFrame argument for timeToCurrentFormat introducedCS5.5. Check negative times,
+nonzero display start, fractional fps and chosen display policy independently.
+
+### Randomness: repeatable evaluation isn't persistent identity
+
+seedRandom(offset,true) removes time from seed, not layer/property identity. Concrete
+static per-property opacity variation:
+
+~~~javascript
+seedRandom(123456, true);
+random(20, 80);
+~~~
+
+Expected bounded20..80 and stable over time for same qualified layer/property/context;
+not identical across duplicate/import/host versions. Default seed includes unique
+layer identifier, property, time and offset. Changing offset controls sequence and
+wiggle initial value; doesn't establish same random stream across independent
+properties. For persistent product values across migration generate/store values
+in owned controls under script policy instead of treating seed as external database ID.
+
+random(max) scalar/array gives0..max; two-bound array variant pads smaller dimension
+with zeros. Validate matching vector shapes in product code rather than silently
+accept unintended padding. gaussRandom bounds contain approximately90%, **not clamp**:
+choose explicit bounded output policy if used for opacity/size. noise(scalar or2/3D
+array) returns scalar -1..1 correlated Perlin signal, not vector per input component.
+For smooth rotation perturbation use value + amplitude*noise(time*frequency), with
+explicit amplitude/range expectations; not random global counter or sampling-order
+state. random historical CS6/CC layer-ID behavior change means same seed text isn't
+a cross-version bit-identical delivery guarantee. Full wiggle/property contract and
+remaining expression pages require separate review, not credited by this block.
+
 **Script**
 
 ~~~text

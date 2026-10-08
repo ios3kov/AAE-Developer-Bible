@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Added pinned expression transforms/time/random full-page operation review: parent-
+  space3D follow, point/vector/surface distinctions, explicit timecode/rounding and
+  random identity/lifetime boundaries; source example discrepancy retained.
+
 - Closed pinned scripting DOM heading classification:642 documented plus6 explicit
   research-only exclusions out of648. Added exhaustive/disjoint ledger regression;
   ImportOptions research clipping/numbering kept outside supported baseline.
