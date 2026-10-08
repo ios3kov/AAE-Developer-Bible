@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 full Property page adds59 documented members: typed values/keys/dropdowns,
+Essential Properties/media and cycle-safe stage links. Ledger579/648; no runtime PASS.
+
 2026-10-08 text-range full pages reconcile remaining18 members; mixed-value editing,
 independent accessors and recomposition boundaries supplied. Ledger520/648.
 

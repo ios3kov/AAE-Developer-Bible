@@ -66,6 +66,125 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Property values, key snapshots and controllers — full review2026-10-08
+
+Full pinned [Property](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/property.md)
+read. This completes remaining member-heading reconciliation, supplementing earlier
+typed commit/keyframe recipes; no installed-host animation or controller execution.
+
+Concrete value inspector: resolve leaf by layer identity/typed path and current
+propertyIndex → propertyValueType → canVaryOverTime/canSetExpression/isSpatial →
+numKeys/expressionEnabled/isTimeVarying → requested-time sample → bounded report.
+value is evaluated at current time, not always underlying static data; numKeys=0
+doesn't imply static if expression enabled. unitsText is descriptive UI units, not
+machine-readable dimensional conversion. hasMin/hasMax guard minValue/maxValue reads
+(otherwise throw); no bound flag doesn't prove arbitrary values safe. propertyValueType
+listed writable has no documented type-conversion operation: use as discriminator.
+
+| Value kind | Commit policy |
+|---|---|
+| OneD/TwoD/ThreeD and spatial variants | Exact finite scalar/vector shape; isSpatial distinguishes geometry from quantitative vectors |
+| COLOR | Four components per source, separate from three-component TextDocument colors; don't transfer schemas blindly |
+| LAYER_INDEX/MASK_INDEX | Current integer index,0 means none; resolve identity immediately before write and recheck after structural edit |
+| SHAPE/MARKER/TEXT_DOCUMENT | Typed object with explicit detached edit/commit and ownership rules from respective recipes |
+| NO_VALUE/CUSTOM_VALUE | No generic numeric setter or JSON round-trip promised; skip unsupported adapter with diagnostic |
+
+Separated inspector branches isSeparationLeader/dimensionsSeparated versus
+isSeparationFollower. Followers expose separationLeader and zero-based
+separationDimension, unlike propertyIndex/key indices. Reacquire followers after
+separation changes; don't write leader vectors and follower scalars interchangeably.
+Expression edit gates canSetExpression, snapshots source/enabled state, writes trusted
+expression, checks expressionError and expressionEnabled, then samples intended times.
+Re-enabling requires valid nonempty expression; successful compile isn't all-time
+evaluation/visual correctness. Don't evaluate untrusted expression text to inspect it.
+
+Concrete animation snapshot: enumerate1..numKeys → keyTime/keyValue → incoming/outgoing
+interpolation and temporal ease → temporal auto/continuous flags → spatial tangents/
+auto/continuous/roving only for spatial type → label22.6+ and selection → bounded typed
+record. Marker comment overload of keyTime/keyValue can throw when missing; duplicate
+comments aren't documented unique IDs, use indexed enumeration. Selection uses
+selectedKeys/keySelected and setSelectedAtKey; labels0..16 via keyLabel/setLabelAtKey
+are UI metadata, not custom RGB, ownership or render behavior.
+
+Restoration command: validate destination type/key capability and explicit replace
+consent → create values at intended times (addKey returns index but does not supply
+requested value; setValueAtTime or setValueAtKey still needed) → resolve fresh indices
+→ set supported interpolation/ease/tangents → deliberate auto/continuous policies
+→ roving interior spatial keys only → reread **all times** after roving → restore
+selection/labels only on qualified versions → sample representative motion and report.
+First/last roving request is ignored; nonspatial throws. Don't use changing index as
+permanent key identity or claim Undo guarantees complete error rollback.
+
+Spatial auto-Bezier is meaningful with spatial continuity. Temporal auto/continuous
+getter descriptions require both in/out BEZIER; temporal auto setter instead mentions
+keySpatialContinuous, conflicting with getters and nonspatial use. Preserve this
+source discrepancy: don't impose a spatial-only gate on all temporal properties or
+promise every flag restores exact motion. Set explicit intended interpolation,
+read back flags/ease/tangents and qualify motion; manual and auto modes need separate
+policies. Omitted out interpolation/tangent/ease copies incoming value per source;
+asymmetric curves require both arguments.
+
+### Dropdown replacement: strings and indices need separate migration
+
+17.0.1+ isDropdownEffect identifies editable Menu of Dropdown Menu Control, not every
+effect enum popup. setPropertyParameters overwrites entries and returns **updated
+Property**; use returned/reacquired handle, not assumed old handle lifetime. Validate
+nonempty unique Strings, no backslash; separator "(-" consumes an index. Source's
+code-page warning means arbitrary Unicode menu labels aren't portable merely because
+ExtendScript Strings support Unicode.26.0+ propertyParameters gives item Strings,
+valueText current selected text for dropdowns; getters cover more dropdown properties
+than this setter, not an authorization to edit all popup definitions.
+
+Concrete menu migration: snapshot old entries (26.0+ getter or known owned definition),
+key/static numeric selections and dependent expression mapping → explicit old-to-new
+index/semantic map including separators → replace once → remap only owned values/
+keys/expressions → getter/valueText readback and report. Numeric index unchanged can
+mean different item after reorder; duplicate retry can destroy mapping evidence.
+On older hosts without getter don't promise arbitrary user's menu backup/restore.
+
+### Essential Properties and alternate media: registration versus instance edit
+
+Property.canAddToMotionGraphicsTemplate supports checkbox/color/single numeric slider/
+Source Text, subject to eligibility and already-added state; not every leaf value.
+15.0+ addToMotionGraphicsTemplate /16.1+ As(comp,name) return boolean and may warn.
+Choose intended comp/name → eligibility check → explicit add → inspect EGP state/count
+→ report; even preflight page mentions warnings, so don't promise silent discovery.
+Registering a controller isn't MOGRT export or consumer validation.
+
+22.0+ essentialPropertySource returns original Property or AVLayer for media control,
+null for non-Essential Property. Branch actual type before edits: changing original
+source may affect shared instances, unlike intended instance override. Source's
+read/write object wording isn't a documented setter to rebind this origin link.
+18.0+ media instance edit: resolve intended Essential Property → canSetAlternateSource
+→ validate candidate AVItem.isMediaReplacementCompatible and cycles/dependencies →
+setAlternateSource(candidate) → alternateSource readback → qualify render. null getter
+can mean unset **or unsupported**; use capability flag. Setter returns nothing and
+documents AVItem input, not null reset; don't invent clearing API from nullable getter.
+Unset uses original media, while alternate source changes rendering without ordinary
+AVLayer source replacement. Output/consumer compatibility still requires qualification.
+
+###26.5 layer-input render stages: late cycle checks
+
+Only LAYER_INDEX properties expose inputLayerAndStage [layerIndex,stageIndex],
+layerInputStage and methods; other property types throw. Namespace is on property:
+LayerInputStageType.SOURCE=0, ALL_EFFECTS=-1, ONLY_MASKS=-2. Negative sentinels aren't
+ascending numeric render order or arbitrary effect indices.
+
+Concrete same-source stage command: resolve current property/source → obtain fresh
+getInputStageCycleSafeLimit immediately before edit → compare semantic stage policy,
+not numeric <= → choose supported safe stage → setLayerInputStage → read pair/check
+limit and qualify rendering. SOURCE always safe. Adding/removing/reordering effects
+or source change invalidates previous limit; stage readback isn't graph-wide proof.
+
+Changing both source/stage uses setInputLayerAndStage(currentLayerIndex,stage) as
+single Undo step,0 no source. Current-source limit isn't proof prospective source
+safe: use SOURCE for conservative new link, reread limit before subsequent stage
+edit, and explicitly report two-step workflow; don't label it atomic final-stage
+assignment. If target-state safety established separately, paired setter is documented
+atomic source/stage update. No rollback-all-side-effects or preflight API accepting
+prospective layer is described. Resolve indices after any structural change and never
+reuse25.6 native declarations to claim exact26.5 stage ABI verification.
+
 ### Character/paragraph/composed-line accessors — full review2026-10-08
 
 Full pinned [CharacterRange](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/text/characterrange.md),

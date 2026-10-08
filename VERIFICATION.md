@@ -2,6 +2,15 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Full Property operation review
+
+Parent `7adb94f`; full pinned page read, source hash matched inventory.59 remaining
+headings recorded; no keyframe/dropdown/Essential Property/stage host execution or
+exact26.5 headers verified. Local source/design checks reported separately below.
+Results: scripts87/87, consistency11/11, docs checker, source hash, inventory49/648,
+generated freshness, strict MkDocs and whitespace PASS. Negative consistency fixtures
+intentionally print stale diagnostics; generated outputs were regenerated and checked.
+
 ### Character/paragraph/composed-line source review
 
 Parent `1b962fa`;3 full pinned pages read/hash checked.18 remaining headings recorded;

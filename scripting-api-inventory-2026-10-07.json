@@ -677,7 +677,9 @@
         },
         {
           "name": "AVItem.isMediaReplacementCompatible",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {
@@ -2171,7 +2173,9 @@
         },
         {
           "name": "Property.canAddToMotionGraphicsTemplate",
-          "literal_mentions": [],
+          "literal_mentions": [
+            "06-SCRIPTING/01-OBJECT-MODEL.md"
+          ],
           "review_status": "UNASSESSED"
         },
         {

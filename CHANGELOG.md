@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Completed Property member reconciliation: typed inspection, animation snapshots,
+  dropdown index migration, EGP/alternate media and26.5 stage links.59 remaining
+  members, ledger579/648; temporal auto-Bezier conflict and cycle-check limits retained.
+
 - Completed text-range source reconciliation: mixed styles, insertion/replacement,
   color/kerning side effects, paragraph/line accessors and validity versus fresh
   composition.18 remaining headings, ledger520/648; no text runtime claim.

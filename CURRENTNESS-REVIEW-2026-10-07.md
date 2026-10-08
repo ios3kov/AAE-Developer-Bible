@@ -67,6 +67,12 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 ### Reproducible scripting inventory
 
 #### Text range full-page reconciliation — 2026-10-08
+Full Property page subsequently reconciled:59 remaining headings, ledger579/648,
+69 without documented reconciliation. Typed inspection/key snapshots/restoration,
+dropdown semantic migration, EGP/alternate media and26.5 layer-input stages supplied.
+Temporal auto-Bezier setter/getter conflict preserved; prospective-source cycle limit
+not invented. No key/dropdown/media/stage runtime or exact26.5 header evidence.
+
 
 Full CharacterRange/ParagraphRange/ComposedLineRange pages read/hash matched.
 Remaining18 headings mapped to mixed-style edit, insertion/replacement, detached
