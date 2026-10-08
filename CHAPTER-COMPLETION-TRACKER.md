@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 full PropertyBase/PropertyGroup review reconciles remaining18 headings;
+named-root/indexed enumeration and invalidation operations supplied. Ledger464/647.
+
 2026-10-08 AVLayer source review adds40 members: matte/source/retime/render policy,
 coordinates/bounds and media controllers. Ledger446/647; runtime NOT_RUN.
 

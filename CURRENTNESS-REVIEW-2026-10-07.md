@@ -66,6 +66,14 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### PropertyBase/PropertyGroup full-page reconciliation — 2026-10-08
+
+Full pages read, hashes match pinned inventory. Remaining18 headings transferred to
+bounded tree inspector and indexed-stack mutation/readback. Indexed numProperties
+doesn't enumerate named layer roots; propertyType listed writable isn't described
+as a type-conversion operation. Source naming discrepancy retained. Ledger464/647,
+183 without documented reconciliation. No property-stack mutation runtime executed.
+
 #### AVLayer reconciliation — 2026-10-08
 
 Full pinned AVLayer page read, SHA256 matches inventory.40 headings transferred to

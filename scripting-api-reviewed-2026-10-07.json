@@ -6,6 +6,16 @@
   "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
   "reviews": [
     {
+      "source_path": "docs/property/propertybase.md",
+      "operation": "Bounded tree inspection, UI versus evaluation gates and indexed-stack mutation/reacquisition; matchName/index reviewed separately",
+      "members": ["PropertyBase.active", "PropertyBase.canSetEnabled", "PropertyBase.duplicate", "PropertyBase.elided", "PropertyBase.enabled", "PropertyBase.isEffect", "PropertyBase.isMask", "PropertyBase.isModified", "PropertyBase.moveTo", "PropertyBase.name", "PropertyBase.parentProperty", "PropertyBase.propertyDepth", "PropertyBase.propertyGroup", "PropertyBase.propertyType", "PropertyBase.remove", "PropertyBase.selected"]
+    },
+    {
+      "source_path": "docs/property/propertygroup.md",
+      "operation": "Indexed enumeration versus explicit named roots, one-step typed lookup and absent-child handling",
+      "members": ["PropertyGroup.numProperties", "PropertyGroup.property"]
+    },
+    {
       "source_path": "docs/layer/avlayer.md",
       "operation": "Matte/source/retime and independent rendering policies, source-space bounds/conversions and Media Replacement registration; source ambiguities retained",
       "members": ["AVLayer.addToMotionGraphicsTemplate", "AVLayer.addToMotionGraphicsTemplateAs", "AVLayer.adjustmentLayer", "AVLayer.audioActive", "AVLayer.audioActiveAtTime", "AVLayer.audioEnabled", "AVLayer.blendingMode", "AVLayer.calculateTransformFromPoints", "AVLayer.canAddToMotionGraphicsTemplate", "AVLayer.canSetCollapseTransformation", "AVLayer.canSetTimeRemapEnabled", "AVLayer.collapseTransformation", "AVLayer.compPointToSource", "AVLayer.effectsActive", "AVLayer.environmentLayer", "AVLayer.frameBlending", "AVLayer.frameBlendingType", "AVLayer.guideLayer", "AVLayer.hasAudio", "AVLayer.hasTrackMatte", "AVLayer.height", "AVLayer.isNameFromSource", "AVLayer.isTrackMatte", "AVLayer.motionBlur", "AVLayer.openInViewer", "AVLayer.preserveTransparency", "AVLayer.quality", "AVLayer.removeTrackMatte", "AVLayer.replaceSource", "AVLayer.samplingQuality", "AVLayer.setTrackMatte", "AVLayer.source", "AVLayer.sourcePointToComp", "AVLayer.sourceRectAtTime", "AVLayer.threeDLayer", "AVLayer.threeDPerChar", "AVLayer.timeRemapEnabled", "AVLayer.trackMatteLayer", "AVLayer.trackMatteType", "AVLayer.width"]

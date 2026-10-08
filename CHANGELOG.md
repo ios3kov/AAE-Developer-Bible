@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Reconciled remaining PropertyBase/PropertyGroup members: bounded inspector,
+  named-root versus indexed enumeration, UI/evaluation gates and indexed-stack
+  mutation/reacquisition.18 headings, ledger464/647; no runtime claim.
+
 - Reconciled full AVLayer page into matte/source/retime/render-policy, bounds/coordinate
   and Media Replacement workflows; preserved current/legacy and example conflicts.
   40 documented headings added, ledger446/647; no image/host execution inferred.

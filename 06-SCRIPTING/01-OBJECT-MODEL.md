@@ -66,6 +66,52 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Property tree inspection and structural mutation — review2026-10-08
+
+Full pinned [PropertyBase](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/propertybase.md)
+and [PropertyGroup](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/propertygroup.md)
+read. Concrete inspector: current layer identity → resolve explicit named root groups
+via property(matchName) → branch propertyType leaf/indexed/named → enumerate indexed
+children1..numProperties and recursively record parent path/type/occurrence/index
+→ bounded output with missing/null/invalid diagnostics. **numProperties counts indexed
+properties**, not every named layer property: a loop over layer.numProperties isn't
+a complete transform/text/camera inventory. Resolve known named roots separately;
+don't claim arbitrary host-property completeness from one recursion algorithm.
+
+property(name) returns null if string child missing; property(index) requires current
+valid bounds. Lookup is one hierarchy step, not a slash-separated recursive path.
+Use canonical matchNames (source example ADBE Masks differs from table's ADBE Mask
+Parade; prefer established ADBE Mask Parade). MatchName identifies property type,
+not unique repeated effect/animator instance. parentProperty is null on Layer;
+propertyDepth0 on Layer. propertyGroup(countUp) ascends1..depth, default1; depth-level
+lookup can return Layer. Don't call propertyGroup(0) as invented root helper.
+
+isEffect/isMask classify groups; elided means organizational group hidden in UI, not
+absent children. isModified means changed since creation, not dirty-since-save or
+tool ownership. selected changes UI; prefer selectedProperties arrays to repeated
+full-tree selection sampling. active is read-only layer video gate (never true for
+audio-only) or property enabled observation. canSetEnabled guards enabled assignment;
+no effect eyeball → don't set blindly. Enabled isn't final pixel/audio visibility.
+name is display metadata; writable for indexed-group children (Layer naming has its
+own inherited semantics), not arbitrary named-group children. propertyType is listed
+read/write in source but no type-conversion operation described: treat as discriminator,
+not supported way to turn Property into PropertyGroup or author a new property type.
+
+Concrete effect-stack edit: resolve layer/ADBE Effect Parade and intended occurrence
+→ snapshot matchName/order/parameters and confirm requested duplicate/reorder/delete
+→ check indexed-parent precondition → duplicate() or moveTo(validIndex)/remove()
+→ reacquire **all affected siblings and descendants** from layer → verify types/order/
+values → report partial outcome. duplicate returns new PropertyBase; moveTo/remove
+return nothing. Removal recursively removes group's children; text animator is a
+documented removal exception. No operations on arbitrary fixed transform children.
+Adding/reordering/removing invalidates references: even old sibling's parameter can
+be invalid after another effect removal. Never keep handles across structure change
+or silently use old index to target a now different instance. Re-evaluate expressions,
+matte/effect stage choices and visual result separately. canAddProperty is preflight,
+not transaction; use addProperty/addVariableFontAxis recipes above with reacquisition.
+
+DOCUMENTED/operation design; full pages read, no property-stack runtime performed.
+
 ### AVLayer: matte/source/render switches are independent contracts
 
 Reviewed2026-10-08: full pinned

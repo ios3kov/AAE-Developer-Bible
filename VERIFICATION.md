@@ -2,6 +2,15 @@
 
 ## Currentness continuation — 2026-10-08
 
+### PropertyBase/PropertyGroup full-page source review
+
+Parent `49c0e9b`; both full pinned pages read, hashes match inventory.18 additional
+documented headings recorded; no effect stack/runtime mutation. Standard scripts/
+consistency/checker/inventory/freshness/strict MkDocs/whitespace checks accompany block.
+Results: scripts86/86, consistency11/11, checker, inventory49/647, generated
+freshness, strict MkDocs and whitespace PASS. Local checks don't certify type-conversion
+semantics, stack visuals, actual installed host or CI.
+
 ### AVLayer matte/media/coordinate source review
 
 Parent `9d6221f`; full pinned page read and SHA256 matches inventory.40 documented
