@@ -66,6 +66,99 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### AVLayer: matte/source/render switches are independent contracts
+
+Reviewed2026-10-08: full pinned
+[AVLayer](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/layer/avlayer.md).
+DOCUMENTED/source designs; no matte/retime/source/coordinate runtime result.
+
+Concrete23.0+ matte assignment: late resolve recipient and intended same-comp AVLayer
+matte → reject self/cycle under product policy → snapshot trackMatteLayer/type
+→ setTrackMatte(matte, ALPHA/LUMA or inverted variant) → read back layer/type/
+hasTrackMatte and inspect intended output. Since23.0 matte isn't layer-order-dependent;
+isTrackMatte says a layer is used as matte, not ownership or exclusivity. Legacy
+trackMatteType setter isn't recommended for new scripts. Older-host adjacency path
+requires explicit reordering/qualification, not an identical modern API claim.
+
+removeTrackMatte detaches while **preserving type**; legacy assignment of NO_TRACK_MATTE
+detaches and resets type. setTrackMatte(null, validType) detaches and sets that type.
+Source warning says NO_TRACK_MATTE invalid/no-op yet example includes a null/NO_TRACK_MATTE
+call: baseline uses removeTrackMatte for preserve-type removal, never relies on the
+ambiguous combination. Getter type alone doesn't prove a matte currently attached;
+check trackMatteLayer/hasTrackMatte. Return is nothing; no readback → unknown outcome,
+not safe blind retry. Matte state doesn't prove image/channel correctness.
+
+Concrete layer-only source replacement: resolve intended AVLayer and current source
+→ choose valid project FootageItem/CompItem with cycle/dependency checks → snapshot
+timing/transform/source/naming/expression policy → replaceSource(newSource,fixExpressions)
+→ read back source/dimensions/name/animation and evaluate affected expressions
+→ report partial outcome. This differs from FootageItem.replace, which changes shared
+source usages. AVLayer.source is read-only and null for text; don't assign it directly.
+Replacing null-layer source doesn't turn it into a visible ordinary layer (source
+warning calls state isNull while public Layer attribute is nullLayer); inspect actual
+state, don't invent a new writable flag. fixExpressions can be costly and isn't an
+all-time semantic correctness proof; plan controlled batch plus deliberate expression
+repair/review rather than repeat after exception. isNameFromSource is false for explicit
+names or no source; source replacement must not silently enforce naming policy.
+
+Concrete retime: check canSetTimeRemapEnabled → snapshot old remap/keys/timing
+→ explicit enable → reacquire Time Remap property and inspect host-created state
+→ apply typed source-time values at planned composition-time keys → read back and
+qualify first/last/reverse/loop frames. canSet isn't proof setter cannot fail; disabling
+remap is not a guaranteed way to restore old keyframes. Don't toggle merely to simplify
+duration logic. Reject scene detection while remap enabled as described above.
+
+| Layer policy | Operation/readback boundary |
+|---|---|
+| Audio | hasAudio means source component; audioEnabled is switch; audioActive/audioActiveAtTime check switch, solo and in/out gates. Not PCM amplitude, non-silence or encoded-audio proof |
+| Sampling | frameBlending read-only observation; set frameBlendingType NO_FRAME_BLEND/FRAME_MIX/PIXEL_MOTION and consider comp.frameBlending independently. quality BEST/DRAFT/WIREFRAME and samplingQuality BICUBIC/BILINEAR aren't codec quality or universal image parity |
+| Blur/effects | motionBlur is layer flag requiring appropriate comp/output policy; effectsActive toggles layer effects. Changing either alters evaluation, not just diagnostic UI |
+| Compositing | adjustmentLayer, blendingMode and preserveTransparency are distinct rendering choices. Use actual enum symbols (source notes SILHOUETE_ALPHA spelling); don't synthesize enum integers or equate modes across color/depth contexts |
+| Structure/renderer | canSetCollapseTransformation gates collapseTransformation. threeDLayer changes layer dimensionality; reacquire transform properties afterward. threeDPerChar applies only to text. environmentLayer source description is legacy Ray-traced3D and sets threeDLayer true; not verified Advanced3D environment setup |
+| Guide flag | guideLayer is layer role, not Item/Layer guide arrays or ViewOptions guide visibility. Don't infer final-output inclusion policy solely from this short DOM property description; inspect chosen render-settings/consumer behavior |
+| Geometry | width/height read-only layer dimensions, not transformed comp-space bounds or full effect extents |
+
+### AVLayer coordinate and bounds operations: no expression API substitution
+
+sourceRectAtTime(time,extents) returns source-space top/left/width/height for text/shape
+content; extents true is documented for shape bounds expansion. It is not final
+post-effects, masked, transformed or motion-blurred alpha bounds. Concrete2D alignment:
+read rectangle at intended time → derive four source corners → sourcePointToComp
+each corner at current comp time → derive desired comp-space alignment → convert
+desired point with compPointToSource where appropriate → edit intended transform
+using property/key policy → read back/qualify. Bound samples and establish comp.time
+deliberately if current-time conversion is required, restoring UI time afterward.
+
+sourcePointToComp/compPointToSource take finite2-component coordinate arrays despite
+syntax lines omitting arguments. On text they reflect only **first character at current
+time**; no arbitrary3D/per-character/world-vector mapping guarantee. These scripting
+methods aren't expression toComp/toWorld/toCompVec and don't inherit optional time/
+vector contracts by similar name. Animated/per-character3D/camera-sensitive alignment
+needs an explicit qualified route, not a universal two-point inverse assumption.
+
+calculateTransformFromPoints takes top-left/top-right/**bottom-right**3-component
+points and returns object of transform values. Source example names third variable
+bl, conflicting with parameter table: use documented bottom-right, record conflict,
+don't copy ambiguous example geometry. This is calculation, not mutation. Reject
+degenerate/nonfinite geometry under product policy; whitelist returned fields and
+resolve proper matchNames/types before applying with static/key/separation policy,
+not blind for-in setters over arbitrary object. No documented perspective/planarity/
+all-renderer equivalence inferred from its terse description. openInViewer can return
+null for text/shapes and changes Layer-panel focus, not coordinate/output correctness.
+
+### Media Replacement controllers: capability then add, not replace media
+
+18.0+ canAddToMotionGraphicsTemplate(comp) checks eligible AVLayer and not-already-added
+state. Requires video-switch layer, not adjustment/null; source CompItem or supported
+FootageItem, not SolidSource/non-media FileSource. Concrete registration: resolve
+intended layer and EGP comp → validate eligibility → canAdd → explicit controller
+name/consent → addToMotionGraphicsTemplate or addToMotionGraphicsTemplateAs
+→ inspect boolean and EGP state/controller count → report. False can display warning;
+don't retry as duplicate operation. This adds a **Media Replacement controller**,
+doesn't set alternate media, export a MOGRT or prove target-consumer compatibility.
+Names are display metadata; controller index gap documented above remains. Property
+alternate-source APIs need their separately reviewed capability/source contracts.
+
 ### Layer construction and structural edits — review2026-10-08
 
 Full pinned [Layer](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/layer/layer.md)

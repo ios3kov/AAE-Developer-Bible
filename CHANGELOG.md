@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Reconciled full AVLayer page into matte/source/retime/render-policy, bounds/coordinate
+  and Media Replacement workflows; preserved current/legacy and example conflicts.
+  40 documented headings added, ledger446/647; no image/host execution inferred.
+
 - Reconciled Layer/LayerCollection construction and structural workflows: source
   ownership, timing, parenting, copy/reorder/precompose, selection-sensitive presets,
   scene detection and layer-view guides.49 members, ledger406/647; no runtime claim.

@@ -6,6 +6,11 @@
   "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
   "reviews": [
     {
+      "source_path": "docs/layer/avlayer.md",
+      "operation": "Matte/source/retime and independent rendering policies, source-space bounds/conversions and Media Replacement registration; source ambiguities retained",
+      "members": ["AVLayer.addToMotionGraphicsTemplate", "AVLayer.addToMotionGraphicsTemplateAs", "AVLayer.adjustmentLayer", "AVLayer.audioActive", "AVLayer.audioActiveAtTime", "AVLayer.audioEnabled", "AVLayer.blendingMode", "AVLayer.calculateTransformFromPoints", "AVLayer.canAddToMotionGraphicsTemplate", "AVLayer.canSetCollapseTransformation", "AVLayer.canSetTimeRemapEnabled", "AVLayer.collapseTransformation", "AVLayer.compPointToSource", "AVLayer.effectsActive", "AVLayer.environmentLayer", "AVLayer.frameBlending", "AVLayer.frameBlendingType", "AVLayer.guideLayer", "AVLayer.hasAudio", "AVLayer.hasTrackMatte", "AVLayer.height", "AVLayer.isNameFromSource", "AVLayer.isTrackMatte", "AVLayer.motionBlur", "AVLayer.openInViewer", "AVLayer.preserveTransparency", "AVLayer.quality", "AVLayer.removeTrackMatte", "AVLayer.replaceSource", "AVLayer.samplingQuality", "AVLayer.setTrackMatte", "AVLayer.source", "AVLayer.sourcePointToComp", "AVLayer.sourceRectAtTime", "AVLayer.threeDLayer", "AVLayer.threeDPerChar", "AVLayer.timeRemapEnabled", "AVLayer.trackMatteLayer", "AVLayer.trackMatteType", "AVLayer.width"]
+    },
+    {
       "source_path": "docs/layer/layer.md",
       "operation": "Layer identity/timing/parenting/reorder/copy/preset/detection and versioned layer-view guides; dated copy Undo warning retained",
       "members": ["Layer.activeAtTime", "Layer.addGuide", "Layer.applyPreset", "Layer.autoOrient", "Layer.comment", "Layer.containingComp", "Layer.copyToComp", "Layer.doSceneEditDetection", "Layer.duplicate", "Layer.getGuideAsObject", "Layer.guides", "Layer.hasVideo", "Layer.id", "Layer.inPoint", "Layer.index", "Layer.isNameSet", "Layer.label", "Layer.locked", "Layer.marker", "Layer.moveAfter", "Layer.moveBefore", "Layer.moveToBeginning", "Layer.moveToEnd", "Layer.nullLayer", "Layer.outPoint", "Layer.parent", "Layer.remove", "Layer.removeGuide", "Layer.selectedProperties", "Layer.setGuide", "Layer.setParentWithJump", "Layer.shy", "Layer.solo", "Layer.startTime", "Layer.stretch", "Layer.time"]

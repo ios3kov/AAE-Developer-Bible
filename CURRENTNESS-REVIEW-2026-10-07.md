@@ -66,6 +66,15 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### AVLayer reconciliation — 2026-10-08
+
+Full pinned AVLayer page read, SHA256 matches inventory.40 headings transferred to
+matte/source/retime/render policies, coordinate/bounds and Media Replacement registration.
+NO_TRACK_MATTE null/example conflict, transform bottom-right/example bl and legacy
+Ray-traced description preserved; no guessed enum/coordinate/effect-bounds contract.
+Ledger446/647,201 headings without documented reconciliation. No render/coordinate/
+matte/MOGRT/retime host result inferred.
+
 #### Layer/LayerCollection reconciliation — 2026-10-08
 
 Full pinned pages read, SHA256 matches inventory.49 documented members transferred

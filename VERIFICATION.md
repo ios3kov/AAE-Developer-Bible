@@ -2,6 +2,16 @@
 
 ## Currentness continuation — 2026-10-08
 
+### AVLayer matte/media/coordinate source review
+
+Parent `9d6221f`; full pinned page read and SHA256 matches inventory.40 documented
+headings recorded. No matte/source/retime/coordinate/image/Media Replacement runtime.
+Standard repository checks and inventory regeneration accompany bounded source design;
+no SDK/compiler/host/consumer or CI PASS inferred.
+Results: scripts86/86, consistency11/11, checker, inventory49/647, generated
+freshness, strict MkDocs and whitespace PASS. Intentional negative-fixture stale
+diagnostics aren't stale generated output after regeneration.
+
 ### Layer/LayerCollection structural operation source review
 
 Parent `e599563`;2 pinned pages fully read and source hashes match inventory.

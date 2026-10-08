@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 AVLayer source review adds40 members: matte/source/retime/render policy,
+coordinates/bounds and media controllers. Ledger446/647; runtime NOT_RUN.
+
 2026-10-08 Layer/LayerCollection full-page review adds49 documented members:
 creation/parenting/timing/structural edits/presets/detection/guides; ledger406/647.
 
