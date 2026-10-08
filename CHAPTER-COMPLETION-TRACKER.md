@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 UXP folder/source/index block:25/44 pinned pages,281 repeated rows;
+19 remain. Internal helper excluded, owner/deferred contract gaps retained.
+
 2026-10-08 UXP fonts/animation values:19/44 pages,229 repeated rows/headings;
 25 remain. Typed ownership/units/parameter-map operations separate from host PASS.
 

@@ -412,6 +412,58 @@ API limit, but impose product size bound. Changing detached value not proven hos
 marker write until Property set/readback; duration bar isn't automatic playback/retime.
 No font/ease/path/marker/UXP host runtime or full animation contract PASS.
 
+### Project folders and generated sources — full pinned review2026-10-08
+
+Six full pages FolderItem/ItemCollection/SolidSource/PlaceholderSource/DeferredCall/
+index read; ledger25/44 pages,281/1448 rows/headings,19 pages remain. Index itself
+zero rows/43 object links, confirms module require("aftereffects") but isn't module
+constructor/enum export reference or shared-platform setup contract.
+
+Owned project-folder organization: known supported collection.addFolder(name) returns
+folder under that collection's owner (project/root→root, nested folder→that folder).
+addComp follows same parent policy, so create directly in intended collection when
+supported. Existing items move by item.parentFolder assignment after checking current
+project, target owner and cycle prevention under product policy; no OS folder creation.
+Folder.item(1..numItems) enumerates **direct children**, numItems/items.length not
+recursive descendants. Snapshot approved target IDs before reorder/move and re-resolve
+within actual owner; collection.itemByID **throws absent**, unlike nullable Project
+lookup contract. Moving item out of folder can make owner-scoped ID lookup fail
+without deleting it. Do not call private_itemAtIndex (explicit internal helper);
+no public getByIndex method invented on this ItemCollection page.
+
+Folder name/comment/label/selected metadata and inherited IDs/typeName/GUID obey
+earlier item rules: locale typeName not stable type test, encoded comment limit,
+selection not command authorization. remove **recursively deletes project contents**,
+not disk; never use as automatic compensation for partially failed folder command
+when user items might have been moved into it. Guides/setGuide inherited rows are
+published on FolderItem but meaningful viewer behavior not independently specified:
+don't infer real folder video viewer/guide rendering from duplicated table.
+
+SolidSource color RGB0..1 exactly3 components: user-approved owned solid's mainSource
+→ validate role/current owner → snapshot RGB → write finite intended color → readback.
+Shared source used by many layers/comps means edit affects every consumer; duplicate/
+replace only with explicit ownership policy, no silent global brand-color update.
+Inherited alphaMode/invertAlpha/premulColor only meaningful when hasAlpha/appropriate
+mode; normal solid isStill, so loop/conform/field/pulldown settings aren't universally
+usable just because rows RW. Reuse FileSource interpretation dependency rules where
+non-still supported, not assume SolidSource gains file/reload from similar base.
+
+PlaceholderSource has no file-path/reload or new creation methods; replacement belongs
+FootageItem.replaceWithPlaceholder/replace and proxy owner methods. isStill true
+duration0 placeholder, nonzero placeholder timed per description; inspect actual
+value before conform/loop/field/pulldown writes. Display/native/conform rates aren't
+decoded media or filled missing frames. guessAlpha/Pulldown mutate estimates with
+no-change hasAlpha/isStill gates as above. No missingFootagePath field fabricated for
+all placeholders from FileSource contract. Full inherited source-row review doesn't
+promise actual footage import/replacement success, dimensions/ranges or visual output.
+
+Pinned DeferredCall still **only duration** (read-only elapsed seconds) after call
+stack deferred execution in description. No result getter/then/await/cancel/status/
+error member documented; duration isn't completion sentinel or promise resolution
+interface. Preserve integration BLOCKED for output/renderGUID async results rather
+than invent methods or equate elapsed0 with pending. No folder/solid/placeholder/
+deferred/source/UXP runtime performed in this block.
+
 ## Identity, selection и invalidation
 
 [Project](https://developer.adobe.com/after-effects/uxp/after-effects-api/project)

@@ -2,6 +2,15 @@
 
 ## Currentness continuation — 2026-10-08
 
+### UXP folder/generated-source/index review
+
+Parent `3eae19e`;6 full pinned pages read, ledger25/44 pages/281 repeated rows.
+No folder/source/solid/placeholder/deferred/UXP execution; inherited guide meaning,
+async result integration and constructor/enum export contracts not inferred.
+Results: scripts93/93, consistency11/11, docs checker and whitespace PASS;
+generated freshness/strict MkDocs checked before publication. Negative-fixture
+stale diagnostics intentional; no CI/host result inferred.
+
 ### UXP font and animation-value source review
 
 Parent `d4938ad`;5 full pinned pages read; ledger19/44 pages,229 repeated rows.

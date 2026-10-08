@@ -2,6 +2,9 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Reviewed6 official UXP folder/collection/generated-source/deferred/index pages;
+  owner-specific lookup/mutation and still-source gates, no invented async interface.
+
 - Reviewed5 official UXP font/ease/shape/marker pages: disambiguated picker and
   fallback/revision, variable axes, typed topology/feathers and object parameter maps.
 

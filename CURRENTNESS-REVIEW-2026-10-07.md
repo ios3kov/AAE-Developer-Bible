@@ -44,6 +44,11 @@ the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
 
+2026-10-08 official UXP folders/generated sources/index block:6 full pages;
+ledger25/44 pages,281/1448 repeated rows/headings,19 remain. Owner-specific creation/
+throwing ID lookup/recursive-delete consent, solid/placeholder interpretation gates
+and DeferredCall only-duration integration gap reconciled. No host/runtime PASS.
+
 2026-10-08 official UXP font/animation-value block:5 full pages; ledger19/44,
 229/1448 repeated rows/headings,25 remain. Font picker/revision/fallback/variable axes,
 typed ease/path/feather and marker-object parameters documented. Global defaults,
