@@ -2,6 +2,28 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Full pinned UXP host-page review closure
+
+Parent `c356a2a87b503ab8ef786d3db0686433d2a6cee5`. Последние19 страниц полностью
+прочитаны; локальные source bytes сверены по SHA256 с official pin
+`7d1cd01b4c69a9e02b77d48b3f919a6145a90841`. Ledger44/44 страницы и1448 повторяемых
+property rows/method headings. Полнота относится к страницам этого snapshot,
+не к уникальным API, всем overloads/types/constructors или shared-platform.
+
+Практические lifecycle/project/export, layer/property/text/3D операции согласованы
+с разными return/access/version contracts. Независимое редакционное ревью выявило
+и помогло исправить internal anchor и устаревшие промежуточные coverage числа.
+Layer `.wait()` mention сохранён при неполной DeferredCall member table.
+No AE UXP, renderer, font/layout, file export, native SDK or host execution.
+
+Local source checks: UXP inventory3/3, consistency11/11,128-core docs checker,
+19 downloaded source hashes, staged generated freshness and strict MkDocs PASS.
+`git diff --check` PASS. Negative-fixture stale messages in consistency tests are
+intentional. Проверено Python3.12.14 с pinned docs dependencies; результаты CI
+и generated-only follow-up commits фиксируются отдельно по фактическим SHA.
+Эта запись описывает содержащую её source revision; собственный будущий commit
+hash не подставляется в evidence заранее.
+
 ### UXP folder/generated-source/index review
 
 Parent `3eae19e`;6 full pinned pages read, ledger25/44 pages/281 repeated rows.

@@ -4,13 +4,19 @@
 
 Edition: **1.1 — editorial freeze, 2026-10-07**
 
-Native research baseline: **2026-10-01 / SDK25.6 build61**; selected source/platform rereviews through **2026-10-07**.
+Native research baseline: **2026-10-01 / SDK25.6 build61**; selected source rereviews through **2026-10-08**.
 
 **Canonical writing/editing rules:** [EDITORIAL-GUIDE.md](EDITORIAL-GUIDE.md)  
 Status: **edition1.1 frozen; expanded completeness/currentness review IN PROGRESS**.
 The historical127-page closure does not certify the full current API surface.
 [Current review and open criteria](CURRENTNESS-REVIEW-2026-10-07.md).
 [Freeze record and reproduction](EDITION-FREEZE-2026-10-07.md).
+
+Последнее дополнение: [практический AE UXP host API](07-PANELS/03-UXP-HOST-API.md)
+согласован с **44/44 страницами** официального pinned source. Добавлены слои,
+свойства, текст, камеры/свет/3D, lifecycle и экспорт; расхождения с ExtendScript
+и неполные vendor contracts указаны явно. Это полный обзор данного набора страниц,
+не утверждение о runtime, всех referenced types или shared-platform coverage.
 
 ## Цель
 
@@ -68,7 +74,7 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 | Импорт/экспорт собственного медиаформата | AEIO |
 | Заменить 3D-renderer AE | Artisan — только при реальной необходимости |
 | Автоматизировать проект, слои, render queue | ExtendScript |
-| Сделать dockable UI-панель | CEP сейчас; UXP — план миграции |
+| Сделать dockable UI-панель | CEP; для подходящего UXP host — опубликованный AE API и отдельная проверка setup |
 | Высокая скорость + UI | Hybrid: native C++ + panel/script bridge |
 
 ## Что читать сначала

@@ -1,8 +1,16 @@
 # Status
 
-Updated: **2026-10-07**
+Updated: **2026-10-08**
 
 ## Active: current completeness and currency review
+
+Завершён полный обзор **44/44 pinned AE UXP host pages**: 1448 повторяемых строк
+свойств/заголовков, не уникальных API. Последние19 страниц добавили lifecycle,
+настройки проекта/MOGRT, создание и редактирование слоёв, Property/key/mask,
+text ranges/tagged ranges, камеры/свет/mesh/model. Исправлено утверждение об отсутствии
+получения DeferredCall результата: layer docs упоминают `.wait()`, но полный
+async/error contract не задан. [Глава](07-PANELS/03-UXP-HOST-API.md) и
+[ledger](uxp-api-reviewed-2026-10-08.json) согласованы; UXP runtime NOT_RUN.
 
 Native26.5 selected public contracts reconciled against available local25.6 tree:
 guide unit-loss/percentage fallback, ItemView26.0+ versus grouped26.5 notes,
@@ -12,19 +20,20 @@ review. Exact26.5 archive/full header diff and full current API inventory still 
 
 Owner requested a stricter full/current Bible after edition1.1 freeze. Current
 API coverage is **not yet accepted**. [New criteria/source observations](CURRENTNESS-REVIEW-2026-10-07.md):
-current SDK header/archive acquisition remains OPEN; Console Loading, release-notes
-HTTP403. Published AE UXP27.0 host API now has a practical documented operation
-guide; full object/platform/packaging coverage and native26.5 reconciliation remain.
+current SDK header/archive acquisition remains OPEN. Следующие source-review задачи:
+shared UXP platform/AE setup, ExtendScript runtime/File/Folder, полный native
+public-guide inventory и обновление host/platform sources. Полное чтение44 UXP
+страниц не закрывает отсутствующие constructor/enum/type/async contracts.
 Historical closure below applies to the old plan, not this expanded acceptance.
 
-## Current edition — 2026-10-07
+## Historical edition freeze — 2026-10-07
 
 **Edition1.1 editorially complete.** All127 core rows reconciled C/explicit L;
 blocks1–16 closed in documentation scope. [Freeze/reproduction record](EDITION-FREEZE-2026-10-07.md)
 names parent, containing source revision convention, local checks and retained limits.
 No new real-SDK/host result or final GitHub CI success is asserted. Owner's no-reuse-
-license decision retained. Next edition work is optional research/host evidence,
-not an outstanding mandatory closure queue.
+license decision retained. That edition's closure does not cancel the expanded
+currentness queue above; new host evidence remains separate from editorial scope.
 
 ## Completion history — 2026-10-07
 

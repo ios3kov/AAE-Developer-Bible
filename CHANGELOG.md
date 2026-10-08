@@ -2,6 +2,11 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Closed full pinned UXP host-page review:44/44 pages,1448 repeated rows/headings.
+  Added19 pages of lifecycle/project/export, layers, properties/keys/masks, text
+  ranges and3D operations. Preserved return/access/geometry/beta/type conflicts;
+  corrected DeferredCall `.wait()` mention. Exhaustive page-set check now runs in CI.
+
 - Reviewed6 official UXP folder/collection/generated-source/deferred/index pages;
   owner-specific lookup/mutation and still-source gates, no invented async interface.
 

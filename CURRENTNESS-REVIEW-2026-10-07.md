@@ -34,7 +34,7 @@ full UXP/runtime/SDK26.5 audit or new installed AE observation inferred.
 | Native guides | dated reviewed source | Guide2, ItemView2, Comp13, Stream7 changes need full topic/source reconciliation |
 | Effect metadata | reviewed PiPL baseline | Search_Keywords/Description/EXT3 and preview media are PProBeta27-only per current guide |
 | ExtendScript | reviewed ES3 lessons/DOM | Full current scripting object/member inventory OPEN |
-| AE UXP | migration chapter | First practical host-API guide added; full published object/member/platform/packaging coverage OPEN |
+| AE UXP | official source pin7d1cd01 | 44/44 full host pages reviewed2026-10-08; constructor/enum/type/async gaps, shared platform and AE setup remain explicit |
 | Host/OS support | retained dated matrix | Fresh readable release/requirements source OPEN; HTTP403 is not verification |
 
 Native guide lists `AEGP_CreateParametricMeshLayerInComp` in CompSuite13 and
@@ -43,6 +43,23 @@ layer-parameter render-stage sampling. Exact signatures/macros/layouts require
 the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
+
+**Актуальный UXP результат — 2026-10-08:** полное чтение44/44 pinned страниц
+завершено; 1448/1448 повторяемых property rows/method headings охвачены page review.
+Последние19 страниц: Application/Project/CompItem, Layer/LayerCollection/AVLayer/
+ShapeLayer/TextLayer, Property/PropertyGroup/MaskPropertyGroup, TextDocument и3 ranges,
+CameraLayer/LightLayer/ParametricMeshLayer/ThreeDModelLayer. Все SHA256 сверены.
+Практические операции и расхождения внесены в host chapter; regression требует
+точного совпадения inventory/ledger, включая index без member headings.
+
+Это не1448 уникальных API, полный overload/constructor/enum reference, все типы
+или shared-platform coverage. MaterialPropertyGroup не имеет страницы в данном
+index. Layer `.wait()` mention уточняет прежнюю only-duration формулировку:
+собственная DeferredCall table неполна, точные wait/error/cancel semantics остаются
+неизвестными. Native SDK и AE UXP runtime в этом блоке не выполнялись.
+
+Следующие датированные записи сохраняют промежуточный coverage своих итераций;
+числа «remain» в них не являются текущим итогом.
 
 2026-10-08 official UXP folders/generated sources/index block:6 full pages;
 ledger25/44 pages,281/1448 repeated rows/headings,19 remain. Owner-specific creation/
@@ -121,8 +138,10 @@ expression member inventory or runtime PASS.
   headers/utilities/sample/tool/resource diff against25.6. Do not distribute SDK.
 - [ ] Reconcile all published native families/members, including new26.5 APIs and
   cross-host-only additions. Map topic → authoritative source → version → actual recipe.
-- [ ] Cover published AE UXP objects and shared-platform contracts with AE host
-  setup/manifest/permissions/UI/file/network/storage/lifecycle/packaging workflow.
+- [x] Read all44 pinned published AE UXP host pages and reconcile practical operations;
+  retain contradictory/incomplete contracts without inventing API parity.
+- [ ] Finish shared-platform contracts and AE-specific setup/manifest/permissions/
+  UI/file/network/storage/lifecycle/packaging workflow, with explicit source gaps.
 - [ ] Review current scripting/expression object/member changes and missing operation
   recipes; distinguish ExtendScript, expression JS and UXP rather than porting by name.
 - [ ] Read current host/platform requirements/release notes from a verifiable official
