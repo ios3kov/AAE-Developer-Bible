@@ -85,7 +85,8 @@ nav:
       - "CEP development": 07-PANELS/01-CEP.md
       - "UXP transition for After Effects": 07-PANELS/02-UXP-TRANSITION.md
       - "AE UXP host API operations": 07-PANELS/03-UXP-HOST-API.md
-      - "Panels: CEP now, UXP next": 07-PANELS/README.md
+      - "UXP platform: lifecycle, files and distribution": 07-PANELS/04-UXP-PLATFORM.md
+      - "Panels: CEP and AE UXP": 07-PANELS/README.md
   - 08-MACOS:
       - "macOS — Xcode setup": 08-MACOS/01-XCODE-SETUP.md
       - "macOS — Apple Silicon / Universal binary": 08-MACOS/02-UNIVERSAL-BINARY.md

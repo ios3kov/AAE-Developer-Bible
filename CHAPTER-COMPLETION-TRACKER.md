@@ -1,8 +1,25 @@
 # Поглавный трекер завершения
 
-Обновлено: **2026-10-07**. План: [16 логических блоков](COMPLETION-PLAN.md). Правила: [EDITORIAL-GUIDE](EDITORIAL-GUIDE.md); существующий source/evidence baseline — [coverage matrix](FINAL-COVERAGE-AUDIT.md).
+Обновлено: **2026-10-08**. План: [16 логических блоков](COMPLETION-PLAN.md). Правила: [EDITORIAL-GUIDE](EDITORIAL-GUIDE.md); существующий source/evidence baseline — [coverage matrix](FINAL-COVERAGE-AUDIT.md).
 
-## Final editorial result — 2026-10-07
+## Текущий результат после freeze
+
+Полное чтение44/44 pinned AE UXP host pages завершено; scope и сохранённые
+vendor-contract gaps описаны в [host chapter](07-PANELS/03-UXP-HOST-API.md).
+Отдельная [shared-platform глава](07-PANELS/04-UXP-PLATFORM.md) увеличивает
+текущий core inventory до129 страниц. Её ledger содержит47 полных shared-platform
+страниц и5 AE setup/site файлов. File/Folder/runtime supplement опирается на8 полных
+страниц/2790 строк;16 переносимых checks используют фактические code fences и doubles.
+Source coverage не присваивает runtime PASS.
+
+Дополнены scripting match-name routes по8/8 pinned страницам и757 табличным
+строкам. [Host/platform rereview](HOST-PLATFORM-REVIEW-2026-10-08.md) закрывает
+прежний HTTP403 gap, сохраняя различия host/SDK/renderer и даты источников.
+Текущие оставшиеся задачи — в [currentness review](CURRENTNESS-REVIEW-2026-10-07.md).
+
+## История предыдущих редакционных блоков
+
+Числа coverage и «remain» ниже относятся к указанным итерациям, не к текущему итогу.
 
 2026-10-08 UXP folder/source/index block:25/44 pinned pages,281 repeated rows;
 19 remain. Internal helper excluded, owner/deferred contract gaps retained.
@@ -110,7 +127,7 @@ permissions/development/distribution workflow now documented. AE host setup ID a
 full member reconciliation stay in active currentness queue; historical C rows are
 not converted to full-current acceptance by this bounded review.
 
-After freeze: current inventory expanded to **128** with AE UXP host API chapter.
+First post-freeze expansion increased the inventory to **128** with the AE UXP host chapter.
 Historical127 rows retain their old-plan results; [currentness review](CURRENTNESS-REVIEW-2026-10-07.md)
 is the active completeness/currency queue, not automatically closed by those C/L.
 
@@ -149,7 +166,7 @@ cross-page review. Добавления и результаты:
 
 ## Что здесь учитывается
 
-Это рабочая очередь для **127 core pages**: Markdown непосредственно в разделах 00–15, 17 и 19, включая их обзорные README. Dated source reviews, verification ledgers, вложенные source/reference guides и исследовательские приложения учитываются отдельно ниже. Каждый core page включён ровно один раз.
+Это рабочая очередь для **129 core pages**: Markdown непосредственно в разделах 00–15, 17 и 19, включая их обзорные README. Исторический freeze охватывал127 страниц. Dated source reviews, verification ledgers, вложенные source/reference guides и исследовательские приложения учитываются отдельно ниже. Каждый core page включён ровно один раз.
 
 Строки задают конкретный оставшийся результат по аудиту и плану. Это не новая полная техническая сертификация каждой главы и не отмена прежних source reviews. `R` может обозначать запланированную сверку, а не уже обнаруженную ошибку. Сам факт наличия текста, большого объёма или зелёной CI не закрывает строку.
 
@@ -255,8 +272,9 @@ cross-page review. Добавления и результаты:
 |---|---|---|---|---|---|---|
 | [CEP development](07-PANELS/01-CEP.md) | C | C | C | C | C | Manifest/bootstrap walkthrough и controlled failure paths согласованы. **№2 выполнен**. |
 | [UXP transition for After Effects](07-PANELS/02-UXP-TRANSITION.md) | C | L | C | L | C | Dated roadmap/published docs, installed availability unknown; [review](CHAPTER-RECONCILIATION-2026-10-07.md#windows-and-compatibility-closure). |
-| [AE UXP host API operations](07-PANELS/03-UXP-HOST-API.md) | E | C | C | C | C | Published27.0 module/create-comp/readback documented; remaining object/platform/packaging coverage [OPEN](CURRENTNESS-REVIEW-2026-10-07.md). |
-| [Panels: CEP now, UXP transition](07-PANELS/README.md) | C | L | C | L | C | UI route with unknown-outcome/rollout boundaries; [final review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure). |
+| [AE UXP host API operations](07-PANELS/03-UXP-HOST-API.md) | C | C | C | C | C | Full44/44 pinned pages reconciled with practical operations; constructor/type/async source gaps explicit, runtime not claimed. [Ledger](uxp-api-reviewed-2026-10-08.json). |
+| [UXP platform: lifecycle, files and distribution](07-PANELS/04-UXP-PLATFORM.md) | L | C | C | C | C | 47 full Hub pages plus5 AE setup/site files; selected workflows and explicit missing AE setup/host mapping. [Ledger](uxp-platform-reviewed-2026-10-08.json). |
+| [Panels: CEP and AE UXP](07-PANELS/README.md) | C | L | C | L | C | UI route with published AE API/platform chapters, unknown-outcome and setup/version boundaries; historical [review](CHAPTER-RECONCILIATION-2026-10-07.md#entry-and-index-closure). |
 
 ## 08-MACOS
 

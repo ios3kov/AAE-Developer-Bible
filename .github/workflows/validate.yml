@@ -32,6 +32,8 @@ jobs:
         run: node scripts/test_scripting_lessons.js
       - name: ScriptUI command portable safety (not AE host tests)
         run: node scripts/test_scriptui_command.js
+      - name: Documentation file examples with failure doubles (not AE or filesystem tests)
+        run: node scripts/test_document_file_examples.js
       - name: Illustrative evidence plan structure (not AE host tests)
         run: python -m unittest scripts.test_evidence_plan -v
       - name: Z-depth collector portable safety tests (not AE host tests)

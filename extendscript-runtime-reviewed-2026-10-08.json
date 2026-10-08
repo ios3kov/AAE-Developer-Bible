@@ -1,0 +1,121 @@
+{
+  "source_repository": "docsforadobe/javascript-tools-guide",
+  "source_revision": "ac6839049e17f4652d301e7d28f8f0d3d5fbb66a",
+  "reviewed_on": "2026-10-08",
+  "evidence": "Eight full pinned pages read; fetched Git blob SHA1 verified against bytes; SHA256 calculated and rechecked. Maintained mirror of the Adobe guide, not current vendor host certification. DOCUMENTED / SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED.",
+  "scope": "Eight complete runtime/File/Folder pages, 2790 source lines; provenance README read separately. Operational coverage, not completion of every ExtendScript runtime subsystem.",
+  "reviews": [
+    {
+      "source_path": "docs/file-system-access/file-object.md",
+      "source_sha256": "d0447bc13f93f32582b64c6eb54336d6c28639aac553dbd0d33d212be02da977",
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Picker cancellation and type, byte versus character I/O, explicit modes and close outcomes, separate handles, bounded ingestion, destructive copy/rename limits and original UTF-8 export",
+      "bytes": 41050,
+      "lines": 1036,
+      "git_blob_sha": "e7bf64470018a4f034255dd8012d0be656287f5d",
+      "full_page_reviewed": true,
+      "source_url": "https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/file-system-access/file-object.md"
+    },
+    {
+      "source_path": "docs/file-system-access/folder-object.md",
+      "source_sha256": "918131cb26fd5cfba6c8257d59bf7a7d6ee91f0c82189c165473faaa29d96f1f",
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Chosen folder ownership, nullable root parent, nonrecursive create contract, current/userData/temp/startup distinctions and materialized directory enumeration limit",
+      "bytes": 22853,
+      "lines": 713,
+      "git_blob_sha": "ed7dd2d433af874e780b9dc4f4c23cb83f8e6816",
+      "full_page_reviewed": true,
+      "source_url": "https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/file-system-access/folder-object.md"
+    },
+    {
+      "source_path": "docs/file-system-access/using-file-and-folder-objects.md",
+      "source_sha256": "8138799e8e4db6a2ded9bc2dfa485c4bd7cc30e8fe3fda8b77c701f8480c84f4",
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "URI/native paths, explicit base, alias/path traversal limits, encoding/BOM detection conflicts and preservation of primary I/O errors before cleanup",
+      "bytes": 13436,
+      "lines": 164,
+      "git_blob_sha": "d40d645559ed557e459855fa046ca9e83e89ba6e",
+      "full_page_reviewed": true,
+      "source_url": "https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/file-system-access/using-file-and-folder-objects.md"
+    },
+    {
+      "source_path": "docs/file-system-access/file-access-error-messages.md",
+      "source_sha256": "e8a787b9155c9d8b6e31dde1cb3429b937b98a64a0a0511e4968a101e6c51821",
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Conversion, partial multibyte and filesystem failure outcomes; primary and close error reporting without treating English messages as stable enums",
+      "bytes": 2298,
+      "lines": 25,
+      "git_blob_sha": "43eb1c1f5f9efedf88a3959bfb3c8e4e77e85bc3",
+      "full_page_reviewed": true,
+      "source_url": "https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/file-system-access/file-access-error-messages.md"
+    },
+    {
+      "source_path": "docs/file-system-access/file-and-folder-supported-encoding-names.md",
+      "source_sha256": "3f18e1a5699f530b0501f5ddc3451a349b45068c5ed519c5b8188f723930672f",
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Host/OS encoding availability, explicit format policy and BINARY byte-string versus decoded text",
+      "bytes": 5236,
+      "lines": 119,
+      "git_blob_sha": "f4bfad903c01a5c75efee4a3241eccb67f42d734",
+      "full_page_reviewed": true,
+      "source_url": "https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/file-system-access/file-and-folder-supported-encoding-names.md"
+    },
+    {
+      "source_path": "docs/introduction/extendscript-overview.md",
+      "source_sha256": "315385f4f4cf9dd5f56b5fb3f9a33d6e7883ad6c79d030a23e8ff70729b7d6fa",
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Host-dependent ExtendScript facilities and explicit separation from expression, CEP/Node and UXP runtimes; JSON capability/codec design rather than unverified native availability",
+      "bytes": 6907,
+      "lines": 83,
+      "git_blob_sha": "dd75fce64906854a42d4aa8ba41b46ce1fe09439",
+      "full_page_reviewed": true,
+      "source_url": "https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/introduction/extendscript-overview.md"
+    },
+    {
+      "source_path": "docs/extendscript-tools-features/dollar-object.md",
+      "source_sha256": "4558c9f1609fe523176de987bd5e52ad9caa8923cba2c6df39e47bc17a6e5563",
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Engine diagnostics, $.error versus File.error, executing files versus reading data, sleep/timer limitations and synchronous I/O boundaries",
+      "bytes": 11585,
+      "lines": 552,
+      "git_blob_sha": "75a47568433afd465667ae1a2d665d1a4aa025b8",
+      "full_page_reviewed": true,
+      "source_url": "https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/extendscript-tools-features/dollar-object.md"
+    },
+    {
+      "source_path": "docs/extendscript-tools-features/preprocessor-directives.md",
+      "source_sha256": "2e209cbc3aa56f930922edde778f2697bd66df9d1136cccf662dd8154dddfd63",
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Trusted source inclusion, runtime/data distinction and the historical host-specific targetengine support boundary",
+      "bytes": 4584,
+      "lines": 98,
+      "git_blob_sha": "074abf24e4449aa9ce287d8fe2ce6b6ee279c7b4",
+      "full_page_reviewed": true,
+      "source_url": "https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/extendscript-tools-features/preprocessor-directives.md"
+    }
+  ],
+  "provenance": {
+    "source_path": "readme.md",
+    "source_sha256": "3c508ab8e0215477d2cacf81573e0497e41ee404deff19c9f7d021f0c68a70a9",
+    "git_blob_sha1": "b3d1b2eb03fb2efcb5a8c202e98b9f4039d3f3c1",
+    "statement": "Repository describes itself as community-supported educational documentation with Adobe copyright. Pin is the maintained mirror revision, not an Adobe-hosted version declaration."
+  },
+  "dated_vendor_sources": [
+    {
+      "url": "https://helpx.adobe.com/after-effects/desktop/automate-in-after-effects/automate-animation/scripts.html",
+      "page_updated_on": "2024-10-03",
+      "reviewed_on": "2026-10-08",
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Allow Scripts To Write Files And Access Network; current page retains historical tooling prose, which is not promoted to a modern ESTK availability claim"
+    }
+  ],
+  "runtime_not_claimed": [
+    "No AE invocation or new installed-host/build/render/filesystem evidence",
+    "No exclusive create, atomic replace, file durability, filesystem canonicalization or concurrent writer guarantee",
+    "No universal native JSON, modern JavaScript, Node or UXP facilities in ExtendScript",
+    "No I/O timeout or asynchronous execution implied by bounded byte counts, sleep, timer or execute",
+    "No complete runtime claim for ScriptUI, BridgeTalk, Socket, ExternalObject, E4X, reflection/localization or debugger"
+  ],
+  "source_pages": 8,
+  "source_lines": 2790
+}

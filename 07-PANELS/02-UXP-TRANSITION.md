@@ -7,6 +7,11 @@ Published AE-specific contracts now have a separate [host API operation guide](0
 differences, guide overloads and DeferredCall documentation gaps. Migration roadmap
 alone no longer stands in for that API coverage; remaining currentness work is explicit.
 
+[Shared UXP platform](04-UXP-PLATFORM.md) отдельно описывает lifecycle, UI,
+permissions, file/storage/network и packaging по официальному source snapshot.
+AE host ID/setup остаётся конкретным пробелом источника; версия common UXP
+не равна версии After Effects.
+
 ## Adobe timeline snapshot — 2026-10-01
 
 Adobe's 2026-09-24 developer announcement states:

@@ -10,28 +10,15 @@ Do not force all three into one runtime.
 
 ## Recommended architecture
 
-```text
-UI layer
-  CEP now / UXP later
-       |
-       | versioned commands + JSON
-       v
-Automation layer
-  ExtendScript dispatcher
-       |
-       +---- project edits ----------> AE scripting DOM
-       |
-       +---- control native feature -> parameter/menu/file/IPC bridge
+Панель передаёт намерение в application command. Команда выбирает adapter:
+CEP вызывает ExtendScript dispatcher, UXP обращается к опубликованному host
+module, а native операция использует свой поддерживаемый bridge. UI получает
+результат команды и обновляет снимок состояния проекта.
 
-Native layer
-  Effect plug-in / AEGP service
-       |
-       +---- PICA suites ---> AE native APIs
-       +---- shared suite --> other native modules
-       +---- external IPC --> helper/service when justified
-```
-
-The layer boundary is more important than the UI technology. A future CEP -> UXP migration should not require rewriting the domain model or native engine.
+AE UXP project operations use the published `aftereffects` module; they do not
+automatically pass through ExtendScript. Native bridge choice remains explicit
+parameter/menu/file/IPC or suite design, with its own permission and lifetime.
+The application commands and native engine can remain shared across UI adapters.
 
 ## Which bridge should you use?
 
@@ -41,7 +28,8 @@ The layer boundary is more important than the UI technology. A future CEP -> UXP
 | Add a small native command reachable from AE | AEGP command/menu/service |
 | Effect parameter or render behavior | Effect API |
 | Native module to native module | PICA/shared suite |
-| Panel calling project automation | CEP/UXP -> scripting bridge |
+| CEP panel calling project automation | CEP → ExtendScript bridge |
+| UXP panel calling project automation | Published AE UXP host module on a supported host |
 | Heavy external compute | Helper/service + explicit IPC |
 | High-volume pixels | Native effect/GPU path, not JSON |
 
@@ -217,7 +205,10 @@ wake-function dependencies alive until workers and callbacks can no longer reach
 them; see the [panel handoff route](../14-NATIVE-INTEGRATIONS/07-NATIVE-PANELS.md#freshness-cancellation-and-teardown-сверка-2026-10-07).
 
 These are architectural contracts, not a direct CEP→native transport implementation
-in the supplied templates. UXP routes remain conditional on a published AE host API.
+in the supplied templates. [AE UXP host API](../07-PANELS/03-UXP-HOST-API.md) is
+published; AE setup, installed runtime support and each native bridge contract
+remain separately qualified. [Shared platform lifecycle](../07-PANELS/04-UXP-PLATFORM.md)
+does not grant arbitrary host calls, workers or direct native pointer access.
 
 Protocol compatibility should be explicit.
 

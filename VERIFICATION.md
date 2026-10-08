@@ -2,6 +2,54 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Shared UXP platform, File/Folder, match names and host/platform review
+
+Parent `b5216fbd80ebb63aa48c2ee4b447eab3a9afc99c`. New platform chapter increases
+the current core inventory to129; historical127-page freeze and128-page UXP block
+counts remain dated. Exact native baseline stays SDK25.6build61.
+
+Full-source reading and exact-byte SHA256 checks:47 selected Adobe UXP Hub pages
+at `ea508323293acd250a2058c92410e0df7a3a50b0`, plus5 AE setup/site files at
+`7d1cd01b4c69a9e02b77d48b3f919a6145a90841`;52 unique files after deduplication.
+Eight match-name pages at scripting pin `7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`
+contain757 repeated rows. Eight JavaScript Tools Guide runtime pages at
+`ac6839049e17f4652d301e7d28f8f0d3d5fbb66a` contain2790 lines; community-mirror
+provenance and broader-runtime scope are explicit. File hashes, operation mappings
+and Git blob identities are in the respective dated ledgers. Independent review
+confirmed match-name counts/identifiers and official host/platform deltas.
+
+Four official Adobe pages were successfully read: release notes, system requirements,
+Advanced3D and known issues. [Dated source review](HOST-PLATFORM-REVIEW-2026-10-08.md)
+records their different update dates; this closes the earlier HTTP403 access gap,
+not an installed-host/driver/renderer verification.
+
+`node scripts/test_document_file_examples.js`:16/16 PASS, Node24.19.0. The test
+extracts actual code fences from the two chapters; fake File/provider objects cover
+BOM auto-position, bounded reads and growth, invalid limits, primary plus cleanup
+errors, failed open, existing output, partial writes, picker cancellation, unknown
+write outcome and readback mismatch. These are control-flow checks, not ExtendScript,
+UXP, actual filesystem/network, persistence/durability or AE observations. Added to CI.
+Existing scripting import/queue test and8-case ScriptUI test also PASS.
+
+Local source checks: consistency11/11, UXP inventory3/3,129-core checker and generated
+source-table freshness PASS, Python3.12.14 with pinned documentation dependencies.
+Intentional stale-output messages belong to negative test fixtures. Generated docs
+freshness, strict MkDocs and whitespace checks are completed before publishing the
+containing source revision; exact GitHub run results are recorded separately.
+No current SDK archive, real host, signing, driver update, installation or package
+publication result is asserted by this block.
+
+### Published UXP host-page block: exact GitHub evidence
+
+Source commit `b457925347a9cb95a78b39c16c6d48ab9e73ab1c`:
+[Validate](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37827943145)
+and [Regenerate docs](https://github.com/ios3kov/AAE-Developer-Bible/actions/runs/37827943161)
+both completed successfully. Validate included Ubuntu portable checks and macOS
+native-driver regressions. Generated-only follow-up
+`b5216fbd80ebb63aa48c2ee4b447eab3a9afc99c` matched the local generated output.
+No additional workflow run on the generated-only commit is inferred. This is
+repository/documentation CI evidence, not an AE or real SDK test.
+
 ### Full pinned UXP host-page review closure
 
 Parent `c356a2a87b503ab8ef786d3db0686433d2a6cee5`. Последние19 страниц полностью

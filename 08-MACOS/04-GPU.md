@@ -4,6 +4,10 @@
 
 Общая Effect/GPU lifecycle-модель находится в [GPU effects](../02-EFFECT-PLUGINS/05-GPU.md). Здесь — то, что меняется именно из-за macOS, Apple Silicon, Metal, bundle layout и Xcode/toolchain.
 
+Используйте датированный [host/renderer snapshot](../00-START-HERE/02-ENVIRONMENT-MATRIX.md#host-snapshot-2026-10-08)
+для разделения общих требований AE, Advanced3D и известных проблем конкретных
+конфигураций. Старое требование renderer не снижает минимум текущего host.
+
 ## Главный принцип
 
 Mac GPU backend не должен определять effect semantics.

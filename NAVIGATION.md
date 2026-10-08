@@ -6,6 +6,8 @@
 
 После freeze: [полнота и актуальность — active review](CURRENTNESS-REVIEW-2026-10-07.md).
 AE-specific [UXP host API operations](07-PANELS/03-UXP-HOST-API.md) дополняют transition roadmap.
+[Shared UXP platform](07-PANELS/04-UXP-PLATFORM.md) покрывает lifecycle/UI,
+permissions, files/storage/network и packaging с отдельной границей AE setup.
 
 Маршруты описывают действия читателя. Они не означают, что примеры
 уже собраны или проверены в вашем After Effects. Отделяйте чтение
@@ -166,7 +168,9 @@ AE-specific [UXP host API operations](07-PANELS/03-UXP-HOST-API.md) дополн
 
 - [CEP development](07-PANELS/01-CEP.md)
 - [UXP transition for After Effects](07-PANELS/02-UXP-TRANSITION.md)
-- [Panels: CEP now, UXP next](07-PANELS/README.md)
+- [AE UXP host API operations](07-PANELS/03-UXP-HOST-API.md)
+- [UXP platform: lifecycle, files and distribution](07-PANELS/04-UXP-PLATFORM.md)
+- [Panels: CEP and AE UXP](07-PANELS/README.md)
 
 ## 08-MACOS
 

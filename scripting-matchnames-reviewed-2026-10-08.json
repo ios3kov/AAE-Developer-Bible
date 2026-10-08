@@ -1,0 +1,76 @@
+{
+  "repository": "docsforadobe/after-effects-scripting-guide",
+  "source_revision": "7137a990db4bd8dc9f5869b8ca431c7dfed52bdc",
+  "reviewed_date": "2026-10-08",
+  "provenance": "Community-maintained Adobe scripting guide; not a current vendor binary or SDK-header guarantee",
+  "evidence": "All 8 full pinned match-name pages read; AE runtime NOT_RUN",
+  "scope": "All docs/matchnames/**/*.md paths in the non-truncated pinned tree; table rows include repeats and are not API signatures or current installed capabilities",
+  "source_pages": 8,
+  "table_rows": 757,
+  "reviews": [
+    {
+      "source_path": "docs/matchnames/effects/firstparty.md",
+      "source_sha256": "986333b597bb8e2fe6a4d55164f043946ff8af5266cd33f68f97dc528a1451e8",
+      "bytes": 24749,
+      "table_rows": 313,
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Exact effect lookup with installed capability checks, distinct legacy identifiers and separate BPC/GPU evidence"
+    },
+    {
+      "source_path": "docs/matchnames/layer/3dlayer.md",
+      "source_sha256": "b6d65be3dd87f0cb174e977fb589de44720a2f74615d5f8aa3531e133714d3bd",
+      "bytes": 1412,
+      "table_rows": 20,
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Renderer-qualified geometry/material roots without inferring Substance or parametric mesh property contracts"
+    },
+    {
+      "source_path": "docs/matchnames/layer/avlayer.md",
+      "source_sha256": "d9c31b68b9fd8ee4ae9f28173a6609fbd48859af0b0ebdad8e50a8e7b41361d6",
+      "bytes": 1642,
+      "table_rows": 22,
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Named transform, audio, mask and effect roots with separated dimensions and role validation"
+    },
+    {
+      "source_path": "docs/matchnames/layer/cameralayer.md",
+      "source_sha256": "b2535433770a2d1937d97521267cafc081ba7de8bb19e079b030cdad46ae84dc",
+      "bytes": 1271,
+      "table_rows": 15,
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Camera/iris property lookup preserving literal identifiers and host/version applicability"
+    },
+    {
+      "source_path": "docs/matchnames/layer/layerstyles.md",
+      "source_sha256": "1f5ed488ae621b60a3fade211755184b90289c6fedee198bf40b14da19afe674",
+      "bytes": 7704,
+      "table_rows": 109,
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Literal slash-bearing style identifiers, existing-owner lookup and no invented style creation route"
+    },
+    {
+      "source_path": "docs/matchnames/layer/lightlayer.md",
+      "source_sha256": "53954a3020c285ad1f4ee5a83e4332d964c69a99213daf014330502fa3b4ee0d",
+      "bytes": 1072,
+      "table_rows": 11,
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Light, falloff and shadow property lookup with type-aware edit policy"
+    },
+    {
+      "source_path": "docs/matchnames/layer/shapelayer.md",
+      "source_sha256": "18c80a2f5ca2b604203543db7bdef5a3c99b4222f52e775c8366ea3ce80b9a4a",
+      "bytes": 11409,
+      "table_rows": 143,
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Owned vector hierarchy construction and mutation with fresh group references"
+    },
+    {
+      "source_path": "docs/matchnames/layer/textlayer.md",
+      "source_sha256": "7959b8581dadca5e3b65053448a8dc186dfa183bce9099f073b75b5c7d5849a9",
+      "bytes": 8072,
+      "table_rows": 124,
+      "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
+      "operation": "Source Text versus animator/selector property routes and scoped text styling"
+    }
+  ]
+}

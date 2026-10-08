@@ -12,11 +12,14 @@ The historical127-page closure does not certify the full current API surface.
 [Current review and open criteria](CURRENTNESS-REVIEW-2026-10-07.md).
 [Freeze record and reproduction](EDITION-FREEZE-2026-10-07.md).
 
-Последнее дополнение: [практический AE UXP host API](07-PANELS/03-UXP-HOST-API.md)
-согласован с **44/44 страницами** официального pinned source. Добавлены слои,
-свойства, текст, камеры/свет/3D, lifecycle и экспорт; расхождения с ExtendScript
-и неполные vendor contracts указаны явно. Это полный обзор данного набора страниц,
-не утверждение о runtime, всех referenced types или shared-platform coverage.
+Последнее дополнение: отдельная [глава UXP platform](07-PANELS/04-UXP-PLATFORM.md)
+описывает lifecycle, UI, файлы, сеть и доставку по47 shared-platform страницам и5
+AE setup/site файлам. [Scripting](06-SCRIPTING/01-OBJECT-MODEL.md) дополнен точными
+match names и File/Folder с примерами ограниченного чтения и экспорта. Обновлены
+[официальные требования host/platform](HOST-PLATFORM-REVIEW-2026-10-08.md).
+Ранее согласованы **44/44 опубликованные AE UXP host страницы**; отсутствующие
+конструкторы/типы, AE setup и runtime-version mapping остаются явными границами.
+Текущий core inventory —129 страниц; source review не означает выполнение в AE.
 
 ## Цель
 
@@ -59,8 +62,9 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 Отсутствие runtime evidence у source example означает только **«Bible не заявляет этот runtime result»**, а не «Bible обязана теперь собрать и протестировать этот пример».
 
 План edition1.1 [завершён](COMPLETION-PLAN.md), но по новому требованию владельца
-полнота/актуальность текущего SDK/API проверяется отдельно. [Исторический tracker](CHAPTER-COMPLETION-TRACKER.md)
-фиксирует127 pages C/L, не исчерпывающий current API inventory. Новая работа не
+полнота/актуальность текущего SDK/API проверяется отдельно. [Tracker](CHAPTER-COMPLETION-TRACKER.md)
+сохраняет историческое закрытие127 pages C/L и текущую очередь129 страниц;
+это не исчерпывающий current API inventory. Новая работа не
 заменяется обязательной host-QA всех examples.
 
 ## Главный принцип
@@ -106,7 +110,7 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 04-AEIO/             import/export
 05-ARTISAN/          custom 3D renderer
 06-SCRIPTING/        ExtendScript / ScriptUI / expressions
-07-PANELS/           CEP и переход на UXP
+07-PANELS/           CEP, опубликованный AE UXP API и общая платформа UXP
 08-MACOS/            Xcode, Universal, debug, signing, notarization
 09-WINDOWS/          Visual Studio, x64/ARM64, debug, signing
 10-TESTING/          correctness, MFR, GPU/CPU, perf, crashes
@@ -139,16 +143,18 @@ AE Developer Bible — это **база знаний**, а не отдельн�
 
 См. [completion plan](COMPLETION-PLAN.md), [editorial checklist](COMPLETION-CHECKLIST.md) и [coverage matrix](FINAL-COVERAGE-AUDIT.md).
 
-## Состояние UXP / CEP на дату снимка
+## Состояние UXP / CEP на дату review
 
-Adobe 24 сентября 2026 объявила расширение UXP на After Effects. Public beta UXP для After Effects заявлена к ноябрю 2026. На дату этой редакции это **датированный planning fact**, а не уже проверенный AE UXP API.
+Историческое объявление Adobe от24 сентября2026 и план public beta к ноябрю
+сохранены в [migration chapter](07-PANELS/02-UXP-TRANSITION.md). На2026-10-08 уже
+прочитан опубликованный официальный AE UXP API; сводить его к roadmap неверно.
+Публикация документации сама по себе не устанавливает доступность конкретного AE
+build, host ID для manifest или соответствие версии общей платформы UXP.
 
-Практическое правило текущей редакции:
-
-- heavy render/effect code → C++ SDK;
-- production panel сейчас → CEP с отделённой business logic;
-- UXP учитывать как migration target;
-- не путать будущий roadmap с доступным контрактом.
+Heavy render/effect code использует C++ SDK. Панель выбирает CEP либо AE UXP по
+подтверждённой поддержке целевой среды. Общая business logic может быть отделена
+от host adapter; ExtendScript и UXP host calls имеют разные контракты. Начать с
+[host API](07-PANELS/03-UXP-HOST-API.md) и [platform workflow](07-PANELS/04-UXP-PLATFORM.md).
 
 ## Что эта база не делает
 
@@ -183,6 +189,6 @@ Block 4 is complete in the editorial/tooling scope: exact-head PR regeneration a
 - **Frozen/generated validation:** run `python scripts/build_docs.py --check` before regenerating anything. A stale MASTER or MANIFEST fails. Validate automatically chooses this lane for generated-only push commits; workflow_dispatch can explicitly select it.
 - **Identity:** the MASTER header records a relocatable source-content SHA-256, excluding MASTER/MANIFEST. It is not a Git revision. CI reports checkout SHA, triggering SHA and PR head SHA separately. Bot commits retain a `Source-Git-SHA` trailer and report the resulting generated commit SHA.
 
-Consistency tests check the actual request/success/error JSON examples in four CEP documents, the complete 127-row core inventory against nested menu/NAVIGATION, and three registered current evidence boundaries. They detect regressions and explicit unsupported CURRENT-COMPILE/RUNTIME/HOST claims; they do not certify every prose claim or execute AE. Existing source-driven CEP VM tests remain separate.
+Consistency tests check the actual request/success/error JSON examples in four CEP documents, the complete 129-row core inventory against nested menu/NAVIGATION, and three registered current evidence boundaries. They detect regressions and explicit unsupported CURRENT-COMPILE/RUNTIME/HOST claims; they do not certify every prose claim or execute AE. Source-driven CEP and documentation-file VM tests remain separate; their doubles do not establish real host or filesystem behavior.
 
 PR regeneration checks out the exact PR head with read-only repository permission. It validates, regenerates and uploads a bundle/provenance packet containing the bot-authored generated commit (or an explicit no-change result). Publishing that commit is separate: verify its parent equals the still-current PR source SHA, its changed paths are only MASTER/MANIFEST, and generated --check passes, then fast-forward the PR branch. No write token is passed to PR code; failures are not swallowed. The main-only regeneration workflow remains separate.

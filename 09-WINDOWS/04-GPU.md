@@ -2,6 +2,10 @@
 
 Эта глава описывает Windows-specific слой GPU effect development. Общая lifecycle-модель — в [GPU effects](../02-EFFECT-PLUGINS/05-GPU.md).
 
+Текущий датированный [host/renderer snapshot](../00-START-HERE/02-ENVIRONMENT-MATRIX.md#host-snapshot-2026-10-08)
+отдельно фиксирует требования OpenCL и driver-related known issues. Возможность
+запустить AE и возможность выполнить конкретный backend плагина проверяются раздельно.
+
 ## Главный принцип
 
 Математический contract должен быть backend-independent:

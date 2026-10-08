@@ -1068,57 +1068,14 @@ path/returned handle are not output evidence: require decoded files, full reques
 frame coverage, identity and explicit status. Avoid arbitrary polling or workers
 calling host methods without a documented permission.
 
-## Shared platform setup, permissions and packaging — 2026-10-07
+## Shared platform и AE setup
 
-Reviewed Adobe [first plugin](https://developer.adobe.com/uxp/guides/tutorials/build-your-first-plugin/),
-[manifest](https://developer.adobe.com/uxp/guides/explanation/concepts/manifest/),
-[package](https://developer.adobe.com/uxp/guides/how-to/distribution/package/) and
-[install](https://developer.adobe.com/uxp/guides/how-to/distribution/install/).
-The common tutorial and manifest HostDefinition list PS/ID/Premiere/AME, **not AE**.
-Consequently this is a shared-platform workflow with an AE-specific setup gap,
-not a validated AE starter. Do not invent app:"AE" or copy another host's ID.
-
-1. Obtain AE-specific supported host/build/UDT template and host ID from its actual
-   setup documentation/distribution. Confirm connected host in UDT, not merely a
-   page saying API27.0. Until then no installable AE manifest is claimed here.
-2. Keep manifest.json at bundle root; current common schema example uses
-   manifestVersion5 (number), stable id/name/semver, host minVersion and command/panel
-   entrypoint IDs. Bind code to those exact IDs. Reference table calls schema version
-   string while example uses number: follow host's validated schema, record conflicts.
-3. Enable development mode in UDT and supporting host, Load & Watch, debug in host.
-   HTML/JS reload loses in-memory state; stop listeners/timers and invalidate pending
-   UI generations. Manifest changes require Unload then Load, not hot reload.
-4. Default deny optional capabilities. For user-selected files prefer
-   localFileSystem:"request", plugin-only storage needs no fullAccess. Network allowlist
-   exact needed domains; avoid domains:"all". Clipboard/webview/process/addon permissions
-   are separate, not granted by network or a host path parameter.
-5. Handle picker cancellation, stale persistent tokens, revoked/missing paths and
-   failed writes. Plugin folder is not project persistence or a credential store.
-   Remote content is data; validate bridge origin/message schema, never evaluate code
-   from response strings. Leave allowCodeGenerationFromStrings false unless justified.
-6. UI uses shared UXP HTML/CSS/Spectrum, not full Chrome/CEP behavior. Bundle needed
-   components; resize/theme/keyboard/focus and repeated show/hide need dedicated checks.
-   Disable mutation controls while a host command is active; stale UI suppression
-   does not cancel already executed host work.
-7. Package with UDT Actions → Package into .ccx, inspect logs. Single host object for
-   distribution; multi-host arrays are development convenience and packaging selects
-   first host. Packaging success does not establish installed AE compatibility.
-8. Stable Marketplace ID comes from distribution portal; independent/enterprise use
-   separate stable ID to avoid Marketplace entitlement failure. CCX needs no CEP
-   package signature/timestamp; this does **not** waive native addon signing/notary.
-9. Test user install via CC Desktop (.ccx double-click), consent, installed listing,
-   host discovery, update, disable and uninstall with actual artifact hash recorded.
-   Do not require end users to enable developer mode. No AE Marketplace eligibility
-   inferred from common packaging docs.
-
-Hybrid .uxpaddon is not an AE Effect/AEGP binary renamed. Common package guide
-specifies mac/arm64, mac/x64, win/x64 layouts and native signing/notary; support in
-the chosen AE UXP build still needs host-specific confirmation. Developer loading,
-CCX packaging and installed-product evidence remain separate lanes (NOT_RUN here).
-
-The remaining AE host ID/setup and file/network/lifecycle member details are open
-source contracts, not hidden under a claim that common UXP documentation guarantees
-every host API or installation channel.
+[Отдельная platform-глава](04-UXP-PLATFORM.md) описывает официальные shared UXP
+lifecycle/UI, manifest/UDT, file/storage/network и distribution contracts.
+AE Get Started остаётся заглушкой; host ID, соответствие AE build ↔ UXP runtime
+и устанавливаемый AE starter не выводятся из MinVersion27.0. Entry/nativePath,
+Promise и AbortController подчиняются своим контрактам и не расширяют автоматически
+возможности AE host module или DeferredCall.
 
 Use [evidence records](../10-TESTING/07-TEST-EVIDENCE.md): exact host version/build/beta,
 plugin/package source identity, entry/manifest/runtime, project preconditions,

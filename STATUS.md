@@ -4,6 +4,14 @@ Updated: **2026-10-08**
 
 ## Active: current completeness and currency review
 
+Добавлена [UXP platform глава](07-PANELS/04-UXP-PLATFORM.md):47 полных shared
+страниц и5 AE setup/site файлов, с отдельным ledger и сохранёнными source gaps.
+В scripting дописаны8 match-name страниц/757 повторяемых строк и8 runtime/File/
+Folder страниц. Три авторских файловых примера проверяются16 переносимыми cases
+из фактического текста главы; это проверки control flow с doubles, не AE или I/O.
+Официальные release/requirements/Advanced3D/known-issues страницы прочитаны,
+прежний HTTP403 больше не является текущим access gap. Core inventory теперь129.
+
 Завершён полный обзор **44/44 pinned AE UXP host pages**: 1448 повторяемых строк
 свойств/заголовков, не уникальных API. Последние19 страниц добавили lifecycle,
 настройки проекта/MOGRT, создание и редактирование слоёв, Property/key/mask,
@@ -21,9 +29,11 @@ review. Exact26.5 archive/full header diff and full current API inventory still 
 Owner requested a stricter full/current Bible after edition1.1 freeze. Current
 API coverage is **not yet accepted**. [New criteria/source observations](CURRENTNESS-REVIEW-2026-10-07.md):
 current SDK header/archive acquisition remains OPEN. Следующие source-review задачи:
-shared UXP platform/AE setup, ExtendScript runtime/File/Folder, полный native
-public-guide inventory и обновление host/platform sources. Полное чтение44 UXP
-страниц не закрывает отсутствующие constructor/enum/type/async contracts.
+полный native public-guide inventory/reconciliation, оставшиеся отдельные области
+ExtendScript runtime и финальная provenance sweep. AE-specific UXP setup/version map
+не опубликованы в проверенных источниках. Полное чтение44 UXP host страниц и выбранных
+platform workflow источников не закрывает отсутствующие constructor/enum/type/async
+contracts и не является полным обзором всего UXP Hub.
 Historical closure below applies to the old plan, not this expanded acceptance.
 
 ## Historical edition freeze — 2026-10-07

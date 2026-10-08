@@ -2,6 +2,18 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Added separate UXP platform chapter covering lifecycle/UI, storage, network and
+  distribution:47 full shared pages plus5 AE setup/site files, exact-byte ledger.
+  Preserved missing AE manifest host ID/runtime map and upstream version conflicts.
+- Reviewed all8 match-name source pages/757 repeated table rows and added typed
+  layer/text/shape/style/effect resolution recipes. Reviewed8 ExtendScript runtime/
+  File/Folder pages with bounded binary read and new UTF-8 export examples.
+- Added16 source-extracted portable file-example cases covering cancellation,
+  BOM/size limits, partial writes and primary/cleanup outcomes; no real I/O or AE.
+- Re-read official release/requirements/Advanced3D/known-issues sources and updated
+  dated host/platform matrix. Added core page129 and reconciled navigation/old UXP
+  roadmap-only language without changing historical evidence or SDK25.6 baseline.
+
 - Closed full pinned UXP host-page review:44/44 pages,1448 repeated rows/headings.
   Added19 pages of lifecycle/project/export, layers, properties/keys/masks, text
   ranges and3D operations. Preserved return/access/geometry/beta/type conflicts;

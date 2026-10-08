@@ -31,12 +31,12 @@
 | OS | supported minimum/maximum policy |
 | CPU architecture | arm64/x86_64/x64/ARM64 as relevant |
 | compiler/toolchain | Xcode/Clang or Visual Studio/MSVC generation |
-| extension type | Effect / AEGP / AEIO / Artisan / Script / CEP / hybrid |
+| extension type | Effect / AEGP / AEIO / Artisan / Script / CEP / UXP / hybrid |
 | pixel formats | 8/16/32 bpc actually supported by feature |
 | SmartFX | yes/no + ROI assumptions |
 | MFR | supported/disabled/experimental |
 | GPU | backend/device requirements |
-| panel runtime | CEP version / migration boundary |
+| panel runtime | CEP/UXP version, host module and rollout boundary |
 | signing | development vs release policy |
 | dependencies | bundled/runtime/framework requirements |
 | host products | AE only vs Premiere compatibility where applicable |
@@ -49,6 +49,52 @@ native guide lists26.5 changes, but actual26.5 SDK headers not acquired/reviewed
 retained25.6 exact baseline. Do not assume a26.5 native host exposes27.0 UXP API.
 
 [Claim/source/version table](../BLOCK-5-SOURCES.md) keeps SDK ABI, documented host requirements, panel runtime and platform policy in separate columns. SDK 25.6 build 61 is the Bible native baseline, not an AE/OS support range. Current Adobe Windows-on-Arm requirements are documented separately from our unperformed native ARM64 host tests.
+
+## Опубликованный host snapshot — 2026-10-08
+
+[Adobe release notes](https://helpx.adobe.com/after-effects/desktop/what-s-new/release-notes-after-effects.html)
+на дату чтения называют текущим выпуском **26.5, September2026**.
+[System requirements](https://helpx.adobe.com/after-effects/desktop/get-started/technical-requirements/system-requirements.html),
+обновлённые2026-09-09, явно относятся к26.0/26.2/26.2.1/26.3/26.5.
+
+| Область | Опубликованный минимум / условие |
+|---|---|
+| Windows x64 | Windows11 24H2; Intel6thGen+/Ryzen1000+ с AVX2 |
+| Windows on Arm | Snapdragon X; Windows11 24H2 build26100.2033; Adreno driver31.0.121.1+ |
+| macOS | Sonoma14; Intel6thGen с AVX2 либо Apple Silicon по отдельной колонке |
+| RAM | 16GB; для Apple Silicon указана unified memory |
+| Windows GPU | NVIDIA Maxwell+ с4GB VRAM; AMD/Intel discrete4GB и OpenCL |
+| Windows/OpenCL | С AE25.6 требуется2.0; поддержка1.2 и ниже прекращена |
+| Intel Mac GPU | Discrete AMD с4GB VRAM |
+
+Это vendor support specification. Продукт отдельно выбирает свои OS/architecture
+границы, toolchain и deployment target; перечисление host hardware не доказывает
+доступность конкретного native suite, UXP member или GPU callback.
+
+### Advanced 3D: дополнительный набор условий
+
+Связанная [Adobe Advanced3D page](https://helpx.adobe.com/after-effects/desktop/work-with-3d-composition/advanced-3d-renderer/advanced-3d-renderer.html)
+имеет более старую дату **2025-04-02**. Она отдельно требует Metal на Mac и не
+поддерживает Intel Mac с integrated GPU. Её macOS12/OpenCL1.0 строки нельзя
+использовать для снижения более новых общих host requirements выше. Рекомендуемая
+интерпретация: пересечение требований выбранной версии AE и нужного renderer;
+неразрешённые driver/device расхождения проверять по конкретной конфигурации.
+Полный список моделей GPU остаётся в источнике, не в универсальном whitelist Bible.
+
+### Known issues: добавить риск, не менять все машины
+
+[Adobe known issues](https://helpx.adobe.com/after-effects/desktop/troubleshooting/fixed-and-known-issues/known-issues-after-effects.html),
+обновлено2026-10-07, отдельно описывает startup crash со старым Intel OpenCL
+`igdrcl64.dll` версии20.19.15.4531, а также Intel Mac/AMD/macOS14 crash при
+Transmit + Draft3D. Совпадение имени DLL не достаточно для диагноза; продуктовый
+installer не должен удалять системные driver files или registry entries по имени.
+Сначала подтвердить точную конфигурацию и следовать scoped vendor procedure.
+
+В26.5 также указан сброс twirl state у Shape/Camera при открытии проектов,
+сохранённых до25.2. Это UI-state issue, не автоматически потеря геометрии/камеры.
+Добавляйте такие кейсы в релевантные product lanes; не распространяйте временную
+обходную меру на всю support matrix. [Source review](../HOST-PLATFORM-REVIEW-2026-10-08.md)
+закрывает прежний HTTP403 source-access gap, без нового host/runtime результата.
 
 ## Platform baseline
 

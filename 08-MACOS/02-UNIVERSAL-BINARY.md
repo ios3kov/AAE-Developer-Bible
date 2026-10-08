@@ -4,6 +4,11 @@ A macOS Universal plug-in contains both arm64 and x86_64 machine-code slices in 
 
 Ship both only if the product still claims both Apple Silicon and Intel support.
 
+Host eligibility is a separate input: the dated
+[Adobe requirements review](../00-START-HERE/02-ENVIRONMENT-MATRIX.md#host-snapshot-2026-10-08)
+distinguishes the application minimum, renderer requirements and known platform
+issues. A deployment target or Universal slice list does not replace that review.
+
 ## PiPL and binary must agree
 
 For an effect with one entry point, the resource commonly declares both architectures:

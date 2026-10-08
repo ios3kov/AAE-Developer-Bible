@@ -31,11 +31,11 @@ full UXP/runtime/SDK26.5 audit or new installed AE observation inferred.
 | Layer | Retained exact baseline | Current published surface / gap |
 |---|---|---|
 | Native headers/samples | supplied SDK25.6build61 | 26.5 guide additions; actual archive/header/toolset diff OPEN |
-| Native guides | dated reviewed source | Guide2, ItemView2, Comp13, Stream7 changes need full topic/source reconciliation |
+| Native guides | dated reviewed source | Selected Guide2, ItemView2, Comp13, Stream7 deltas reconciled; full pinned public-guide review in progress |
 | Effect metadata | reviewed PiPL baseline | Search_Keywords/Description/EXT3 and preview media are PProBeta27-only per current guide |
-| ExtendScript | reviewed ES3 lessons/DOM | Full current scripting object/member inventory OPEN |
-| AE UXP | official source pin7d1cd01 | 44/44 full host pages reviewed2026-10-08; constructor/enum/type/async gaps, shared platform and AE setup remain explicit |
-| Host/OS support | retained dated matrix | Fresh readable release/requirements source OPEN; HTTP403 is not verification |
+| ExtendScript / expressions | retained lessons and dated evidence | Pinned DOM648 headings classified,32 expression pages and8 match-name pages reviewed;8 File/Folder/runtime pages added, broader runtime and source-contract gaps explicit |
+| AE UXP | official source pin7d1cd01 | 44/44 full host pages;47 selected Hub pages plus5 AE setup/site files reviewed. Constructor/enum/type/async and AE setup/runtime-map gaps retained |
+| Host/OS support | historical matrix retained | Four official pages read2026-10-08; dated release26.5/requirements and known issues transferred, previous HTTP403 access gap closed |
 
 Native guide lists `AEGP_CreateParametricMeshLayerInComp` in CompSuite13 and
 `AEGP_ObjectType_3D_PARAMETRIC_MESH` from GetLayerObjectType; StreamSuite7 exposes
@@ -43,6 +43,27 @@ layer-parameter render-stage sampling. Exact signatures/macros/layouts require
 the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
+
+**Platform/runtime дополнение — 2026-10-08:** новая
+[UXP platform глава](07-PANELS/04-UXP-PLATFORM.md) закрывает выбранные lifecycle/UI,
+file/network/storage и packaging workflows по47 полным Hub страницам и5 AE setup/
+site файлам. Общие страницы дедуплицированы в [52-file ledger](uxp-platform-reviewed-2026-10-08.json).
+AE setup остаётся опубликованной заглушкой; shared manifest/version table не дают
+AE host ID, minimum UDT или UXP↔AE mapping. Эти данные не придуманы.
+
+Все8 pinned match-name страниц/757 повторяемых строк прочитаны и сопоставлены
+с property-tree операциями. Отдельно прочитаны8 runtime/File/Folder страниц,
+2790 строк, с исходными hashes. Добавлены собственные bounded binary reader,
+new-file UTF-8 export и UXP JSON export;16 source-extracted portable cases проверяют
+отмену, пределы, частичный outcome и cleanup, без настоящего I/O или AE.
+ScriptUI/BridgeTalk/Socket/ExternalObject/E4X и остальные runtime references не
+объявляются полностью пересмотренными из-за чтения этих8 страниц.
+
+[Host/platform review](HOST-PLATFORM-REVIEW-2026-10-08.md) закрывает доступ к текущим
+официальным release notes и requirements, добавляет Advanced3D/known-issues scope.
+Сохранённые даты различаются; более старый renderer minimum не понижает текущий
+host minimum. Exact SDK25.6build61 baseline и отсутствие нового26.5 archive
+не изменились. Текущий core inventory129 не заменяет source API inventory.
 
 **Актуальный UXP результат — 2026-10-08:** полное чтение44/44 pinned страниц
 завершено; 1448/1448 повторяемых property rows/method headings охвачены page review.
@@ -140,12 +161,13 @@ expression member inventory or runtime PASS.
   cross-host-only additions. Map topic → authoritative source → version → actual recipe.
 - [x] Read all44 pinned published AE UXP host pages and reconcile practical operations;
   retain contradictory/incomplete contracts without inventing API parity.
-- [ ] Finish shared-platform contracts and AE-specific setup/manifest/permissions/
-  UI/file/network/storage/lifecycle/packaging workflow, with explicit source gaps.
+- [x] Review selected shared-platform setup/manifest/permissions/UI/file/network/
+  storage/lifecycle/packaging workflows; explicitly preserve unpublished AE-specific
+  setup/runtime mapping. This is scoped operation coverage, not all UXP Hub APIs.
 - [ ] Review current scripting/expression object/member changes and missing operation
   recipes; distinguish ExtendScript, expression JS and UXP rather than porting by name.
-- [ ] Read current host/platform requirements/release notes from a verifiable official
-  route; close dated-snapshot gaps or explicitly report blocked assertions.
+- [x] Read current host/platform requirements/release notes from a verifiable official
+  route; close the previous access gap and retain separate dates/runtime limits.
 - [ ] Audit source/recipe completeness against current API inventory, not just the
   historical127 core menu entries. Overview L does not excuse a missing promised operation.
 - [ ] Final source/date/link/provenance sweep, tests/generated outputs and new freeze.

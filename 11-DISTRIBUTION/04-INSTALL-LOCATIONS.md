@@ -75,7 +75,8 @@ After Effects UXP is in a transition period in this 2026 snapshot. Do not invent
 AE-specific documentation is already published (landing reread 2026-10-07);
 publication is not installed beta/GA evidence. Follow exact AE-specific packaging/
 install contracts for the chosen host/runtime; this cheat sheet does not invent a
-cross-host UXP filesystem location. See [transition boundary](../07-PANELS/02-UXP-TRANSITION.md).
+cross-host UXP filesystem location. See [transition boundary](../07-PANELS/02-UXP-TRANSITION.md)
+and the [shared packaging/install workflow](../07-PANELS/04-UXP-PLATFORM.md).
 
 ## Common vs AE-specific policy
 

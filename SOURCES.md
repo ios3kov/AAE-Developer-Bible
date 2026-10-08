@@ -5,9 +5,32 @@ Research snapshots: retained 2026-10-01 / 2026-10-02; selected platform/roadmap 
 Freeze rereview **2026-10-07**: Apple notarization workflow, sample-first/install/
 debugger guides, Windows ARM build/SignTool and AE UXP landing reviewed within
 [macOS/Windows reconciliation](CHAPTER-RECONCILIATION-2026-10-07.md).
-Adobe host requirements fetch HTTP403; dated2026-10-04 support snapshot retained
-explicitly, not freshly certified. No exhaustive external-link/API audit or installed
+At that freeze rereview Adobe host requirements returned HTTP403; its retained
+snapshot was not freshly certified. No exhaustive external-link/API audit or installed
 beta/GA/native host verification. SDK25.6 baseline and per-record dates unchanged.
+
+**2026-10-08 update:** official release/requirements, Advanced3D requirements and
+known issues successfully read. [Host/platform review](HOST-PLATFORM-REVIEW-2026-10-08.md)
+records page dates, transferred claims and remaining gaps. The earlier HTTP403
+observation remains historical; it is no longer the current access status.
+
+**Pinned operation reviews — 2026-10-08:**
+
+- [AE UXP host ledger](uxp-api-reviewed-2026-10-08.json):44 official pages at
+  `AdobeDocs/uxp-after-effects@7d1cd01b4c69a9e02b77d48b3f919a6145a90841`.
+- [UXP platform ledger](uxp-platform-reviewed-2026-10-08.json):47 selected official
+  `AdobeDocs/uxp-hub` pages at `ea508323293acd250a2058c92410e0df7a3a50b0`, plus5
+  AE setup/site files at the host pin. Full-file hashes and exact repository scopes
+  are retained; this is not all Hub API or AE version compatibility.
+- [Match-name ledger](scripting-matchnames-reviewed-2026-10-08.json):all8 pinned
+  tables,757 repeated rows at scripting guide revision
+  `7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`. Type identities are not installed-effect
+  availability or complete parameter/value contracts.
+- [ExtendScript runtime ledger](extendscript-runtime-reviewed-2026-10-08.json):8
+  full File/Folder/encoding/runtime pages,2790 lines at JavaScript Tools Guide
+  `ac6839049e17f4652d301e7d28f8f0d3d5fbb66a`. This is a community-maintained mirror
+  of Adobe material, not a current Adobe host support declaration. Broader runtime
+  subsystems remain separate. The vendor scripts-permission page has its own date.
 
 [Claim/source/version table](BLOCK-5-SOURCES.md) separates SDK, host, panel and platform boundaries. [Block 5 review](BLOCK-5-REVIEW-2026-10-04.md) records practical-depth comparison, fresh checks and remaining uncertainty.
 
@@ -25,6 +48,8 @@ beta/GA/native host verification. SDK25.6 baseline and per-record dates unchange
   https://blog.developer.adobe.com/en/publish/2026/09/investing-in-the-future-of-creative-cloud-extensibility-uxp-comes-to-our-flagship-applications
 - Adobe CEP Resources  
   https://github.com/Adobe-CEP/CEP-Resources
+- [Adobe AE UXP documentation source](https://github.com/AdobeDocs/uxp-after-effects)
+- [Adobe shared UXP Hub documentation source](https://github.com/AdobeDocs/uxp-hub)
 - Adobe CEP 12 HTML Extension Cookbook  
   https://github.com/Adobe-CEP/CEP-Resources/blob/master/CEP_12.x/Documentation/CEP%2012%20HTML%20Extension%20Cookbook.md
 - Adobe CEP Samples  
@@ -50,6 +75,7 @@ beta/GA/native host verification. SDK25.6 baseline and per-record dates unchange
   https://ae-scripting.docsforadobe.dev/
 - Source repository for C++ guide  
   https://github.com/docsforadobe/after-effects-plugin-guide
+- [JavaScript Tools Guide maintained mirror](https://github.com/docsforadobe/javascript-tools-guide)
 
 Important: Docs for Adobe is community-maintained. For shipping decisions, validate version-sensitive facts against the actual SDK headers/samples and Adobe release notes you build against.
 

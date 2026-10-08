@@ -81,8 +81,8 @@ def core_paths(text):
 def navigation_errors(texts):
     errors = []
     core = core_paths(texts['CHAPTER-COMPLETION-TRACKER.md'])
-    if len(core) != 128 or len(set(core)) != 128:
-        errors.append('core baseline must contain 128 unique tracked rows; changes require review')
+    if len(core) != 129 or len(set(core)) != 129:
+        errors.append('core baseline must contain 129 unique tracked rows; changes require review')
     menu = set(menu_paths(yaml.safe_load(texts['mkdocs.yml'])['nav']))
     catalogue = {p.split('#')[0] for p in re.findall(r'\]\(([^)]+)\)', texts['NAVIGATION.md'])}
     for path in sorted(set(core) - menu):
@@ -122,7 +122,7 @@ def check(root=ROOT):
 def main():
     errors = check()
     sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-    print(json.dumps({'git_sha': sha, 'scope': 'CEP examples / 128 core menu entries / declared evidence boundaries',
+    print(json.dumps({'git_sha': sha, 'scope': 'CEP examples / 129 core menu entries / declared evidence boundaries',
                       'dirty':bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),
                       'errors': errors, 'status': 'FAIL' if errors else 'PASS'}, indent=2))
     return bool(errors)

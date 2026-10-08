@@ -1,10 +1,13 @@
-# Panels: CEP now, UXP transition
+# Panels: CEP и AE UXP
 
 Panels are the UI/application layer of many After Effects tools. They should not become the place where project/render truth is accidentally stored.
 
 ## Dated platform status
 
-On the Bible research snapshot, Adobe has announced UXP for After Effects and a transition away from CEP. The detailed dates/source are recorded in [UXP transition](02-UXP-TRANSITION.md).
+На2026-10-08 опубликованы AE-specific UXP APIs и общие platform contracts.
+[Host operations](03-UXP-HOST-API.md) и [shared platform](04-UXP-PLATFORM.md)
+разделяют их возможности, источники и пробелы AE setup. Датированный план перехода
+от CEP сохранён в [UXP transition](02-UXP-TRANSITION.md).
 
 Treat roadmap dates as dated facts, not permanent API contracts.
 
@@ -22,7 +25,8 @@ AE bridge adapter
 After Effects
 ```
 
-Today the shell may be CEP; later it may be UXP. Domain/application logic should survive the shell change.
+Shell выбирается по поддерживаемой среде продукта. Domain/application logic
+должна переживать смену CEP/UXP adapter.
 
 ## Source of truth
 
@@ -254,6 +258,7 @@ Bible documents these areas; it does not need to execute every panel source exam
 ## Read next
 
 - [AE UXP host API and concrete project command](03-UXP-HOST-API.md)
+- [UXP platform: lifecycle, UI, files, network and packaging](04-UXP-PLATFORM.md)
 
 - [CEP](01-CEP.md)
 - [UXP transition](02-UXP-TRANSITION.md)

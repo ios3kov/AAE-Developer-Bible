@@ -537,6 +537,103 @@ if safe option reconstruction isn't established for target build, disable that e
 while retaining validated shape creation/type operation. Inherited property list isn't
 proof every AVLayer operation is meaningful for parametric geometry.
 
+### Match names: точные идентификаторы и маршруты — review2026-10-08
+
+Полностью прочитаны все8 страниц `docs/matchnames/` на pin
+`7137a990db4bd8dc9f5869b8ca431c7dfed52bdc`:757 табличных строк, включая повторы.
+[Ledger с SHA256 и областью переноса](../scripting-matchnames-reviewed-2026-10-08.json).
+Это community-maintained reference, не новый exact-SDK или host result.
+Каталог помогает выбрать идентификатор; тип значения, возможность записи,
+единицы, версия и время следуют отдельному Property/owner contract.
+
+#### AVLayer, камера, свет и3D
+
+| Задача | Именованная группа / выбранные свойства | Pinned источник |
+|---|---|---|
+| Transform слоя | `ADBE Transform Group` → `ADBE Position`, `ADBE Scale`, `ADBE Opacity` | [AVLayer](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/matchnames/layer/avlayer.md) |
+| Маски, эффекты, звук | `ADBE Mask Parade`, `ADBE Effect Parade`, `ADBE Audio Group` | Та же AVLayer page |
+| Камера | `ADBE Camera Options Group` → `ADBE Camera Zoom`, `ADBE Camera Focus Distance` | [Camera](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/matchnames/layer/cameralayer.md) |
+| Свет | `ADBE Light Options Group` → `ADBE Light Intensity`, `ADBE Light Color` | [Light](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/matchnames/layer/lightlayer.md) |
+| Геометрия и material options | `ADBE Extrsn Options Group`, `ADBE Material Options Group` | [3D](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/matchnames/layer/3dlayer.md) |
+
+Стрелка означает последовательные `property()` lookup, а не одну составную строку.
+Сначала получить подходящий тип слоя, затем группу, затем leaf и проверить
+`propertyValueType`. Для separated Position использовать соответствующий follower;
+наличие имён `ADBE Position_0/1/2` не делает2D слой трёхмерным.
+
+Сохраняйте буквальное написание: в camera list есть `ADBE Iris Hightlight Saturation`.
+Автоматическое исправление «опечатки» создаст другой lookup key. В3D list нет полного
+контракта современных Substance materials или parametric mesh: не строить его
+из старых reflection/transparency имён и не переносить на UXP material API.
+
+#### Shape: собрать конкретную иерархию
+
+[Shape list](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/matchnames/layer/shapelayer.md)
+различает корневой `ADBE Root Vectors Group`, вложенный `ADBE Vectors Group` и
+`ADBE Vector Transform Group`. `ADBE Vector Shape - Group` — path group,
+`ADBE Vector Shape` — само path-свойство. Одного совпадения display name Path
+недостаточно для выбора setter.
+
+Рекомендуемая операция: создать свой ShapeLayer → получить root contents →
+добавить разрешённый `ADBE Vector Group` → заново получить его contents →
+добавить path и fill/stroke по `canAddProperty` → после каждого добавления
+обновить ссылки → записать Shape/цвет/толщину через typed Property contract.
+Проверить порядок операторов и результат. Корневой Layer Transform и transform
+vector group действуют на разных уровнях; не смешивать их координаты.
+
+Repeater, Trim, Merge, Offset, dash/taper/wave и gradient представлены отдельными
+семействами. Список идентификаторов не задаёт формат gradient stops, диапазоны
+enum или возможность добавить каждый leaf напрямую. Сохраняйте и такие точные
+ключи, как `ADBE Vector Star Inner Roundess`; исправление spelling не является
+обновлением API. Отсутствующие свойства обрабатывать как неподдержанный маршрут.
+
+#### Text: Source Text и animator — разные владельцы
+
+[Text list](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/matchnames/layer/textlayer.md)
+даёт маршрут `ADBE Text Properties` → `ADBE Text Document` для Source Text.
+Рекомендуемый read/edit/write использует свежий TextDocument и выбранную key/time
+policy; свойства animator не являются полями этого документа.
+
+От `ADBE Text Properties` получить `ADBE Text Animators`, затем собственный
+`ADBE Text Animator`. У animator отдельно получить `ADBE Text Animator Properties`
+и `ADBE Text Selectors`; это две дочерние ветви.
+Различать percent- и index-based Start/End/Offset; mode/units определяют смысл
+чисел. Наличие буквы3D в имени animator Position не доказывает включение
+per-character3D. После structural add перечитать группу и потом менять значения.
+Старый перечень front/bevel/side/back properties не является универсальной схемой
+новых материалов. Variable font axis получает имя по отдельному API, а не
+придуманному matchName на основе шрифтового tag.
+
+#### Layer Styles: slash внутри имени
+
+[Styles list](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/matchnames/layer/layerstyles.md)
+содержит буквальные идентификаторы `dropShadow/enabled`, `dropShadow/color`,
+`gradientFill/gradient`, `frameFX/enabled`. **Не разбивать `/` как путь**:
+таблица называет так одно свойство. Реальную owner-иерархию нужно установить
+отдельно; каталог не документирует создание каждого Layer Style через addProperty.
+
+Для правки существующего style сначала найти его у согласованного слоя и проверить
+leaf/type, затем применить policy времени и прочитать итог. Drop Shadow как style
+и одноимённый effect — разные владельцы и ключи. Display label не годится для
+автоматической замены одного другим. Compound gradient/blend values нельзя
+сериализовать по выдуманной RGB-схеме; отсутствие контракта остаётся явным.
+
+#### Эффекты: каталог и установленная capability
+
+[First-party effect list](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/matchnames/effects/firstparty.md)
+публикует matchName, EN label, BPC и версию появления GPU acceleration там, где
+она указана. Пустая GPU ячейка не доказывает отсутствие поддержки сегодня;
+таблица не является полным современным capability manifest.
+
+Практический путь: выбрать точный key из каталога → проверить `app.effects` в
+текущем host → получить `ADBE Effect Parade` цели → `canAddProperty` → добавить
+один экземпляр → заново получить его и параметры → проверить результат.
+`ADBE Gaussian Blur` и `ADBE Gaussian Blur 2` — разные ключи, а не свободные
+синонимы; сходство label не разрешает миграцию анимации или замену legacy effect.
+Для текущих BPC/GPU/MFR claims использовать отдельно датированный
+[официальный effects atlas](../21-BUILTIN-EFFECTS-REVERSE-ENGINEERING/README.md).
+Ни доступный effect, ни сохранённый matchName не подтверждают визуальную эквивалентность.
+
 ### Property tree inspection and structural mutation — review2026-10-08
 
 Full pinned [PropertyBase](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/propertybase.md)
@@ -1622,7 +1719,8 @@ owned output File → readback path/settings → queue status. Нельзя rend
 неизвестный output или считать exit0 доказательством полного набора decoded frames.
 
 File/Folder: permissions на script filesystem/network не предполагать включёнными.
-Для UTF-8 text установить encoding до open, проверить return/status, close в finally;
+После успешного open явно задать encoding перед I/O; учитывать BOM/позицию,
+проверить return/status, close в finally;
 не переписывать существующий file без explicit policy. `app.settings` — preferences,
 не project persistence или secret vault. Scheduled chunks хранят generation/job ID,
 обрабатывают bounded batch и revalidate target; cancelTask прекращает будущие
@@ -1887,46 +1985,286 @@ UI event
   -> UI renders result
 ~~~
 
-The command function should remain callable from ScriptUI, CEP, a JSX harness or a future UXP adapter without rewriting the operation.
+Операция приложения должна оставаться понятной независимо от UI. JSX implementation
+может вызываться из ScriptUI, CEP bridge или JSX harness; UXP adapter требует
+отдельного переноса host calls по опубликованному AE UXP contract.
 
 ## Long operations
 
-### File/Folder и preferences: bounded сценарии
+### ExtendScript runtime, File/Folder и preferences
 
-**UTF-8 text export (SOURCE EXAMPLE / AE NOT_RUN).** Включённые scripting file
-permissions — prerequisite, не обещание helper. Dialog до mutation, новый filename,
-проверка parent Folder и возвращаемых I/O statuses. Здесь нет project edits и Undo:
+**ExtendScript runtime и File/Folder — DOCUMENTED / SOURCE EXAMPLE /
+RUNTIME-NOT-CLAIMED, review 2026-10-08.** Прочитаны целиком восемь страниц
+[JavaScript Tools Guide](https://github.com/docsforadobe/javascript-tools-guide/tree/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs).
+Это закреплённое community-maintained зеркало исходного Adobe guide с последующими
+правками сообщества; оно не устанавливает поддержку каждого поведения в современной
+версии AE. Ниже документированные контракты отделены от собственных сценариев.
+В AE примеры не запускались. [Source ledger](../extendscript-runtime-reviewed-2026-10-08.json)
+фиксирует8 полных страниц/2790 строк и их SHA256. Переносимые проверки
+[фактических примеров](../scripts/test_document_file_examples.js) используют doubles;
+они проверяют контроль ошибок, а не реальный filesystem/runtime.
+
+#### Runtime и разрешения
+
+**DOCUMENTED.** [Обзор ExtendScript](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/introduction/extendscript-overview.md)
+описывает расширения языка и библиотеки, доступность которых зависит от host.
+[Объект `$`](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/extendscript-tools-features/dollar-object.md)
+даёт `$.version`, `$.build`, `$.os`, `$.fileName`, `$.global` и диагностику.
+Версия этого движка не заменяет `app.version`. Присваивание `$.error` вызывает
+ошибку; присваивание `File.error` очищает файловую ошибку — это разные каналы.
+`$.sleep()` приостанавливает вызывающий поток. `$.hiresTimer` измеряет микросекунды
+с предыдущего чтения, но не ограничивает длительность блокирующего I/O.
+
+[Директивы](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/extendscript-tools-features/preprocessor-directives.md)
+`#include`/`#includepath` управляют подключением исполняемого исходника;
+`$.evalFile()` также исполняет файл. Страница `#targetengine` отдельно ограничивает
+его поддержку Illustrator/InDesign CS5: из неё нельзя вывести гарантированную
+продолжительность жизни именованного engine в AE.
+
+**Проектное решение.** Писать host-часть совместимым синтаксисом `var`/`function`,
+а требуемые возможности проверять внутри самого ExtendScript. Наличие `JSON`,
+`Promise`, `Buffer`, `fetch` или модулей в CEP/Node/UXP ничего не доказывает о JSX.
+Для JSON проверять доступность нужных `parse`/`stringify` либо поставлять проверенный
+совместимый codec вместе с инструментом. Затем проверять схему, размеры массивов,
+допустимые ключи, диапазоны чисел и глубину. Не заменять JSON-parser вызовом `eval`,
+`$.evalFile` или динамическим `#include`. JavaScript expression engine композиции
+также не является настройкой runtime скриптов.
+
+[Официальная Adobe Help](https://helpx.adobe.com/after-effects/desktop/automate-in-after-effects/automate-animation/scripts.html)
+(обновлена 2024-10-03; проверена 2026-10-08) указывает переключатель
+**Allow Scripts To Write Files And Access Network** в Scripting & Expressions.
+Он относится к записи и сети; не приписывайте ему запрет любого чтения. Разрешение
+скриптов не выдаёт права ОС на произвольный каталог. Команда сообщает фактическую
+ошибку доступа и предлагает выбрать доступное место; сама не меняет preferences.
+
+#### Выбор места, URI и собственность
+
+**DOCUMENTED.** [File](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/file-system-access/file-object.md):
+`openDialog()`/`saveDialog()` возвращают выбранный объект, при отмене — `null`;
+множественный выбор меняет форму результата. Диалог сохранения ещё не создаёт файл.
+Фильтры различаются по платформам.
+[Folder](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/file-system-access/folder-object.md):
+конструктор создаёт объект пути, `create()` — каталог, с Boolean-результатом;
+рекурсивное создание родителей не обещано. Для folder picker справочник указывает
+`File` или `Folder`, поэтому проверяется фактически полученный тип.
+`Folder.current` — изменяемый текущий каталог. `userData` относится к данным
+пользователя, `temp` — к временным данным, `startup` — к приложению. Это не папка
+открытого проекта. `parent` корневой папки может быть `null`.
+
+[Контракт путей](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/file-system-access/using-file-and-folder-objects.md):
+`absoluteURI`/`fullName` представляют URI, `fsName` — полный путь ОС;
+относительные пути используют `Folder.current`. URI содержит percent-encoding.
+Alias обычно перенаправляет I/O на цель; некоторые операции над ссылкой составляют
+исключение. Это не обещание разрешения всех разновидностей symlink, junction и
+ссылок в родительских каталогах.
+
+**Сценарий команды.** Получить один `File` или `Folder` → обработать `null` как
+`cancelled` → проверить тип → зафиксировать выбранную базовую папку → проверить
+input/output policy → только затем начать работу. При отмене никаких Undo groups,
+созданных каталогов или пустых output-файлов не требуется. Имя из фильтра диалога
+не доказывает формат содержимого.
+
+Хранить пути вместе с их форматом и ролью: URI для собственного manifest, `fsName`
+для API, ожидающего native path. Не склеивать native и URI-фрагменты и не декодировать
+строку повторно. Для имени, пришедшего из manifest, разрешать один листовой компонент
+по правилам продукта: отклонять пустую строку, `.`/`..`, разделители, NUL и запрещённые
+платформой имена. Не превращать недопустимое имя незаметным удалением символов в
+другое допустимое имя. Для относительного дерева проверять каждый компонент.
+
+Проверка строкового префикса, `exists`, нормализация регистра или один `resolve()`
+не доказывают, что запись останется внутри разрешённого дерева. Для входных данных
+без доверия использовать контролируемый каталог и проверку канонического пути на
+уровне сервиса с нужными гарантиями ОС. В обычном интерактивном инструменте сохранить
+явный выбор пользователя и не расширять его рекурсивной обработкой чужих ссылок.
+`Folder.getFiles()` возвращает готовый массив: лимит дальнейшей обработки не
+ограничивает память, уже потраченную на перечисление одного огромного каталога.
+
+#### Режимы, результат и текстовый протокол
+
+**DOCUMENTED, краткая карта File.**
+
+| Операция | Существенная граница |
+|---|---|
+| `open("r")` | Чтение существующего файла; проверяется Boolean |
+| `open("w")` | Существующее содержимое уничтожается при открытии |
+| `open("e")` / `open("a")` | Редактирование существующего / добавление в конец |
+| `read(n)` / `readln()` | Количество символов / строка; это не лимит байтов |
+| `length` / `seek()` / `tell()` | Байты; присваивание `length` изменяет файл |
+| `write()` / `writeln()` / `close()` | Проверяется Boolean; `writeln` добавляет выбранный `lineFeed` |
+| `copy()` / `rename()` | Copy перезаписывает цель; rename принимает новое имя без пути |
+| `remove()` / `execute()` | Немедленное удаление / запуск ассоциированного приложения; не Undo и не ожидание завершения |
+
+`eof` истинно также у закрытого файла. `changePath()` меняет путь объекта, а не
+перемещает данные. Успех `open` не заменяет проверку чтения, записи и закрытия.
+
+**DOCUMENTED.** [Unicode I/O](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/file-system-access/using-file-and-folder-objects.md#unicode-io)
+описывает автоматическое определение кодировки в `open`, пропуск найденного BOM
+и эвристику UTF-8 без BOM. `File.encoding` управляет последующими операциями.
+Описания `open()` и Unicode I/O расходятся в деталях BOM и определения UTF-8;
+по ним нельзя задать детерминированный decoder.
+[Список кодировок](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/file-system-access/file-and-folder-supported-encoding-names.md)
+содержит зависимые от ОС варианты; доступность проверяется `File.isEncodingAvailable`.
+`BINARY` представляет байт одним символом со значением 0…255; при записи сохраняются
+нижние восемь бит. Это строка ExtendScript, а не `Buffer`.
+[Ошибки I/O](https://github.com/docsforadobe/javascript-tools-guide/blob/ac6839049e17f4652d301e7d28f8f0d3d5fbb66a/docs/file-system-access/file-access-error-messages.md)
+включают ошибки преобразования и неполный многобайтный символ. Следующая успешная
+операция может очистить `File.error`, поэтому причину сохраняют до cleanup.
+
+**Решение формата.** До открытия output определить кодировку, допустимость BOM,
+newline policy и предельный размер. После успешного `open` явно задать кодировку
+перед I/O: одной настройки до автоматического определения недостаточно для
+самостоятельного контракта инструмента. Для текста не считать BOM-эвристику строгой
+проверкой UTF-8. Для точных байтов переключиться на `BINARY` и вернуть позицию к нулю,
+чтобы автопропуск BOM не потерял начало. `readln` и повторная сборка строк не подходят
+для сохранения исходных delimiters.
+
+Старый guide рекомендует BOM для Unicode-файлов вообще. Продукт должен выбрать
+политику конкретного формата и согласовать её с потребителем, а не добавлять BOM
+ко всем текстовым артефактам. `lineFeed` управляет добавлением delimiter через
+`writeln`, но не нормализует уже находящиеся в payload CR/LF.
+
+#### Ограниченное чтение без изменения проекта
+
+**SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED.** Собственный reader принимает выбранный
+`File`, создаёт отдельный handle и возвращает byte-string. Лимит 2 MiB ниже — политика
+этого примера. Начальный размер является ранней проверкой; предел проверяется также
+по реально прочитанным данным. Все чтения ограничены, включая проверку одного лишнего
+байта на границе. Здесь нет AE mutation и Undo.
 
 ```jsx
-function writeNewUtf8(file, text) {
-    if (!file || file.exists || !file.parent.exists)
+function readBinaryBounded(input, maxBytes) {
+    if (!(input instanceof File)) throw new Error("Choose one file");
+    if (typeof maxBytes !== "number" || !isFinite(maxBytes) ||
+        maxBytes < 0 || maxBytes !== Math.floor(maxBytes) ||
+        maxBytes > 2 * 1024 * 1024)
+        throw new Error("Invalid byte limit");
+
+    var file = new File(input.absoluteURI);
+    if (!file.exists) throw new Error("Input is missing");
+    if (file.length > maxBytes) throw new Error("Input exceeds byte limit");
+
+    var opened = false, primary = null, closeProblem = null;
+    var parts = [], total = 0;
+    try {
+        if (!file.open("r")) throw new Error(file.error || "Open failed");
+        opened = true;
+        file.encoding = "BINARY";
+        if (!file.seek(0, 0)) throw new Error(file.error || "Seek failed");
+        for (;;) {
+            var remaining = maxBytes - total;
+            var request = remaining < 4096 ? remaining + 1 : 4096;
+            var chunk = file.read(request);
+            var readProblem = file.error;
+            if (readProblem) throw new Error(readProblem);
+            if (typeof chunk !== "string") throw new Error("Invalid read result");
+            total += chunk.length;
+            if (total > maxBytes) throw new Error("Input exceeds byte limit");
+            if (chunk.length) parts.push(chunk);
+            if (file.eof) break;
+            if (!chunk.length) throw new Error("Read made no progress");
+        }
+    } catch (e) {
+        primary = { message: String(e) };
+    } finally {
+        if (opened) {
+            try {
+                if (!file.close()) closeProblem = file.error || "Close failed";
+            } catch (closeError) { closeProblem = String(closeError); }
+        }
+    }
+    if (primary || closeProblem)
+        throw new Error((primary ? primary.message : "") +
+            (closeProblem ? "\nClose: " + closeProblem : ""));
+    return parts.join("");
+}
+```
+
+Ожидаемый результат: весь принятый byte-string не длиннее `maxBytes`, включая BOM,
+возвращается после успешного закрытия. Декодирование и JSON parsing — следующий
+отдельный этап с проверенным codec и лимитами схемы; byte-string нельзя напрямую
+выдавать за декодированный Unicode. Перед AE mutation подготовить и проверить весь
+план изменений.
+
+Размер, `modified` и повторное чтение не превращают файл в неизменяемый snapshot.
+Если сторонний процесс меняет input, согласовать передачу готового неизменяемого
+артефакта или отклонять такой источник. Ограничение байтов не задаёт таймаут сети,
+не запускает worker и не делает ScriptUI отзывчивым. Для более крупных задач нужен
+отдельный протокол выполнения; checkpoints и отмена работают между завершёнными
+операциями. Память требуется также для массива chunks, итоговой строки, декодирования
+и разобранной структуры.
+
+#### Экспорт и замена существующего результата
+
+**SOURCE EXAMPLE / RUNTIME-NOT-CLAIMED.** Для небольшого уже проверенного текстового
+payload и нового имени в существующем контролируемом каталоге:
+
+```jsx
+function writeNewUtf8(destination, text) {
+    if (!(destination instanceof File) || typeof text !== "string")
+        throw new Error("Expected File and text");
+    var file = new File(destination.absoluteURI);
+    if (file.exists || !file.parent || !file.parent.exists)
         throw new Error("Choose a new file in an existing folder");
-    file.encoding = "UTF-8";
     var opened = false, primary = null, closeProblem = null;
     try {
         if (!file.open("w")) throw new Error(file.error || "Open failed");
         opened = true;
+        file.encoding = "UTF-8";
         if (!file.write(text)) throw new Error(file.error || "Write failed");
-    } catch (e) { primary = e; }
+    } catch (e) { primary = { message: String(e) }; }
     finally {
         if (opened) {
-            try { if (!file.close()) closeProblem = "Close failed: " + file.error; }
-            catch (c) { closeProblem = c.toString(); }
+            try {
+                if (!file.close()) closeProblem = file.error || "Close failed";
+            } catch (closeError) { closeProblem = String(closeError); }
         }
     }
     if (primary || closeProblem)
-        throw new Error((primary ? primary.toString() : "") + "\n" + (closeProblem || ""));
+        throw new Error((primary ? primary.message : "") +
+            (closeProblem ? "\nClose: " + closeProblem : ""));
     return file.fsName;
 }
 ```
 
-Expected: Unicode text roundtrips through an independent UTF-8 reader, output
-path returned only after successful close. Failure can leave partial own file;
-do not report complete export. `exists` check is **not exclusive creation**: race
-can create a file before open("w"). Use a product-owned staging directory under
-controlled access; if collision-free publication against concurrent writers is
-required, use an external service with exclusive-create/atomic-publish semantics,
-not this helper. Never delete user files as automatic error cleanup.
+Helper не добавляет BOM или newline автоматически: они определяются подготовленным
+payload. Ожидание — независимый читатель получает именно выбранный текстовый формат;
+проверку roundtrip требуется провести отдельно. Ошибка может оставить частичный
+собственный файл. `exists` перед `open("w")` не является exclusive-create: допустимость
+helper зависит от контроля над каталогом и отсутствия конкурирующих writers.
+
+**Сценарий замены.** Сначала сериализовать и проверить данные → записать отдельный
+собственный staging-файл → закрыть → прочитать и проверить формат/содержимое → выбрать
+способ публикации. По умолчанию публикация нового versioned имени сохраняет старый
+результат. Если продукт разрешает замену, политика должна описывать backup, каждый
+неуспешный шаг и оставшиеся реальные пути.
+
+Например, перенос старого результата в backup и последующий rename staging — два
+шага с промежутком, когда final отсутствует. При втором failure backup остаётся
+доступным, а команда сообщает отсутствие final. Возвращать backup допустимо только
+после проверки, что назначение не занял другой участник; эта проверка тоже не
+устраняет гонку. Не удалять backup автоматически в ветке ошибки. `rename`, `copy`,
+`close` и такой сценарий сами по себе не обещают атомарную замену, exclusive ownership,
+durability после потери питания или синхронизацию нескольких writers. Для этих
+требований нужен квалифицированный внешний файловый сервис. `File.execute()` не
+даёт его протокол завершения; ограничения `system.callSystem()` разобраны выше
+в разделе External helper invocation.
+
+#### Файл проекта и sidecar
+
+Использовать уже описанный контракт Application/project lifecycle: у несохранённого
+проекта `app.project.file` может быть `null`, а Save As меняет выбранную базовую папку.
+Для команды «экспорт рядом с проектом» зафиксировать project/job generation → выбрать
+или сохранить документ по политике пользователя → заново получить `app.project.file`
+→ определить output → непосредственно перед host mutation повторно проверить цель.
+Не подставлять `Folder.current` в отсутствие `.aep` и не считать совпавший путь
+доказательством прежнего project object. Запись sidecar и `Project.save()` — разные
+результаты: отчёт указывает отдельно путь sidecar, состояние сохранения проекта и
+частичный failure. Undo проекта не возвращает прежние байты внешнего файла.
+
+**Граница покрытия.** Закрыт source review выбранных File/Folder, encoding, `$`,
+preprocessor и runtime-overview страниц. Полное поведение ScriptUI, BridgeTalk,
+Socket, ExternalObject, E4X, reflection/localization и отладчика остаётся отдельными
+runtime-областями; этот блок не объявляет завершённым весь ExtendScript runtime.
 
 **Preferences.** A tool can save a short non-secret mode string under its own
 `app.settings` section; this does not mutate project and needs no Undo. Example:
@@ -1953,9 +2291,7 @@ The guide documents values as strings, per-version preferences (not automaticall
 migrated across AE installs), and a reported1999-byte failure limit in AE15.0.1;
 keep tiny preferences rather than interpreting that observation as a universal
 modern capacity guarantee.
-Exact
-File/Folder APIs follow [ExtendScript File reference](https://extendscript.docsforadobe.dev/file-system-access/file-object/)
-(open/write/close returns reviewed2026-10-07), not browser File APIs; Settings follows
+Settings follows the separately reviewed
 [pinned guide](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/settings.md).
 
 Host-side ExtendScript can block interactive work. Avoid one giant call that performs expensive file parsing, networking or computation and then mutates the project.
