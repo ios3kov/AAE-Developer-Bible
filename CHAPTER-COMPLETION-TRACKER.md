@@ -4,6 +4,10 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 expression inventory32 pages/295 headings;5 full-page operation reviews
+(52 headings) pinned/hash checked,27 pages remain. Property/path workflows supplied;
+expanded acceptance OPEN, source ambiguities retained without runtime claims.
+
 2026-10-08 expressions continuation pins independent source and reviews3 full pages:
 coordinates/time/random operation recipes; expression inventory remains OPEN.
 

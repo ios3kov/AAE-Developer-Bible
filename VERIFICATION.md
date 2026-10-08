@@ -2,6 +2,16 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Expression inventory and property/path review
+
+Parent `ab8eb69`; full Property/Path Property pages read;5 reviewed-page hashes checked
+against inventory.32 source pages/295 headings,5 reviews/52 headings. Added inventory/
+review uniqueness/provenance tests. No expression/marker/path/loop/AE execution;
+semantic/source designs separate from generated-doc checks and compiler/runtime PASS.
+Results: scripts90/90, consistency11/11, checker/source hashes, generated freshness,
+strict MkDocs and whitespace PASS; negative consistency fixture stale diagnostics
+intentional, no CI/host PASS inferred.
+
 ### Expression coordinates/time/random source review
 
 Parent `337216e`;3 full expression pages read at independent pinned revision

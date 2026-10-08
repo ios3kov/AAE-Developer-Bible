@@ -1,0 +1,13 @@
+{
+  "source_revision": "a5c5c5066d0395239d524510ace060963f5c0d33",
+  "review_date": "2026-10-08",
+  "evidence": "Full-page DOCUMENTED operation-design review; AE runtime NOT_RUN",
+  "scope": "Explicit full pages only; page headings are not all inherited contracts or signatures",
+  "reviews": [
+    {"source_path": "docs/general/random-numbers.md", "source_sha256": "75de1fd87c091000354a2dfd04ea8fb4fd8d6c8c6331b07d912ee3ffca0c62d5", "coverage_page": "06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md", "operation": "Seed lifetime, bounded uniform versus unbounded Gaussian and scalar correlated noise"},
+    {"source_path": "docs/general/time-conversion.md", "source_sha256": "f8037e7a799a80b18ef95a5188495cb160d144092882f8f26d4496239733aae7", "coverage_page": "06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md", "operation": "Explicit frame/timecode offset and duration rounding policy"},
+    {"source_path": "docs/layer/layer-space-transforms.md", "source_sha256": "a8274f22faaddc96116bf9954863a68918c95a2362cabce0184e441f993252fa", "coverage_page": "06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md", "operation": "Parent-space follow, point versus vector and camera surface projection"},
+    {"source_path": "docs/objects/property.md", "source_sha256": "10dca1dec0dd5c291aca49c18c42ce707790dc95cb40698fe039a98cc534a3ba", "coverage_page": "06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md", "operation": "Key/marker trigger boundaries, qualified loops, time sampling, smoothing and perturbation"},
+    {"source_path": "docs/objects/path-property.md", "source_sha256": "950d557e124ce7c58683d5749fccb33870e9cb01bc456891ad677b0f5cfd20ec", "coverage_page": "06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md", "operation": "Typed path rebuild, arc-length follow, tangent offsets and coordinate-context qualification"}
+  ]
+}

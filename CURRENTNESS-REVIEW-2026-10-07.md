@@ -44,6 +44,12 @@ the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
 
+2026-10-08 expression property/path block: independent inventory32 pages/295 headings
+(overloads retained),5 explicitly full-page reviews/52 headings,27 pages unreviewed.
+Added marker trigger/count/pre-first gates, versioned next/previousKey, qualified
+loops/sampling/smoothing and path rebuild/arc follow. Source loop default/temporal
+wiggle units ambiguities retained. No expression/key/path runtime or complete coverage.
+
 2026-10-08 expression continuation: pinned reference revision
 `a5c5c5066d0395239d524510ace060963f5c0d33`; full transforms/time/random pages read.
 Practical3D parent-space follow, point/vector/surface distinctions, time offset/

@@ -1,0 +1,493 @@
+{
+  "source_revision": "a5c5c5066d0395239d524510ace060963f5c0d33",
+  "scope": "API-category third-level headings including overloads; not all signatures",
+  "warning": "Unreviewed inventory; no mention-based or automatic PASS",
+  "source_pages": 32,
+  "headings": 295,
+  "records": [
+    {
+      "source_path": "docs/general/color-conversion.md",
+      "source_sha256": "b24b5f06cfb0deb5c8525170f5d98025330e8c6f6369f8f01760d336c3d869bc",
+      "headings": [
+        "rgbToHsl()",
+        "hslToRgb()",
+        "hexToRgb()"
+      ]
+    },
+    {
+      "source_path": "docs/general/general.md",
+      "source_sha256": "a39069ed91947d962d38752e3d496d510297d188a5032dcf52e6d6edeee6d250",
+      "headings": []
+    },
+    {
+      "source_path": "docs/general/global.md",
+      "source_sha256": "68bdddbb02be0b22cc65227127e59d5ce01de0ac38ba0e7d0187139ca3effd5c",
+      "headings": [
+        "colorDepth",
+        "thisComp",
+        "thisLayer",
+        "thisProject",
+        "thisProperty",
+        "time",
+        "value",
+        "comp()",
+        "footage()",
+        "posterizeTime()"
+      ]
+    },
+    {
+      "source_path": "docs/general/interpolation.md",
+      "source_sha256": "04033aa3cf0bdcd79aec857b57eaa1912734bf42fd5792239e4acc7ebdefc031",
+      "headings": [
+        "linear(t, tMin, tMax, value1, value2)",
+        "linear(t, value1, value2)",
+        "ease(t, tMin, tMax, value1, value2)",
+        "ease(t, value1, value2)",
+        "easeIn(t, tMin, tMax, value1, value2)",
+        "easeIn(t, value1, value2)",
+        "easeOut(t, tMin, tMax, value1, value2)",
+        "easeOut(t, value1, value2)"
+      ]
+    },
+    {
+      "source_path": "docs/general/other-math.md",
+      "source_sha256": "bf10613f2c608535639d21d943142492d46706a4cb73095d77dd38af491242b1",
+      "headings": [
+        "degreesToRadians()",
+        "radiansToDegrees()"
+      ]
+    },
+    {
+      "source_path": "docs/general/random-numbers.md",
+      "source_sha256": "75de1fd87c091000354a2dfd04ea8fb4fd8d6c8c6331b07d912ee3ffca0c62d5",
+      "headings": [
+        "gaussRandom()",
+        "gaussRandom(minValOrArray, maxValOrArray)",
+        "noise(valOrArray)",
+        "random()",
+        "random(minValOrArray, maxValOrArray)",
+        "seedRandom()"
+      ]
+    },
+    {
+      "source_path": "docs/general/time-conversion.md",
+      "source_sha256": "f8037e7a799a80b18ef95a5188495cb160d144092882f8f26d4496239733aae7",
+      "headings": [
+        "framesToTime()",
+        "timeToCurrentFormat()",
+        "timeToFeetAndFrames()",
+        "timeToFrames()",
+        "timeToNTSCTimecode()",
+        "timeToTimecode()"
+      ]
+    },
+    {
+      "source_path": "docs/general/vector-math.md",
+      "source_sha256": "407b56eaeee082d9e84bd9cb77a154d8c5fd2ba00fddc91504b04c0cbca9537c",
+      "headings": [
+        "add()",
+        "clamp()",
+        "cross()",
+        "div()",
+        "dot()",
+        "length()",
+        "lookAt()",
+        "mul()",
+        "normalize()",
+        "sub()"
+      ]
+    },
+    {
+      "source_path": "docs/layer/general.md",
+      "source_sha256": "24851fcc7c5d37df31f8cc7fc8d229e7cad2d745c703f0ebf7529fd2ffacd939",
+      "headings": [
+        "Layer.active",
+        "Layer.audioActive",
+        "Layer.enabled",
+        "Layer.hasAudio",
+        "Layer.hasParent",
+        "Layer.hasVideo",
+        "Layer.height",
+        "Layer.index",
+        "Layer.inPoint",
+        "Layer.outPoint",
+        "Layer.parent",
+        "Layer.startTime",
+        "Layer.width",
+        "Layer.sampleImage()"
+      ]
+    },
+    {
+      "source_path": "docs/layer/layer-space-transforms.md",
+      "source_sha256": "a8274f22faaddc96116bf9954863a68918c95a2362cabce0184e441f993252fa",
+      "headings": [
+        "toComp()",
+        "fromComp()",
+        "toWorld()",
+        "fromWorld()",
+        "toCompVec()",
+        "fromCompVec()",
+        "toWorldVec()",
+        "fromWorldVec()",
+        "fromCompToSurface()"
+      ]
+    },
+    {
+      "source_path": "docs/layer/layer.md",
+      "source_sha256": "54503d1dad60730c03af311c8f7791a1d07e91662806b965b5f74f9c18ea72f5",
+      "headings": []
+    },
+    {
+      "source_path": "docs/layer/properties.md",
+      "source_sha256": "0a7880e8502eb0d7657c8ecbc905fe1bb5db5b5bbfa049990756b0619f602342",
+      "headings": [
+        "Layer.anchorPoint",
+        "Layer.audioLevels",
+        "Layer.marker",
+        "Layer.name",
+        "Layer.opacity",
+        "Layer.position",
+        "Layer.rotation",
+        "Layer.scale",
+        "Layer.timeRemap"
+      ]
+    },
+    {
+      "source_path": "docs/layer/sub-objects.md",
+      "source_sha256": "74c385d871bb87a4c2255cf7f9a0c9e95aca781bac51aea10efd2e550bfb63f9",
+      "headings": [
+        "Layer.source",
+        "Layer.effect()",
+        "Layer.mask()",
+        "Layer.sourceRectAtTime()",
+        "Layer.sourceTime()"
+      ]
+    },
+    {
+      "source_path": "docs/layer/threed.md",
+      "source_sha256": "ccab8b437c6b2ec9be6adf60fd0f639d2eb87567e469aa5ed5377124f550d08b",
+      "headings": [
+        "Layer.acceptsLights",
+        "Layer.acceptsShadows",
+        "Layer.ambient",
+        "Layer.castsShadows",
+        "Layer.diffuse",
+        "Layer.lightTransmission",
+        "Layer.metal",
+        "Layer.orientation",
+        "Layer.rotationX",
+        "Layer.rotationY",
+        "Layer.rotationZ",
+        "Layer.shininess",
+        "Layer.specular"
+      ]
+    },
+    {
+      "source_path": "docs/objects/camera.md",
+      "source_sha256": "252048df079ea87778bbe73f3a4531969a5d86ad3f9c7a2191714ef868743d80",
+      "headings": [
+        "Camera.active",
+        "Camera.aperture",
+        "Camera.blurLevel",
+        "Camera.depthOfField",
+        "Camera.focusDistance",
+        "Camera.highlightGain",
+        "Camera.highlightSaturation",
+        "Camera.highlightThreshold",
+        "Camera.irisAspectRatio",
+        "Camera.irisDiffractionFringe",
+        "Camera.irisRotation",
+        "Camera.irisRoundness",
+        "Camera.irisShape",
+        "Camera.pointOfInterest",
+        "Camera.zoom"
+      ]
+    },
+    {
+      "source_path": "docs/objects/comp.md",
+      "source_sha256": "105d1158c8f4abf3c8ffccfe172de0b27548122457c06d32e1912103f07da1fd",
+      "headings": [
+        "Comp.activeCamera",
+        "Comp.bgColor",
+        "Comp.displayStartTime",
+        "Comp.duration",
+        "Comp.frameDuration",
+        "Comp.height",
+        "Comp.marker",
+        "Comp.name",
+        "Comp.ntscDropFrame",
+        "Comp.numLayers",
+        "Comp.pixelAspect",
+        "Comp.shutterAngle",
+        "Comp.shutterPhase",
+        "Comp.width",
+        "Comp.layer()",
+        "Comp.layerByComment()"
+      ]
+    },
+    {
+      "source_path": "docs/objects/dropdown.md",
+      "source_sha256": "9a5ea4e3c9c5e4c13c0f32582da2be21851ea8be2935201e1d95ac2fe0d45bb9",
+      "headings": [
+        "items",
+        "text",
+        "textAtTime()"
+      ]
+    },
+    {
+      "source_path": "docs/objects/effect.md",
+      "source_sha256": "c535045d07c58019fdbbc437769e5830c3cb1b378a9563b622654b4205fa9f7a",
+      "headings": [
+        "Effect.active",
+        "Effect.param()"
+      ]
+    },
+    {
+      "source_path": "docs/objects/footage.md",
+      "source_sha256": "cfca461a142fbe917c88071bacfe339055313d891aabd53cfd4d8c3664aa1dc1",
+      "headings": [
+        "Footage.duration",
+        "Footage.frameDuration",
+        "Footage.height",
+        "Footage.name",
+        "Footage.ntscDropFrame",
+        "Footage.pixelAspect",
+        "Footage.sourceData",
+        "Footage.sourceText",
+        "Footage.width",
+        "Footage.dataKeyCount()",
+        "Footage.dataKeyTimes()",
+        "Footage.dataKeyValues()",
+        "Footage.dataValue()"
+      ]
+    },
+    {
+      "source_path": "docs/objects/key.md",
+      "source_sha256": "eef920a5b5a91705561d01f31c52780ffd942dc5fe98e2301a05b8a74ed10963",
+      "headings": [
+        "Key.index",
+        "Key.time",
+        "Key.value"
+      ]
+    },
+    {
+      "source_path": "docs/objects/light.md",
+      "source_sha256": "c4eb61e5480f18a28df761a6601f98c8d055143fb487e6f1039f0bca388528df",
+      "headings": [
+        "Light.castsShadows",
+        "Light.color",
+        "Light.coneAngle",
+        "Light.coneFeather",
+        "Light.falloff",
+        "Light.falloffDistance",
+        "Light.intensity",
+        "Light.pointOfInterest",
+        "Light.radius",
+        "Light.shadowDarkness",
+        "Light.shadowDiffusion"
+      ]
+    },
+    {
+      "source_path": "docs/objects/marker-property.md",
+      "source_sha256": "02cf5750273c5394125214e01a53858701dda38317dc2b3e99c954298578ad22",
+      "headings": [
+        "Marker.numKeys",
+        "Marker.key(index)",
+        "Marker.nearestKey()"
+      ]
+    },
+    {
+      "source_path": "docs/objects/markerkey.md",
+      "source_sha256": "ea4f0676dac42ac364287f40572020332db01e5b8a2c7ea574d7ecb042f59520",
+      "headings": [
+        "MarkerKey.chapter",
+        "MarkerKey.comment",
+        "MarkerKey.cuePointName",
+        "MarkerKey.duration",
+        "MarkerKey.eventCuePoint",
+        "MarkerKey.frameTarget",
+        "MarkerKey.parameters",
+        "MarkerKey.protectedRegion",
+        "MarkerKey.url"
+      ]
+    },
+    {
+      "source_path": "docs/objects/mask.md",
+      "source_sha256": "ccae2b636cf4651498cc3b9caa28753e4eac068f269fcbb2d117ab60736850dd",
+      "headings": [
+        "Mask.invert",
+        "Mask.maskExpansion",
+        "Mask.maskFeather",
+        "Mask.maskOpacity",
+        "Mask.maskPath"
+      ]
+    },
+    {
+      "source_path": "docs/objects/path-property.md",
+      "source_sha256": "950d557e124ce7c58683d5749fccb33870e9cb01bc456891ad677b0f5cfd20ec",
+      "headings": [
+        "name",
+        "PathProperty.createPath()",
+        "PathProperty.inTangents()",
+        "PathProperty.isClosed()",
+        "PathProperty.normalOnPath()",
+        "PathProperty.outTangents()",
+        "PathProperty.pointOnPath()",
+        "PathProperty.points()",
+        "PathProperty.tangentOnPath()"
+      ]
+    },
+    {
+      "source_path": "docs/objects/project.md",
+      "source_sha256": "895a25fb890b408d7c558ff50a8615d8482d33f0e0bf9713df4e67948b5e897e",
+      "headings": [
+        "Project.bitsPerChannel",
+        "Project.fullPath",
+        "Project.linearBlending"
+      ]
+    },
+    {
+      "source_path": "docs/objects/property.md",
+      "source_sha256": "10dca1dec0dd5c291aca49c18c42ce707790dc95cb40698fe039a98cc534a3ba",
+      "headings": [
+        "name",
+        "numKeys",
+        "propertyIndex",
+        "speed",
+        "value",
+        "velocity",
+        "key()",
+        "key()",
+        "loopIn()",
+        "loopInDuration()",
+        "loopOut()",
+        "loopOutDuration()",
+        "nearestKey()",
+        "nextKey()",
+        "previousKey()",
+        "propertyGroup()",
+        "smooth()",
+        "speedAtTime()",
+        "temporalWiggle()",
+        "valueAtTime()",
+        "velocityAtTime()",
+        "wiggle()"
+      ]
+    },
+    {
+      "source_path": "docs/objects/propertygroup.md",
+      "source_sha256": "b3fa9998ce8b453d973e479aabf233bd7d30e8b6f4c3349b323f83dade25a376",
+      "headings": [
+        "PropertyGroup.name",
+        "PropertyGroup.numProperties",
+        "PropertyGroup.propertyIndex",
+        "PropertyGroup.propertyGroup()"
+      ]
+    },
+    {
+      "source_path": "docs/text/sourcetext.md",
+      "source_sha256": "7992dcb22d084ebad83e7d4eb84494464df889358de252fd158bbfa77916a7e3",
+      "headings": [
+        "SourceText.isHorizontalText",
+        "SourceText.isParagraphText",
+        "SourceText.isPointText",
+        "SourceText.isVerticalText",
+        "SourceText.style",
+        "SourceText.createStyle()",
+        "SourceText.getStyleAt()"
+      ]
+    },
+    {
+      "source_path": "docs/text/style.md",
+      "source_sha256": "39fff1e6a083764fc7d9c007cfe9a2dfbee5ea53fce0eaf8fdd44f9cb1f73767",
+      "headings": [
+        "Chaining",
+        "TextStyle.applyFill",
+        "TextStyle.applyStroke",
+        "TextStyle.baselineDirection",
+        "TextStyle.baselineOption",
+        "TextStyle.baselineShift",
+        "TextStyle.digitSet",
+        "TextStyle.direction",
+        "TextStyle.fillColor",
+        "TextStyle.firstLineIndent",
+        "TextStyle.font",
+        "TextStyle.fontSize",
+        "TextStyle.horizontalScaling",
+        "TextStyle.isAllCaps",
+        "TextStyle.isAutoLeading",
+        "TextStyle.isEveryLineComposer",
+        "TextStyle.isFauxBold",
+        "TextStyle.isFauxItalic",
+        "TextStyle.isHangingRoman",
+        "TextStyle.isLigature",
+        "TextStyle.isSmallCaps",
+        "TextStyle.justification",
+        "TextStyle.kerning",
+        "TextStyle.kerningType",
+        "TextStyle.leading",
+        "TextStyle.leadingType",
+        "TextStyle.leftMargin",
+        "TextStyle.lineJoin",
+        "TextStyle.rightMargin",
+        "TextStyle.spaceAfter",
+        "TextStyle.spaceBefore",
+        "TextStyle.strokeColor",
+        "TextStyle.strokeWidth",
+        "TextStyle.tracking",
+        "TextStyle.tsume",
+        "TextStyle.verticalScaling",
+        "TextStyle.replaceText()",
+        "TextStyle.setAllCaps()",
+        "TextStyle.setApplyFill()",
+        "TextStyle.setApplyStroke()",
+        "TextStyle.setAutoLeading()",
+        "TextStyle.setBaselineDirection()",
+        "TextStyle.setBaselineShift()",
+        "TextStyle.setBaselineOption()",
+        "TextStyle.setDigitSet()",
+        "TextStyle.setDirection()",
+        "TextStyle.setEveryLineComposer()",
+        "TextStyle.setFauxBold()",
+        "TextStyle.setFauxItalic()",
+        "TextStyle.setFillColor()",
+        "TextStyle.setFirstLineIndent()",
+        "TextStyle.setFont()",
+        "TextStyle.setFontSize()",
+        "TextStyle.setHangingRoman()",
+        "TextStyle.setHorizontalScaling()",
+        "TextStyle.setJustification()",
+        "TextStyle.setKerning()",
+        "TextStyle.setKerningType()",
+        "TextStyle.setLeading()",
+        "TextStyle.setLeadingType()",
+        "TextStyle.setLeftMargin()",
+        "TextStyle.setLigature()",
+        "TextStyle.setLineJoin()",
+        "TextStyle.setRightMargin()",
+        "TextStyle.setSmallCaps()",
+        "TextStyle.setSpaceAfter()",
+        "TextStyle.setSpaceBefore()",
+        "TextStyle.setStrokeColor()",
+        "TextStyle.setStrokeWidth()",
+        "TextStyle.setText()",
+        "TextStyle.setTracking()",
+        "TextStyle.setTsume()",
+        "TextStyle.setVerticalScaling()"
+      ]
+    },
+    {
+      "source_path": "docs/text/text.md",
+      "source_sha256": "2c8e51844e79894602f443d524e8e79c0374ff446ee66b2b79f094aac03abfbd",
+      "headings": [
+        "Text.sourceText",
+        "Text.Font..."
+      ]
+    },
+    {
+      "source_path": "docs/text/variable-fonts.md",
+      "source_sha256": "bc7603f5fb1daa2aea4c30c3c7a9b4a38abaeb9cbdd16632ca574f3792d3a40b",
+      "headings": []
+    }
+  ]
+}

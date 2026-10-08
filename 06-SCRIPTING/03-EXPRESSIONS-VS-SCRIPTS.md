@@ -6,6 +6,126 @@ Scripts and expressions both use JavaScript-like syntax, but they occupy differe
 
 ## Practical expression contracts — reviewed2026-10-08
 
+### Property animation: trigger bounds, loops and sampling
+
+Full pinned [Property](https://github.com/docsforadobe/after-effects-expression-reference/blob/a5c5c5066d0395239d524510ace060963f5c0d33/docs/objects/property.md)
+read. Expression Property is evaluation context, not writable scripting Property.
+name/display propertyIndex aren't stable instance identity; propertyGroup(countUp)
+provides hierarchy-relative relations for duplicated groups, provided actual structure
+validated. numKeys changes with separated dimensions and includes markers on marker
+property; never key(0) or key(numKeys) before checking count.
+
+Concrete marker-triggered playback on keyed numeric property,26.0+ JavaScript engine:
+
+~~~javascript
+var m = thisLayer.marker;
+var result = value;
+if (numKeys >= 2 && m.numKeys > 0) {
+    var trigger = m.previousKey(time);
+    if (trigger.time <= time) {
+        var first = key(1).time;
+        var last = key(numKeys).time;
+        var elapsed = Math.max(0, Math.min(time - trigger.time, last - first));
+        result = valueAtTime(first + elapsed);
+    }
+}
+result;
+~~~
+
+previousKey returns at-or-before but clamps to first before first marker; explicit
+trigger.time<=time prevents premature playback. nextKey returns after requested time
+but clamps to last after final key; returned object isn't proof an upcoming event.
+Both introduced26.0, JavaScript expression engine only, not scripting methods or
+Legacy ExtendScript expression support. Older rig uses bounded indexed scan or
+nearestKey plus time check; nearest isn't necessarily previous. key(index) returns
+Key/MarkerKey, marker-name overload only for marker properties; duplicate-name policy
+needs marker-specific review. No count-zero behavior promised. Source example ignores
+pre-first trigger/count/zero-duration gates: these product checks are deliberate.
+
+Loop command validates numeric animatable property and at least two distinct key times,
+then chooses loopOut/loopIn (key intervals) or loopOutDuration/loopInDuration (seconds).
+numKeyframes1 spans last two keys for loopOut, first two for loopIn,0 uses all keys.
+cycle repeats, pingpong reverses, offset accumulates endpoint difference; continue
+extrapolates endpoint velocity and **doesn't accept** interval/duration argument.
+Duration0 uses layer In/Out-boundary semantics, not universal all-keys equivalent;
+use explicit positive duration for bounded product loop. Source wording for loopInDuration
+default says segment begins at Out point while first-key-forward description suggests
+other endpoint: retain ambiguity and avoid that default in portable generated rigs.
+Source Text/paths/custom histogram don't support these generic numeric loops.
+cycle seam can jump if endpoints differ; pingpong/offset isn't automatic seamless
+motion. Inspect boundary/negative-time/in-out behavior and qualify actual output.
+
+value is current property value; expression valueAtTime(t) has **no scripting
+preExpression boolean**. velocity/velocityAtTime return same-dimensional temporal
+rate; speed/speedAtTime scalar spatial speed, not arbitrary numeric rate. Source's
+valueAtTime(random(4)) example doesn't select discrete four keys on interpolated
+animation: continuous random time interpolates values. To choose actual key values
+use explicit integer selection and key(index).value under engine policy; don't
+present time sampling as discrete selection or baked-key preservation.
+
+smooth(width,samples,t) uses temporal box filter, default0.2 seconds/5 samples;
+bounded positive width and odd sample count include center under product policy.
+More samples increase evaluation cost; it isn't causal live filtering or one-time
+script smoothing. wiggle(freq,amp,octaves,amp_mult,t) perturbs property value, amp in
+property units; do not add value a second time to its returned absolute result.
+For2D Y-only perturbation return [value[0],wiggle(3,50)[1]], preserving X. Scale
+correlated axes need explicit vector construction, not assumption components match.
+Bound octave/sample cost, confirm dimensions/range (opacity clamping separate).
+temporalWiggle changes sample time of existing animation, not spatial amplitude;
+its table copies "property units" for amp despite description time perturbation.
+No unambiguous units contract established here: keep target-build qualification,
+don't claim pixels converted directly into seconds. All outcomes remain expectations,
+not executed AE results or hidden evaluation-order state.
+
+### Paths: rebuild values, don't mutate project geometry from expression
+
+Full pinned [Path Property](https://github.com/docsforadobe/after-effects-expression-reference/blob/a5c5c5066d0395239d524510ace060963f5c0d33/docs/objects/path-property.md)
+read,15.0+ methods. Concrete flatten/open path expression on intended mask Path:
+
+~~~javascript
+var p = thisProperty.points(time);
+var zeros = [];
+for (var i = 0; i < p.length; i++) zeros.push([0, 0]);
+thisProperty.createPath(p, zeros, zeros, false);
+~~~
+
+createPath returns Path evaluation value, not adding masks or persistent vertices.
+points must contain at least one finite2D pair; explicit nonempty tangent arrays match
+point count. Default empty tangent arrays accepted as documented special case despite
+table equal-count wording; explicit zeros avoid relying on mismatch handling.
+Tangents are **offsets from parent vertices**, not absolute handle coordinates.
+points/inTangents/outTangents sample optional time and round four decimals; copying
+through them isn't lossless original geometry serialization. isClosed no time arg
+documented, so don't invent closure-state sampling overload.
+
+Mask points relative layer upper-left origin; shape paths relative group anchor and
+brush points relative stroke start. Don't pass shape-group coordinates straight into
+layer.toComp while ignoring nested group transforms. Concrete mask follower on2D
+Position: source.mask("Bible Path").maskPath.pointOnPath(u,time) → source.toComp(point,time)
+→ parent.fromComp(compPoint,time) if parent exists → compatible Position dimensions.
+Choose finite u0..1 under product policy, validated mask/name and ownership policy.
+No3D/shape-group generalized mapping claimed by this bounded mask route.
+
+pointOnPath uses **arc length**, not Bezier parameter/vertex index; closed0/1 same point,
+open1 last point. Linear u yields uniform progress along sampled local path; animated
+geometry or nonuniform transforms can invalidate constant comp/world-space speed.
+tangentOnPath/normalOnPath return unit-length2D offsets at arc fraction, not point
+positions or stored Bezier outTangents. Offset curve point = point + distance*normal;
+use Vec transform for direction versus point transform for position. Incoming direction
+is negative tangent, not original incoming handle magnitude. Cusp/degenerate path
+orientation/error behavior not fully described: reject unsupported state/report, no
+invented stable normal. name is display property name, not path identity. Bound
+diagnostic loops and cache sampled arrays within evaluation rather than re-read each
+vertex; no path image/host execution from these designs.
+
+### Independent expression inventory
+
+`expression-api-inventory-2026-10-08.json`:32 API-category pages/295 third-level headings
+including overloads. Page heading strings aren't unique global symbols or complete
+signature inventory. `expression-api-reviewed-2026-10-08.json` explicitly records5
+full-page operation reviews (52 headings), SHA256/source and coverage route;27 pages
+remain unreviewed. No literal mention or downloaded bytes give coverage PASS.
+
 Pinned expression-reference revision
 [`a5c5c5066d0395239d524510ace060963f5c0d33`](https://github.com/docsforadobe/after-effects-expression-reference/tree/a5c5c5066d0395239d524510ace060963f5c0d33).
 Full [layer-space transforms](https://github.com/docsforadobe/after-effects-expression-reference/blob/a5c5c5066d0395239d524510ace060963f5c0d33/docs/layer/layer-space-transforms.md),

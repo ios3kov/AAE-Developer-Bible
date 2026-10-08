@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Added reproducible pinned expression inventory and explicit full-page review ledger;
+  property animation/marker trigger/loop/sampling and typed path/arc-follow operations.
+  5/32 pages reviewed (52/295 headings), no automatic or runtime PASS.
+
 - Added pinned expression transforms/time/random full-page operation review: parent-
   space3D follow, point/vector/surface distinctions, explicit timecode/rounding and
   random identity/lifetime boundaries; source example discrepancy retained.
