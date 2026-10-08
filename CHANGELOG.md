@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Added official pinned AE UXP inventory and explicit review ledger; reviewed
+  ImportOptions/FileSource/FootageItem/OutputModule operations, language-specific
+  sequence contracts and retained constructor/type/access discrepancies.
+
 - Reconciled all7 pinned scripting zero-qualified-heading pages: eight globals,
   collection semantics and typed camera/text/shape/model/placeholder operations.
   Independent hash ledger/regression; retained inheritance/matte/source-owner gaps.

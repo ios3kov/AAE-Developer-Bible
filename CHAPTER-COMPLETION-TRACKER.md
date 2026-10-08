@@ -4,6 +4,10 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 official UXP inventory44 pages/1448 repeated rows/headings;4 pinned
+full reviews/79 rows,40 pages remain. Import/media/output operations supplied;
+published27.0 versus availability and source-contract gaps retained, acceptance OPEN.
+
 2026-10-08 scripting7/7 zero-heading pages independently reviewed; globals/collections/
 typed inheritance operations supplied with exhaustive provenance test. DOM648 count
 unchanged; signature/match-name/runtime/File/Folder/current acceptance still OPEN.

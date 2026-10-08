@@ -2,6 +2,16 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Official pinned UXP inventory and media/output review
+
+Parent `a9f9598`; published HTML source link verified, official repository revision
+7d1cd01b4c69a9e02b77d48b3f919a6145a90841 inventoried:44 pages/1448 repeated rows/
+method headings.4 full pages read, hashes pinned,79 rows. No import/relink/proxy/
+output/module/UXP/AE runtime performed; no SDK26.5 or installed27.0 inferred.
+Results: scripts93/93, consistency11/11, docs checker and whitespace PASS;
+generated freshness and strict MkDocs checked before publication. Negative fixture
+stale diagnostics intentional; no CI/runtime evidence inferred.
+
 ### Scripting zero-heading source review
 
 Parent `e8f160a`;7 full pinned zero-member-heading pages read and hash checked;

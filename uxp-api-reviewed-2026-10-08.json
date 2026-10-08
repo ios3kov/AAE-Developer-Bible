@@ -1,0 +1,11 @@
+{
+  "source_revision": "7d1cd01b4c69a9e02b77d48b3f919a6145a90841",
+  "evidence": "Explicit full pinned official pages reviewed; AE UXP runtime NOT_RUN",
+  "scope": "Only listed full pages; repeated inherited rows are not unique API symbols",
+  "reviews": [
+    {"source_path": "src/pages/after-effects-api/filesource.md", "source_sha256": "05ff4a1ea32ac2c8b2b38689f24683170a663d82bba0c2f6f16b6e9d1907630f", "coverage_page": "07-PANELS/03-UXP-HOST-API.md", "operation": "Typed source interpretation gates, main-only reload and path replacement ownership"},
+    {"source_path": "src/pages/after-effects-api/footageitem.md", "source_sha256": "5b38eadb24cb4e7a7ef835ee68790a97a6b55a00142a30cd28e71cb583681986", "coverage_page": "07-PANELS/03-UXP-HOST-API.md", "operation": "ID-based relink/readback, proxy interpretation, metadata and view/guide/deferred boundaries"},
+    {"source_path": "src/pages/after-effects-api/importoptions.md", "source_sha256": "9902f7f57f2817bab6af31128194e7045cad0618a79e9800993162e212fca5c4", "coverage_page": "07-PANELS/03-UXP-HOST-API.md", "operation": "String-path typed import policy, canImportAs and numbered/range UXP-specific contracts"},
+    {"source_path": "src/pages/after-effects-api/outputmodule.md", "source_sha256": "d8a05ccf702f37b919902c85d1b0b64a3351ae1e74def05e430c3b4cdea77790", "coverage_page": "07-PANELS/03-UXP-HOST-API.md", "operation": "Owned module template/settings/path preparation and boolean/readback/output-evidence separation"}
+  ]
+}

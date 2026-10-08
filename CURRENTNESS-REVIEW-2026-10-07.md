@@ -44,6 +44,14 @@ the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
 
+2026-10-08 official AE UXP source pinned at7d1cd01b4c69a9e02b77d48b3f919a6145a90841
+(AdobeDocs/uxp-after-effects, linked from published HTML). Inventory44 pages (43
+objects + index)/1448 repeated property rows and method headings, not unique symbols.
+Initial4 full pinned reviews/79 rows: import/media interpretation/relink/proxy/output
+workflows. Official UXP range APIs distinguished from ExtendScript research exclusions;
+constructor/enum exports, RW/prose and string/File discrepancies retained.40 pages
+unreviewed at this pin; no automatic promotion of earlier live reviews or host PASS.
+
 2026-10-08 scripting zero-heading closure:7/7 such inventory pages read/hash checked
 and independently reconciled, including8 unqualified globals, Collection table,
 Camera26.3 Advanced3D options and typed inheritance.648 DOM heading denominator
