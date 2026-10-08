@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 full TextDocument review adds63 remaining members; scoped styles and box
+layout operations supplied with source gaps retained. Ledger642/648, not full acceptance.
+
 2026-10-08 full Property page adds59 documented members: typed values/keys/dropdowns,
 Essential Properties/media and cycle-safe stage links. Ledger579/648; no runtime PASS.
 

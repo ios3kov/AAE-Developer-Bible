@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Completed TextDocument full-page review: mixed-style scope, font/paragraph policies,
+  composer migration, box fitting and fresh layout diagnostics.63 remaining members,
+  ledger642/648; source leading/units/empty-line gaps retained, no text runtime claim.
+
 - Completed Property member reconciliation: typed inspection, animation snapshots,
   dropdown index migration, EGP/alternate media and26.5 stage links.59 remaining
   members, ledger579/648; temporal auto-Bezier conflict and cycle-check limits retained.

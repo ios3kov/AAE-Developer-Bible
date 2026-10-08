@@ -66,6 +66,89 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### TextDocument styling and box layout — full review2026-10-08
+
+Full pinned [TextDocument](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/text/textdocument.md)
+read. Concrete style command: resolve intended TextLayer/Source Text and time/key
+policy → obtain TextDocument → choose whole-document or range scope explicitly →
+edit whitelisted requested fields → commit → reacquire actual document → verify
+font/style/text/layout and report. text is String, not executable template syntax.
+Never call resetCharStyle/resetParagraphStyle just to initialize editing of user's
+existing text: they reset all characters/paragraphs to panel defaults, not a portable
+fixed stylesheet or restoration of previous styles. New TextDocument isn't guaranteed
+to preserve existing mixed styles; use detached current document for surgical edits.
+
+Most character getters reflect **first character**, while whole TextDocument setters
+apply to **all characters**. Such snapshots cannot restore mixed runs faithfully.
+Use CharacterRange for local edits/mixed reporting. Paragraph getters commonly return
+undefined for mixed state; retain it as indeterminate rather than overwrite defaults.
+justification uniquely reports MULTIPLE_JUSTIFICATIONS; assigning that sentinel
+sets CENTER_JUSTIFY, so never round-trip it as mixed-style restoration.
+
+| Character policy | Requested fields and side effects |
+|---|---|
+| Font | font is PostScript String, missing match creates substitute; duplicate name selects lookup entry0.24.0+ fontObject gives precise FontObject control. fontFamily/fontStyle/fontLocation read-only diagnostics, first character; location may empty, not font license/availability proof |
+| Size/shape | fontSize pixels0.1..1296; baselineShift pixels. horizontalScale/verticalScale source prose says pixels but offers no full normalized/percentage conversion contract: don't derive layer-scale units from labels. tracking spacing field has no unit conversion specified here |
+| Appearance | applyFill/applyStroke separately enable paint; fillColor/strokeColor RGB floats including HDR overbright. Reading disabled color throws; setting enables paint across affected characters. strokeWidth0..1000,0 clips0.01; disable stroke via applyStroke, not width0 |
+| Stroke ordering | strokeOverFill per-character can be overridden by whole layer More Options render order (ADBE Text Render Order); lineJoinType MITER/ROUND/BEVEL relevant to stroke. Getter alone isn't final pixel-order proof |
+| Case/baseline | allCaps/smallCaps/subscript/superscript read-only first-character flags.24.0+ use fontCapsOption normal/small/all/all-small and fontBaselineOption normal/faux super/sub. Display transformations aren't rewriting text String |
+| Faux/shaping | fauxBold/fauxItalic readable13.2, writable24.0; not actual font style substitution. ligature/noBreak explicit booleans; autoKernType NONE/METRIC/OPTICAL uses actual NO_AUTO_KERN enum. kerning getter0 in metric/optical mode isn't computed kerning; write selects manual mode |
+| CJK/digits | baselineDirection stream/rotated/cross-stream (Tate-Chu-Yoko), digitSet declared enum, tsume intentionally normalized0..1; source accepts larger values but warns unexpected results. Reject >1 under product policy, don't pass100 for100% |
+
+Paragraph policy chooses direction LTR/RTL independently from digitSet and layer
+lineOrientation24.2+ HORIZONTAL/VERTICAL_RIGHT_TO_LEFT/VERTICAL_LEFT_TO_RIGHT.
+24.0+ autoHyphenate, everyLineComposer, hangingRoman, startIndent/endIndent/
+firstLineIndent, spaceBefore/spaceAfter and leadingType apply across paragraphs on
+whole-document write; scope through paragraph accessors when only part intended.
+noBreak can oppose wrapping/hyphenation; hangingRoman meaningful for box text.
+composerEngine can migrate LATIN_CJK_ENGINE to UNIVERSAL_TYPE_ENGINE, **not back**;
+generic snapshot/finally restore can't guarantee reversibility. Confirm migration
+separately; don't silently upgrade engine during a spacing command.
+
+Leading command: report autoLeading and leading separately; leading returns0 while
+autoLeading true,0 assignment clips0.01. Pinned setter prose says it sets autoLeading
+**true**, which conflicts with intuitive manual-leading behavior; don't infer a
+manual-spacing result from assignment alone. Set explicit desired policy, read back
+both after commit and qualify layout on intended build. leadingType ROMAN/JAPANESE
+is paragraph policy, not fontBaselineOption. No new text runtime resolves this gap.
+
+### Box fitting and layout diagnostics: recompose before acceptance
+
+pointText/boxText read-only kind flags, not conversion setters. boxTextPos is layer
+coordinates relative to anchor (despite prose width/height); setter availability is
+qualified as "seems" from14 in source, so preserve target-build qualification.
+boxTextSize is two integers>=1. Both throw for non-box text. Concrete fit command:
+confirm box text → snapshot geometry/policies/font/revision → set intended size/
+position and bounded layout policies → commit → fresh document → boxOverflow,
+composedLineCount, baselineLocs and requested bounds inspection → report overset/
+visible layout separately from text-string success. Never spin unbounded font-size
+reduction until overflow clears or silently delete overset text.
+
+24.6+ boxInsetSpacing same inset all four edges, not four-value margins;
+boxVerticalAlignment TOP/CENTER/BOTTOM/JUSTIFY. boxAutoFitPolicy grows **downward**
+height (NONE/HEIGHT_CURSOR/HEIGHT_PRECISE_BOUNDS/HEIGHT_BASELINE), disabled when vertical
+alignment isn't TOP. Nonzero boxFirstBaselineAlignmentMinimum overrides chosen
+boxFirstBaselineAlignment enum (ASCENT/CAP_HEIGHT/EM_BOX/LEADING/LEGACY_METRIC/
+MINIMUM_VALUE_ASIAN/MINIMUM_VALUE_ROMAN/TYPO_ASCENT/X_HEIGHT). Set policies in deliberate
+order and read back; changing height alone doesn't prove preserved positioning.
+
+baselineLocs groups four floats per wrapped composed line: start_x/start_y/end_x/end_y.
+Empty line sentinel3.402823466e+38 must be rejected as geometry, not incorporated
+into huge bounds. paragraphCount>=1 even empty text, while composedLineCount can0
+when entirely overset. Detached edits don't update composition snapshots: commit
+then reacquire before accepting overflow/line count/baselines.
+
+24.3+ paragraphCharacterIndexesAt / composedLineCharacterIndexesAt map character
+index to {start,end} bounds, not paragraph/line ordinal. Validate returned bounds;
+last paragraph/line may equal bounds per method page even though range-page line
+description says always some length. Record empty/ambiguous result, don't create
+invalid range. Composed mapping can throw after detached length changes because
+line data stale. Range constructors use0-based starts, default end=start+1, -1
+dynamic final end; paragraph/line start must be below count and end>start, whereas
+character start may equal text length for explicit insertion span. Can't span final
+carriage return with CharacterRange. Unicode/grapheme/glyph identity isn't inferred
+from generic text indices. Source designs only; no font/leading/box layout runtime.
+
 ### Property values, key snapshots and controllers — full review2026-10-08
 
 Full pinned [Property](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/property/property.md)

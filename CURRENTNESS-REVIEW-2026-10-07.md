@@ -67,6 +67,12 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 ### Reproducible scripting inventory
 
 #### Text range full-page reconciliation — 2026-10-08
+Full TextDocument page subsequently read/hash matched:63 remaining headings mapped
+to scoped styling, irreversible composer migration, box fitting and fresh composition
+diagnostics. Leading setter/autoLeading prose, scale units and empty-line mapping
+ambiguities retained. Ledger642/648;6 headings remain (3 research-only,3 ImportOptions).
+This is DOM-heading reconciliation, not expression/native/UXP or full acceptance PASS.
+
 Full Property page subsequently reconciled:59 remaining headings, ledger579/648,
 69 without documented reconciliation. Typed inspection/key snapshots/restoration,
 dropdown semantic migration, EGP/alternate media and26.5 layer-input stages supplied.

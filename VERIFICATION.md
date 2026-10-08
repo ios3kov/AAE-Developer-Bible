@@ -2,6 +2,14 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Full TextDocument source review
+
+Parent `9c97d64`; full pinned page read/hash checked,63 remaining headings recorded.
+No text/style/leading/box/runtime execution. Repository validation below concerns
+source designs/generated documentation only, not image or installed-host PASS.
+Results: scripts87/87, consistency11/11, checker/hash/inventory49/648, generated
+freshness, strict MkDocs and whitespace PASS.
+
 ### Full Property operation review
 
 Parent `7adb94f`; full pinned page read, source hash matched inventory.59 remaining
