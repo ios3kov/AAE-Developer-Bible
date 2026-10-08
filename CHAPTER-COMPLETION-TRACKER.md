@@ -4,6 +4,11 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 pinned expressions:32/32 full-page reviews,295 headings including
+non-API headings and3 zero-heading pages; regression checks exhaustive page set.
+Text styles/variable axes supplied with source gaps. Not expression language/host
+completeness or whole-Bible expanded acceptance; native/UXP/runtime queues OPEN.
+
 2026-10-08 expressions global/layer/camera/light:28/32 pages (213/295 headings),
 4 text pages remain. Sampling/timing/typed options source gaps retained, not runtime.
 

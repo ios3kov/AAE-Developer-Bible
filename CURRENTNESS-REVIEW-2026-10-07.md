@@ -44,6 +44,15 @@ the current SDK, not guessed declarations copied from overview prose.
 
 ## Обязательная очередь новой актуальной редакции
 
+2026-10-08 pinned expression page-review closure:32/32 pages,295/295 third-level
+headings reconciled by explicit full-page reviews; includes3 zero-heading pages,
+non-callable Text.Font menu and Chaining overview. Added uniform/range text styles,
+paragraph ordering and owned variable-axis remap; retained None/chaining, manual
+kerning and Tsume source gaps. Exhaustive page-set regression added. This is pinned
+source/design classification, not all signatures/engine language/current official
+contracts or AE runtime PASS. Expanded whole-Bible acceptance remains OPEN; native/
+UXP current inventories, runtime/File/Folder and final provenance queues remain.
+
 2026-10-08 expression global/layer/camera/light block:9 full pages including2
 zero-heading navigation pages read/hash checked; ledger28/32 (213/295 headings),
 4 text pages remain. Context/cadence, transforms/audio/source-time/bounds/sampling,

@@ -4,6 +4,10 @@
   "evidence": "Full-page DOCUMENTED operation-design review; AE runtime NOT_RUN",
   "scope": "Explicit full pages only; page headings are not all inherited contracts or signatures",
   "reviews": [
+    {"source_path": "docs/text/sourcetext.md", "source_sha256": "7992dcb22d084ebad83e7d4eb84494464df889358de252fd158bbfa77916a7e3", "coverage_page": "06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md", "operation": "Explicit character/time style sampling, empty-content gates and text-kind observations"},
+    {"source_path": "docs/text/style.md", "source_sha256": "39fff1e6a083764fc7d9c007cfe9a2dfbee5ea53fce0eaf8fdd44f9cb1f73767", "coverage_page": "06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md", "operation": "Uniform title, range styles, paragraph ordering and chaining/kerning/Tsume source gaps"},
+    {"source_path": "docs/text/text.md", "source_sha256": "2c8e51844e79894602f443d524e8e79c0374ff446ee66b2b79f094aac03abfbd", "coverage_page": "06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md", "operation": "SourceText content/style versus non-callable font-menu dialog"},
+    {"source_path": "docs/text/variable-fonts.md", "source_sha256": "bc7603f5fb1daa2aea4c30c3c7a9b4a38abaeb9cbdd16632ca574f3792d3a40b", "coverage_page": "06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md", "operation": "Zero-heading axis-property guidance, typed owned animator/font/bounds remap"},
     {"source_path": "docs/general/general.md", "source_sha256": "a39069ed91947d962d38752e3d496d510297d188a5032dcf52e6d6edeee6d250", "coverage_page": "06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md", "operation": "Navigation categories and zero-heading scope"},
     {"source_path": "docs/general/global.md", "source_sha256": "68bdddbb02be0b22cc65227127e59d5ce01de0ac38ba0e7d0187139ca3effd5c", "coverage_page": "06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md", "operation": "Containing evaluation context and bounded posterized cadence"},
     {"source_path": "docs/layer/general.md", "source_sha256": "24851fcc7c5d37df31f8cc7fc8d229e7cad2d745c703f0ebf7529fd2ffacd939", "coverage_page": "06-SCRIPTING/03-EXPRESSIONS-VS-SCRIPTS.md", "operation": "Layer gates/identity/timing and bounded direct-stage pixel sampling"},

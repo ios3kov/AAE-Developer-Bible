@@ -360,11 +360,94 @@ operations above not executed in AE; qualification gaps remain explicit.
 
 ### Independent expression inventory
 
+### Text expression styles and variable axes — full review2026-10-08
+
+Full pinned text/text, sourcetext, style and variable-fonts pages read. Text.sourceText
+is content,17.0+ also exposes SourceText style operations, **not scripting
+TextDocument**. Text.Font... is an expression-menu dialog that inserts internal font
+name String, not callable expression API. Font resolution/installation/licensing
+remains separate from a successful style-object construction.
+
+Concrete owned plain-title Source Text expression,17.0+ style route:
+
+~~~javascript
+text.sourceText.createStyle()
+    .setFont("Impact")
+    .setFontSize(48)
+    .setText("Bible Title")
+    .setApplyFill(true)
+    .setFillColor([0.2, 0.6, 1.0]);
+~~~
+
+This deliberately creates uniform style, not preserves arbitrary mixed runs. Font
+must exist under deployment policy; no substitute/glyph/render PASS inferred.
+createStyle initializes empty style; inheriting reference.getStyleAt(0,time) chooses
+**one character at explicit time**, not all reference runs/paragraphs. Check nonempty
+content and valid index first; source doesn't define empty/out-of-range recovery.
+SourceText.style explicitly equated to getStyleAt(0,0) by pinned page: don't describe
+it as necessarily animated current-time style; use explicit getStyleAt(index,time)
+when temporal sampling intended. SourceText25.0 flags distinguish horizontal/vertical
+and point/paragraph text; they aren't conversion setters or layout/glyph bounds.
+
+25.0+ range-style route: generate final bounded content, setText, calculate valid
+startIndex/count for that final content (zero-based character indexing; spaces and
+line breaks count), then supported per-character setters. A simple ASCII product
+can use .setFillColor([1,0,0],0,5) for five initial characters of known content.
+Source doesn't establish grapheme/surrogate/combining-sequence indexing guarantees:
+don't equate visible glyph count with JS length for arbitrary multilingual text.
+replaceText(String,start,count) can change length; recalculate later ranges. Omitted
+count means rest of string, not one character. These evaluations return output style,
+not durable project edit or scripting CharacterRange/ParagraphRange.
+
+Style review groups and operation policy:
+
+| Family | Read/write operation and boundaries |
+| --- | --- |
+| Font/size/scaling | font/fontSize/horizontalScaling/verticalScaling and matching setters; validate finite size/scale and installed internal font name, don't assume renderer glyph metric identity. |
+| Case/faux/ligature | isAllCaps/isSmallCaps/isFauxBold/isFauxItalic/isLigature and setAllCaps/setSmallCaps/setFauxBold/setFauxItalic/setLigature; ranges only25.0+, faux isn't installed real font face, case display isn't necessarily source String replacement. |
+| Paint/stroke | applyFill/applyStroke, fillColor/strokeColor RGB three normalized components, strokeWidth; enable fill/stroke explicitly and positive width for visible stroke. lineJoin/setLineJoin use bevel/miter/round; scoped setter25.0+, not native pixel-compositing blend mode. |
+| Baseline/digits | baselineDirection default/rotated/tate-chuu-yoko, baselineOption default/subscript/superscript, baselineShift numeric, digitSet default/hindidigits and matching setters; distinguish text orientation from baseline direction. |
+| Spacing | tracking, leading, isAutoLeading and matching setters; explicit setAutoLeading(false) before manual leading, scoped consistently. Numeric tracking/shift/leading units/ranges not fully specified here; don't borrow every scripting unit. |
+| Kerning | kerning/kerningType manual/metrics/optical read; setKerning(value,index) versus setKerningType(metrics/optical,start,count). **manual not setter enum**; automatic takes precedence, no promised disable-automatic setter route. |
+| Paragraph layout | direction, justification, isEveryLineComposer, isHangingRoman, leadingType, firstLineIndent, leftMargin/rightMargin, spaceBefore/spaceAfter; getters often first paragraph, setters whole layer, not mixed-paragraph preservation. |
+| Tsume | getter0..1 versus setTsume table0..100; no declared reversible conversion/round-trip contract. Qualify units before automatic migration. |
+
+When both setText and paragraph setters used, pinned warnings require **setText
+first**, then setDirection/setEveryLineComposer/setFirstLineIndent/setHangingRoman/
+setJustification/setLeadingType/setLeftMargin/setRightMargin/setSpaceBefore/setSpaceAfter.
+direction left-to-right/right-to-left changes left/right justification interpretation;
+justification exact strings alignCenter/alignLeft/alignRight/justifyFull/
+justifyLastCenter/justifyLastLeft/justifyLastRight; leadingType bottom-to-bottom/
+top-to-top. Read first paragraph isn't full-document snapshot for restoring mixed
+formatting. Don't invent paragraph range overloads for whole-layer setters.
+
+Pinned page's general "all methods chain" conflicts with Returns **None** for
+setKerning/setKerningType/setTsume. Until vendor/target contract resolved, do not
+generate those calls as fluent chain or assert returned TextStyle. setKerningType
+and setTsume may need separate qualified invocation, not automatic chain inference.
+No manual-kerning recovery or Tsume reversible setter guarantee from repository build.
+
+26.0 variable-font page has **zero third-level headings but actual API guidance**:
+text.animator("Animator 1").property.fontAxisWght (also Wdth/Slnt/Ital/Opsz examples).
+fontAxis[Tag] prose is naming-pattern notation, not promise dynamic JS indexing
+fontAxis["wght"]. Use exact documented constructed property spelling and owned
+animator; actual axis must exist on chosen variable font and be added to animator.
+Validate tag/property/font and source-provided axis bounds rather than assume universal
+weight0..1000 or divide weight by10 as a universal Opacity mapping. Concrete controlled
+route: qualified axis value and finite known min<max → linear(axis,min,max,0,100).
+No invented custom-tag capitalization normalization, font-axis discovery expression,
+font download or global font design-vector setter. No typography/axis/host execution.
+
+### Independent expression inventory
+
 `expression-api-inventory-2026-10-08.json`:32 API-category pages/295 third-level headings
 including overloads. Page heading strings aren't unique global symbols or complete
-signature inventory. `expression-api-reviewed-2026-10-08.json` explicitly records28
-full-page operation reviews (213 headings), SHA256/source and coverage route;4 pages
-remain unreviewed. No literal mention or downloaded bytes give coverage PASS.
+signature inventory. `expression-api-reviewed-2026-10-08.json` explicitly records32
+full-page operation reviews (295 headings), SHA256/source and coverage route; all32
+pages classified, including non-API/navigation headings and variable-font zero-heading
+guidance. This closes only this pinned page-review scope, **not complete expression
+language signatures, current official/vendor contracts or installed-host validation**.
+No literal mention or downloaded bytes give coverage PASS.
 
 Pinned expression-reference revision
 [`a5c5c5066d0395239d524510ace060963f5c0d33`](https://github.com/docsforadobe/after-effects-expression-reference/tree/a5c5c5066d0395239d524510ace060963f5c0d33).

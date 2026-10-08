@@ -2,6 +2,17 @@
 
 ## Currentness continuation — 2026-10-08
 
+### Pinned expression text/page-review closure
+
+Parent `21963ca`;4 full text pages read/hash checked, ledger32/32 pages/295 headings,
+including3 zero-heading pages. Exhaustive review-page set asserted independently of
+literal mention counts. No font/text/glyph/axis/expression/host runtime performed.
+Pinned source/design review doesn't resolve conflicting vendor/source contracts or
+certify all signatures, expression engines or complete current Bible acceptance.
+Results: scripts90/90, consistency11/11, checker/32 source hashes and whitespace
+PASS; generated freshness and strict MkDocs checked before publication. Negative
+fixture stale diagnostics intentional; no GitHub CI or host result inferred.
+
 ### Expression global/layer/camera/light review
 
 Parent `e68fccd`;9 full pinned pages read/hash checked, ledger28/32 (213 headings).

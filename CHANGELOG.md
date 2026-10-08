@@ -2,6 +2,11 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Closed pinned expression page-review scope32/32 pages (295 headings): text
+  style/range/paragraph and variable-font-axis operations, exact source hashes and
+  exhaustive page-set regression. Retained chaining/None/kerning/Tsume gaps;
+  no current vendor contract, full-language or host-runtime completeness claim.
+
 - Reviewed9 expression context/layer/camera/light pages, including navigation scope;
   supplied cadence, source-time, direct pixel sampling and typed lighting policies.
   Ledger28/32 pages,213/295 headings; source-route/units/default gaps retained.

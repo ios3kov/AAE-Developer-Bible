@@ -19,6 +19,9 @@ class ExpressionInventoryTests(unittest.TestCase):
         self.assertEqual(ledger["source_revision"], inventory["source_revision"])
         paths = [r["source_path"] for r in ledger["reviews"]]
         self.assertEqual(len(paths), len(set(paths)))
+        self.assertEqual(set(paths), set(known), "Pinned page review must be exhaustive")
+        self.assertEqual(inventory["source_pages"], len(known))
+        self.assertEqual(inventory["headings"], sum(len(r["headings"]) for r in known.values()))
         for r in ledger["reviews"]:
             self.assertEqual(r["source_sha256"], known[r["source_path"]]["source_sha256"])
             self.assertTrue(r["operation"])
