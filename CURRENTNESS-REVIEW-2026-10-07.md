@@ -66,6 +66,15 @@ the roadmap-only gap for this bounded operation, **not this whole queue**.
 
 ### Reproducible scripting inventory
 
+#### Font ecosystem full-page reconciliation — 2026-10-08
+
+Full FontObject/FontsObject pages read/hash checked. Remaining26 headings reconciled
+into font-picker disambiguation, soft proxy lifetime, variable-instance discovery,
+default-font/UI policy and asynchronous folder-update workflows. Lookup can create
+variable instance; default mapping doesn't guarantee even one glyph; null resets
+launch default, not prior mapping. Ledger502/648;146 headings without documented
+reconciliation. No font install/cloud sync/default mutation/runtime performed.
+
 #### Light/mesh/value objects and heading correction — 2026-10-08
 
 Full LightLayer/ParametricMeshLayer/GuideOptions/KeyframeEase pages read, hashes match

@@ -4,6 +4,9 @@
 
 ## Final editorial result — 2026-10-07
 
+2026-10-08 full font ecosystem review reconciles remaining26 members with picker,
+soft lifetime, defaults and async update operation guidance. Ledger502/648.
+
 2026-10-08 light/mesh/guide/ease source block fixes missed colon heading; inventory
 648, ledger476.12 reviewed members with version/type/options boundaries, not runtime.
 

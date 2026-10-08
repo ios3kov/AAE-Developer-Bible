@@ -6,6 +6,16 @@
   "coverage_page": "06-SCRIPTING/01-OBJECT-MODEL.md",
   "reviews": [
     {
+      "source_path": "docs/text/fontobject.md",
+      "operation": "Soft font lifetime, descriptor disambiguation and variable dictionary discovery; prior identity/glyph members covered separately",
+      "members": ["FontObject.familyName", "FontObject.familyPrefix", "FontObject.fullName", "FontObject.hasDesignAxes", "FontObject.isFromAdobeFonts", "FontObject.location", "FontObject.nativeFamilyName", "FontObject.nativeFullName", "FontObject.nativeStyleName", "FontObject.otherFontsWithSameDict", "FontObject.postScriptName", "FontObject.styleName", "FontObject.technology", "FontObject.type", "FontObject.version", "FontObject.writingScripts"]
+    },
+    {
+      "source_path": "docs/text/fontsobject.md",
+      "operation": "Ambiguous lookup/variable creation, explicit UI/default-font policies, script ranges and asynchronous non-system folder update",
+      "members": ["FontsObject.favoriteFontFamilyList", "FontsObject.fontsDuplicateByPostScriptName", "FontsObject.fontsWithDefaultDesignAxes", "FontsObject.getCTScriptForString", "FontsObject.getDefaultFontForCTScript", "FontsObject.getFontsByFamilyNameAndStyleName", "FontsObject.getFontsByPostScriptName", "FontsObject.mruFontFamilyList", "FontsObject.pollForAndPushNonSystemFontFoldersChanges", "FontsObject.setDefaultFontForCTScript"]
+    },
+    {
       "source_path": "docs/layer/lightlayer.md",
       "operation": "Typed lights and version-gated same-comp 2D environment source linking",
       "members": ["LightLayer.lightSource", "LightLayer.lightType"]

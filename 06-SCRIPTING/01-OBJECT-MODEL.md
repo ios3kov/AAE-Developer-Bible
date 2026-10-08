@@ -66,6 +66,70 @@ member audit. Mesh shape/options source:
 
 ## Сквозные automation операции
 
+### Full font ecosystem review —2026-10-08
+
+Full pinned FontObject/FontsObject pages reread (source links in font preflight below).
+Existing session/revision/glyph/replace workflow remains; this completes the remaining
+font descriptor/discovery/default-policy contracts, not all TextDocument styling.
+FontObject is a **soft reference**: retaining it doesn't keep native font proxy alive;
+after removal any property read can throw. Catch invalid references, re-enumerate on
+fontServerRevision change, and never hold one across asynchronous activation unchecked.
+
+Concrete font picker: current revision → enumerate allFonts or filtered lookup
+getFontsByFamilyNameAndStyleName/getFontsByPostScriptName → handle empty/multiple
+arrays → display postScriptName, familyName/styleName/fullName plus native Unicode
+name variants, technology/type/version, writingScripts, substitute/Adobe Fonts status
+and variable designVector → explicit candidate selection → revision recheck and late
+fontID resolution → assign/commit and verify actual font/layout. ASCII versus native
+names are display/disambiguation, not proof one is file basename. location can be
+empty; don't infer missing font or redistribute font bytes from path/isFromAdobeFonts.
+Font licensing/embedding rights are separate from install/lookup success.
+
+fontsDuplicateByPostScriptName (24.6+) gives duplicate groups with primary at0;
+first candidate doesn't establish desired file/technology/design instance. Source
+getFontsByPostScriptName prose says entry0 used with TextDocument.fontObject while
+TextDocument.fontObject must be reviewed on its own; don't generalize tuple ordering
+into exact-font persistence. getFontsByPostScriptName may **create a previously absent
+variable font instance** when prefix matches. Even a lookup can change font ecosystem;
+recheck revision, don't claim every discovery call is side-effect-free.
+
+Variable picker: hasDesignAxes gates axis workflow; familyPrefix is variable-only;
+fontsWithDefaultDesignAxes returns one default instance per unique variable dictionary.
+otherFontsWithSameDict (25.1+) enumerates related variable instances, empty for ordinary
+font or single instance. Dictionary identity doesn't guarantee equal designVector or
+appearance. technology and type are distinct CTFontTechnology/CTFontType enums,
+writingScripts CTScript array isn't guaranteed glyph support for every Unicode member.
+Font version String is diagnostic, not binary hash or supported host-version matrix.
+
+25.1+ fallback report: getCTScriptForString(text,preferredCTScript) returns contiguous
+range counts chars and ctScript; preferred breaks ambiguous membership ties, empty
+text → empty array. Validate accumulated range bounds against intended text and
+retain index/Unicode policy; don't derive grapheme/glyph/layout counts from this API.
+getDefaultFontForCTScript exposes fallback mapping but guarantees **neither all nor
+any glyphs** for that script. Preflight selected text with hasGlyphsFor and qualify
+shaping; default lookup isn't a successful-font-substitution report.
+
+Intentional fallback-policy edit: save current getDefaultFontForCTScript mapping →
+choose non-variable FontObject (variable rejected) and explicit user consent →
+setDefaultFontForCTScript → read mapping → report changed boolean. false means mapping
+unchanged, not failure. null resets to **application-launch default**, not necessarily
+the prior user mapping; restore captured font only while valid. Roman default also
+reinitializes Character panel after style reset. Restoring environment policy doesn't
+undo text already typed/substituted under that policy.
+
+favoriteFontFamilyList/mruFontFamilyList (24.6+) accept unsorted family-name arrays,
+empty clears. These alter user's Character/Properties UI lists, not project font
+availability. Snapshot/merge/restore only for intentional operation, don't reset as
+hidden picker initialization. pollForAndPushNonSystemFontFoldersChanges (24.6+) checks
+known Adobe non-system folders; true means detected and **async update scheduled**,
+not font installed/ready, false no known change. Observe later revision, re-enumerate
+with bounded retry/timeout policy and expose pending result; no synchronous wait or
+specific completion callback guaranteed. Do not copy/install fonts as part of report.
+
+Pinned intro says Adobe sync cannot be disabled, later freezeSyncSubstitutedFonts24.6
+explicitly disables attempts: use versioned later contract, retain historical intro
+scope. No font installation/polling/default mutation or runtime observed here.
+
 ### Typed value objects and current light/mesh options — review2026-10-08
 
 Full pinned [GuideOptions](https://github.com/docsforadobe/after-effects-scripting-guide/blob/7137a990db4bd8dc9f5869b8ca431c7dfed52bdc/docs/other/guideoptions.md),

@@ -2,6 +2,10 @@
 
 ## Currentness continuation — 2026-10-08
 
+- Completed FontObject/FontsObject full-page reconciliation: soft lifetime, descriptor
+  disambiguation, variable-instance lookup side effects, script/default mappings and
+  asynchronous font updates.26 remaining members, ledger502/648; no font runtime.
+
 - Fixed extractor omission of colon-suffixed LightLayer.lightSource; denominator648.
   Reconciled light/mesh/GuideOptions/KeyframeEase full pages and12 members with concrete
   version/typed-value workflows; ledger476/648, unresolved mesh contracts retained.
