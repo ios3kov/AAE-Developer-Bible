@@ -40,7 +40,7 @@
     "Windows compile",
     "GitHub licensed SDK provisioning"
   ],
-  "publication": "prepared supplement; no GitHub source commit, tag or release created by preparation",
+  "publication": "Included in the documentation supplement; actual tag, containing source SHA and publication status are recorded separately in GitHub Release v1.2.2 and release-evidence.json. Tested source SHA is unchanged.",
   "earlier_failed_report": {
     "bytes": 27316,
     "sha256": "ca52a7a406c36c8b386f95177184244e4717d13a1ec204e55cfb08d6500d2f33",

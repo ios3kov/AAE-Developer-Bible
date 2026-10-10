@@ -1,5 +1,7 @@
 # CI gates and publication — 1.2.1
 
+Evidence supplement 1.2.2: [owner-run SDK result](NATIVE-SDK-OWNER-CHECK-2026-10-10.md) records 13/13 compiler checks on the exact v1.2.1 source. This local observation does not provision GitHub CI. The SDK-access requirements below remain applicable; the original 1.2.1 release statements retain their date/scope.
+
 ## Committed documentation, not a repaired copy
 
 Every `Validate` push/PR/manual run executes `python scripts/build_docs.py --check` against the checkout **before** any regeneration. A stale MASTER or MANIFEST is a failing check, including source-only and mixed changes. `docs_lane.py` reports historical lane/identity information only; selecting `source` cannot waive this check.

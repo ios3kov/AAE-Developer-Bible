@@ -1,5 +1,7 @@
 # Navigation
 
+[SDK evidence on the owner's Mac](NATIVE-SDK-OWNER-CHECK-2026-10-10.md) · [Evidence release 1.2.2](RELEASE-1.2.2.md).
+
 [Current CI gates and SDK setup](CI-GATES.md) · [CI correction 1.2.1](RELEASE-1.2.1.md).
 
 Выберите маршрут ниже или перейдите к тематическому каталогу разделов.

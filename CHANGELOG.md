@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.2 — 2026-10-10 — owner-supplied SDK evidence
+
+Добавлены [owner-supplied native SDK evidence](NATIVE-SDK-OWNER-CHECK-2026-10-10.md), машинный отчёт без временных путей и его provenance/hash. 13 compiler checks PASS относятся к source `0ea8131bcb599fc52df5c7cf6d1d7057bf4d1352`, не автоматически к SHA нового релиза. Обновлены ссылки README/VERIFICATION. Native исходники, compiler drivers и архивы v1.2.1 не изменены. [Описание выпуска](RELEASE-1.2.2.md).
+
 ## 1.2.1 — 2026-10-10 — CI correctness patch
 
 Unconditional committed MASTER/MANIFEST freshness before regeneration; strict anchor failures; read-only main regeneration; real licensed-SDK CI lane for changed native inputs with explicit BLOCKED/N/A boundaries; negative execution regressions and clearer historical counters. Native examples/SDK contract drivers and historical evidence remain unchanged. [Release notes](RELEASE-1.2.1.md), [CI/adoption](CI-GATES.md). Final run/tag/assets establish publication, not this entry.
