@@ -1,0 +1,29 @@
+name: Publish Bible 1.2.1
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/release-1.2.1.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: publish-bible-1.2.1
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.repository == 'ios3kov/AAE-Developer-Bible' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify exact source, gates and assets before stable publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/publish_ci_patch.py
