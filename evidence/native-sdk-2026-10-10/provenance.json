@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "evidence_origin": "owner-supplied local compiler report",
+  "reported_run_date": "2026-10-10",
+  "date_basis": "owner conversation; original report has no timestamp",
+  "tested_source_git_sha": "0ea8131bcb599fc52df5c7cf6d1d7057bf4d1352",
+  "original_report": {
+    "filename": "native-compile-report.json",
+    "bytes": 20425,
+    "sha256": "7b0668a5c0a45692c7e7f966459f64c89e2477cb2a02b789ab0b20471b2c7569",
+    "included": false
+  },
+  "public_report": {
+    "path": "native-compile-report.redacted.json",
+    "sha256": "bd396e6b12f9b7f989a8903863a3b83018fce642e9167d1e30de5fc8b9a9bfbe"
+  },
+  "redactions": {
+    "sdk.examples_root": "<SDK_EXAMPLES>",
+    "source.root": "<BIBLE_ROOT>",
+    "results[].command": "matching temporary source/SDK/probe path prefixes replaced only"
+  },
+  "unchanged_fields": "source Git SHA, dirty flag, SDK digest/count, compiler identity, per-source hashes, argv flags, result statuses, exit codes, stdout/stderr and summary",
+  "macos_sdkroot": {
+    "value": "NOT_RECORDED",
+    "owner_reported_resolution_command": "/usr/bin/xcrun --sdk macosx --show-sdk-path"
+  },
+  "additional_terminal_observations": {
+    "required_tables": 35,
+    "missing": 0,
+    "call_sites": 39,
+    "unknown": 0,
+    "parser_diagnostics": 4,
+    "source": "owner-provided terminal transcript, not the compiler JSON"
+  },
+  "not_established": [
+    "fresh compile of future source commits",
+    "link",
+    "PiPL/load",
+    "After Effects runtime",
+    "Windows compile",
+    "GitHub licensed SDK provisioning"
+  ],
+  "publication": "prepared supplement; no GitHub source commit, tag or release created by preparation",
+  "earlier_failed_report": {
+    "bytes": 27316,
+    "sha256": "ca52a7a406c36c8b386f95177184244e4717d13a1ec204e55cfb08d6500d2f33",
+    "summary": {
+      "translation_units": 13,
+      "failed": 13,
+      "status": "FAIL"
+    },
+    "note": "Retained as preceding failure, not rewritten as PASS; not included in public supplement."
+  }
+}
