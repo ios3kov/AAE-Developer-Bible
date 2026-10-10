@@ -1,5 +1,7 @@
 # Navigation
 
+[Current CI gates and SDK setup](CI-GATES.md) · [CI correction 1.2.1](RELEASE-1.2.1.md).
+
 Выберите маршрут ниже или перейдите к тематическому каталогу разделов.
 
 Текущая редакция: [edition1.1 freeze — 2026-10-07](EDITION-FREEZE-2026-10-07.md).

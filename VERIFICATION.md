@@ -1,5 +1,22 @@
 # Verification purpose
 
+## Current CI contract — 2026-10-10 / correction 1.2.1
+
+[CI gates and reproduction](CI-GATES.md) is the current checking procedure; the dated records below are historical observations, not a fresh PASS for the present commit. Exact final checks and source identity are recorded by the GitHub run and release-evidence.json after execution, never predicted here.
+
+| Topic | Reading the evidence correctly |
+|---|---|
+| Generated documentation | Every PR/push checks the committed MASTER/MANIFEST before regeneration; a repaired staging copy is not proof of committed freshness |
+| Link validation | Strict MkDocs treats missing anchors as errors; explicit HTML aliases are valid |
+| Native compilation | The current integration runs the real SDK runner only for changed native inputs; SDK absence then blocks it. This patch does not modify those inputs or assert a fresh Adobe compile |
+| Historical compiler counts | 10 primary C++ sources + 2 forwarding entries + 1 foundation probe = 13 compiler invocations, not 13 independent implementations |
+| SDK table/function totals | Older 230 / 3537 counts and later inventory counts belong to their dated parser/SDK reports; neither is a current unique-API coverage claim |
+| Menu omissions | Count the actual candidate; old 46/27 figures below and in the navigation audit are historical snapshots |
+
+---
+
+## Historical verification ledger (dates and original scopes preserved)
+
 ## Currentness continuation — 2026-10-08
 
 ### Full ExtendScript runtime and final source continuation

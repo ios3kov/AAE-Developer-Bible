@@ -50,6 +50,8 @@ retained25.6 exact baseline. Do not assume a26.5 native host exposes27.0 UXP API
 
 [Claim/source/version table](../BLOCK-5-SOURCES.md) keeps SDK ABI, documented host requirements, panel runtime and platform policy in separate columns. SDK 25.6 build 61 is the Bible native baseline, not an AE/OS support range. Current Adobe Windows-on-Arm requirements are documented separately from our unperformed native ARM64 host tests.
 
+<a id="host-snapshot-2026-10-08"></a>
+
 ## Опубликованный host snapshot — 2026-10-08
 
 [Adobe release notes](https://helpx.adobe.com/after-effects/desktop/what-s-new/release-notes-after-effects.html)

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1 — 2026-10-10 — CI correctness patch
+
+Unconditional committed MASTER/MANIFEST freshness before regeneration; strict anchor failures; read-only main regeneration; real licensed-SDK CI lane for changed native inputs with explicit BLOCKED/N/A boundaries; negative execution regressions and clearer historical counters. Native examples/SDK contract drivers and historical evidence remain unchanged. [Release notes](RELEASE-1.2.1.md), [CI/adoption](CI-GATES.md). Final run/tag/assets establish publication, not this entry.
+
 ## Currentness continuation — 2026-10-08
 
 - Completed all73 JavaScript Tools Guide pages: new runtime/data/debugger chapter,
