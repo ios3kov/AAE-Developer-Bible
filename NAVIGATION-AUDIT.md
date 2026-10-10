@@ -1,5 +1,7 @@
 # Navigation audit — block 3
 
+> Current reading note — 2026-10-10: the 46-row baseline and subsequent 27-omission result below are historical. The current candidate's omission list is emitted by MkDocs; archive/evidence/generated pages need not all appear in the main menu. Link/anchor validity is checked separately and strictly by [CI](CI-GATES.md). No historical count or browser result is replaced with a new unperformed observation.
+
 ## Current edition status — 2026-10-07
 
 Block3 is editorially complete; OPEN/next-step wording below is historical.

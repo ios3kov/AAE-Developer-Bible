@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       lane:
-        description: Source staging or frozen generated revision
+        description: Identity reporting lane; committed freshness is always required
         type: choice
         options: [source, frozen]
         default: source
@@ -26,6 +26,8 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
+      - name: Reject stale committed documentation before any regeneration
+        run: python scripts/build_docs.py --check
       - name: CEP bridge portable protocol tests (not AE host tests)
         run: node scripts/test_cep_bridge.js
       - name: Scripting lesson portable safety (not AE host tests)
@@ -65,6 +67,8 @@ jobs:
           -I19-NATIVE-CODE-FOUNDATION/code
           19-NATIVE-CODE-FOUNDATION/tests/test_foundation.cpp -o /tmp/foundation-test
       - run: /tmp/foundation-test
+      - name: CI gate negative execution controls (not Adobe runtime tests)
+        run: python -m unittest discover -s tests/ci_gates -v
       - name: Documentation consistency regressions
         run: |
           python -m unittest discover -s tests/consistency -v
@@ -85,9 +89,6 @@ jobs:
         run: |
           python scripts/docs_lane.py --lane "$REQUESTED_LANE" --github-output "$GITHUB_OUTPUT" > "$RUNNER_TEMP/docs-identity.json"
           cat "$RUNNER_TEMP/docs-identity.json" >> "$GITHUB_STEP_SUMMARY"
-      - name: Reject stale frozen outputs before regeneration
-        if: steps.docs-lane.outputs.lane == 'frozen'
-        run: python scripts/build_docs.py --check
       - name: Stage source documentation without changing the checkout
         run: |
           python scripts/build_docs.py --output-root "$RUNNER_TEMP/bible-validation"

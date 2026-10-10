@@ -9,6 +9,8 @@ plugins:
 validation:
   nav:
     omitted_files: info
+  links:
+    anchors: warn
 theme:
   name: material
 nav:
@@ -27,6 +29,8 @@ nav:
   - Navigation audit: NAVIGATION-AUDIT.md
   - External sources review 2026-10-02: EXTERNAL-SOURCES-REVIEW-2026-10-02.md
   - Verification: VERIFICATION.md
+  - CI gates and SDK setup: CI-GATES.md
+  - CI correction release 1.2.1: RELEASE-1.2.1.md
   - Coverage: FINAL-COVERAGE-AUDIT.md
   - Editorial audit 2026-10-02: EDITORIAL-AUDIT-2026-10-02.md
   - Completion plan: COMPLETION-PLAN.md

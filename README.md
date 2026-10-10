@@ -1,5 +1,7 @@
 # AE Developer Bible
 
+CI correction **1.2.1 — 2026-10-10**: [changes](RELEASE-1.2.1.md), [working gates and SDK setup](CI-GATES.md). Publication and exact source are established by [GitHub Release v1.2.1](https://github.com/ios3kov/AAE-Developer-Bible/releases/tag/v1.2.1) and its Evidence, not this version label. The historical edition and source-review dates below remain unchanged.
+
 **Практическая библия по разработке инструментов, скриптов, панелей и нативных plug-in'ов для Adobe After Effects.**
 
 Edition: **1.1 — historical freeze, 2026-10-07; source-completion supplement, 2026-10-08**
