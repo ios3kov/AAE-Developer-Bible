@@ -1,5 +1,9 @@
 # Verification purpose
 
+## Owner-supplied SDK compiler evidence — 2026-10-10
+
+[Запись и отчёт](NATIVE-SDK-OWNER-CHECK-2026-10-10.md): 13/13 syntax/type проверок прошли на Mac владельца для clean source `0ea8131bcb599fc52df5c7cf6d1d7057bf4d1352`. Это PROJECT-REPORTED локальный результат, не новый прогон CI/AE. Дата и SDKROOT-workaround сообщены владельцем; точное значение SDKROOT не записано. История ниже сохраняет свой исходный scope.
+
 ## Current CI contract — 2026-10-10 / correction 1.2.1
 
 [CI gates and reproduction](CI-GATES.md) is the current checking procedure; the dated records below are historical observations, not a fresh PASS for the present commit. Exact final checks and source identity are recorded by the GitHub run and release-evidence.json after execution, never predicted here.

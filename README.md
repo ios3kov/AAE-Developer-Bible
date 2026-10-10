@@ -1,5 +1,7 @@
 # AE Developer Bible
 
+Дополнение **1.2.2 — 2026-10-10**: [SDK-проверка на Mac владельца](NATIVE-SDK-OWNER-CHECK-2026-10-10.md) — 13 compiler syntax/type проверок PASS для коммита `0ea8131`. [Границы и выпуск](RELEASE-1.2.2.md). Проверка внутри AE и доступ GitHub CI к SDK этим результатом не подтверждаются.
+
 CI correction **1.2.1 — 2026-10-10**: [changes](RELEASE-1.2.1.md), [working gates and SDK setup](CI-GATES.md). Publication and exact source are established by [GitHub Release v1.2.1](https://github.com/ios3kov/AAE-Developer-Bible/releases/tag/v1.2.1) and its Evidence, not this version label. The historical edition and source-review dates below remain unchanged.
 
 **Практическая библия по разработке инструментов, скриптов, панелей и нативных plug-in'ов для Adobe After Effects.**
